@@ -1,4 +1,4 @@
-package gnu.tk;
+package gnu.x11.tk;
 
 
 /** X Toolkit. */
