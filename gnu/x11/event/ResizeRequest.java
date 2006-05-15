@@ -17,4 +17,13 @@ public class ResizeRequest extends Event {
 
   public int width () { return read2 (8); }
   public int height () { return read2 (10); }
+
+  /**
+   * Returns the window ID of the resize request.
+   *
+   * @return the window ID of the resize request
+   */
+  public int window_id () {
+    return read4 (4);
+  }
 }
