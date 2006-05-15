@@ -1,6 +1,8 @@
 package gnu.x11;
 
 import gnu.x11.event.Event;
+
+import java.io.BufferedOutputStream;
 import java.io.DataInputStream;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -163,6 +165,29 @@ public class Connection {
     }     
   }
 
+  /**
+   * Sets up a connection over the specified <code>socket</code>. This should
+   * be used when there is a need to use non-TCP sockets, like connecting
+   * to an X server via Unix domain sockets. You need to provide an
+   * implementation for this kind of socket though.
+   *
+   * @param display the display for which to set up a connection
+   * @param socket the socket to use for that connection
+   * @param display_no the display number
+   */
+  Connection (Display display, Socket socket, String hostname,
+              int display_no) {
+    this.display = display;
+    this.hostname = hostname;
+    this.display_no = display_no;
+    this.socket = socket;
+    try {
+      out = socket.getOutputStream ();
+      din = new DataInputStream (socket.getInputStream ());
+    } catch (IOException e) {
+      throw new java.lang.Error ("Failed to create socket: " + e);
+    }
+  }
 
   public void check_error () {
     // `XSync' function in `xc/lib/X11/Sync.c' uses the same technique.
