@@ -89,4 +89,16 @@ public class ZPixmap extends Image {
       data [i+2] = (byte) b;
     }
   }
+
+  /**
+   * Puts the image data into this image. This data must be in the same format
+   * as specified in this image.
+   *
+   * @param image_data the data to set
+   */
+  public void set_data (int[] image_data) {
+    int len = pixel_byte_count * width * height;
+    len = Math.min(len, data.length);
+    System.arraycopy(image_data, 0, data, 0, len);
+  }
 }
