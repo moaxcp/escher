@@ -6,6 +6,8 @@ import gnu.x11.extension.EventFactory;
 import gnu.x11.extension.BigRequests;
 import gnu.x11.extension.NotFoundException;
 import gnu.x11.extension.XCMisc;
+
+import java.net.Socket;
 import java.util.Hashtable;
 
 
@@ -160,6 +162,23 @@ public class Display {
     this (hostname, display_no, 0);
   }
 
+  /**
+   * Sets up a display using a connection over the specified
+   * <code>socket</code>. This should be used when there is a need to use
+   * non-TCP sockets, like connecting to an X server via Unix domain sockets.
+   * You need to provide an implementation for this kind of socket though.
+   *
+   * @param socket the socket to use for that connection
+   * @param hostname the hostname to connect to
+   * @param display_no the display number
+   * @param screen_no the screen number
+   */
+  public Display (Socket socket, String hostname, int display_no,
+                  int screen_no) {
+    default_screen_no = screen_no;
+    connection = new Connection (this, socket, hostname, display_no);
+    init();
+  }
 
   /**
    * @see <a href="XOpenDisplay.html">XOpenDisplay</a>
@@ -167,18 +186,20 @@ public class Display {
   public Display (String hostname, int display_no, int screen_no) {
     default_screen_no = screen_no;
     connection = new Connection (this, hostname, display_no);
+    init();
+  }
 
+  private void init() {
+    
     // authorization protocol
     String auth_name = "";
     String auth_data = "";
-    int n = Data.len (auth_name);
-    int d = Data.len (auth_data);
     
     Request request = new Request (this, 'B', // java = MSB
       3 + Data.unit (auth_name) + Data.unit (auth_data));
-    request.index = 2;		// connection setup request hack
-    request.write2 (11);	// major version
-    request.write2 (0);		// minor version
+    request.index = 2;// connection setup request hack
+    request.write2 (11);// major version
+    request.write2 (0);// minor version
     request.write2 (auth_name.length ());
     request.write2 (auth_data.length ());
     request.write1 (auth_name);
@@ -188,7 +209,6 @@ public class Display {
     init_defaults ();
     init_big_request_extension ();
   }
-
 
   // opcode 23 - get selection owner
   /**
