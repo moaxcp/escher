@@ -214,7 +214,6 @@ public class Data {
     return new String (data, j+offset, length);
   }
 
-
   //-- write1 - given j
 
   public void write1 (int j, boolean b) {
@@ -282,6 +281,35 @@ public class Data {
     index += Data.len (s);
   }
 
+  /**
+   * Writes a field of type STRING16 into the data buffer.
+   *
+   * @param s the string to write
+   */
+  public void write_string16 (String s) {
+    write_string16 (index, s);
+    boolean odd = s.length() % 2 == 1;
+    // If we have an odd number of characters, we have to add a padding of
+    // 2.
+    index += s.length() * 2 + (odd ? 2 : 0);
+  }
+
+  /**
+   * Writes a field of type STRING16 into the data buffer at the specified
+   * position.
+   *
+   * @param j the index where to write the string
+   * @param s the string to write
+   */
+  public void write_string16 (int j, String s) {
+    char[] chars = s.toCharArray();
+    int len = chars.length;
+    for (int i = 0; i < len; i++)
+      {
+        data[j + i * 2] = (byte) (chars[i] >> 8);
+        data[j + i * 2 + 1] = (byte) (chars[i] & 0xFF);
+      }
+  }
 
   public void write1 (byte [] b, int offset) {
     write1 (index, b, offset);
