@@ -8,7 +8,7 @@ import gnu.x11.Window;
 public abstract class Input extends Event {
   /** Reading. */
   public Input (Display display, byte [] data) {
-    super (display, data, 4); 
+    super (display, data, 12); 
   }
 
 
