@@ -68,13 +68,13 @@ public class Zion extends Application {
       if (Misc.empty (command)) continue;
       
       if (command.equals ("reset")) 
-        gnu.util.ReloadableClassLoader.instance.reset ();
+        gnu.util.ReloadableClassLoader.reset ();
       else if (command.equals ("exit")) exit ();
 
       else {
         // possbily reset
         if (command.charAt (0) == '=') {
-          gnu.util.ReloadableClassLoader.instance.reset ();
+          gnu.util.ReloadableClassLoader.reset ();
           command = command.substring (1, command.length ());
         }
 
