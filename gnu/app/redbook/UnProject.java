@@ -1,4 +1,4 @@
-package gnu.x11.extension.glx.test;
+package gnu.app.redbook;
 
 import gnu.x11.extension.glx.GL;
 import gnu.x11.Input;
