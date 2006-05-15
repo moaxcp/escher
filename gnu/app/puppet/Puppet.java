@@ -1443,7 +1443,7 @@ public class Puppet extends Application {
 
   public void scan_children () {
     // query all top-level windows
-    for (Enum e=root.tree ().children (); e.more ();) {
+    for (gnu.x11.Enum e=root.tree ().children (); e.more ();) {
       Client client = (Client) Client.intern (display, e.next4 ());
 
       // get override_redirect and map_state
