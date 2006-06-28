@@ -213,10 +213,10 @@ public class Input {
     Data reply = display.read_reply (request);
 
     keysyms_per_keycode = reply.read1 (1);
-    keysyms = new int [keysym_count];
+    keysyms = new int [keysym_count * keysyms_per_keycode];
 
-    for (int i=0; i<keysym_count; i++)
-      keysyms [i] = reply.read4 (32 + 4 * i * keysyms_per_keycode);
+    for (int i=0; i < keysym_count * keysyms_per_keycode; i++)
+      keysyms [i] = reply.read4 (32 + 4 * i);
   }
 
 
@@ -415,40 +415,22 @@ public class Input {
 	System.out.print (KEYBUT_STRINGS [i] + " ");
   }
 
-
-  /** Convert a keysym of uppercase to lowercase. */
-  private int lower (int keysym) {
-    if (keysym >= 'A' && keysym <= 'Z')
-      return keysym - 'A' + 'a';
-    else
-      return keysym;
-  }
-    
-
-  /** Convert a keysym of lowercase to uppercase. */
-  private int upper (int keysym) {
-    if (keysym >= 'a' && keysym <= 'z')
-      return keysym - 'a' + 'A';
-    else
-      return keysym;
-  }
-
-
   public int keycode_to_keysym (int keycode, int keystate) {
     if (keycode > max_keycode) 
       throw new java.lang.Error ("Invalid keycode: " + keycode);
 
-    int keysym = keysyms [keycode - min_keycode];
-    boolean shift_down_p = (keystate & Input.SHIFT_MASK) != 0;
+    int keysym = 0;
+    int keysym_no = 0;
 
-    /* We cannot guarantee keysyms returned by `keyboard_mapping()' from
-     * server is in lowercase or uppercase. XFree86 returns lowercase while
-     * Solaris uppercase.
-     */    
-    if (shift_down_p) 
-      return upper (keysym);
-    else
-      return lower (keysym);
+    // TODO: Maybe add handling of other modifiers. 
+    if ((keystate & SHIFT_MASK) != 0)
+      keysym_no = 1;
+    else if ((keystate & MOD5_MASK) != 0) // Alt Gr
+      keysym_no = 2; // TODO: 4 seems also valid.
+
+    int index = (keycode - min_keycode) * keysyms_per_keycode + keysym_no;
+    keysym = keysyms[index];
+    return keysym;
   }
 
 
@@ -469,6 +451,6 @@ public class Input {
    * Input#ungrab_keyboard(int)
    */
   public void ungrab_keyboard () {
-    ungrab_keyboard (display.CURRENT_TIME);
+    ungrab_keyboard (Display.CURRENT_TIME);
   }
 }
