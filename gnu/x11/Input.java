@@ -415,18 +415,46 @@ public class Input {
 	System.out.print (KEYBUT_STRINGS [i] + " ");
   }
 
+  /**
+   * Maps a keycode to a keysym.
+   *
+   * @param keycode the keycode
+   * @param keystate the modifiers
+   *
+   * @return the keysym for the specified key code and modifier mask
+   */
   public int keycode_to_keysym (int keycode, int keystate) {
+    return keycode_to_keysym(keycode, keystate, false);
+  }
+
+  /**
+   * Maps a keycode to a keysym. When <code>ignore_modifiers</code> is
+   * <code>true</code> then this returns the plain keysymbol, independent
+   * of the modifiers. Otherwise it returns the real symbol.
+   *
+   * @param keycode the keycode
+   * @param keystate the modifiers
+   * @param ignore_modifiers <code>true</code> for returning plain
+   *        keysyms, <code>false</code> for taking the modifiers
+   *        into account
+   *
+   * @return the keysym for the specified key code and modifier mask
+   */
+  public int keycode_to_keysym (int keycode, int keystate,
+                                boolean ignore_modifiers) {
     if (keycode > max_keycode) 
       throw new java.lang.Error ("Invalid keycode: " + keycode);
 
     int keysym = 0;
     int keysym_no = 0;
 
-    // TODO: Maybe add handling of other modifiers. 
-    if ((keystate & SHIFT_MASK) != 0)
-      keysym_no = 1;
-    else if ((keystate & MOD5_MASK) != 0) // Alt Gr
-      keysym_no = 2; // TODO: 4 seems also valid.
+    // TODO: Maybe add handling of other modifiers.
+    if (! ignore_modifiers) {
+      if ((keystate & SHIFT_MASK) != 0)
+        keysym_no = 1;
+      else if ((keystate & MOD5_MASK) != 0) // Alt Gr
+        keysym_no = 2; // TODO: 4 seems also valid.
+    }
 
     int index = (keycode - min_keycode) * keysyms_per_keycode + keysym_no;
     keysym = keysyms[index];
