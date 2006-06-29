@@ -7,7 +7,13 @@ import gnu.x11.extension.BigRequests;
 import gnu.x11.extension.NotFoundException;
 import gnu.x11.extension.XCMisc;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.net.InetAddress;
 import java.net.Socket;
+import java.net.UnknownHostException;
 import java.util.Hashtable;
 
 
@@ -192,18 +198,23 @@ public class Display {
   private void init() {
     
     // authorization protocol
-    String auth_name = "";
-    String auth_data = "";
+    XAuthority xauth = get_authority ();
+    //System.err.println("xauth: " + xauth);
+    byte[] auth_name = xauth.protocol_name;
+    byte[] auth_data = xauth.protocol_data;
     
     Request request = new Request (this, 'B', // java = MSB
       3 + Data.unit (auth_name) + Data.unit (auth_data));
     request.index = 2;// connection setup request hack
     request.write2 (11);// major version
     request.write2 (0);// minor version
-    request.write2 (auth_name.length ());
-    request.write2 (auth_data.length ());
+    request.write2 (auth_name.length);
+    request.write2 (auth_data.length);
+    request.write2 (0); // 2 bytes must be skipped.
     request.write1 (auth_name);
+    request.pad (auth_name.length);
     request.write1 (auth_data);
+    request.pad( auth_data.length);
 
     init_server_info (read_reply (request));
     init_defaults ();
@@ -751,5 +762,42 @@ public class Display {
       + "\n  release-number: " + release_no
       + "\n  maximum-request-length: " + maximum_request_length
       + "\n" + connection;
+  }
+
+  /**
+   * Fetches the XAuthority that matches this display.
+   *
+   * @return the XAuthority that matches this display
+   */
+  private XAuthority get_authority () {
+
+    XAuthority[] auths = XAuthority.get_authorities();
+
+    // Fetch hostname.
+    String hostname = connection.hostname;
+    if (hostname == null || hostname.equals ("")
+        || hostname.equals ("localhost")) {
+      // Translate localhost hostnames to the real hostname of this host.
+      try {
+        InetAddress local = InetAddress.getLocalHost ();
+        hostname = local.getHostName ();
+      } catch (UnknownHostException ex) {}
+    }
+
+    // Fetch display no.
+    String display_no = String.valueOf (connection.display_no);
+
+    // Find the XAuthority that matches the hostname and display no.
+    XAuthority found = null;
+    for (int i = 0; i < auths.length; i++) {
+      XAuthority auth = auths[i];
+      // FIXME: Maybe add handling of IP addresses here.
+      if (auth.hostname != null && auth.hostname.equals (hostname)
+          && auth.display.equals (display_no)) {
+        found = auth;
+        break;
+      }
+    }
+    return found;
   }
 }

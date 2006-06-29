@@ -537,6 +537,17 @@ public class Data {
   }
 
 
+  /**
+   * Writes X bytes of zero, where X is the number that pads n to a multiple
+   * of 4.
+   *
+   * @param n the number of bytes that have been written and need padding
+   */
+  public void pad (int n) {
+    int x = n % 4;
+    index += x;
+  }
+
   public void write_unused (int i) { index += i; }
   public void write1_unused () { index++; }
   public void write2_unused () { index += 2; }
