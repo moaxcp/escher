@@ -1,4 +1,31 @@
 -*- outline -*-
+* 0.2.3
+** gnu.x11.Fontable
+   - Implemented font metrics queries info () and text_extent ().
+** gnu.x11.Display
+   - Added option of using a custom Socket implementation,
+     like Unix sockets for faster communication on Unix systems.
+** gnu.x11.Display
+** gnu.x11.XAuthority
+   - Implemented Xauthority for connection setup.
+** gnu.x11.Input
+   - Fixed keycode to keysym translation to correctly detect
+     shifted or otherwise modified keysyms. Fixed offset error.
+** gnu.x11.Data
+   - Added methods for writing STRING16 values.
+** gnu.x11.event.ResizeRequest
+   - Added method for querying the window ID.
+** gnu.x11.image.ZPixmap
+   - Added method for setting image data.
+** gnu.x11.Data.java
+   - Added pad() function.
+** gnu.app.puppet.Puppet
+   - Fully qualified Enum class, for compatibility with JDK5.
+** gnu.app.redbook.UnProject
+** gnu.x11.tk.Tk
+   - Fixed package declaration to fix build.
+** etc/escher-style-eclipse.xml
+   - Added Eclipse code formatted for the Escher style.
 
 * 0.2.2
    - dual licenses: GPL and BSD
