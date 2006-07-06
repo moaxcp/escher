@@ -1,11 +1,14 @@
 package gnu.x11.event;
 
 import gnu.x11.Display;
-import gnu.x11.Window;
+import gnu.x11.ResponseInputStream;
 
+/**
+ * The base class for all X events.
+ */
+public abstract 
+class Event {
 
-/** X event. */
-public class Event extends gnu.x11.Data {
   public static final int NO_EVENT_MASK = 0;
   public static final int KEY_PRESS_MASK = 1<<0;
   public static final int KEY_RELEASE_MASK = 1<<1;
@@ -34,49 +37,56 @@ public class Event extends gnu.x11.Data {
   public static final int OWNER_GRAB_BUTTON_MASK = 1<<24;
   public static final int LAST_MASK_INDEX = 24;
 
-
+  /**
+   * The display from which this event originated.
+   */
   public Display display;
-  public boolean synthetic;
-  public int window_offset;
 
+  /**
+   * The event code;
+   */
+  public int code;
 
-  /** Writing. */
-  public Event (Display display, int code, int window_offset) {
+  /**
+   * Event-specific detail information.
+   */
+  public int detail;
+
+  /**
+   * The sequence number of the event.
+   */
+  public int sequence_number;
+
+  /**
+   * Creates an event without reading. This is used in subclasses that
+   * don't use the usual first 3 fields.
+   */
+  Event () {
+    // Nothing to do here.
+  }
+
+  /**
+   * Reads the event from the input stream.
+   */
+  public Event (Display display, ResponseInputStream in) {
     this.display = display;
-    this.window_offset = window_offset;
-
-    data = new byte [32];
-    data [0] = (byte) code;
+    code = in.read_int8 ();
+    detail = in.read_int8 ();
+    sequence_number = in.read_int16();
   }
 
 
-  /** Reading. */
-  public Event (Display display, byte [] data, int window_offset) {
-    super (data);
-    this.display = display;
-    this.window_offset = window_offset;
-
-    synthetic = (this.data [0] & 0x80) != 0;
-    this.data [0] &= 0x7f;
+  public int code () {
+    return code;
   }
 
-
-  public int code () { return read1 (0); }
-  public int seq_no () { return read2 (2); }
-  public int time () { return read4 (4); }
-  public int window_id () { return read4 (window_offset); }
-  public void set_window (Window window) { set_window (window.id); }
-  public void set_window (int i) { write4 (window_offset, i); }
-
+  public int seq_no () {
+    return sequence_number;
+  }
 
   public String toString () {
     String class_name = "#" + getClass ().getName ();
-    String synthetic0 = synthetic ? " (synthetic) " : " ";
-    return class_name + " " + code () + synthetic0 + window ();
+    return class_name + " " + code ();
   }
 
-
-  public Window window () {
-    return (Window) Window.intern (display, window_id ());
-  }
 }

@@ -1,57 +1,97 @@
 package gnu.x11.event;
 
 import gnu.x11.Display;
+import gnu.x11.ResponseInputStream;
 import gnu.x11.Window;
 
 
-/** X input-related event. */
+/**
+ * X input-related event.
+ */
 public abstract class Input extends Event {
-  /** Reading. */
-  public Input (Display display, byte [] data) {
-    super (display, data, 12); 
+
+  public int time;
+
+  public int root_window_id;
+
+  public int event_window_id;
+
+  public int child_window_id;
+
+  public int root_x;
+
+  public int root_y;
+
+  public int event_x;
+
+  public int event_y;
+
+  public int state;
+
+  public boolean same_screen;
+
+  /**
+   * Reads the event from the input stream.
+   */
+  public Input (Display display, ResponseInputStream in) {
+    
+    super (display, in);
+    time = in.read_int32 ();
+    root_window_id = in.read_int32 ();
+    event_window_id = in.read_int32 ();
+    child_window_id = in.read_int32 ();
+    root_x = in.read_int16 ();
+    root_y = in.read_int16 ();
+    event_x = in.read_int16 ();
+    event_y = in.read_int16 ();
+    state = in.read_int16 ();
+    same_screen = in.read_bool ();
+    in.skip (1); // Unused.
   }
 
 
-  //-- reading
+  public int detail () {
+    return detail;
+  }
 
-  public int detail () { return read1 (1); }
-  public int root_id () { return read4 (8); }
-  public int child_id () { return read4 (16); }
-  public int root_x () { return read2 (20); }
-  public int root_y () { return read2 (22); }
-  public int event_x () { return read2 (24); }
-  public int event_y () { return read2 (26); }
-  public int state () { return read2 (28); }
-  public boolean same_screen () { return read_boolean (30); }
+  public int root_id () {
+    return root_window_id;
+  }
 
+  public int child_id () {
+    return child_window_id;
+  }
+
+  public int root_x () {
+    return root_x;
+  }
+
+  public int root_y () {
+    return root_y;
+  }
+
+  public int event_x () {
+    return event_x;
+  }
+
+  public int event_y () {
+    return event_y;
+  }
+
+  public int state () {
+    return state;
+  }
+
+  public boolean same_screen () {
+    return same_screen;
+  }
 
   public Window root () { 
-    return (Window) Window.intern (display, root_id ()); 
+    return (Window) Window.intern (display, root_window_id); 
   }
 
-
-  public Window child () { 
-    return (Window) Window.intern (display, child_id ()); 
+  public Window child () {
+    return (Window) Window.intern (display, child_window_id); 
   }
 
-
-  /** Writing. */
-  public Input (Display display, int CODE) { 
-    super (display, CODE, 12); 
-  }
-
-
-  //-- writing
-
-  public void set_detail (int i) { write1 (1, i); }
-  public void set_root (Window w) { set_root_id (w.id); }
-  public void set_root_id (int i) { write4 (8, i); }
-  public void set_child (Window w) { set_child_id (w.id); }
-  public void set_child_id (int i) { write4 (16, i); }
-  public void set_root_x (int i) { write2 (20, i); }
-  public void set_root_y (int i) { write2 (22, i); }
-  public void set_event_x (int i) { write2 (24, i); }
-  public void set_event_y (int i) { write2 (26, i); }
-  public void set_state (int i) { write2 (28, i); }
-  public void set_same_screen (boolean b) { write1 (30, b); }
 }

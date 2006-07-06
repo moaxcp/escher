@@ -2,21 +2,42 @@ package gnu.x11.event;
 
 import gnu.x11.Display;
 import gnu.x11.Rectangle;
+import gnu.x11.ResponseInputStream;
 import gnu.x11.Window;
 
 
 /** X configure request event. */
-public class ConfigureRequest extends Event {
+public final class ConfigureRequest extends Event {
   public static final int CODE = 23;
 
+  public int parent_window_id;
+  public int window_id;
+  public int sibling_id;
 
-  // reading
+  public int x;
+  public int y;
+  public int width;
+  public int height;
 
-  public ConfigureRequest (Display display, byte [] data) {
-    super (display, data, 8); 
+  public int border_width;
+  public int value_mask;
+
+
+  public ConfigureRequest (Display display, ResponseInputStream in) {
+    super (display, in);
+    parent_window_id = in.read_int32 ();
+    window_id = in.read_int32 ();
+    sibling_id = in.read_int32 ();
+    x = in.read_int16 ();
+    y = in.read_int16 ();
+    width = in.read_int16 ();
+    height = in.read_int16 ();
+    border_width = in.read_int16 ();
+    value_mask = in.read_int16 ();
+    in.skip (4);
   }
 
-  
+
   public Window.Changes changes () {
     Window.Changes c = new Window.Changes ();
 
@@ -35,14 +56,37 @@ public class ConfigureRequest extends Event {
   }
 
 
-  public int stack_mode () { return read1 (1); }
-  public int sibling_id () { return read4 (12); }
-  public int x () { return read2 (16); }
-  public int y () { return read2 (18); }
-  public int width () { return read2 (20); }
-  public int height () { return read2 (22); }
-  public int border_width () { return read2 (24); }
-  public int bitmask () { return read2 (26); }
+  public int stack_mode () {
+    return detail;
+  }
+
+  public int sibling_id () {
+    return sibling_id;
+  }
+
+  public int x () {
+    return x;
+  }
+
+  public int y () {
+    return y;
+  }
+
+  public int width () {
+    return width;
+  }
+
+  public int height () {
+    return height;
+  }
+
+  public int border_width () {
+    return border_width;
+  }
+
+  public int bitmask () {
+    return value_mask;
+  }
 
 
   public Rectangle rectangle () {

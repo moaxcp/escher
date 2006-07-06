@@ -2,44 +2,69 @@ package gnu.x11.event;
 
 import gnu.x11.Display;
 import gnu.x11.Rectangle;
+import gnu.x11.ResponseInputStream;
 
 
 /** X configure notify event. */
-public class ConfigureNotify extends Event {
+public final class ConfigureNotify extends Event {
   public static final int CODE = 22;
 
-  
+  public int event_window_id;
+  public int window_id;
+  public int above_sibling_id;
+
+  public int x;
+  public int y;
+  public int width;
+  public int height;
+
+  public int border_width;
+  public boolean override_redirect;
+
   /** Reading. */
-  public ConfigureNotify (Display display, byte [] data) {
-    super (display, data, 8); 
+  public ConfigureNotify (Display display, ResponseInputStream in) {
+    super (display, in);
+    event_window_id = in.read_int32 ();
+    window_id = in.read_int32 ();
+    above_sibling_id = in.read_int32 ();
+    x = in.read_int16 ();
+    y = in.read_int16 ();
+    width = in.read_int16 ();
+    height = in.read_int16 ();
+    border_width = in.read_int16 ();
+    override_redirect = in.read_bool();
+    in.skip (5);
   }
 
 
   //-- reading
 
-  public int event_id () { return read4 (4); }
-  public int above_sibling_id () { return read4 (12); }
-  public int x () { return read2 (16); }
-  public int y () { return read2 (18); }
-  public int width () { return read2 (20); }
-  public int height () { return read2 (22); }
+  public int event_id () {
+    return event_window_id;
+  }
 
+  public int above_sibling_id () {
+    return above_sibling_id;
+  }
+
+  public int x () {
+    return x;
+  }
+
+  public int y () {
+    return y;
+  }
+
+  public int width () {
+    return width;
+  }
+
+  public int height () {
+    return height;
+  }
 
   public Rectangle rectangle () {
     return new Rectangle (x (), y (), width (), height ());
   }
 
-
-  /** Writing. */
-  public ConfigureNotify (Display display) { super (display, CODE, 8); }
-
-  //-- writing
-  public void set_event_id (int i) { write4 (4, i); }
-  public void set_above_sibling_id (int i) { write4 (12, i); }
-  public void set_x (int i) { write2 (16, i); }
-  public void set_y (int i) { write2 (18, i); }
-  public void set_width (int i) { write2 (20, i); }
-  public void set_height (int i) { write2 (22, i); }
-  public void set_border_width (int i) { write2 (24, i); }
-  public void set_override_redirect (boolean b) { write1 (26, b); }
 }

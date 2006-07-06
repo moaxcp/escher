@@ -1,22 +1,37 @@
 package gnu.x11.event;
 
 import gnu.x11.Display;
+import gnu.x11.ResponseInputStream;
 
 
 /** X resize request event. */
-public class ResizeRequest extends Event {
+public final class ResizeRequest extends Event {
   public static final int CODE = 25;
 
+  public int window_id;
 
-  public ResizeRequest (Display display, byte [] data) {
-    super (display, data, 8); 
+  public int width;
+  public int height;
+
+  
+  public ResizeRequest (Display display, ResponseInputStream in) {
+    super (display, in);
+    window_id = in.read_int32 ();
+    width = in.read_int16 ();
+    height = in.read_int16 ();
+    in.skip (20);
   }
 
 
   //-- reading
 
-  public int width () { return read2 (8); }
-  public int height () { return read2 (10); }
+  public int width () {
+    return width;
+  }
+
+  public int height () {
+    return height;
+  }
 
   /**
    * Returns the window ID of the resize request.
@@ -24,6 +39,6 @@ public class ResizeRequest extends Event {
    * @return the window ID of the resize request
    */
   public int window_id () {
-    return read4 (4);
+    return window_id;
   }
 }
