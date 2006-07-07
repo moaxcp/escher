@@ -35,20 +35,41 @@ public class Colormap extends Resource {
 
   // opcode 78 - create colormap
   /**
-   * @param alloc valid:
-   * {@link #NONE},
-   * {@link #ALL}
+   * Creates a colormap of the specified visual type for the screen on which
+   * the window resides. The visual type must be supported by the screen
+   * (or a Match error results). The initial values of the colormap entries
+   * are undefined for classes GrayScale, PseudoColor and DirectColor. For
+   * StaticGray, StaticColor and TrueColor <code>alloc</code> must be specified
+   * as <code>NONE</code> (or a Match error results). For the other classes,
+   * if alloc is <code>NONE</code> the colormap initially has no allocated
+   * entries, and clients can allocate entries. If alloc is <code>ALL</code>,
+   * then the entire colormap is allocated writable. The initial values of all
+   * allocated entries are undeﬁned. For GrayScale and PseudoColor, the effect
+   * is as if an AllocColorCells request returned all pixel values from zero to
+   * N − 1, where N is the colormap-entries value in the speciﬁed visual.
+   * For DirectColor, the effect is as if an AllocColorPlanes request returned
+   * a pixel value of zero and red-mask, green-mask, and blue-mask values
+   * containing the same bits as the corresponding masks in the speciﬁed
+   * visual. However, in all cases, none of these entries can be freed with
+   * FreeColors.
+   *
+   * @param window the window for which the colormap is allocated
+   * @param visual the visual type
+   * @param alloc one of {@link #NONE}, {@link #ALL}, see above for explanation
    *
    * @see <a href="XCreateColormap.html">XCreateColormap</a>
    */   
-  public Colormap (Window window, int visual_id, boolean alloc_all) {
+  public Colormap (Window window, Visual visual_type, int alloc) {
     super (window.display);
 
-    Request request = new Request (display, 78, alloc_all, 4);
-    request.write4 (id);
-    request.write4 (window.id);
-    request.write4 (visual_id);
-    display.send_request (request);
+    RequestOutputStream o = display.connection.out;
+    synchronized (o) {
+      o.begin_request (78, alloc, 4);
+      o.write_int32 (id);
+      o.write_int32 (window.id);
+      o.write_int32 (visual_type.id);
+      o.send ();
+    }
   }
 
 
@@ -57,20 +78,26 @@ public class Colormap extends Resource {
    * @see <a href="XFreeColormap.html">XFreeColormap</a>
    */
   public void free () {
-    Request request = new Request (display, 79, 2);
-    request.write4 (id);
-    display.send_request (request);
-  }
 
+    RequestOutputStream o = display.connection.out;
+    synchronized (o) {
+      o.begin_request (78, 0, 2);
+      o.write_int32 (id);
+      o.send ();
+    }
+  }
 
   // opcode 80 - copy colormap and free
   public Colormap copy_and_free (int new_id) {
+
     Colormap new_map = new Colormap (display, new_id);
-    
-    Request request = new Request (display, 80, 3);
-    request.write4 (new_id);
-    request.write4 (id);
-    display.send_request (request);
+    RequestOutputStream o = display.connection.out;
+    synchronized (o) {
+      o.begin_request (80, 0, 3);
+      o.write_int32 (new_id);
+      o.write_int32 (id);
+      o.send ();
+    }
     return new_map;
   }
 
@@ -80,9 +107,12 @@ public class Colormap extends Resource {
    * @see <a href="XInstallColormap.html">XInstallColormap</a>
    */
   public void install () {
-    Request request = new Request (display, 81, 2);
-    request.write4 (id);
-    display.send_request (request);
+    RequestOutputStream o = display.connection.out;
+    synchronized (o) {
+      o.begin_request (81, 0, 3);
+      o.write_int32 (id);
+      o.send ();
+    }
   }
 
 
@@ -91,9 +121,12 @@ public class Colormap extends Resource {
    * @see <a href="XUninstallColormap.html">XUninstallColormap</a>
    */
   public void uninstall () {
-    Request request = new Request (display, 82, 2);
-    request.write4 (id);
-    display.send_request (request);
+    RequestOutputStream o = display.connection.out;
+    synchronized (o) {
+      o.begin_request (82, 0, 3);
+      o.write_int32 (id);
+      o.send ();
+    }
   }
 
 
@@ -106,49 +139,111 @@ public class Colormap extends Resource {
 
   // opcode 84 - alloc color
   /**
+   * Allocates a read-only colormap entry corresponding to the closest RGB
+   * values provided by the hardware. It also returns the pixel and RGB values
+   * actually used. Multiple clients requesting the same effective RGB values
+   * can be assigned the same read-only entry, allowing entries to be shared.
+   *
+   * The return value carries the pixel value as {@link Color#pixel} and
+   * the RGB value as {@link Color#exact}.
+   *
+   * @param red the red component
+   * @param green the green component
+   * @param blue the blue component
+   *
+   * @return the closest pixel and RGB value of the requested entry
+   *
    * @see <a href="XAllocColor.html">XAllocColor</a>
    */
   public Color alloc_color (int red, int green, int blue) {
-    Request request = new Request (display, 84, 4);
-    request.write4 (id);
-    request.write2 (red);
-    request.write2 (green);
-    request.write2 (blue);
-
-    Data reply = display.read_reply (request);
-    Color color = new Color (reply.read4 (16));
-    color.exact = new RGB (reply.read2 (8), reply.read2 (10), reply.read2 (12));
-    return color;
+    RequestOutputStream o = display.connection.out;
+    synchronized (o) {
+      o.begin_request (84, 0, 4);
+      o.write_int32 (id);
+      o.write_int16 (red);
+      o.write_int16 (green);
+      o.write_int16 (blue);
+      o.skip (2);
+    }
+    ResponseInputStream i = display.connection.read_reply ();
+    Color c;
+    synchronized (i) {
+      assert i.read_int8 () == 1; // Reply.
+      i.skip (7);
+      int r = i.read_int16 ();
+      int g = i.read_int16 ();
+      int b = i.read_int16 ();
+      i.skip (2);
+      int p = i.read_int32 ();
+      i.skip (12);
+      c = new Color(p);
+      c.exact = new RGB (r, g, b);
+    }
+    return c;
   }
 
   
   // opcode 85 - alloc named color
   /**
+   * Looks up the named color with respect to the screen associated with the
+   * colormap. Then it does an AllocColor on the colormap. The name should
+   * use ISO Latin-1 encoding, and uppercase and lowercase do not matter. The
+   * exact RGB values specify the true values for the color, and the
+   * visual values specify the values actually used in the colormap.
+   * 
+   * @param name the name of the color
+   *
+   * @return the allocated color
+   *
    * @see <a href="XAllocNamedColor.html">XAllocNamedColor</a>
    */  
   public Color alloc_named_color (String name) {
-    Request request = new Request (display, 85, 3+Data.unit (name));
-    request.write4 (id);
-    request.write2 (name.length ());
-    request.write2_unused ();
-    request.write1 (name);
 
-    Data reply = display.read_reply (request);
-    Color color = new Color (reply.read4 (8));
-    color.name = name;
-    color.exact = new RGB (reply.read2 (12), reply.read2 (14), 
-      reply.read2 (16));
-    color.visual = new RGB (reply.read2 (18), reply.read2 (20), 
-      reply.read2 (22));
-    return color;
+    RequestOutputStream o = display.connection.out;
+    int n = name.length ();
+    int p = RequestOutputStream.pad (n);
+
+    synchronized (o) {
+      o.begin_request (85, 0, 3 + (n + p) / 4);
+      o.write_int32 (id);
+      o.write_int16 (n);
+      o.skip (2);
+      o.write_string8 (name);
+      o.skip (p);
+    }
+    ResponseInputStream i = display.connection.read_reply ();
+    Color c;
+    synchronized (i) {
+      assert i.read_int8 () == 1;
+      i.skip (7);
+      int pixel = i.read_int32 ();
+      int er = i.read_int16 ();
+      int eg = i.read_int16 ();
+      int eb = i.read_int16 ();
+      int vr = i.read_int16 ();
+      int vg = i.read_int16 ();
+      int vb = i.read_int16 ();
+      i.skip (8);
+      c = new Color (pixel);
+      c.exact = new RGB (er, eg, eb);
+      c.visual = new RGB (vr, vg, vb);
+    }
+    return c;
   }
 
 
-  /** Reply of {@link #alloc_color_cells(boolean, int, int)}. */
-  public static class ColorCellsReply extends Data {
-    public ColorCellsReply (Data data) { super (data); }
+  /**
+   * Reply of {@link #alloc_color_cells(boolean, int, int)}.
+   */
+  // FIXME: Improve API somehow here.
+  public static class ColorCellsReply {
+    public int [] pixels;
+    public int [] masks;
+    ColorCellsReply (int [] p, int [] m) {
+      pixels = p;
+      masks = m;
+    }
   }
-
 
   // opcode 86 - alloc color cells
   /**
@@ -157,28 +252,84 @@ public class Colormap extends Resource {
   public ColorCellsReply alloc_color_cells (boolean contiguous, 
     int color_count, int plane_count) {
 
-    Request request = new Request (display, 86, contiguous, 3);
-    request.write4 (id);
-    request.write2 (color_count);
-    request.write2 (plane_count);
-    return new ColorCellsReply (display.read_reply (request));
+    RequestOutputStream o = display.connection.out;
+    synchronized (o) {
+      o.begin_request (86, contiguous ? 1 : 0, 3);
+      o.write_int32 (id);
+      o.write_int16 (color_count);
+      o.write_int16 (plane_count);
+    }
+    ResponseInputStream i = display.connection.read_reply ();
+    ColorCellsReply r;
+    synchronized (i) {
+      assert i.read_int8 () == 1;
+      i.skip (7);
+      int n = i.read_int16 ();
+      int m = i.read_int16 ();
+      i.skip (20);
+      int [] pixels = new int [n];
+      for (int j = 0; j < n; j++)
+        pixels [j] = i.read_int32 ();
+      int [] masks = new int [m];
+      for (int j = 0; j < m; j++)
+        masks [j] = i.read_int32 ();
+      r = new ColorCellsReply (pixels, masks);
+    }
+    return r;
   }
 
+  /**
+   * Reply for {@link Colormap#alloc_planes(boolean, int, int, int, int)}.
+   */
+  public class ColorPlaneReply {
+    public int red_mask;
+    public int green_mask;
+    public int blue_mask;
+    public int [] pixels;
+
+    ColorPlaneReply (int rm, int gm, int bm, int [] px) {
+      red_mask = rm;
+      green_mask = rm;
+      blue_mask = bm;
+      pixels = px;
+    }
+  }
 
   // opcode 87 - alloc color planes
   /**
    * @see <a href="XAllocColorPlanes.html">XAllocColorPlanes</a>
    */
-  public Data alloc_planes (boolean contiguous, int color_count, 
-    int red_count, int green_count, int blue_count) {
+  public ColorPlaneReply alloc_planes (boolean contiguous, int color_count, 
+                                       int red_count, int green_count,
+                                       int blue_count) {
 
-    Request request = new Request (display, 87, contiguous, 4);
-    request.write4 (id);
-    request.write2 (color_count);
-    request.write2 (red_count);
-    request.write2 (green_count);
-    request.write2 (blue_count);
-    return display.read_reply (request);
+    RequestOutputStream o = display.connection.out;
+    synchronized (o) {
+      o.begin_request (87, contiguous ? 1 : 0, 4);
+      o.write_int32 (id);
+      o.write_int16 (color_count);
+      o.write_int16 (red_count);
+      o.write_int16 (green_count);
+      o.write_int16 (blue_count);
+    }
+
+    ResponseInputStream i = display.connection.read_reply ();
+    ColorPlaneReply r;
+    synchronized (i) {
+      assert i.read_int8 () == 1;
+      i.skip (7);
+      int n = i.read_int16 ();
+      i.skip (2);
+      int rm = i.read_int32 ();
+      int gm = i.read_int32 ();
+      int bm = i.read_int32 ();
+      i.skip (8);
+      int [] px = new int [n];
+      for (int j = 0; j < n; j++)
+        px [j] = i.read_int32 ();
+      r = new ColorPlaneReply (rm, gm, bm, px);
+    }
+    return r;
   }
 
 
@@ -187,43 +338,72 @@ public class Colormap extends Resource {
    * @see <a href="XFreeColors.html">XFreeColors</a>
    */
   public void free_colors (int [] pixels, int plane_mask) {
-    Request request = new Request (display, 88, 3+pixels.length);
-    request.write4 (id);
-    request.write4 (plane_mask);
 
-    for (int i=0; i<pixels.length; i++)
-      request.write4 (pixels [i]);
-
-    display.send_request (request);
+    int n = pixels.length;
+    RequestOutputStream o = display.connection.out;
+    synchronized (o) {
+      o.begin_request (88, 0, 3 + n);
+      o.write_int32 (id);
+      o.write_int32 (plane_mask);
+      for (int i = 0; i < pixels.length; i++)
+        o.write_int32 (pixels [i]);
+      o.send ();
+    }
   }
 
+
+  /**
+   * Used in {@link Colormap#store_colors()}.
+   */
+  public static class ColorItem {
+
+    public int pixel;
+    public int red;
+    public int green;
+    public int blue;
+    public boolean do_red;
+    public boolean do_green;
+    public boolean do_blue;
+
+    public ColorItem (int pixel, int red, int green, int blue,
+                      boolean do_red, boolean do_green, boolean do_blue) {
+      this.pixel = pixel;
+      this.red = red;
+      this.green = green;
+      this.blue = blue;
+      this.do_red = do_red;
+      this.do_green = do_green;
+      this.do_blue = do_blue;
+    }
+
+    void write (RequestOutputStream o) {
+      o.write_int32 (pixel);
+      o.write_int16 (red);
+      o.write_int16 (green);
+      o.write_int16 (blue);
+      int do_colors = ( do_red ? 0x01 : 0 )
+                      | ( do_green ? 0x02 : 0)
+                      | (do_blue ? 0x04 : 0); 
+      o.write_int8 (do_colors);
+      o.skip (1);
+    }
+  }
 
   // opcode 89 - store colors
   /**
    * @see <a href="XStoreColors.html">XStoreColors</a>
    */
-  public void store_colors (int [] pixels, boolean [] do_reds, 
-    boolean [] do_greens, boolean [] do_blues, RGB [] rgbs) {
+  public void store_colors (ColorItem[] items) {
 
-    Request request = new Request (display, 89, 2+3*pixels.length);
-    request.write4 (id);
-
-    for (int i=0; i<pixels.length; i++) {
-      request.write4 (pixels [i]);
-      request.write2 (rgbs [i].red);
-      request.write2 (rgbs [i].green);
-      request.write2 (rgbs [i].blue);
-
-      int do_color = 0;
-      if (do_reds [i]) do_color |= 0x01;
-      if (do_greens [i]) do_color |= 0x02;
-      if (do_blues [i]) do_color |= 0x04;
-
-      request.write1 (do_color);
-      request.write1_unused ();
+    int n = items.length;
+    RequestOutputStream o = display.connection.out;
+    synchronized (o) {
+      o.begin_request (89, 0, 3 + 2 * n);
+      o.write_int32 (id);
+      for (int i = 0; i < n; i++)
+        items [i].write (o);
+      o.send ();
     }
-
-    display.send_request (request);
   }
 
 
@@ -232,68 +412,118 @@ public class Colormap extends Resource {
    * @see <a href="XStoreNamedColor.html">XStoreNamedColor</a>
    */
   public void store_named_color (int pixel, String name, boolean do_reds, 
-    boolean do_greens, boolean do_blues) {
+                                 boolean do_greens, boolean do_blues) {
 
     int do_color = 0;
     if (do_reds) do_color |= 0x01;
     if (do_greens) do_color |= 0x02;
     if (do_blues) do_color |= 0x04;
 
-    Request request = new Request (display, 90, do_color, 4+Data.unit (name));
-    request.write4 (id);
-    request.write4 (pixel);
-    request.write2 (name.length ());
-    request.write1 (name);
-    display.send_request (request);
+    int n = name.length ();
+    int p = RequestOutputStream.pad (n);
+
+    RequestOutputStream o = display.connection.out;
+    synchronized (o) {
+      o.begin_request (90, do_color, 4 + (n + p) / 4);
+      o.write_int32 (id);
+      o.write_int32 (pixel);
+      o.write_int16 (n);
+      o.skip (2);
+      o.write_string8 (name);
+      o.skip (p);
+      o.send ();
+    }
   }
 
     
   // opcode 91 - query colors
   /**
-   * @return valid: {@link Enum#next()} of type {@link RGB}
+   * Returns the hardware specific color values stored in this colormap
+   * for the specified pixels. The values returned for an unallocated entry
+   * are undefined.
+   *
+   * @param pixels the pixels for which to return the color values
+   *
+   * @return the hardware specific color values of this colormap
+   *
    * @see <a href="XQueryColors.html">XQueryColors</a>
    */
-  public Enum colors (int [] pixels) {
-    Request request = new Request (display, 91, 2+pixels.length);
-    request.write4 (id);
+  public RGB [] colors (int [] pixels) {
 
-    for (int i=0; i<pixels.length; i++)
-      request.write4 (pixels [i]);
+    RequestOutputStream o = display.connection.out;
+    int n = pixels.length;
+    synchronized (o) {
+      o.begin_request (91, 0, 2 + n);
+      o.write_int32 (id);
+      for (int j = 0; j < n; j++)
+        o.write_int32 (pixels [j]);
+    }
 
-    Data reply = display.read_reply (request);
-
-    return new Enum (reply, 32, reply.read2 (8)) {
-      public Object next () {
-        int r = read2 (offset);
-        int g = read2 (offset+2);
-        int b = read2 (offset+4);
-        RGB rgb = new RGB (r, g, b);
-
-        inc (4);
-        return rgb;
+    ResponseInputStream i = display.connection.read_reply ();
+    RGB [] rgbs;
+    synchronized (i) {
+      assert i.read_int8 () == 1;
+      i.skip (7);
+      int len = i.read_int16 ();
+      rgbs = new RGB [len];
+      i.skip (22);
+      for (int j = 0; j < len; j++) {
+        int r = i.read_int16 ();
+        int g = i.read_int16 ();
+        int b = i.read_int16 ();
+        i.skip (2);
+        rgbs [j] = new RGB (r, g, b);
       }
-    };
+    }
+    return rgbs;
   }
 
 
   // opcode 92 - lookup color
   /**
+   * Looks up the name of a color with respect to the screen associated with
+   * this colormap, and returns both the exact color values and the closest
+   * values provided by the hardware with respect to the visual type of this
+   * colormap. The name should use the ISO Latin-1 encoding, and uppercase and
+   * lowercase do not matter.
+   *
+   * @param name the color name to lookup
+   *
+   * @return the color
+   *
    * @see <a href="XLookupColor.html">XLookupColor</a>
    */
   public Color lookup_color (String name) {
-    Request request = new Request (display, 92, 3+Data.unit (name));
-    request.write4 (id);
-    request.write2 (name.length ());
-    request.write2_unused ();
-    request.write1 (name);
 
-    Data reply = display.read_reply (request);
-    Color color = new Color (0);
-    color.name = name;
-    color.exact = new RGB (reply.read2 (8), reply.read2 (10), reply.read2 (12));
-    color.visual = new RGB (reply.read2 (14), reply.read2 (16), 
-      reply.read2 (18));
-    return color;
+    int n = name.length ();
+    int p = RequestOutputStream.pad (n);
+    RequestOutputStream o = display.connection.out;
+    synchronized (o) {
+      o.begin_request (92, 0, 3 + (n + p) / 4);
+      o.write_int32 (id);
+      o.write_int16 (n);
+      o.skip (2);
+      o.write_string8 (name);
+      o.skip (p);
+    }
+
+    ResponseInputStream i = display.connection.read_reply ();
+    Color c;
+    synchronized (i) {
+      assert i.read_int8 () == 1;
+      i.skip (7);
+      int er = i.read_int16 ();
+      int eg = i.read_int16 ();
+      int eb = i.read_int16 ();
+      int vr = i.read_int16 ();
+      int vg = i.read_int16 ();
+      int vb = i.read_int16 ();
+      i.skip (12);
+      c = new Color (0);
+      c.exact = new RGB (er, eg, eb);
+      c.visual = new RGB (vr, vg, vb);
+    }
+    return c;
   }
 
 
