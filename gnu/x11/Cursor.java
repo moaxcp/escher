@@ -140,45 +140,52 @@ public class Cursor extends Resource {
    * @see <a href="XCreatePixmapCursor.html">XCreatePixmapCursor</a>
    */
   public Cursor (Pixmap src, Pixmap mask, int source_char,  
-    int mask_char, int fg_r, int fg_g, int fg_b, 
-    int bg_r, int bg_g, int bg_b, int x, int y) { 
+                 int mask_char, int fg_r, int fg_g, int fg_b, 
+                 int bg_r, int bg_g, int bg_b, int x, int y) { 
 
     super (src.display);
 
-    Request request = new Request (display, 93, 8);
-    request.write4 (id);
-    request.write4 (src.id);
-    request.write4 (mask.id);
-    request.write2 (fg_r);
-    request.write2 (fg_g);
-    request.write2 (fg_b);
-    request.write2 (bg_r);
-    request.write2 (bg_g);
-    request.write2 (bg_b);
-    request.write2 (x);
-    request.write2 (y);
-    display.send_request (request);    
+    RequestOutputStream o = display.connection.out;
+    synchronized (o) {
+      o.begin_request (93, 0, 8);
+      o.write_int32 (id);
+      o.write_int32 (src.id);
+      o.write_int32 (mask.id);
+      o.write_int16 (fg_r);
+      o.write_int16 (fg_g);
+      o.write_int16 (fg_b);
+      o.write_int16 (bg_r);
+      o.write_int16 (bg_g);
+      o.write_int16 (bg_b);
+      o.write_int16 (x);
+      o.write_int16 (y);
+      o.send ();
+    }
   }
 
 
   // opcode 94 - create glyph cursor
   public void create (Font src, Font mask, int source_char, 
-    int mask_char, int fg_r, int fg_g, int fg_b, 
-    int bg_r, int bg_g, int bg_b) {
+                      int mask_char, int fg_r, int fg_g, int fg_b, 
+                      int bg_r, int bg_g, int bg_b) {
 
-    Request request = new Request (display, 94, 8);
-    request.write4 (id);
-    request.write4 (src.id);
-    request.write4 (mask.id);
-    request.write2 (source_char);
-    request.write2 (mask_char);
-    request.write2 (fg_r);
-    request.write2 (fg_g);
-    request.write2 (fg_b);
-    request.write2 (bg_r);
-    request.write2 (bg_g);
-    request.write2 (bg_b);
-    display.send_request (request);
+    RequestOutputStream o = display.connection.out;
+    synchronized (o) {
+      o.begin_request (94, 0, 8);
+      o.write_int32 (id);
+      o.write_int32 (src.id);
+      o.write_int32 (mask.id);
+      o.write_int16 (source_char);
+      o.write_int16 (mask_char);
+      o.write_int16 (fg_r);
+      o.write_int16 (fg_g);
+      o.write_int16 (fg_b);
+      o.write_int16 (bg_r);
+      o.write_int16 (bg_g);
+      o.write_int16 (bg_b);
+      o.send ();
+      
+    }
   }
 
 
@@ -187,9 +194,12 @@ public class Cursor extends Resource {
    * @see <a href="XFreeCursor.html">XFreeCursor</a>
    */
   public void free () {
-    Request request = new Request (display, 95, 2);
-    request.write4 (id);
-    display.send_request (request);
+    RequestOutputStream o = display.connection.out;
+    synchronized (o) {
+      o.begin_request (95, 0, 2);
+      o.write_int32 (id);
+      o.send ();
+    }
   }
 
 
@@ -198,14 +208,18 @@ public class Cursor extends Resource {
    * @see <a href="XRecolorCursor.html">XRecolorCursor</a>
    */
   public void recolor (RGB foreground, RGB background) {
-    Request request = new Request (display, 96, 5);
-    request.write2 (id);
-    request.write2 (foreground.red);
-    request.write2 (foreground.green);
-    request.write2 (foreground.blue);
-    request.write2 (background.red);
-    request.write2 (background.green);
-    request.write2 (background.blue);
-    display.send_request (request);
+
+    RequestOutputStream o = display.connection.out;
+    synchronized (o) {
+      o.begin_request (96, 0, 5);
+      o.write_int32 (id);
+      o.write_int16 (foreground.red);
+      o.write_int16 (foreground.green);
+      o.write_int16 (foreground.blue);
+      o.write_int16 (background.red);
+      o.write_int16 (background.green);
+      o.write_int16 (background.blue);
+      o.send ();
+    }
   }
 }
