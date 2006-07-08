@@ -2,39 +2,25 @@ package gnu.x11;
 
 
 /** X depth. */
-public class Depth extends Data {
-  public Depth (Data data, int offset) { super (data, offset); }
-  public int depth () { return read1 (0); }
-  public int visual_count () { return read2 (2); }
-  public int length () { return 8 + visual_count ()*24; }
+public class Depth {
 
+  public int depth;
+  public Visual[] visual_types;
 
-  /**
-   * @return valid:
-   * {@link Enum#elt(int)} of type {@link Visual},
-   * {@link Enum#next()} of type {@link Visual}
-   */
-  public Enum visuals () {
-    return new Enum (this, 8, visual_count ()) {
-      public Object elt (int i) {
-        int offset = start_offset + i*24;
-        return new Visual (this, offset);
-      }
-
-
-      public Object next () {
-        Visual visual = new Visual (this, 0);
-        inc (24);
-        return visual;
-      }     
-    };
+  public Depth (ResponseInputStream in) {
+    depth = in.read_int8 ();
+    in.skip(1);
+    int visual_count = in.read_int16 ();
+    in.skip (4);
+    visual_types = new Visual [visual_count];
+    for (int i = 0; i < visual_count; i++) {
+      visual_types [i] = new Visual (in);
+    }
   }
-
 
   public String toString () {
     return "#Depth"
-      + "\n  depth: " + depth ()
-      + "\n  visual-count: " + visual_count ()
-      + visuals ().to_string (Enum.NEXT, "\n#Depth: ");
+      + "\n  depth: " + depth
+      + "\n  visual-count: " + visual_types.length;
   }
 }
