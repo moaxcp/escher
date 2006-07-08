@@ -1,23 +1,57 @@
 package gnu.x11;
 
 
-/** X graphics context. */
+/**
+ * X graphics context. This is used to change settings for drawing.
+ */
 public class GC extends Fontable {
+
+  /**
+   * Aggregates ChangeGC requests.
+   */
+  private class ChangeGCRequestObject implements RequestObject {
+
+    /**
+     * The values that are changes.
+     */
+    Values values;
+
+    /**
+     * Creates a new ChangeGCRequestObject.
+     *
+     * @param v the values to be changed
+     */
+    ChangeGCRequestObject (Values v) {
+      values = v;
+    }
+
+    /**
+     * Writes this object to the connection stream.
+     *
+     * @param c the connection
+     */
+    public void write (RequestOutputStream s) {
+
+      s.set_index (2);
+      s.write_int16 (3 + values.count());
+      s.write_int32 (GC.this.id);
+      values.write (s);
+    }
+    
+  }
+
   public GC (Display display) {
     super (display);
   }
-
 
   public GC (GC src, int mask) {
     super (src.display);
     src.copy (this, mask);
   }
 
-
   public GC (GC src) {
     this (src, Values.ALL);
   }
-
 
   /** X GC values. */
   public static class Values extends ValueList {
@@ -326,54 +360,95 @@ public class GC extends Fontable {
 
   // opcode 55 - create gc
   /**
+   * Creates a GC for the specified drawable with the specified values.
+   *
    * @see <a href="XCreateGC.html">XCreateGC</a>
    */
   public void create (Drawable drawable, Values values) {
-    Request request = new Request (display, 55, 4+values.count ());
-    request.write4 (id);
-    request.write4 (drawable.id);
-    request.write4 (values.bitmask);
-    values.write (request);
-    display.send_request (request);
-  }
 
+    RequestOutputStream o = display.out;
+    synchronized (o) {
+      o.begin_request(55, 0, 4 + values.count());
+      o.write_int32 (id);
+      o.write_int32 (drawable.id);
+      values.write (o);
+      o.send ();
+    }
+  }
 
   // opcode 56 - change gc
   /**
-   * This request will be aggregated.
-   * 
+   * Changes the current settings for this GC. This request will be aggregated.
+   *
+   * @param values the values to change
+   *
    * @see <a href="XChangeGC.html">XChangeGC</a>
    * @see Request.Aggregate aggregation
    */
   public void change (Values values) {
-    display.send_request (new Request.ValueList (display, 56, 3, id, values));
+
+    RequestOutputStream o = display.out;
+    synchronized (o) {
+      o.begin_request (56, 0, 0);
+      ChangeGCRequestObject cr = new ChangeGCRequestObject (values);
+      cr.write(o);
+      o.send ();
+    }
   }
 
 
   // opcode 57 - copy gc
   /**
+   * Copies the state from this GC into the specified destination GC. The
+   * mask is used to include/exclude specific state.
+   *
+   * @param dest the destination GC
+   * @param mask the state mask
+   *
    * @see <a href="XCopyGC.html">XCopyGC</a>
    */
   public void copy (GC dest, int mask) {
-    Request request = new Request (display, 57, 4);
-    request.write4 (id);
-    request.write4 (dest.id);
-    request.write4 (mask);
-    display.send_request (request);
+
+    RequestOutputStream o = display.out;
+    synchronized (o) {
+      o.begin_request (57, 0, 4);
+      o.write_int32 (id); // Src-ID.
+      o.write_int32 (dest.id); // Dst-ID.
+      o.write_int32 (mask);
+      o.send ();
+    }
+
   }
 
   
   // opcode 58 - set dashes
   /**
+   * Sets the dashes used for drawing lines.
+   *
+   * @param dash_offset the dash offset
+   * @param dashes the dashes spec
+   *
    * @see <a href="XSetDashes.html">XSetDashes</a>
    */
   public void set_dashes (int dash_offset, byte [] dashes) {
-    Request request = new Request (display, 58, 3+Data.unit (dashes));
-    request.write4 (id);
-    request.write2 (dash_offset);
-    request.write2 (dashes.length);
-    request.write1 (dashes);
-    display.send_request (request);
+    
+    int n = dashes.length;
+    int p = 4 - (n % 4);
+
+    RequestOutputStream o = display.out;
+    synchronized (o) {
+      o.begin_request (58, 0, 3 + (n + p) / 4);
+
+      o.write_int32 (id); // The GC id.
+      o.write_int16 (dash_offset); // The dash offset.
+      o.write_int16 (n); // The number of dashes.
+      o.write_bytes (dashes); // The actual dashes.
+
+      for (int i = 0; i < p; i++)
+        o.write_int8 (0); // Pad.
+
+      o.send ();
+    }
   }
 
 
@@ -394,21 +469,23 @@ public class GC extends Fontable {
    * @see <a href="XSetClipRectangles.html">XSetClipRectangles</a>
    */
   public void set_clip_rectangles (int clip_x_origin, int clip_y_origin,
-    Rectangle [] rectangles, int ordering) {
+                                   Rectangle [] rectangles, int ordering) {
 
-    Request request = new Request (display, 59, ordering, 3+2*rectangles.length);
-    request.write4 (id);
-    request.write2 (clip_x_origin);
-    request.write2 (clip_y_origin);
+    RequestOutputStream o = display.out;
+    synchronized (o) {
+      o.begin_request (59, ordering, 3+2*rectangles.length);
+      o.write_int32 (id);
+      o.write_int16 (clip_x_origin);
+      o.write_int16 (clip_y_origin);
 
-    for (int i=0; i<rectangles.length; i++) {
-      request.write2 (rectangles [i].x);
-      request.write2 (rectangles [i].y);
-      request.write2 (rectangles [i].width);
-      request.write2 (rectangles [i].height);
+      for (int i = 0; i < rectangles.length; i++) {
+        o.write_int16 (rectangles [i].x);
+        o.write_int16 (rectangles [i].y);
+        o.write_int16 (rectangles [i].width);
+        o.write_int16 (rectangles [i].height);
+      }
+      o.send ();
     }
-
-    display.send_request (request);
   }
 
 
@@ -417,9 +494,12 @@ public class GC extends Fontable {
    * @see <a href="XFreeGC.html">XFreeGC</a>
    */
   public void free () {
-    Request request = new Request (display, 60, 2);
-    request.write4 (id);
-    display.send_request (request);
+    RequestOutputStream o = display.out;
+    synchronized (o) {
+      o.begin_request (60, 0, 2);
+      o.write_int32 (id);
+      o.send ();
+    }
   }
 
 
@@ -607,9 +687,15 @@ public class GC extends Fontable {
    * @see Values#set_foreground(int)
    */
   public void set_foreground (int pixel) {
-    Values gc_values = new Values ();
-    gc_values.set_foreground (pixel);
-    change (gc_values);
+    RequestOutputStream o = display.out;
+    synchronized (o) {
+      o.begin_request (56, 0, 0);
+      Values v = new Values ();
+      v.set_foreground (pixel);
+      ChangeGCRequestObject ro = new ChangeGCRequestObject (v);
+      ro.write (o);
+      o.send ();
+    }
   }
 
 
