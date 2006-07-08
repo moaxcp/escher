@@ -5,6 +5,7 @@ import gnu.x11.image.Image;
 
 /** X drawable. */
 public abstract class Drawable extends Resource {
+
   public int width, height;
 
 
@@ -25,6 +26,52 @@ public abstract class Drawable extends Resource {
     super (display, id);
   }
 
+  public static class GeometryInfo {
+
+    public int depth;
+    public int root_window_id;
+    public int x;
+    public int y;
+    public int width;
+    public int height;
+    public int border_width;
+
+    GeometryInfo (ResponseInputStream i) {
+      depth = i.read_int8 ();
+      i.skip (6);
+      root_window_id = i.read_int32 ();
+      x = i.read_int16 ();
+      y = i.read_int16 ();
+      width = i.read_int16 ();
+      height = i.read_int16 ();
+      border_width = i.read_int16 ();
+      i.skip (10); // Unused.
+    }
+  }
+
+  // opcode 14 - get geometry
+  /**
+   * @see <a href="XGetGeometry.html">XGetGeometry</a>
+   */
+  public GeometryInfo get_geometry () {
+
+    GeometryInfo info;
+    RequestOutputStream o = display.out;
+    synchronized (o) {
+      o.begin_request (14, 0, 2);
+      o.write_int32 (id);
+      ResponseInputStream i = display.in;
+      synchronized (i) {
+        i.read_reply (o);
+        assert i.read_int8 () == 1;
+        info = new GeometryInfo (i);
+      }
+    }
+    // FIXME: Is this good? Not sure.
+    width = info.width;
+    height = info.height;
+    return info;
+  }
 
   // opcode 62 - copy area
   /**
