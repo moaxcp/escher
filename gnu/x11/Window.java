@@ -1,11 +1,12 @@
 package gnu.x11;
 
 import gnu.x11.event.Event;
-import gnu.x11.event.ClientMessage;
+import gnu.x11.extension.glx.GLXDrawable;
 
 
 /** X window. */
-public class Window extends Drawable {
+public class Window extends Drawable implements GLXDrawable {
+
   /**
    * Predefined windows.
    *
@@ -269,21 +270,23 @@ public class Window extends Drawable {
    * @see <a href="XCreateWindow.html">XCreateWindow</a>
    */  
   public void create (int border_width, int depth, int klass, int visual_id,
-    Attributes attr) {
+                      Attributes attr) {
 
-    Request request = new Request (display, 1, depth, 8+attr.count ());
-    request.write4 (id);
-    request.write4 (parent.id);
-    request.write2 (x);
-    request.write2 (y);
-    request.write2 (width);
-    request.write2 (height);
-    request.write2 (border_width);
-    request.write2 (klass);
-    request.write4 (visual_id);
-    request.write4 (attr.bitmask);
-    attr.write (request);
-    display.send_request (request);
+    RequestOutputStream o = display.out;
+    synchronized (o) {
+      o.begin_request (1, depth, 8+attr.count ());
+      o.write_int32 (id);
+      o.write_int32 (parent.id);
+      o.write_int32 (x);
+      o.write_int32 (y);
+      o.write_int32 (width);
+      o.write_int32 (height);
+      o.write_int32 (border_width);
+      o.write_int32 (klass);
+      o.write_int32 (visual_id);
+      attr.write (o);
+      o.send ();
+    }
   }
 
 
@@ -314,13 +317,80 @@ public class Window extends Drawable {
    * @see Request.Aggregate aggregation
    */  
   public void change_attributes (Attributes attr) {
-    display.send_request (new Request.ValueList (display, 2, 3, id, attr));
+    // FIXME: Implement aggregation.
+    RequestOutputStream o = display.out;
+    synchronized (o) {
+      o.begin_request (2, 0, 3 + attr.count ());
+      o.write_int32 (id);
+      attr.write (o);
+      o.send ();
+    }
   }
 
 
   /** Reply of {@link #attributes()}. */
-  public static class AttributesReply extends Data {
-    public AttributesReply (Data data) { super (data); }
+  public static class AttributesReply {
+
+    public int backing_store;
+
+    public int visual_id;
+
+    public int window_class;
+
+    public int bit_gravity;
+
+    public int win_gravity;
+
+    public int backing_planes;
+
+    public int backing_pixel;
+
+    public boolean save_under;
+
+    public boolean map_is_installed;
+
+    public int map_state;
+
+    public boolean override_redirect;
+
+    public int colormap_id;
+
+    public int all_event_masks;
+
+    public int your_event_mask;
+
+    public int do_not_propagate_mask;
+
+    /**
+     * Reads the AttributesReply data from the specified input stream.
+     */
+    public AttributesReply (ResponseInputStream in) {
+
+      int code = in.read_int8 ();
+      assert code == 1 : "Errors and events should be catched in Connection";
+
+      backing_store = in.read_int8 ();
+
+      in.read_int16 (); // Sequence number, not needed.
+
+      in.read_int32 (); // Reply length, not needed.
+
+      visual_id = in.read_int32 ();
+      window_class = in.read_int16 ();
+      bit_gravity = in.read_int8 ();
+      win_gravity = in.read_int8 ();
+      backing_planes = in.read_int32 ();
+      backing_pixel = in.read_int32 ();
+      save_under = in.read_bool ();
+      map_is_installed = in.read_bool ();
+      map_state = in.read_int8 ();
+      override_redirect = in.read_bool ();
+      colormap_id = in.read_int32 ();
+      all_event_masks = in.read_int32 ();
+      your_event_mask = in.read_int32 ();
+      do_not_propagate_mask = in.read_int16 ();
+      in.skip (2); // Unused.
+    }
   
   
     public static final int UNMAPPED = 0;
@@ -334,10 +404,14 @@ public class Window extends Drawable {
      * {@link #UNVIEWABLE},
      * {@link #VIEWABLE}
      */
-    public int map_state () { return read1 (26); }
+    public int map_state () {
+      return map_state;
+    }
   
   
-    public boolean override_redirect () { return read_boolean (27); }
+    public boolean override_redirect () {
+      return override_redirect;
+    }
   }
   
   
@@ -346,9 +420,18 @@ public class Window extends Drawable {
    * @see <a href="XGetAttributes.html">XGetAttributes</a>
    */
   public AttributesReply attributes () {
-    Request request = new Request (display, 3, 2);
-    request.write4 (id);
-    return new AttributesReply (display.read_reply (request));
+    RequestOutputStream o = display.out;
+    AttributesReply r;
+    synchronized (o) {
+      o.begin_request (3, 0, 2);
+      o.write_int32 (id);
+      ResponseInputStream i = display.in;
+      synchronized (i) {
+        i.read_reply (o);
+        r = new AttributesReply (i);
+      }
+    }
+    return r;
   }
 
 
@@ -357,9 +440,12 @@ public class Window extends Drawable {
    * @see <a href="XDestroyWindow.html">XDestroyWindow</a>
    */
   public void destroy () {
-    Request request = new Request (display, 4, 2);
-    request.write4 (id);
-    display.send_request (request);
+    RequestOutputStream o = display.out;
+    synchronized (o) {
+      o.begin_request (4, 0, 2);
+      o.write_int32 (id);
+      o.send ();
+    }
   }
 
 
@@ -368,9 +454,12 @@ public class Window extends Drawable {
    * @see <a href="XDestroySubwindows.html">XDestroySubwindows</a>
    */
   public void destroy_subwindows () {
-    Request request = new Request (display, 5, 2);
-    request.write4 (id);
-    display.send_request (request);
+    RequestOutputStream o = display.out;
+    synchronized (o) {
+      o.begin_request (5, 0, 2);
+      o.write_int32 (id);
+      o.send ();
+    }
   }  
 
 
@@ -387,9 +476,12 @@ public class Window extends Drawable {
    * @see <a href="XChangeSaveSet.html">XChangeSaveSet</a>
    */  
   public void change_save_set (boolean mode) {
-    Request request = new Request (display, 6, mode, 2);
-    request.write4 (id);
-    display.send_request (request);    
+    RequestOutputStream o = display.out;
+    synchronized (o) {
+      o.begin_request (6, mode ? 1 : 0, 2);
+      o.write_int32 (id);
+      o.send ();
+    }
   }
 
 
@@ -398,12 +490,16 @@ public class Window extends Drawable {
    * @see <a href="XReparentWindow.html">XReparentWindow</a>
    */
   public void reparent (Window parent, int x, int y) {
-    Request request = new Request (display, 7, 4);
-    request.write4 (id);
-    request.write4 (parent.id);
-    request.write2 (x);
-    request.write2 (y);
-    display.send_request (request);
+
+    RequestOutputStream o = display.out;
+    synchronized (o) {
+      o.begin_request (7, 0, 4);
+      o.write_int32 (id);
+      o.write_int32 (parent.id);
+      o.write_int16 (x);
+      o.write_int16 (y);
+      o.send ();
+    }
   }
 
 
@@ -412,9 +508,12 @@ public class Window extends Drawable {
    * @see <a href="XMapWindow.html">XMapWindow</a>
    */
   public void map () {
-    Request request = new Request (display, 8, 2);
-    request.write4 (id);
-    display.send_request (request);
+    RequestOutputStream o = display.out;
+    synchronized (o) {
+      o.begin_request (8, 0, 2);
+      o.write_int32 (id);
+      o.send ();
+    }
   }
 
 
@@ -423,9 +522,12 @@ public class Window extends Drawable {
    * @see <a href="XMapSubwindows.html">XMapSubwindows</a>
    */
   public void map_subwindows () {
-    Request request = new Request (display, 9, 2);
-    request.write4 (id);
-    display.send_request (request);
+    RequestOutputStream o = display.out;
+    synchronized (o) {
+      o.begin_request (9, 0, 2);
+      o.write_int32 (id);
+      o.send ();
+    }
   }  
 
 
@@ -434,9 +536,12 @@ public class Window extends Drawable {
    * @see <a href="XUnmapWindow.html">XUnmapWindow</a>
    */
   public void unmap () {
-    Request request = new Request (display, 10, 2);
-    request.write4 (id);
-    display.send_request (request);
+    RequestOutputStream o = display.out;
+    synchronized (o) {
+      o.begin_request (10, 0, 2);
+      o.write_int32 (id);
+      o.send ();
+    }
   }
 
 
@@ -445,9 +550,12 @@ public class Window extends Drawable {
    * @see <a href="XUnmapSubwindows.html">XUnmapSubwindows</a>
    */
   public void unmap_subwindows () {
-    Request request = new Request (display, 11, 2);
-    request.write4 (id);
-    display.send_request (request);
+    RequestOutputStream o = display.out;
+    synchronized (o) {
+      o.begin_request (11, 0, 2);
+      o.write_int32 (id);
+      o.send ();
+    }
   }
 
 
@@ -497,8 +605,14 @@ public class Window extends Drawable {
    * @see Request.Aggregate aggregation
    */
   public void configure (Changes changes) {
-    display.send_request (new Request.ValueList (
-      display, 12, 3, id, changes));
+    // FIXME: Implement aggregation.
+    RequestOutputStream o = display.out;
+    synchronized (o) {
+      o.begin_request (12, 0, 3 + changes.count ());
+      o.write_int32 (id);
+      changes.write (o);
+      o.send ();
+    }
   }
 
 
@@ -515,94 +629,38 @@ public class Window extends Drawable {
    * @see <a href="XCirculateSubwindows.html">XCirculateSubwindows</a>
    */
   public void circulate_window (int direction) {
-    Request request = new Request (display, 13, direction, 2);
-    request.write4 (id);
-    display.send_request (request);
-  }
-
-
-  /** Reply of {@link #geometry()}. */
-  public static class GeometryReply extends Data {
-    public Display display;
-
-    public GeometryReply (Display display, Data data) { 
-      super (data);
-      this.display = display;
+    RequestOutputStream o = display.out;
+    synchronized (o) {
+      o.begin_request (13, direction, 2);
+      o.write_int32 (id);
+      o.send ();
     }
-
-
-    public int depth () { return read1 (1); }
-    public int root_id () { return read4 (8); }
-    public Window root () { return (Window) intern (display, read4 (8)); }
-    public int x () { return read2 (12); }
-    public int y () { return read2 (14); }
-    public int width () { return read2 (16); }
-    public int height () { return read2 (18); }
-    public int border_width () { return read2 (20); }
   }
-  
-  
-  // opcode 14 - get geometry
-  /**
-   * @see <a href="XGetGeometry.html">XGetGeometry</a>
-   */
-  public GeometryReply geometry () {
-    Request request = new Request (display, 14, 2);
-    request.write4 (id);
-
-    Data reply = display.read_reply (request);
-    GeometryReply gr = new GeometryReply (display, reply);
-
-    // update our variables
-    x = gr.x ();
-    y = gr.y ();
-    width = gr.width ();
-    height = gr.height ();
-
-    return gr;
-  }
-
 
   /** Reply of {@link #tree()}. */
-  public static class TreeReply extends Data {
-    public Display display;
+  public class TreeInfo {
 
-    public TreeReply (Display display, Data data) { 
-      super (data); 
-      this.display = display;
+    Window root;
+    Window parent;
+    Window [] children;
+
+    TreeInfo (ResponseInputStream i) {
+      root = (Window) intern (display, i.read_int32 ());
+      int parent_id = i.read_int32 ();
+      if (parent_id != 0)
+        parent = (Window) intern (display, parent_id);
+      else
+        parent = null;
+
+      int num_windows = i.read_int16 ();
+      i.skip (14);
+      children = new Window [num_windows];
+      for (int j = 0; j < num_windows; j++) {
+        int id = i.read_int32 ();
+        children [j] = (Window) intern (display, id);
+      }
     }
 
-
-    public int root_id () { return read4 (8); }
-    public int parent_id () { return read4 (12); }
-    public int children_count () { return read2 (16); }
-
-
-    public Window root () {
-      return (Window) intern (display, root_id ());
-    }
-
-
-    /**
-     * @return possible: {@link #NONE}
-     */
-    public Window parent () {
-      return (Window) intern (display, parent_id ());
-    }
-
-
-    /**
-     * @return valid:
-     * {@link Enum#next()} of type {@link Window},
-     * {@link Enum#next4()}
-     */
-    public Enum children () {
-      return new Enum (this, 32, children_count ()) {
-        public Object next () {
-          return intern (display, next4 ());
-        }
-      };
-    }
   }
 
 
@@ -610,10 +668,22 @@ public class Window extends Drawable {
   /**
    * @see <a href="XQueryTree.html">XQueryTree</a>
    */
-  public TreeReply tree () {
-    Request request = new Request (display, 15, 2);
-    request.write4 (id);
-    return new TreeReply (display, display.read_reply (request));
+  public TreeInfo tree () {
+
+    TreeInfo info;
+    RequestOutputStream o = display.out;
+    synchronized (o) {
+      o.begin_request (15, 0, 2);
+      o.write_int32 (id);
+      ResponseInputStream i = display.in;
+      synchronized (i) {
+        i.read_reply (o);
+        assert i.read_int8 () == 1;
+        i.skip (7);
+        info = new TreeInfo (i);
+      }
+    }
+    return info;
   }
 
 
@@ -645,23 +715,38 @@ public class Window extends Drawable {
    * @see <a href="XChangeProperty.html">XChangeProperty</a>
    */ 
   public void change_property (int mode, int n, Atom property, Atom type,
-    int format, Object data, int offset, int data_format) {
+                               int format, byte [] data, int offset, int data_format) {
 
-    Request request = new Request (display, 18, mode, 6+Data.unit (n*format/8));
-    request.write4 (id);
-    request.write4 (property.id);
-    request.write4 (type.id);
-    request.write1 (format);
-    request.write3_unused ();
-    request.write4 (n);		// data length in format unit
-
-    // data
-    switch (data_format) {
-    case 8: request.write1 ((byte []) data, offset); break;    
-    case 16: request.write2 ((int []) data, offset); break;
-    case 32: request.write4 ((int []) data, offset); break;
+    int len = 0;
+    switch (format) {
+    case 8:
+      len = n;
+      break;
+    case 16:
+      len = n * 2;
+      break;
+    case 32:
+      len = n * 4;
+      break;
+    default:
+      len = 0;
     }
-    display.send_request (request);
+
+    int p = RequestOutputStream.pad (len);
+
+    RequestOutputStream o = display.out;
+    synchronized (o) {
+      o.begin_request (18, mode, 6 + (n + p) / 4);
+      o.write_int32 (id);
+      o.write_int32 (property.id);
+      o.write_int32 (type.id);
+      o.write_int8 (format);
+      o.skip (3);
+      o.write_int32 (n); // data length in format unit
+      o.write (data);
+      o.skip (p);
+      o.send ();
+    }
   }
 
 
@@ -670,24 +755,56 @@ public class Window extends Drawable {
    * @see <a href="XDeleteProperty.html">XDeleteProperty</a>
    */
   public void delete_property (Atom property) {
-    Request request = new Request (display, 19, 3);
-    request.write4 (id);
-    request.write4 (property.id);
-    display.send_request (request);
+
+    RequestOutputStream o = display.out;
+    synchronized (o) {
+      o.begin_request (19, 0, 3);
+      o.write_int32 (id);
+      o.write_int32 (property.id);
+      o.send ();
+    }
   }
 
 
   /** Reply of {@link #property(boolean, Atom, Atom, int, int)}. */
-  public static class PropertyReply extends Data {
-    public PropertyReply (Data data) { super (data); }
-    public int format () { return read1 (1); }
-    public int type_id () { return read4 (8); }
-    public int byte_after () { return read4 (12); }
-    public int length () { return read4 (16); }
-  
-  
-    public Enum items () {
-      return new Enum (this, 32, length ());
+  public class Property {
+
+    public int format;
+    public Atom type;
+    public int bytes_after;
+    public int length;
+    public byte [] value;
+
+    Property (ResponseInputStream i) {
+      format = i.read_int8 ();
+      i.skip (6);
+      int atom_id = i.read_int32 ();
+      if (atom_id != 0)
+        type = (Atom) Atom.intern (display, atom_id);
+      else
+        type = null;
+      bytes_after = i.read_int32 ();
+      length = i.read_int32 ();
+      i.skip (12);
+      int num_bytes;
+      switch (format) {
+      case 8:
+        num_bytes = length;
+        break;
+      case 16:
+        num_bytes = length * 2;
+        break;
+      case 32:
+        num_bytes = length * 4;
+        break;
+      default:
+        num_bytes = 0;
+      }
+      value = new byte [num_bytes];
+      i.read_data (value);
+      int p = RequestOutputStream.pad (num_bytes);
+      if (p > 0)
+        i.skip (p);
     }
   }
   
@@ -696,16 +813,26 @@ public class Window extends Drawable {
   /**
    * @see <a href="XGetWindowProperty.html">XGetWindowProperty</a>
    */
-  public PropertyReply property (boolean delete, Atom property, Atom type, 
-    int offset, int length) {
-    
-    Request request = new Request (display, 20, delete, 6);
-    request.write4 (id);
-    request.write4 (property.id);
-    request.write4 (type.id);
-    request.write4 (offset);
-    request.write4 (length);
-    return new PropertyReply (display.read_reply (request));
+  public Property get_property (boolean delete, Atom property,
+                                Atom type, int offset, int length) {
+
+    Property prop;
+    RequestOutputStream o = display.out;
+    synchronized (o) {
+      o.begin_request (20, delete ? 1 : 0, 6);
+      o.write_int32 (id);
+      o.write_int32 (property.id);
+      o.write_int32 (type.id);
+      o.write_int32 (offset);
+      o.write_int32 (length);
+      ResponseInputStream i = display.in;
+      synchronized (i) {
+        i.read_reply (o);
+        assert i.read_int8 () == 1;
+        prop = new Property (i);
+      }
+    }
+    return prop;
   }
 
 
@@ -718,16 +845,27 @@ public class Window extends Drawable {
    * @see <a href="XRotateWindowProperties.html">
    * XRotateWindowProperties</a>
    */
-  public Enum properties () {
-    Request request = new Request (display, 21, 2);
-    request.write4 (id);
+  public Atom [] list_properties () {
 
-    Data reply = display.read_reply (request);
-    return new Enum (reply, 32, reply.read2 (8)) {
-      public Object next () {
-        return Atom.intern (display, next4 ());
+    Atom [] atoms;
+    RequestOutputStream o = display.out;
+    synchronized (o) {
+      o.begin_request (21, 0, 2);
+      o.write_int32 (id);
+      ResponseInputStream i = display.in;
+      synchronized (i) {
+        i.read_reply (o);
+        assert i.read_int8 () == 1;
+        i.skip (7);
+        int num_atoms = i.read_int16 ();
+        atoms = new Atom [num_atoms];
+        i.skip (22);
+        for (int j = 0; j < num_atoms; j++) {
+          atoms [j] = (Atom) Atom.intern (display, i.read_int32 ());
+        }
       }
-    };
+    }
+    return atoms;
   }
 
 
@@ -737,11 +875,14 @@ public class Window extends Drawable {
    * @see <a href="XSetSelectionOwner.html">XSetSelectionOwner</a>
    */
   public void set_selection_owner (Atom selection, int time) {
-    Request request = new Request (display, 22, 4);
-    request.write4 (id);
-    request.write4 (selection.id);
-    request.write4 (time);
-    display.send_request (request);
+    RequestOutputStream o = display.out;
+    synchronized (o) {
+      o.begin_request (22, 0, 4);
+      o.write_int32 (id);
+      o.write_int32 (selection.id);
+      o.write_int32 (time);
+      o.send ();
+    }
   }
 
 
@@ -751,15 +892,18 @@ public class Window extends Drawable {
    * @see <a href="XConvertSelection.html">XConvertSelection</a>
    */
   public void convert_selection (Atom selection, Atom target, 
-    Atom property, int time) {
+                                 Atom property, int time) {
 
-    Request request = new Request (display, 24, 6);
-    request.write4 (id);
-    request.write4 (selection.id);
-    request.write4 (target.id);
-    request.write4 (property.id);
-    request.write4 (time);
-    display.send_request (request);
+    RequestOutputStream o = display.out;
+    synchronized (o) {
+      o.begin_request (24, 0, 6);
+      o.write_int32 (id);
+      o.write_int32 (selection.id);
+      o.write_int32 (target.id);
+      o.write_int32 (property.id);
+      o.write_int32 (time);
+      o.send ();
+    }
   }
 
 
@@ -768,13 +912,16 @@ public class Window extends Drawable {
    * @see <a href="XSendEvent.html">XSendEvent</a>
    */
   public void send_event (boolean propagate, int event_mask, 
-    Event event) {
+                          Event event) {
 
-    Request request = new Request (display, 25, propagate, 11);
-    request.write4 (id);
-    request.write4 (event_mask);
-    request.write1 (event.data);
-    display.send_request (request);
+    RequestOutputStream o = display.out;
+    synchronized (o) {
+      o.begin_request (25, propagate ? 1 : 0, 11);
+      o.write_int32 (id);
+      o.write_int32 (event_mask);
+      event.write (o);
+      o.send ();
+    }
   }
 
 
@@ -816,15 +963,26 @@ public class Window extends Drawable {
     int pointer_mode, int keyboard_mode, Window confine_to, Cursor cursor,
     int time) { 
 
-    Request request = new Request (display, 26, owner_events, 6);
-    request.write4 (id);
-    request.write2 (event_mask);
-    request.write1 (pointer_mode);
-    request.write1 (keyboard_mode);
-    request.write4 (confine_to.id);
-    request.write4 (cursor.id);
-    request.write4 (time);
-    return display.read_reply (request).read1 (1);  
+    int status;
+    RequestOutputStream o = display.out;
+    synchronized (o) {
+      o.begin_request (26, owner_events ? 1 : 0, 6);
+      o.write_int32 (id);
+      o.write_int16 (event_mask);
+      o.write_int16 (pointer_mode);
+      o.write_int16 (keyboard_mode);
+      o.write_int32 (confine_to.id);
+      o.write_int32 (cursor.id);
+      o.write_int32 (time);
+      ResponseInputStream i = display.in;
+      synchronized (i) {
+        i.read_reply (o);
+        assert i.read_int8 () == 1;
+        status = i.read_int8 ();
+        i.skip (30);
+      }
+    }
+    return status;  
   }
 
 
@@ -849,20 +1007,23 @@ public class Window extends Drawable {
    * @see <a href="XGrabButton.html">XGrabButton</a>
    */
   public void grab_button (int button, int modifiers, boolean owner_events,
-    int event_mask, int pointer_mode, int keyboard_mode, Window confine_to,
-    Cursor cursor) { 
-    
-    Request request = new Request (display, 28, owner_events, 6);
-    request.write4 (id);
-    request.write2 (event_mask);
-    request.write1 (pointer_mode);
-    request.write1 (keyboard_mode);
-    request.write4 (confine_to.id);
-    request.write4 (cursor.id);
-    request.write1 (button);
-    request.write1_unused ();
-    request.write2 (modifiers);
-    display.send_request (request);
+                           int event_mask, int pointer_mode, int keyboard_mode,
+                           Window confine_to, Cursor cursor) { 
+
+    RequestOutputStream o = display.out;
+    synchronized (o) {
+      o.begin_request (28, owner_events ? 1 : 0, 6);
+      o.write_int32 (id);
+      o.write_int16 (event_mask);
+      o.write_int8 (pointer_mode);
+      o.write_int8 (keyboard_mode);
+      o.write_int32 (confine_to.id);
+      o.write_int32 (cursor.id);
+      o.write_int8 (button);
+      o.skip (1);
+      o.write_int16 (modifiers);
+      o.send ();
+    }
   }
 
 
@@ -873,10 +1034,14 @@ public class Window extends Drawable {
    * @see <a href="XUngrabButton.html">XUngrabButton</a>
    */
   public void ungrab_button (int button, int modifiers) {
-    Request request = new Request (display, 29, button, 3);
-    request.write4 (id);
-    request.write2 (modifiers);
-    display.send_request (request);
+    RequestOutputStream o = display.out;
+    synchronized (o) {
+      o.begin_request (29, button, 3);
+      o.write_int32 (id);
+      o.write_int16 (modifiers);
+      o.skip (2);
+      o.send ();
+    }
   }
   
 
@@ -904,12 +1069,24 @@ public class Window extends Drawable {
   public int grab_keyboard  (boolean owner_events, int pointer_mode, 
     int keyboard_mode, int time) { 
 
-    Request request = new Request (display, 31, owner_events, 4);
-    request.write4 (id);
-    request.write4 (time);
-    request.write1 (pointer_mode);
-    request.write1 (keyboard_mode);
-    return display.read_reply (request).read1 (1);
+    int status;
+    RequestOutputStream o = display.out;
+    synchronized (o) {
+      o.begin_request (31, owner_events ? 1 : 0, 4);
+      o.write_int32 (id);
+      o.write_int32 (time);
+      o.write_int8 (pointer_mode);
+      o.write_int8 (keyboard_mode);
+      o.skip (2);
+      ResponseInputStream i = display.in;
+      synchronized (i) {
+        i.read_reply (o);
+        assert i.read_int8 () == 1;
+        status = i.read_int8 ();
+        i.skip (30);
+      }
+    }
+    return status;
   }
 
   
@@ -927,17 +1104,20 @@ public class Window extends Drawable {
    * @see <a href="XGrabKey.html">XGrabKey</a>
    */
   public void grab_key (int keysym, int modifiers, boolean owner_events, 
-    int pointer_mode, int keyboard_mode) {
+                        int pointer_mode, int keyboard_mode) {
 
     int keycode = display.input.keysym_to_keycode (keysym);
 
-    Request request = new Request (display, 33, owner_events, 4);
-    request.write4 (id);
-    request.write2 (modifiers);
-    request.write1 (keycode);
-    request.write1 (pointer_mode);
-    request.write1 (keyboard_mode);
-    display.send_request (request);
+    RequestOutputStream o = display.out;
+    synchronized (o) {
+      o.begin_request (33, owner_events ? 1 : 0, 4);
+      o.write_int32 (id);
+      o.write_int16 (modifiers);
+      o.write_int8 (keycode);
+      o.write_int8 (pointer_mode);
+      o.write_int8 (keyboard_mode);
+      o.send ();
+    }
   }
 
 
@@ -954,36 +1134,51 @@ public class Window extends Drawable {
     int keycode = keysym == 0 ? 0 
       : display.input.keysym_to_keycode (keysym);
 
-    Request request = new Request (display, 34, keycode, 3);
-    request.write4 (id);
-    request.write2 (modifiers);
-    display.send_request (request);
+    RequestOutputStream o = display.out;
+    synchronized (o) {
+      o.begin_request (34, keycode, 3);
+      o.write_int32 (id);
+      o.write_int16 (modifiers);
+      o.skip (2);
+      o.send ();
+    }
   }
 
 
   /** Reply of {@link #pointer()}. */
-  public static class PointerReply extends Data {
-    public Display display;
+  public class PointerInfo {
 
-    public PointerReply (Display display, Data data) {
-      super (data);
-      this.display = display;
+    public boolean same_screen; 
+    public Window root;
+    public Window child;
+
+    public int root_x;
+    public int root_y;
+
+    public int win_x;
+    public int win_y;
+
+    public int mask;
+
+    PointerInfo (ResponseInputStream i) {
+      same_screen = i.read_bool ();
+      i.skip (6);
+
+      int root_id = i.read_int32 ();
+      root = (Window) intern (display, root_id);
+
+      int child_id = i.read_int32 ();
+      if (child_id != 0)
+        child = (Window) intern (display, root_id);
+      else
+        child = null;
+
+      root_x = i.read_int16 ();
+      root_y = i.read_int16 ();
+      win_x = i.read_int16 ();
+      win_y = i.read_int16 ();
+      mask = i.read_int16 ();
     }
-  
-  
-    public int child_id () { return read4 (12); }
-    public int root_x () { return read2 (16);}
-    public int root_y () { return read2 (18);}
-  
-  
-    public Window child () { 
-      return (Window) intern (display, child_id ()); 
-    }
-  
-  
-    public Point root_position () { 
-      return new Point (root_x (), root_y ()); 
-    } 
   }
   
   
@@ -991,18 +1186,37 @@ public class Window extends Drawable {
   /**
    * @see <a href="XQueryPointer.html">XQueryPointer</a>
    */
-  public PointerReply pointer () {
-    Request request = new Request (display, 38, 2);
-    request.write4 (id);	       
-    return new PointerReply (display, display.read_reply (request));
+  public PointerInfo query_pointer () {
+
+    PointerInfo info;
+    RequestOutputStream o = display.out;
+    synchronized (o) {
+      o.begin_request (38, 0, 2);
+      o.write_int32 (id);
+      ResponseInputStream i = display.in;
+      synchronized (i) {
+        i.read_reply (o);
+        assert i.read_int8 () == 1;
+        info = new PointerInfo (i);
+        i.skip (6);
+      }
+    }
+    return info;
   }
 
   
-  /** Reply of {@link #motion_events(int, int)}. */
-  public static class MotionEventsReply extends Data {
-    public MotionEventsReply (Data data) { super (data); }
-  }
+  public static class TimeCoord {
 
+    public long timestamp;
+    public int x;
+    public int y;
+
+    TimeCoord (ResponseInputStream i) {
+      timestamp = i.read_int32 ();
+      x = i.read_int16 ();
+      y = i.read_int16 ();
+    }
+  }
 
   // opcode 39 - get motion events
   /**
@@ -1010,35 +1224,75 @@ public class Window extends Drawable {
    * @param stop possible: {@link Display#CURRENT_TIME}
    * @see <a href="XGetMotionEvents.html">XGetMotionEvents</a>
    */
-  public MotionEventsReply motion_events (int start, int stop) {
-    Request request = new Request (display, 39, 4);
-    request.write4 (id);
-    request.write4 (start);
-    request.write4 (stop);
-    return new MotionEventsReply (display.read_reply (request));
+  public TimeCoord [] get_motion_events (int start, int stop) {
+
+    TimeCoord [] timecoords;
+
+    RequestOutputStream o = display.out;
+    synchronized (o) {
+      o.begin_request (39, 0, 4);
+      o.write_int32 (id);
+      o.write_int32 (start);
+      o.write_int32 (stop);
+      ResponseInputStream i = display.in;
+      synchronized (i) {
+        i.read_reply (o);
+        assert i.read_int8 () == 1;
+        i.skip (7);
+        int len = i.read_int32 ();
+        timecoords = new TimeCoord [len];
+        i.skip (20);
+        for (int j = 0; j < len; j++)
+          timecoords [j] = new TimeCoord (i);
+      }
+    }
+    return timecoords;
   }
 
 
   
   /** Reply of {@link #translate_coordinates(Window, int, int)}. */
-  public static class CoordinateReply extends Data {
-    public CoordinateReply (Data data) { super (data); }
+  public class Coordinates {
+    boolean same_screen;
+    Window child;
+    public int x;
+    public int y;
+    Coordinates (ResponseInputStream i) {
+      same_screen = i.read_bool ();
+      i.skip (6);
+      int child_id = i.read_int32 ();
+      if (child_id != 0)
+        child = (Window) intern (display, child_id);
+      else
+        child = null;
+      x = i.read_int16 ();
+      y = i.read_int16 ();
+    }
   }
-  
 
   // opcode 40 - translate coordinates
   /**
    * @see <a href="XTranslateCoordinates.html">XTranslateCoordinates</a>
    */
-  public CoordinateReply translate_coordinates (Window src, 
-    int src_x, int src_y) {
+  public Coordinates translate_coordinates (Window src, int src_x, int src_y) {
 
-    Request request = new Request (display, 40, 4);
-    request.write4 (src.id);
-    request.write4 (id);
-    request.write2 (src_x);
-    request.write2 (src_y);
-    return new CoordinateReply (display.read_reply (request));
+    Coordinates coords;
+    RequestOutputStream o = display.out;
+    synchronized (o) {
+      o.begin_request (40, 0, 4);
+      o.write_int32 (src.id);
+      o.write_int32 (id);
+      o.write_int16 (src_x);
+      o.write_int16 (src_y);
+      ResponseInputStream i = display.in;
+      synchronized (i) {
+        i.read_reply (o);
+        assert i.read_int8 () == 1;
+        coords = new Coordinates (i);
+        i.skip (16);
+      }
+    }
+    return coords;
   }
 
 
@@ -1048,18 +1302,21 @@ public class Window extends Drawable {
    * @see <a href="XWarpPointer.html">XWarpPointer</a>
    */
   public void warp_pointer (Window src, int src_x, int src_y, 
-    int src_width, int src_height, int dest_x, int dest_y) {
+                            int src_width, int src_height, int dest_x, int dest_y) {
 
-    Request request = new Request (display, 41, 6);
-    request.write4 (src.id);
-    request.write4 (id);
-    request.write2 (src_x);
-    request.write2 (src_y);
-    request.write2 (src_width);
-    request.write2 (src_height);
-    request.write2 (dest_x);
-    request.write2 (dest_y);
-    display.send_request (request);
+    RequestOutputStream o = display.out;
+    synchronized (o) {
+      o.begin_request (41, 0, 6);
+      o.write_int32 (src.id);
+      o.write_int32 (id);
+      o.write_int16 (src_x);
+      o.write_int16 (src_y);
+      o.write_int16 (src_width);
+      o.write_int16 (src_height);
+      o.write_int16 (dest_x);
+      o.write_int16 (dest_y);
+      o.send ();
+    }
   }
 
 
@@ -1159,10 +1416,13 @@ public class Window extends Drawable {
    * @see <a href="XSetInputFocus.html">XSetInputFocus</a>
    */
   public void set_input_focus (int revert_to, int time) {
-    Request request = new Request (display, 42, revert_to, 3);
-    request.write4 (id);
-    request.write4 (time);
-    display.send_request (request);
+    RequestOutputStream o = display.out;
+    synchronized (o) {
+      o.begin_request (43, revert_to, 3);
+      o.write_int32 (id);
+      o.write_int32 (time);
+      o.send ();
+    }
   }
 
 
@@ -1171,15 +1431,18 @@ public class Window extends Drawable {
    * @see <a href="XClearArea.html">XClearArea</a>
    */
   public void clear_area (int x, int y, int width, int height, 
-    boolean exposures) {
+                          boolean exposures) {
 
-    Request request = new Request (display, 61, exposures, 4);
-    request.write4 (id);
-    request.write2 (x);
-    request.write2 (y);
-    request.write2 (width);
-    request.write2 (height);
-    display.send_request (request);
+    RequestOutputStream o = display.out;
+    synchronized (o) {
+      o.begin_request (61, exposures ? 1 : 0, 4);
+      o.write_int32 (id);
+      o.write_int16 (x);
+      o.write_int16 (y);
+      o.write_int16 (width);
+      o.write_int16 (height);
+      o.send ();
+    }
   }
 
 
@@ -1192,16 +1455,28 @@ public class Window extends Drawable {
    * @see <a href="XListInstalledColormaps.html">
    * XListInstalledColormaps</a>
    */
-  public Enum installed_colormaps () {
-    Request request = new Request (display, 83, 2);
-    request.write4 (id);
+  public Colormap [] list_installed_colormaps () {
 
-    Data reply = display.read_reply (request);
-    return new Enum (reply, 32, reply.read2 (8)) {
-      public Object next () {
-        return Colormap.intern (display, next4 ());
+    Colormap [] maps;
+    RequestOutputStream o = display.out;
+    synchronized (o) {
+      o.begin_request (83, 0, 2);
+      o.write_int32 (id);
+      ResponseInputStream i = display.in;
+      synchronized (i) {
+        i.read_reply (o);
+        assert i.read_int8 () == 1;
+        i.skip (7);
+        int num_maps = i.read_int16 ();
+        maps = new Colormap [num_maps];
+        i.skip (22);
+        for (int j = 0; j < num_maps; j++) {
+          int id = i.read_int32 ();
+          maps [j] = (Colormap) Colormap.intern (display, id);
+        }
       }
-    };
+    }
+    return maps;
   }
 
 
@@ -1211,15 +1486,19 @@ public class Window extends Drawable {
    * XRotateWindowProperties</a>
    */
   public void rotate_properties (Atom [] properties, int delta) {
-    Request request = new Request (display, 114, 3+properties.length);
-    request.write4 (id);
-    request.write2 (properties.length);
-    request.write2 (delta);
-    
-    for (int i=0; i<properties.length; i++)
-      request.write4 (properties [i].id);
 
-    display.send_request (request);
+    RequestOutputStream o = display.out;
+    synchronized (o) {
+      o.begin_request (114, 0, 3 + properties.length);
+      o.write_int32 (id);
+      o.write_int16 (properties.length);
+      o.write_int16 (delta);
+      
+      for (int i = 0; i < properties.length; i++)
+        o.write_int32 (properties [i].id);
+
+      o.send ();
+    }
   }
 
 
@@ -1228,7 +1507,8 @@ public class Window extends Drawable {
    */
   public void change_property (Atom property, Atom type, int data) {   
     change_property (REPLACE, 1, property, type, 32, 
-      new int [] {data}, 0, 32); 
+      new byte [] {(byte) (data >> 24), (byte) (data >> 16),
+                   (byte) (data >> 8), (byte) data}, 0, 32);
   }
 
 
@@ -1240,21 +1520,22 @@ public class Window extends Drawable {
     clear_area (0, 0, width, height, exposures);
   }
 
- 
+
   public void delete () {
-    if (!(wm_protocol ("WM_DELETE_WINDOW"))) return;
-
-    ClientMessage event = new ClientMessage (display);
-    Atom wm_protocols = (Atom) Atom.intern (display, "WM_PROTOCOLS");
-    Atom wm_delete_window = (Atom) Atom.intern (display,
-      "WM_DELETE_WINDOW"); 
-
-    event.set_format (32);
-    event.set_window (this);
-    event.set_type (wm_protocols);
-    event.set_wm_data (wm_delete_window.id);
-    event.set_wm_time (display.CURRENT_TIME);
-    send_event (false, Event.NO_EVENT_MASK, event);
+    // FIXME: Re-think WM -messages.
+//    if (!(wm_protocol ("WM_DELETE_WINDOW"))) return;
+//
+//    ClientMessage event = new ClientMessage (display);
+//    Atom wm_protocols = (Atom) Atom.intern (display, "WM_PROTOCOLS");
+//    Atom wm_delete_window = (Atom) Atom.intern (display,
+//      "WM_DELETE_WINDOW"); 
+//
+//    event.set_format (32);
+//    event.set_window (this);
+//    event.set_type (wm_protocols);
+//    event.set_wm_data (wm_delete_window.id);
+//    event.set_wm_time (Display.CURRENT_TIME);
+//    send_event (false, Event.NO_EVENT_MASK, event);
   }
 
 
@@ -1312,15 +1593,16 @@ public class Window extends Drawable {
    * @see #send_event(boolean, int, Event)
    */
   public void iconify () {
-    Atom wm_change_state = (Atom) Atom.intern (display, "WM_CHANGE_STATE");
-
-    ClientMessage event = new ClientMessage (display);
-    event.set_format (32);
-    event.set_window (this);
-    event.set_type (wm_change_state);
-    event.set_wm_data (WMHints.ICONIC);
-    send_event (false, Event.SUBSTRUCTURE_REDIRECT_MASK
-      | Event.SUBSTRUCTURE_NOTIFY_MASK, event); 
+    // FIXME: Re-think WM -messages.
+//    Atom wm_change_state = (Atom) Atom.intern (display, "WM_CHANGE_STATE");
+//
+//    ClientMessage event = new ClientMessage (display);
+//    event.set_format (32);
+//    event.set_window (this);
+//    event.set_type (wm_change_state);
+//    event.set_wm_data (WMHints.ICONIC);
+//    send_event (false, Event.SUBSTRUCTURE_REDIRECT_MASK
+//      | Event.SUBSTRUCTURE_NOTIFY_MASK, event); 
   }
 
 
@@ -1455,7 +1737,7 @@ public class Window extends Drawable {
   public Screen screen () {
     for (int i=0; i<display.screens.length; i++) {
       Screen screen = display.screens [i];
-      if (screen.root_id () == id) return screen;
+      if (screen.root_id == id) return screen;
     }
 
     return null;
@@ -1478,7 +1760,7 @@ public class Window extends Drawable {
    * @see #set_input_focus(int, int)
    */
   public void set_input_focus () {
-    set_input_focus (TO_POINTER_ROOT, display.CURRENT_TIME);
+    set_input_focus (TO_POINTER_ROOT, Display.CURRENT_TIME);
   }
 
   
@@ -1778,10 +2060,13 @@ public class Window extends Drawable {
    * @see #change_property(int, int, Atom, Atom, int, Object, int, int)
    */
   public void set_wm_state (int state, Window icon) {
-    Atom wm_state = (Atom) Atom.intern (display, "WM_STATE");
-    int [] data = {state, icon.id};
+    // FIXME: Re-think WM -stuff. Maybe do outside of Window as this is
+    // not in the core protocol.
 
-    change_property (REPLACE, 2, wm_state, wm_state, 32, data, 0, 32);
+//    Atom wm_state = (Atom) Atom.intern (display, "WM_STATE");
+//    int [] data = {state, icon.id};
+//
+//    change_property (REPLACE, 2, wm_state, wm_state, 32, data, 0, 32);
   }
 
 
@@ -1799,13 +2084,16 @@ public class Window extends Drawable {
    * @see #property(boolean, Atom, Atom, int, int)
    */
   public WMClassHint wm_class_hint () {
-    PropertyReply pi = property (false, Atom.WM_CLASS, 
-      Atom.STRING, 0, MAX_WM_LENGTH); // support other types?
-
-    if (pi.format () != 8 || pi.type_id () != Atom.STRING.id)
-      return null;
-
-    return new WMClassHint (pi);
+    // FIXME: Re-think WM -stuff. Maybe do outside of Window as this is
+    // not in the core protocol.
+    return null;
+//    PropertyReply pi = property (false, Atom.WM_CLASS, 
+//      Atom.STRING, 0, MAX_WM_LENGTH); // support other types?
+//
+//    if (pi.format () != 8 || pi.type_id () != Atom.STRING.id)
+//      return null;
+//
+//    return new WMClassHint (pi);
   }
 
 
@@ -1814,12 +2102,15 @@ public class Window extends Drawable {
    * @see #property(boolean, Atom, Atom, int, int)
    */
   public WMHints wm_hints () {
-    PropertyReply pi = property (false, Atom.WM_HINTS, Atom.WM_HINTS, 0, 8);
-    
-    if (pi.format () != 32 || pi.type_id () != Atom.WM_HINTS.id
-      || pi.length () != 8) return null;
-
-    return new WMHints (pi);
+    // FIXME: Re-think WM -stuff. Maybe do outside of Window as this is
+    // not in the core protocol.
+    return null;
+//    PropertyReply pi = property (false, Atom.WM_HINTS, Atom.WM_HINTS, 0, 8);
+//    
+//    if (pi.format () != 32 || pi.type_id () != Atom.WM_HINTS.id
+//      || pi.length () != 8) return null;
+//
+//    return new WMHints (pi);
   }
 
 
@@ -1828,13 +2119,16 @@ public class Window extends Drawable {
    * @see #property(boolean, Atom, Atom, int, int)
    */
   public String wm_name () {
-    PropertyReply pi = property (false, Atom.WM_NAME, 
-      Atom.STRING, 0, MAX_WM_LENGTH); // support other types?
-
-    if (pi.format () != 8 || pi.type_id () != Atom.STRING.id) 
-      return null;
-
-    return pi.read_string (32, pi.length ());
+    // FIXME: Re-think WM -stuff. Maybe do outside of Window as this is
+    // not in the core protocol.
+    return null;
+//    PropertyReply pi = property (false, Atom.WM_NAME, 
+//      Atom.STRING, 0, MAX_WM_LENGTH); // support other types?
+//
+//    if (pi.format () != 8 || pi.type_id () != Atom.STRING.id) 
+//      return null;
+//
+//    return pi.read_string (32, pi.length ());
   }
 
 
@@ -1843,14 +2137,17 @@ public class Window extends Drawable {
    * @see #property(boolean, Atom, Atom, int, int)
    */
   public WMSizeHints wm_normal_hints () {
-    PropertyReply pi = property (false, Atom.WM_NORMAL_HINTS,
-      Atom.WM_SIZE_HINTS, 0, 18);
-
-    if (pi.format () != 32 
-      || pi.type_id () != Atom.WM_SIZE_HINTS.id
-      || pi.length () != 18) return null;
-   
-    return new WMSizeHints (pi);
+    // FIXME: Re-think WM -stuff. Maybe do outside of Window as this is
+    // not in the core protocol.
+    return null;
+//    PropertyReply pi = property (false, Atom.WM_NORMAL_HINTS,
+//      Atom.WM_SIZE_HINTS, 0, 18);
+//
+//    if (pi.format () != 32 
+//      || pi.type_id () != Atom.WM_SIZE_HINTS.id
+//      || pi.length () != 18) return null;
+//   
+//    return new WMSizeHints (pi);
   }
 
 
@@ -1876,19 +2173,22 @@ public class Window extends Drawable {
    * @see #property(boolean, Atom, Atom, int, int)
    */
   public Enum wm_protocols () {
-    Atom wm_protocols = (Atom) Atom.intern (display, "WM_PROTOCOLS");
-    PropertyReply pi = property (false, wm_protocols, Atom.ATOM, 0,
-      MAX_WM_LENGTH/4);
-
-    if (pi.byte_after () != 0)
-      throw new RuntimeException ("Number of WM protocol exceeds " +
-	MAX_WM_LENGTH/4); 
-
-    return new Enum (pi, 32, pi.length ()) {
-      public Object next () {
-        return Atom.intern (display, next4 ());
-      }
-    };
+    // FIXME: Re-think WM -stuff. Maybe do outside of Window as this is
+    // not in the core protocol.
+    return null;
+//    Atom wm_protocols = (Atom) Atom.intern (display, "WM_PROTOCOLS");
+//    PropertyReply pi = property (false, wm_protocols, Atom.ATOM, 0,
+//      MAX_WM_LENGTH/4);
+//
+//    if (pi.byte_after () != 0)
+//      throw new RuntimeException ("Number of WM protocol exceeds " +
+//	MAX_WM_LENGTH/4); 
+//
+//    return new Enum (pi, 32, pi.length ()) {
+//      public Object next () {
+//        return Atom.intern (display, next4 ());
+//      }
+//    };
   }
 
 
@@ -1896,14 +2196,17 @@ public class Window extends Drawable {
    * @see #property(boolean, Atom, Atom, int, int)
    */
   public WMState wm_state () {
-    Atom wm_state = (Atom) Atom.intern (display, "WM_STATE");    
-    PropertyReply pi = property (false, wm_state, wm_state, 0, 2);
-
-    if (pi.format () != 32 
-      || pi.type_id () != wm_state.id
-      || pi.length () != 2) return null;
-
-    return new WMState (display, pi);
+    // FIXME: Re-think WM -stuff. Maybe do outside of Window as this is
+    // not in the core protocol.
+    return null;
+//    Atom wm_state = (Atom) Atom.intern (display, "WM_STATE");    
+//    PropertyReply pi = property (false, wm_state, wm_state, 0, 2);
+//
+//    if (pi.format () != 32 
+//      || pi.type_id () != wm_state.id
+//      || pi.length () != 2) return null;
+//
+//    return new WMState (display, pi);
   }
 
 
@@ -1920,5 +2223,9 @@ public class Window extends Drawable {
    */
   public void warp_pointer (Point position) {
     warp_pointer (position.x, position.y);
+  }
+
+  public int id () {
+    return id;
   }
 }
