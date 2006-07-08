@@ -81,7 +81,8 @@ public class RequestOutputStream extends FilterOutputStream {
    * @param second_field the second field for the request
    * @param request_length the length of the request
    */
-  void begin_request (int opcode, int second_field, int request_length) {
+  public void begin_request (int opcode, int second_field,
+                             int request_length) {
 
     assert Thread.holdsLock (this);
 
