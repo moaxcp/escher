@@ -100,22 +100,19 @@ public class RequestOutputStream extends FilterOutputStream {
    * Sends the current request to the underlying stream, without necessarily
    * flushing the stream.
    */
-  public synchronized void send () {
+  public void send () {
+    assert Thread.holdsLock (this);
+
     if (request_object != null) {
       //System.err.println("request object: " + request_object);
       request_object.write (this);
       request_object = null;
     }
     if (index > 0) {
-      if (buffer[0] == 0) {
-        System.err.println ("index: " + index);
-        Thread.dumpStack();
-        System.exit(0);
-      }
-      if (buffer[0] == 3) {
-        System.err.println("Window attributes");
-      }
-      //System.err.println("flushing opcode: " + buffer[0]);
+      // Possibly pad request.
+      int pad = pad (index);
+      if (pad != 0)
+        skip (pad);
       try {
         out.write (buffer, 0, index);
       } catch (IOException ex) {
@@ -189,6 +186,10 @@ public class RequestOutputStream extends FilterOutputStream {
     } catch (IOException ex) {
       handle_exception (ex);
     }
+  }
+
+  public void write_bool (boolean b) {
+    write_int8 (b ? 1 : 0);
   }
 
   /**
