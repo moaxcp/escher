@@ -1,13 +1,13 @@
 package gnu.x11.event;
 
 import gnu.x11.Display;
+import gnu.x11.RequestOutputStream;
 import gnu.x11.ResponseInputStream;
 
 /**
  * The base class for all X events.
  */
-public abstract 
-class Event {
+public abstract class Event {
 
   public static final int NO_EVENT_MASK = 0;
   public static final int KEY_PRESS_MASK = 1<<0;
@@ -89,4 +89,17 @@ class Event {
     return class_name + " " + code ();
   }
 
+  /**
+   * Writes this event into a request. This is used in
+   * {@link gnu.x11.Window#send_event(boolean, int, Event)}.
+   *
+   * @param o the output stream to write to
+   */
+  public void write (RequestOutputStream o) {
+    o.write_int8 (code);
+    o.write_int8 (detail);
+    o.write_int16 (sequence_number); // Is this correct?
+
+    // The remaining pieces must be written by the subclasses.
+  }
 }
