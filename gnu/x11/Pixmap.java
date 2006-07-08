@@ -20,18 +20,28 @@ public class Pixmap extends Drawable {
 
 
   /** X pixmap format. */
-  public static class Format extends Data {
-    public Format (Data data, int offset) { super (data, offset); }
-    public int depth () { return read1 (0); }
-    public int bits_per_pixel () { return read1 (1); }
-    public int scanline_pad () { return read1 (2); }
-  
+  public static class Format  {
+    public int depth;
+    public int bits_per_pixel;
+    public int scanline_pad;
+
+    /**
+     * Creates a new instance by reading the data from the X server connection.
+     *
+     * @param in the input stream to read from
+     */
+    public Format (ResponseInputStream in) {
+      depth = in.read_int8 ();
+      bits_per_pixel = in.read_int8 ();
+      scanline_pad = in.read_int8 ();
+      in.skip (5); // Unused.
+    }
   
     public String toString () {
       return "#Pixmap.Format"
-        + "\n  depth: " + depth ()
-        + "\n  bits-per-pixel: " + bits_per_pixel ()
-        + "\n  scanline-pad: " + scanline_pad ();
+        + "\n  depth: " + depth
+        + "\n  bits-per-pixel: " + bits_per_pixel
+        + "\n  scanline-pad: " + scanline_pad;
     }
   }
 
@@ -45,12 +55,15 @@ public class Pixmap extends Drawable {
     this.width = width;
     this.height = height;
 
-    Request request = new Request (display, 53, depth, 4);
-    request.write4 (id);
-    request.write4 (drawable.id);
-    request.write2 (width);
-    request.write2 (height);
-    display.send_request (request);
+    RequestOutputStream o = display.out;
+    synchronized (o) {
+      o.begin_request (53, depth, 4);
+      o.write_int32 (id);
+      o.write_int32 (drawable.id);
+      o.write_int16 (width);
+      o.write_int16 (height);
+      o.send ();
+    }
   }
 
 
@@ -83,8 +96,11 @@ public class Pixmap extends Drawable {
    * @see <a href="XFreePixmap.html">XFreePixmap</a>
    */
   public void free () {
-    Request request = new Request (display, 54, 2);
-    request.write4 (id);
-    display.send_request (request);
+    RequestOutputStream o = display.out;
+    synchronized (o) {
+      o.begin_request (54, 0, 2);
+      o.write_int32 (id);
+      o.send ();
+    }
   }
 }
