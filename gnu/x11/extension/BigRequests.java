@@ -1,6 +1,7 @@
 package gnu.x11.extension;
 
-import gnu.x11.Request;
+import gnu.x11.RequestOutputStream;
+import gnu.x11.ResponseInputStream;
 
 
 /**
@@ -20,7 +21,18 @@ public class BigRequests extends Extension {
    * XExtendedMaxRequestSize</a>
    */
   public int enable () {
-    Request request = new Request (display, major_opcode, 0, 1);
-    return display.read_reply (request).read4 (8);
+    int st;
+    RequestOutputStream o = display.out;
+    synchronized (o) {
+      o.begin_request (major_opcode, 0, 1);
+      ResponseInputStream i = display.in;
+      synchronized (i) {
+        i.read_reply (o);
+        i.skip (8);
+        st = i.read_int32 ();
+        i.skip (20);
+      }
+    }
+    return st;
   }
 }
