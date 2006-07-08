@@ -18,13 +18,14 @@ abstract public class Extension {
 
 
   protected Extension (Display display, String name, 
-    String [] minor_opcode_strings, int error_count, int event_count) 
+                       String [] minor_opcode_strings, int error_count,
+                       int event_count)
     throws NotFoundException {
 
     this.display = display;
     this.name = name;
     
-    Display.ExtensionReply er = display.extension (name);
+    Display.ExtensionInfo er = display.query_extension (name);
     if (!er.present ()) throw new NotFoundException (name);
 
     first_event = er.first_event ();
