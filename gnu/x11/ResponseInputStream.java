@@ -207,9 +207,8 @@ public class ResponseInputStream extends FilterInputStream {
   private void handle_exception (Throwable ex) {
     ex.printStackTrace();
   }
-  public Event read_event () {
 
-    assert Thread.holdsLock (this);
+  public synchronized Event read_event () {
 
     // If there are any events already queued up, then return the first
     // event in the queue.
@@ -255,7 +254,7 @@ public class ResponseInputStream extends FilterInputStream {
       case 0:
         read_error ();
         break;
-      case 1:
+      case 1:System.err.println("reply");
         ev = null;
         break;
       case 2:
@@ -378,6 +377,8 @@ public class ResponseInputStream extends FilterInputStream {
     assert Thread.holdsLock (this);
     assert Thread.holdsLock (out);
 
+    int exp_seq_no = out.seq_number;
+
     // Flush the current request.
     out.flush();
 
@@ -385,10 +386,23 @@ public class ResponseInputStream extends FilterInputStream {
     Event ev = null;
     do {
       ev = read_event_from_stream ();
+      System.err.println("queueing event: " + ev);
       if (ev != null)
         events.offer (ev);
     } while (ev != null);
 
+    try {
+      mark (4);
+      int reply = read_int8 ();
+      assert reply == 1;
+      skip (1);
+      int seq_no = read_int16 ();
+      assert exp_seq_no == seq_no : "expected sequence number: " + exp_seq_no
+      + " got sequence number: " + seq_no;
+      reset ();
+    } catch (IOException ex) {
+      handle_exception (ex);
+    }
   }
 
 
