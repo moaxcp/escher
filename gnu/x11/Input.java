@@ -57,9 +57,12 @@ public class Input {
    * @see <a href="XUngrabPointer.html">XUngrabPointer</a>
    */
   public void ungrab_pointer (int time) {
-    Request request = new Request (display, 27, 2);
-    request.write4 (time);
-    display.send_request (request);
+    RequestOutputStream o = display.out;
+    synchronized (o) {
+      o.begin_request (27, 0, 2);
+      o.write_int32 (time);
+      o.send ();
+    }
   }
 
 
@@ -71,13 +74,16 @@ public class Input {
    *  XChangeActivePointerGrab</a>
    */
   public void change_active_pointer_grab (int event_mask, 
-    Cursor cursor, int time) {
+                                          Cursor cursor, int time) {
 
-    Request request = new Request (display, 30, 4);
-    request.write4 (cursor.id);
-    request.write4 (time);
-    request.write2 (event_mask);
-    display.send_request (request);    
+    RequestOutputStream o = display.out;
+    synchronized (o) {
+      o.begin_request (30, 0, 4);
+      o.write_int32 (cursor.id);
+      o.write_int32 (time);
+      o.write_int16 (event_mask);
+      o.send ();
+    }
   }
 
 
@@ -87,9 +93,13 @@ public class Input {
    * @see <a href="XUngrabKeyboard.html">XUngrabKeyboard</a>
    */
   public void ungrab_keyboard (int time) {
-    Request request = new Request (display, 32, 2);
-    request.write4 (time);
-    display.send_request (request);
+
+    RequestOutputStream o = display.out;
+    synchronized (o) {
+      o.begin_request (32, 0, 2);
+      o.write_int32 (time);
+      o.send ();
+    }
   }
 
 
@@ -119,42 +129,30 @@ public class Input {
    * @see <a href="XAllowEvents.html">XAllowEvents</a>
    */
   public void allow_events (int mode, int time) {
-    Request request = new Request (display, 35, mode, 2);
-    request.write4 (time);
-    display.send_request (request);
+
+    RequestOutputStream o = display.out;
+    synchronized (o) {
+      o.begin_request (35, mode, 2);
+      o.write_int32 (time);
+      o.send ();
+    }
   }
 
 
   /** Reply of {@link #input_focus()} */
-  public static class InputFocusReply extends Data {
-    public Display display;
+  public class InputFocusInfo {
 
-    public InputFocusReply (Display display, Data data) { 
-      super (data); 
-      this.display = display;
+    public int revert_to;
+    public int focus_id;
+    public Window focus;
+
+    InputFocusInfo (ResponseInputStream i) {
+      revert_to = i.read_int8 ();
+      i.skip (6);
+      focus_id = i.read_int32 ();
+      if (focus_id != 0 && focus_id != 1)
+        focus = (Window) Window.intern (display, focus_id);
     }
-  
-  
-    /**
-     * @return possible:
-     * {@link Window#NONE},
-     * {@link Window#POINTER_ROOT}
-     */
-    public int focus_id () { return read4 (8); }
-  
-  
-    public Window focus () { 
-      return (Window) Window.intern (this.display, focus_id ()); 
-    }
-  
-  
-    /** 
-     * @return valid:
-     * {@link Window#TO_NONE},
-     * {@link Window#TO_POINTER_ROOT},
-     * {@link Window#TO_PARENT}
-     */
-    public int revert_to () { return read1 (1); }
   }
   
   
@@ -162,9 +160,21 @@ public class Input {
   /**
    * @see <a href="XGetInputFocus.html">XGetInputFocus</a>
    */
-  public InputFocusReply input_focus () {
-    Request request = new Request (display, 43, 1);
-    return new InputFocusReply (display, display.read_reply (request));
+  public InputFocusInfo input_focus () {
+
+    InputFocusInfo info;
+    RequestOutputStream o = display.out;
+    synchronized (o) {
+      o.begin_request (43, 0, 1);
+      ResponseInputStream i = display.in;
+      synchronized (i) {
+        i.read_reply (o);
+        assert i.read_int8 () == 1;
+        info = new InputFocusInfo (i);
+        i.skip (20);
+      }
+    }
+    return info;
   }
 
 
@@ -173,9 +183,20 @@ public class Input {
    * @return valid: {@link Enum#next1()}
    * @see <a href="XQueryKeymap.html">XQueryKeymap</a>
    */
-  public Enum keymap () {
-    Request request = new Request (display, 44, 1);
-    return new Enum (display.read_reply (request), 8, 32);
+  public byte [] query_keymap () {
+    RequestOutputStream o = display.out;
+    byte [] data = new byte [32];
+    synchronized (o) {
+      o.begin_request (44, 0, 1);
+      ResponseInputStream i = display.in;
+      synchronized (i) {
+        i.read_reply (o);
+        assert i.read_int8 () == 1;
+        i.skip (7);
+        i.read_data (data);
+      }
+    }
+    return data;
   }
 
 
@@ -184,19 +205,22 @@ public class Input {
    * @see <a href="XChangeKeyboardMapping.html">XChangeKeyboardMapping</a>
    */
   public void change_keyboard_mapping (int first_keycode, 
-    int keysyms_per_keycode, int [] keysyms) {
+                                       int keysyms_per_keycode, int [] keysyms) {
     
     int keycode_count = keysyms.length / keysyms_per_keycode;
 
-    Request request = new Request (display, 100, keycode_count, 2+keysyms.length);
-    request.write1 (first_keycode);
-    request.write1 (keysyms_per_keycode);
-    request.write2_unused ();
+    RequestOutputStream o = display.out;
+    synchronized (o) {
+      o.begin_request (100, keycode_count, 2 + keysyms.length);
+      o.write_int8 (first_keycode);
+      o.write_int8 (keysyms_per_keycode);
+      o.skip (2);
 
-    for (int i=0; i<keysyms.length; i++)
-      request.write4 (keysyms [i]);
+      for (int i = 0; i < keysyms.length; i++)
+        o.write_int8 (keysyms [i]);
 
-    display.send_request (request);
+      o.send ();
+    }
   }
 
 
@@ -205,56 +229,57 @@ public class Input {
    * @see <a href="XGetKeyboardMapping.html">XGetKeyboardMapping</a>
    */
   public void keyboard_mapping () {
+
     int keysym_count = max_keycode - min_keycode + 1;
 
-    Request request = new Request (display, 101, 2);
-    request.write1 (min_keycode);
-    request.write1 (keysym_count);
-    Data reply = display.read_reply (request);
+    RequestOutputStream o = display.out;
+    synchronized (o) {
+      o.begin_request (101, 0, 2);
+      o.write_int8 (min_keycode);
+      o.write_int8 (keysym_count);
+      o.write_int16 (0); // Unused.
 
-    keysyms_per_keycode = reply.read1 (1);
-    keysyms = new int [keysym_count * keysyms_per_keycode];
+      ResponseInputStream in = display.in;
+      synchronized (in) {
+        in.read_reply (o);
+        assert in.read_int8 () == 1; // Reply.
+        keysyms_per_keycode = in.read_int8 ();
+        in.skip (2); // Unused.
+        in.skip (4); // length.
+        in.skip (24); // Unused.
+        keysyms = new int [keysym_count * keysyms_per_keycode];
 
-    for (int i=0; i < keysym_count * keysyms_per_keycode; i++)
-      keysyms [i] = reply.read4 (32 + 4 * i);
+        for (int i = 0; i < keysym_count * keysyms_per_keycode; i++) {
+          keysyms [i] = in.read_int32 ();
+        }
+      }
+    }
   }
 
 
   /** Reply of {@link #keyboard_control()} */
-  public static class KeyboardControlReply extends Data {
-    public KeyboardControlReply (Data data) { super (data); }
-    public int led_mask () { return read4 (8); }
-    public int key_click_percent () { return read1 (12); }
-    public int bell_percent () { return read1 (13); }
-    public int bell_pitch () { return read2 (14); }
-    public int bell_duration () { return read2 (16); }
-  
+  public class KeyboardControlInfo {
+
+    public boolean global_auto_repeat;
     
-    /**
-     * @return valid:
-     * {@link Input.KeyboardControl#OFF},
-     * {@link Input.KeyboardControl#ON}
-     */
-    public int global_auto_repeat () { return read1 (1); }
-  
-  
-    /**
-     * @return valid: {@link Enum#next1()}
-     */
-    public Enum auto_repeats () {
-      return new Enum (this, 20, 32);
-    }
-  
-  
-    public String toString () {
-      return "#KeyboardControlReply"
-        + "\n  global-auto-repeat: " 
-        + KeyboardControl.GLOBAL_AUTO_REPEAT_STRINGS [global_auto_repeat ()]
-        + "\n  led-mask: " + Integer.toBinaryString (led_mask ())
-        + "\n  key-click-percent: " + key_click_percent ()
-        + "\n  bell-percent: " + bell_percent ()
-        + "\n  bell-pitch: " + bell_pitch ()
-        + "\n  bell-duration: " + bell_duration ();
+    public int led_mask;
+    public int key_click_percent;
+    public int bell_percent;
+    public int bell_pitch;
+    public int bell_duration;
+    public byte[] auto_repeats;
+
+    KeyboardControlInfo (ResponseInputStream i) {
+      global_auto_repeat = i.read_bool ();
+      i.skip (6);
+      led_mask = i.read_int32 ();
+      key_click_percent = i.read_int8 ();
+      bell_percent = i.read_int8 ();
+      bell_pitch = i.read_int16 ();
+      bell_duration = i.read_int16 ();
+      i.skip (2);
+      auto_repeats = new byte [32];
+      i.read_data (auto_repeats);
     }
   }
   
@@ -278,8 +303,12 @@ public class Input {
    * @see <a href="XChangeKeyboardControl.html">XChangeKeyboardControl</a>
    */
   public void change_keyboard_control (KeyboardControl control) {
-    display.send_request (new Request.ValueList (
-      display, 102, 2, 0, control));
+    RequestOutputStream o = display.out;
+    synchronized (o) {
+      o.begin_request (102, 0, 2 + control.count ());
+      control.write (o);
+      o.send ();
+    }
   }
 
 
@@ -287,9 +316,19 @@ public class Input {
   /**
    * @see <a href="XGetKeyboardControl.html">XGetKeyboardControl</a>
    */
-  public KeyboardControlReply keyboard_control () {
-    Request request = new Request (display, 103, 1);    
-    return new KeyboardControlReply (display.read_reply (request));
+  public KeyboardControlInfo keyboard_control () {
+    KeyboardControlInfo info;
+    RequestOutputStream o = display.out;
+    synchronized (o) {
+      o.begin_request (103, 0, 1);
+      ResponseInputStream i = display.in;
+      synchronized (i) {
+        i.read_reply (o);
+        assert i.read_int8 () == 1;
+        info = new KeyboardControlInfo (i);
+      }
+    }
+    return info;
   }
 
 
@@ -297,33 +336,34 @@ public class Input {
   /**
    * @see <a href="XChangePointerControl.html">XChangePointerControl</a>
    */
-  public void change_pointer_control (boolean do_accel, 
-    boolean do_threshold, int accel_numerator, int accel_denominator,
-    int threshold) {
+  public void change_pointer_control (boolean do_accel, boolean do_threshold,
+                                      int accel_numerator,
+                                      int accel_denominator, int threshold) {
 
-    Request request = new Request (display, 105, 3);
-    request.write2 (accel_numerator);
-    request.write2 (accel_denominator);
-    request.write2 (threshold);
-    request.write1 (do_accel);
-    request.write1 (do_threshold);
-    display.send_request (request);
+    RequestOutputStream o = display.out;
+    synchronized (o) {
+      o.begin_request (105, 0, 3);
+      o.write_int16 (accel_numerator);
+      o.write_int16 (accel_denominator);
+      o.write_int16 (threshold);
+      o.write_bool (do_accel);
+      o.write_bool (do_threshold);
+      o.send ();
+    }
   }
 
 
   /** Reply of {@link #pointer_control()}. */
-  public static class PointerControlReply extends Data {
-    public PointerControlReply (Data data) { super (data); }
-    public int acceleration_numerator () { return read2 (8); }
-    public int acceleration_denumerator () { return read2 (10); }
-    public int threshold () { return read2 (12); }
-  
-  
-    public String toString () {
-      return "#PointerControlReply"
-        + "\n  acceleration: " 
-        + acceleration_numerator () + "/" + acceleration_denumerator ()
-        + "\n  threshold: " + threshold ();
+  public class PointerControlInfo {
+
+    public int acceleration_numerator;
+    public int acceleration_denominator;
+    public int treshold;
+
+    PointerControlInfo (ResponseInputStream i) {
+      acceleration_numerator = i.read_int16 ();
+      acceleration_denominator = i.read_int16 ();
+      treshold = i.read_int16 ();
     }
   }
   
@@ -332,9 +372,20 @@ public class Input {
   /**
    * @see <a href="XGetPointerControl.html">XGetPointerControl</a>
    */
-  public PointerControlReply pointer_control () {
-    Request request = new Request (display, 106, 1);    
-    return new PointerControlReply (display.read_reply (request));
+  public PointerControlInfo get_pointer_control () {
+    PointerControlInfo info;
+    RequestOutputStream o = display.out;
+    synchronized (o) {
+      o.begin_request (106, 0, 1);
+      ResponseInputStream i = display.in;
+      synchronized (i) {
+        i.read_reply (o);
+        assert i.read_int8 () == 1;
+        i.skip (7);
+        info = new PointerControlInfo (i);
+      }
+    }
+    return info;
   }
 
 
@@ -351,9 +402,26 @@ public class Input {
    * @see <a href="XSetPointerMapping.html">XSetPointerMapping</a>
    */
   public int set_pointer_mapping (byte [] map) {
-    Request request = new Request (display, 116, map.length, 2+Data.unit (map));
-    request.write1 (map);
-    return display.read_reply (request).read1 (1);
+
+    int n = map.length;
+    int p = RequestOutputStream.pad (n);
+
+    int status;
+
+    RequestOutputStream o = display.out;
+    synchronized (o) {
+      o.begin_request (116, map.length, 1 + (n + p) / 4);
+      o.write_bytes (map);
+      o.skip (p);
+      ResponseInputStream i = display.in;
+      synchronized (i) {
+        i.read_reply (o);
+        assert i.read_int8 () == 1;
+        status = i.read_int8 ();
+        i.skip (30);
+      }
+    }
+    return status;
   }
 
 
@@ -361,9 +429,23 @@ public class Input {
   /**
    * @see <a href="XGetPointerMapping.html">XGetPointerMapping</a>
    */
-  public Data pointer_mapping () {
-    Request request = new Request (display, 117, 1);
-    return display.read_reply (request);
+  public byte [] get_pointer_mapping () {
+
+    byte [] map;
+    RequestOutputStream o = display.out;
+    synchronized (o) {
+      o.begin_request (117, 0, 1);
+      ResponseInputStream i = display.in;
+      synchronized (i) {
+        i.read_reply (o);
+        assert i.read_int8 () == 1;
+        int len = i.read_int8 ();
+        i.skip (30);
+        map = new byte [len];
+        i.read_data (map);
+      }
+    }
+    return map;
   }
 
 
@@ -380,26 +462,58 @@ public class Input {
    * @see <a href="XSetModifierMapping.html">XSetModifierMapping</a>
    */
   public int set_modifier_mapping (int keycodes_per_modifier, 
-    byte [] keycodes) {
+                                   byte [] keycodes) {
 
-    Request request = new Request (display, 118, keycodes_per_modifier, 
-      1+Data.unit (keycodes));
-    
-    request.write1 (keycodes);
-    return display.read_reply (request).read1 (1);
+    int status;
+    RequestOutputStream o = display.out;
+    synchronized (o) {
+      o.begin_request (118, keycodes_per_modifier,
+                       1 + 2 * keycodes_per_modifier);
+      o.write (keycodes);
+      ResponseInputStream i = display.in;
+      synchronized (i) {
+        i.read_reply (o);
+        assert i.read_int8 () == 1;
+        status = i.read_int8 ();
+        i.skip (30);
+      }
+    }
+    return status;
   }
 
+  public class ModifierMapping {
+
+    public int keycodes_per_modifier;
+    byte [] map;
+
+    ModifierMapping (ResponseInputStream i) {
+      keycodes_per_modifier = i.read_int8 ();
+      i.skip (30);
+      map = new byte [keycodes_per_modifier * 8];
+      i.read_data (map);
+    }
+  }
 
   // opcode 119 - get modifier mapping
   /**
    * @return valid: {@link Enum#next1()}
    * @see <a href="XModifierKeymap.html">XModifierKeymap</a>
    */
-  public Enum modifier_mapping () {
-    Request request = new Request (display, 119, 1);
+  public ModifierMapping modifier_mapping () {
 
-    Data reply = display.read_reply (request);
-    return new Enum (reply, 32, reply.read1 (1));
+    ModifierMapping map;
+
+    RequestOutputStream o = display.out;
+    synchronized (o) {
+      o.begin_request (119, 0, 1);
+      ResponseInputStream i = display.in;
+      synchronized (i) {
+        i.read_reply (o);
+        assert i.read_int8 () == 1;
+        map = new ModifierMapping (i);        
+      }
+    }
+    return map;
   }
 
 
