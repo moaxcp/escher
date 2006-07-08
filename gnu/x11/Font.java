@@ -29,12 +29,18 @@ public class Font extends Fontable {
     super (display);
     this.name = name;
 
-    Request request = new Request (display, 45, 3+Data.unit (name));
-    request.write4 (id);
-    request.write2 (name.length ());
-    request.write2_unused ();
-    request.write1 (name);
-    display.send_request (request);
+    int n = name.length ();
+    int p = RequestOutputStream.pad (n);
+
+    RequestOutputStream o = display.out;
+    synchronized (o) {
+      o.begin_request (45, 0, 3 + (n + p) / 4);
+      o.write_int32 (id);
+      o.write_int16 (name.length ());
+      o.skip (2);
+      o.write_string8 (name);
+      o.send ();
+    }
   }
 
 
@@ -43,9 +49,13 @@ public class Font extends Fontable {
    * @see <a href="XFreeFont.html">XFreeFont</a>
    */
   public void close () {
-    Request request = new Request (display, 46, 2);
-    request.write4 (id);
-    display.send_request (request);
+
+    RequestOutputStream o = display.out;
+    synchronized (o) {
+      o.begin_request (46, 0, 2);
+      o.write_int32 (id);
+      o.send ();
+    }
   }
 
 
