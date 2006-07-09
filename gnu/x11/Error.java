@@ -12,7 +12,7 @@ package gnu.x11;
  * programming, we should utilize the exception facility of Java
  * programming.
  */
-public class Error extends java.lang.Error {
+public class Error extends java.lang.RuntimeException {
   public static final int SUCCESS = 0;
 
 
