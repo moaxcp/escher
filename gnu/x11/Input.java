@@ -242,7 +242,7 @@ public class Input {
       ResponseInputStream in = display.in;
       synchronized (in) {
         in.read_reply (o);
-        assert in.read_int8 () == 1; // Reply.
+        in.skip (1);
         keysyms_per_keycode = in.read_int8 ();
         in.skip (2); // Unused.
         in.skip (4); // length.
