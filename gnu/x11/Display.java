@@ -8,6 +8,7 @@ import gnu.x11.extension.NotFoundException;
 import gnu.x11.extension.XCMisc;
 
 import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -256,9 +257,11 @@ public class Display {
       o.write_pad (auth_name.length);
       o.write_bytes (auth_data);
       o.write_pad (auth_data.length);
+      o.flush ();
       ResponseInputStream i = in;
       synchronized (i) {
-        i.read_reply(o);
+        // Don't do read_reply() here, this is not needed and doesn't work
+        // during connection setup.
         connected = true;
         init_server_info (i);
       }
@@ -267,7 +270,7 @@ public class Display {
     init_keyboard_mapping ();
     init_defaults ();
     init_big_request_extension ();
-
+    //System.err.println("Connection to X server established");
   }
 
   // opcode 23 - get selection owner
@@ -451,6 +454,8 @@ public class Display {
       major_opcode = in.read_int8 ();
       first_event = in.read_int8 ();
       first_error = in.read_int8 ();
+      //System.err.println("first error: " + first_error);
+      //Thread.dumpStack ();
     }
 
     public boolean present () {
@@ -1065,7 +1070,9 @@ public class Display {
     screens = new Screen [screen_count];
     for (int j = 0; j < screen_count; j++) {
       screens [j] = new Screen (this, i);
+      //System.err.println("screen: " + screens [j]);
     }
+
   }
 
   /**
@@ -1161,11 +1168,14 @@ public class Display {
       // TODO: Evaluate if we gain performance by using BufferedOutputStream
       // here.
       OutputStream o = socket.getOutputStream ();
-      out = new RequestOutputStream (o);
+      BufferedOutputStream buf_out = new BufferedOutputStream (o, 256);
+      out = new RequestOutputStream (buf_out);
 
       // Create buffered response input stream.
       InputStream sock_in = socket.getInputStream();
-      BufferedInputStream buf_in = new BufferedInputStream (sock_in);
+      // Buffer space for 4 response messages. More are hardly needed I'd
+      // think.
+      BufferedInputStream buf_in = new BufferedInputStream (sock_in, 128);
       in = new ResponseInputStream (buf_in, this);
     } catch (IOException ex) {
       handle_exception (ex);
