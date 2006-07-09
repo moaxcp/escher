@@ -115,12 +115,13 @@ public class RequestOutputStream extends FilterOutputStream {
       if (pad != 0)
         skip (pad);
       try {
+        //System.err.println("sending request: " + buffer[0] + "seq_no: " + seq_number);
         out.write (buffer, 0, index);
       } catch (IOException ex) {
         handle_exception (ex);
       }
       index = 0;
-      seq_number++;
+      seq_number = (seq_number + 1) & 0xffff; // This counter is only 16-bit.
     }
   }
 
