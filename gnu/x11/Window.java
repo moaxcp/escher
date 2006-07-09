@@ -277,12 +277,12 @@ public class Window extends Drawable implements GLXDrawable {
       o.begin_request (1, depth, 8+attr.count ());
       o.write_int32 (id);
       o.write_int32 (parent.id);
-      o.write_int32 (x);
-      o.write_int32 (y);
-      o.write_int32 (width);
-      o.write_int32 (height);
-      o.write_int32 (border_width);
-      o.write_int32 (klass);
+      o.write_int16 (x);
+      o.write_int16 (y);
+      o.write_int16 (width);
+      o.write_int16 (height);
+      o.write_int16 (border_width);
+      o.write_int16 (klass);
       o.write_int32 (visual_id);
       attr.write (o);
       o.send ();
