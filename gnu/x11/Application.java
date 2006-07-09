@@ -43,11 +43,7 @@ public class Application extends gnu.app.Application {
     Display.Name display_name = option.display_name ("display",
       "X server to connect to", new Display.Name (env));
 
-    int send_mode = option.enum ("send-mode", "request sending mode", 
-      Connection.SEND_MODE_STRINGS, Connection.ASYNCHRONOUS);
-
     if (help_option) return;
     display = new Display (display_name);
-    display.connection.send_mode = send_mode;
   }
 }
