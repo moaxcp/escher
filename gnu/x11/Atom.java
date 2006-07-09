@@ -239,16 +239,31 @@ public class Atom {
    * @see <a href="XInternAtom.html">XInternAtom</a>
    */ 
   public Atom (Display display, String name, boolean only_if_exists) {
+
     this.display = display;
     this.name = name;
 
-    Request request = new Request (display, 16, only_if_exists, 2+Data.unit (name));
-    request.write2 (name.length ());
-    request.write2_unused ();
-    request.write1 (name);
+    int n = name.length();
+    int p = RequestOutputStream.pad (n);
     
-    Data reply = display.read_reply (request);
-    id = reply.read4 (8);
+    RequestOutputStream o = display.out;
+    synchronized (o) {
+      o.begin_request (16, only_if_exists ? 1 : 0,
+                                          2 + (n + p) / 4);
+      o.write_int16 (n);
+      o.skip (2); // Unused.
+      o.write_string8 (name);
+      o.write_pad (n);
+
+      ResponseInputStream i = display.in;
+      synchronized (i) {
+        i.read_reply(o);
+        i.skip (8); // Unused + sequence number + reply length.
+        id = i.read_int32 ();
+        i.skip (20); // Unused.
+      }
+
+    }
 
     display.atom_ids.put (new Integer (id), this);
     display.atom_names.put (name, this);
@@ -260,16 +275,24 @@ public class Atom {
    * @see <a href="XGetAtomName.html">XGetAtomName</a>
    */
   public Atom (Display display, int id, boolean only_if_exists) {
+
     this.display = display;
     this.id = id;
 
-    Request request = new Request (display, 17, 2);
-    request.write4 (id);
+    RequestOutputStream o = display.out;
+    synchronized (o) {
+      o.begin_request (17, 0, 2);
+      o.write_int32 (id);
 
-    Data reply = display.read_reply (request);
-    int len = reply.read2 (8);
-    name = new String (reply.data, 32, len);
-
+      ResponseInputStream i = display.in;
+      synchronized (i) {
+        i.read_reply (o);
+        i.skip (8); // Unused + sequence number + reply length.
+        int len = i.read_int16 ();
+        name = i.read_string8 (len);
+        i.pad (len); // Pad.
+      }
+    }
     display.atom_ids.put (new Integer (id), this);
     display.atom_names.put (name, this);
   }
