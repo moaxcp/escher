@@ -342,226 +342,255 @@ public abstract class Drawable extends Resource {
   }
 
   // opcode 68 - poly arc
+  public void poly_arc (GC gc, Arc [] arcs) {
+    RequestOutputStream o = display.out;
+    synchronized (o) {
+      o.begin_request (68, 0, 3 + 3 * arcs.length);
+      o.write_int32 (id);
+      o.write_int32 (gc.id);
+      for (int i = 0; i < arcs.length; i++) {
+        Arc arc = arcs [i];
+        o.write_int16 (arc.x);
+        o.write_int16 (arc.y);
+        o.write_int16 (arc.width);
+        o.write_int16 (arc.height);
+        o.write_int16 (arc.angle1);
+        o.write_int16 (arc.angle2);
+      }
+    }
+  }
+
+  // opcode 71 - poly fill arc
+  public void poly_fill_arc (GC gc, Arc [] arcs) {
+    RequestOutputStream o = display.out;
+    synchronized (o) {
+      o.begin_request (71, 0, 3 + 3 * arcs.length);
+      o.write_int32 (id);
+      o.write_int32 (gc.id);
+      for (int i = 0; i < arcs.length; i++) {
+        Arc arc = arcs [i];
+        o.write_int16 (arc.x);
+        o.write_int16 (arc.y);
+        o.write_int16 (arc.width);
+        o.write_int16 (arc.height);
+        o.write_int16 (arc.angle1);
+        o.write_int16 (arc.angle2);
+      }
+    }
+  }
+
+  public static final int COMPLEX = 0;
+  public static final int NONCONVEX = 1;
+  public static final int CONVEX = 2;
+
+
+  // opcode 69 - fill poly
   /**
-   * Draws the outline of multiple arcs.
-  ����   0 �  gnu/x11/Drawable  gnu/x11/Resource width I height ORIGIN ConstantValue     PREVIOUS    COMPLEX 	NONCONVEX CONVEX    CURSOR TILE STIPPLE <init> (I)V Code
-     LineNumberTable LocalVariableTable this Lgnu/x11/Drawable; id (Lgnu/x11/Display;)V
-      display Lgnu/x11/Display; (Lgnu/x11/Display;I)V
-  %  # 	copy_area '(Lgnu/x11/Drawable;Lgnu/x11/GC;IIIIII)V	  ) ! "	 + - , gnu/x11/Display . / 
-connection Lgnu/x11/Connection;	 1 3 2 gnu/x11/Connection 4 5 out Lgnu/x11/RequestOutputStream;
- 7 9 8 gnu/x11/RequestOutputStream : ; begin_request (III)V	  =  
- 7 ? @  write_int32	 B = C 
-gnu/x11/GC
- 7 E F  write_int16
- 7 H I J send ()V src gc Lgnu/x11/GC; src_x src_y dst_x dst_y o 
-copy_plane ((Lgnu/x11/Drawable;Lgnu/x11/GC;IIIIIII)V 	bit_plane 
-poly_point (Lgnu/x11/GC;[I[III)V xpoints [I ypoints npoints coordinate_mode i  (Lgnu/x11/GC;[Lgnu/x11/Point;I)V	 ` b a gnu/x11/Point c  x	 ` e f  y points [Lgnu/x11/Point; 	poly_line k java/lang/Error m dUnresolved compilation problem: 
-	int is not a valid type's argument for the synchronized statement
+   * This request will be aggregated.
+   * 
+   * @param shape valid:
+   * {@link #COMPLEX},
+   * {@link #NONCONVEX},
+   * {@link #CONVEX}
+   * 
+   * @param coordinate_mode valid:
+   * {@link #ORIGIN},
+   * {@link #PREVIOUS}
+   * 
+   * @see <a href="XFillPolygon.html">XFillPolygon</a>
+   * @see Request.Aggregate aggregation
+   */
+  public void fill_poly (GC gc, Point [] points, int shape, 
+                         int coordinate_mode) {
 
- j o  p (Ljava/lang/String;)V (Lgnu/x11/GC;[I[IIIZ)V s �Unresolved compilation problems: 
-	The method begin_request(int, int, int) is undefined for the type Connection
-	The method end_request() is undefined for the type Connection
- close Z poly_segment !(Lgnu/x11/GC;[Lgnu/x11/Segment;)V segments [Lgnu/x11/Segment; poly_rectangle #(Lgnu/x11/GC;[Lgnu/x11/Rectangle;)V 
-rectangles [Lgnu/x11/Rectangle; poly_arc (Lgnu/x11/GC;[Lgnu/x11/Arc;)V arcs [Lgnu/x11/Arc; 	fill_poly !(Lgnu/x11/GC;[Lgnu/x11/Point;II)V shape (Lgnu/x11/GC;[I[IIII)V poly_fill_rectangle poly_fill_arc put_small_image ((Lgnu/x11/GC;Lgnu/x11/image/Image;IIII)V image Lgnu/x11/image/Image; y1 y2 (IIIIII)Lgnu/x11/Data; � �Unresolved compilation problems: 
-	The method begin_request(int, int, int) is undefined for the type Connection
-	The method end_request() is undefined for the type Connection
-	The method read_reply(null) is undefined for the type Display
- 
-plane_mask format 	poly_text  (Lgnu/x11/GC;II[Lgnu/x11/Text;)V texts [Lgnu/x11/Text; poly_text16 
-image_text #(Lgnu/x11/GC;IILjava/lang/String;)V s Ljava/lang/String; image_text16 	best_size (III)Lgnu/x11/Size; �	Unresolved compilation problems: 
-	The method begin_request(int, int, int) is undefined for the type Connection
-	The method end_request() is undefined for the type Connection
-	The method read_reply(int) in the type Connection is not applicable for the arguments ()
- klass arc (Lgnu/x11/GC;IIIIII)V angle1 angle2 fill_arc line (Lgnu/x11/GC;IIII)V x1 x2 point (Lgnu/x11/GC;II)V 	put_image &(Lgnu/x11/GC;Lgnu/x11/image/Image;II)V	 + � �  extended_maximum_request_length	 � � � gnu/x11/image/Image �  line_byte_count	 � �  
- � � � java/lang/Math � � min (II)I
-  � � � max_data_byte request_height rem request_count 	rectangle fill_rectangle text 2(Lgnu/x11/GC;IILjava/lang/String;ILgnu/x11/Font;)V � gnu/x11/Text
- � �  � $(Ljava/lang/String;ILgnu/x11/Font;)V
-  � � � delta font Lgnu/x11/Font; length ([Lgnu/x11/Text;I)I
- � � � � (I)I bit n 
-SourceFile Drawable.java!     
-               	    
-     	         	    
-     	         	         	    
-     	         	     "        >     *� �       
-                                >     *+� �       
-                      ! "    #     I     *+� $�       
-                       ! "         & '    <     p*� (� *� 0:		Y:
-�	>� 6	+� <� >	*� <� >	,� A� >	� D	� D	� D	� D	� D	� D	� G
-ç 
-ÿ�   h k   k n k       >    /  0  1  2 % 3 . 4 7 5 = 6 D 7 K 8 R 9 Y : ` ; e 0 o =    f 
-   p       p K     p L M    p N     p O     p      p      p P     p Q    d R 5 	  S T    Q     w*� (� *� 0:
-
-Y:�
-?� 6
-+� <� >
-*� <� >
-,� A� >
-� D
-� D
-� D
-� D
-� D
-� D
-	� D
-� Gç ÿ�   o r   r u r       B    G  H  I  J % K . L 7 M = N D O K P R Q Y R ` S g T l H v V    p    w       w K     w L M    w N     w O     w P     w Q     w      w      w U  	  k R 5 
-  V W      	   c*� (� *� 0:Y:�@`� 6*� <� >+� A� >6� ,.� D-.� D����� Gç ÿ�   [ ^   ^ a ^       2    v  w  x  y ( z 1 { 7 | @ } I { S  X w b �    R    c       c L M    c X Y    c Z Y    c [     c \    W R 5  4  ]    V ^         l,�6*� (� *� 0:Y:�@,�`� 6*� <� >+� A� >6� ,2� _� D,2� d� D����� Gç ÿ�   d g   g j g       6    �  �  �  � " � + � 4 � : � F � R � \ � a � k �    H    l       l L M    l g h    l \    h [    \ R 5  7 % ]    i W     f     
-� jYl� n�           �    >    
-       
- L M    
- X Y    
- Z Y    
- [     
- \    i q     p     
-� jYr� n�           �    H    
-       
- L M    
- X Y    
- Z Y    
- [     
- \     
- t u   i ^     R     
-� jYr� n�           �    *    
-       
- L M    
- g h    
- \    v w     H     
-� jYr� n�           �         
-       
- L M    
- x y   z {     H     
-� jYr� n�                   
-       
- L M    
- | }   ~      H     
-� jYr� n�          +         
-       
- L M    
- � �   � �     \     
-� jYr� n�          \    4    
-       
- L M    
- g h    
- �     
- \    � �     p     
-� jYr� n�          |    H    
-       
- L M    
- X Y    
- Z Y    
- [     
- �     
- \    � {     H     
-� jYr� n�          �         
-       
- L M    
- | }   �      H     
-� jYr� n�          �         
-       
- L M    
- � �   � �     p     
-� jYr� n�          �    H    
-       
- L M    
- � �    
- �     
- �     
- c     
- f    � �     p     
-� jY�� n�          �    H    
-       
- c     
- f     
-      
-      
- �     
- �    � �     \     
-� jYr� n�          �    4    
-       
- L M    
- c     
- f     
- � �   � �     \     
-� jYr� n�              4    
-       
- L M    
- c     
- f     
- � �   � �     \     
-� jYr� n�          :    4    
-       
- L M    
- c     
- f     
- � �   � �     \     
-� jYr� n�          O    4    
-       
- L M    
- c     
- f     
- � �   � �     R     
-� jY�� n�          j    *    
-       
- �     
-      
-     � �     z     
-� jYr� n�          �    R    
-       
- L M    
- c     
- f     
-      
-      
- �     
- �    � �     z     
-� jYr� n�          �    R    
-       
- L M    
- c     
- f     
-      
-      
- �     
- �    � �     f     
-� jYr� n�          �    >    
-       
- L M    
- �     
- �     
- �     
- �    � �     R     
-� jYr� n�          �    *    
-       
- L M    
- c     
- f    � �     	 
-   g*� (� �hd6,� �l6,� �p6,� �l� � `66	� (*+,	h,� �	`h� �	h`� ��		��ױ       * 
-  � � �  � 4� :� B� Y� \� f�    f 
-   g       g L M    g � �    g c     g f    Y �    P �     G �   4 3 �   7 / ]  	  � �     f     
-� jYr� n�          �    >    
-       
- L M    
- c     
- f     
-      
-     � �     f     
-� jYr� n�              >    
-       
- L M    
- c     
- f     
-      
-     � �     �     *+� �Y� �Y� �S� α       
-   " #    H            L M     c      f      � �     �      � �   � �     p     *+� �Y� �Y� �S� α       
-   * +    4            L M     c      f      � �   � �     y     >6� +2� �`>�+�����          / 0 2    4    .begin_request (77, n, 4 + (2 * n + p) / 4);
+    RequestOutputStream o = display.out;
+    synchronized (o) {
+      o.begin_request (69, 0, 4 * points.length);
+      o.write_int32 (id);
+      o.write_int32 (gc.id);
+      o.write_int8 (shape);
+      o.write_int8 (coordinate_mode);
+      o.skip (2);
+      for (int i = 0; i < points.length; i++) {
+        Point p = points [i];
+        o.write_int16 (p.x);
+        o.write_int16 (p.y);
+      }
+    }
+  }
 
-    o.write_int32 (id);
-    o.write_int32 (gc.id);
-    o.write_int16 (x);
-    o.write_int16 (y);
-    o.write_string16 (s);
+  public void fill_poly (GC gc, int [] xpoints, int [] ypoints, int npoints,
+                         int shape, int coordinate_mode) {
 
-    o.write_pad (2 * n); // Pad.
-    display.connection.end_request ();
+    RequestOutputStream o = display.out;
+    synchronized (o) {
+      o.begin_request (69, 0, 4 + npoints);
+      o.write_int32 (id);
+      o.write_int32 (gc.id);
+      o.write_int8 (shape);
+      o.write_int8 (coordinate_mode);
+      o.skip (2);
+      for (int i = 0; i < npoints; i++) {
+        o.write_int16 (xpoints [i]);
+        o.write_int16 (ypoints [i]);
+      }
+    }
+  }
+
+  // opcode 72 - put image
+  public void put_small_image (GC gc, Image image, int y1, int y2, 
+                               int x, int y) {
+
+    RequestOutputStream o = display.out;
+    synchronized (o) {
+      int offset = image.line_byte_count * y1;
+      int length = image.line_byte_count * (y2 - y1);
+      int p = RequestOutputStream.pad (length);
+
+      o.begin_request (72, image.format, 6 + (length + p) / 4);
+      o.write_int32 (id);
+      o.write_int32 (gc.id);
+      o.write_int16 (image.width);
+      o.write_int16 (y2 - y1);
+      o.write_int16 (x);
+      o.write_int16 (y);
+      o.write_int8 (image.left_pad);
+      o.write_int8 (image.pixmap_format.depth);
+      o.skip (2);
+      o.write (image.data, offset, length);
+      o.send ();
+    }
+  }
+
+
+  // opcode 73 - get image TODO
+  /**
+   * @see <a href="XGetImage.html">XGetImage</a>
+   */
+  public Data image (int x, int y, int width, int height, 
+    int plane_mask, int format) {
+
+    // FIXME: Implement!
+    return null;
+  }
+
+
+  // opcode 74 - poly text8
+  /**
+   * @see <a href="XDrawText.html">XDrawText</a>
+   */
+  public void poly_text (GC gc, int x, int y, Text [] texts) {
+
+    int n = length (texts, 8);
+    int p = RequestOutputStream.pad (n);
+    RequestOutputStream o = display.out;
+    synchronized (o) {
+      o.begin_request (74, 0, 4 + (n + p) / 4);
+      o.write_int32 (id);
+      o.write_int32 (gc.id);
+      o.write_int16 (x);
+      o.write_int16 (y);
+
+      for (int i = 0; i < texts.length; i++) {
+        if (texts [i].font != null) {
+          o.write_int8 (255);// font-shift indicator
+          o.write_int32 (texts [i].font.id); // java = MSB
+        }
+
+        o.write_int8 (texts [i].s.length ());
+        o.write_int8 (texts [i].delta);
+        o.write_string8 (texts [i].s);
+      }
+      o.send ();
+    }
+  }
+
+
+  // opcode 75 - poly text16
+  /**
+   * @see <a href="XDrawText16.html">XDrawText16</a>
+   */
+  public void poly_text16 (GC gc, int x, int y, Text [] texts) {
+
+    int n = length (texts, 8);
+    int p = RequestOutputStream.pad (n);
+
+    RequestOutputStream o = display.out;
+    synchronized (o) {
+      o.begin_request (75, 0, 4 + (n + p) / 4);
+
+      o.write_int32 (id);
+      o.write_int32 (gc.id);
+      o.write_int16 (x);
+      o.write_int16 (y);
+
+
+      for (int i = 0; i < texts.length; i++) {
+        if (texts [i].font != null) {
+          o.write_int8 (255);// font-shift indicator
+          o.write_int32 (texts [i].font.id); // java = MSB
+        }
+
+        String s = texts [i].s;
+
+        if (s.charAt (0) > 128) { // non-ascii
+          o.write_int8 (s.length ()/2);
+          o.write_int8 (texts [i].delta);
+          o.write_string8 (s);
+        } else {// ascii
+          o.write_int8 (s.length ());
+          o.write_int8 (texts [i].delta);
+          o.write_string16 (s);
+        }
+      }
+
+      o.send ();
+      
+    }
+  }
+
+
+
+  // opcode 76 - image text8
+  /**
+   * @see <a href="XDrawImageString.html">XDrawImageString</a>
+   */
+  public void image_text (GC gc, int x, int y, String s) {
+
+    int n = s.length ();
+    int p = RequestOutputStream.pad (n);
+    RequestOutputStream o = display.out;
+    synchronized (o) {
+      o.begin_request (76, n, 4 + (n + p) / 4);
+      o.write_int32 (id);
+      o.write_int32 (gc.id);
+      o.write_int16 (x);
+      o.write_int16 (y);
+      o.write_string8 (s);
+      o.send ();
+    }
+  }
+
+
+  // opcode 77 - image text16
+  /**
+   * @see <a href="XDrawImageString16.html">XDrawImageString16</a>
+   */
+  public void image_text16 (GC gc, int x, int y, String s) {
+
+    int n = s.length ();
+    int p = RequestOutputStream.pad (2 * n);
+
+    RequestOutputStream o = display.out;
+    synchronized (o) {
+      o.begin_request (77, n, 4 + (2 * n + p) / 4);
+      o.write_int32 (id);
+      o.write_int32 (gc.id);
+      o.write_int16 (x);
+      o.write_int16 (y);
+      o.write_string16 (s);
+      o.send ();
+    }
   }
 
 
@@ -772,21 +801,11 @@ Y:�
     }
   }
 
-  public void poly_text8 (GC gc, int x, int y, Text[] texts) {
-
-    // FIXME: Implement.
-  }
-
-  public void poly_text16 (GC gc, int x, int y, Text[] texts) {
-
-    // FIXME: Implement.
-  }
-
   /**
    * @see #poly_text(GC, int, int, Text[])
    */
   public void text8 (GC gc, int x, int y, String s, int delta, Font font) {
-    poly_text8 (gc, x, y, new Text [] {new Text (s, delta, font)});
+    poly_text (gc, x, y, new Text [] {new Text (s, delta, font)});
   }
 
 
@@ -794,7 +813,14 @@ Y:�
    * @see #text(GC, int, int, String, int, Font)
    */
   public void text (GC gc, int x, int y, String s) {
-    poly_text8 (gc, x, y, new Text [] {new Text (s, 0, null)});
+    poly_text (gc, x, y, new Text [] {new Text (s, 0, null)});
+  }
+
+  private int length (Text [] texts, int bit) {
+    int n = 0;
+    for (int i=0; i<texts.length; i++) n += texts [i].length (bit);
+
+    return n;
   }
 }
 
