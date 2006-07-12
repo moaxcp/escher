@@ -59,7 +59,7 @@ public class Colormap extends Resource {
    *
    * @see <a href="XCreateColormap.html">XCreateColormap</a>
    */   
-  public Colormap (Window window, Visual visual_type, int alloc) {
+  public Colormap (Window window, int visual_id, int alloc) {
     super (window.display);
 
     RequestOutputStream o = display.out;
@@ -67,7 +67,7 @@ public class Colormap extends Resource {
       o.begin_request (78, alloc, 4);
       o.write_int32 (id);
       o.write_int32 (window.id);
-      o.write_int32 (visual_type.id);
+      o.write_int32 (visual_id);
       o.send ();
     }
   }
