@@ -775,10 +775,9 @@ public class Print extends gnu.x11.extension.Extension
   
   
   public gnu.x11.event.Event build (Display display, 
-    byte [] data, int code) {
+                                    ResponseInputStream i, int code) {
 
-    //return new PrintNotifyEvent (display, data);
-    return null;
+    return new PrintNotifyEvent (display, i);
   }
 
 
