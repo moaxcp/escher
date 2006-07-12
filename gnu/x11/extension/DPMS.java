@@ -1,7 +1,7 @@
 package gnu.x11.extension;
 
-import gnu.x11.Data;
-import gnu.x11.Request;
+import gnu.x11.RequestOutputStream;
+import gnu.x11.ResponseInputStream;
 
 
 /**
@@ -41,13 +41,21 @@ public class DPMS extends Extension {
     super (display, "DPMS", MINOR_OPCODE_STRINGS); 
 
     // check version before any other operations
-    Request request = new Request (display, major_opcode, 0, 2);
-    request.write2 (CLIENT_MAJOR_VERSION);
-    request.write2 (CLIENT_MINOR_VERSION);
+    RequestOutputStream o = display.out;
+    synchronized (o) {
+      o.begin_request (major_opcode, 0, 2);
+      o.write_int16 (CLIENT_MAJOR_VERSION);
+      o.write_int16 (CLIENT_MINOR_VERSION);
 
-    Data reply = display.read_reply (request);
-    server_major_version = reply.read2 (8);
-    server_minor_version = reply.read2 (10);
+      ResponseInputStream i = display.in;
+      synchronized (i) {
+        i.read_reply (o);
+        i.skip (8);
+        server_major_version = i.read_int16 ();
+        server_minor_version = i.read_int16 ();
+        i.skip (20);
+      }
+    }
   }
   
   
@@ -63,24 +71,38 @@ public class DPMS extends Extension {
    * @see <a href="DPMSCapable.html">DPMSCapable</a>
    */
   public boolean capable () {
-    Request request = new Request (display, major_opcode, 1, 1);
-    return display.read_reply (request).read_boolean (8);
+    boolean capable;
+    RequestOutputStream o = display.out;
+    synchronized (o) {
+      o.begin_request (major_opcode, 1, 1);
+      ResponseInputStream i = display.in;
+      synchronized (i) {
+        i.skip (8);
+        capable = i.read_bool ();
+        i.skip (23);
+      }
+    }
+    return capable;
   }
 
   
   /** Reply of {@link #timeouts()} */
-  public static class TimeoutsReply extends Data {
-    public TimeoutsReply (Data data) { super (data); }
-    public int standby () { return read2 (8); }
-    public int suspend () { return read2 (10); }
-    public int off () { return read2 (12); }
-  
-  
+  public static class TimeoutsInfo {
+
+    public int standby;
+    public int suspend;
+    public int off;
+    TimeoutsInfo (ResponseInputStream i) {
+      standby = i.read_int16 ();
+      suspend = i.read_int16 ();
+      off = i.read_int16 ();
+    }
+
     public String toString () {
       return "#TimeoutsReply"
-        + "\n  standby: " + standby ()
-        + "\n  suspend: " + suspend ()
-        + "\n  off: " + off ();
+        + "\n  standby: " + standby
+        + "\n  suspend: " + suspend
+        + "\n  off: " + off;
     }
   }
   
@@ -89,9 +111,19 @@ public class DPMS extends Extension {
   /**
    * @see <a href="DPMSGetTimeouts.html">DPMSGetTimeouts</a>
    */
-  public TimeoutsReply timeouts () {
-    Request request = new Request (display, major_opcode, 2, 1);
-    return new TimeoutsReply (display.read_reply (request));
+  public TimeoutsInfo timeouts () {
+    TimeoutsInfo info;
+    RequestOutputStream o = display.out;
+    synchronized (o) {
+      o.begin_request (major_opcode, 2, 1);
+      ResponseInputStream i = display.in;
+      synchronized (i) {
+        i.skip (8);
+        info = new TimeoutsInfo(i);
+        i.skip (18);
+      }
+    }
+    return info;
   }
 
 
@@ -100,11 +132,16 @@ public class DPMS extends Extension {
    * @see <a href="DPMSSetTimeouts.html">DPMSSetTimeouts</a>
    */
   public void set_timeouts (int standby, int suspend, int off) {
-    Request request = new Request (display, major_opcode, 3, 3);
-    request.write2 (standby);
-    request.write2 (suspend);
-    request.write2 (off);
-    display.send_request (request);
+
+    RequestOutputStream o = display.out;
+    synchronized (o) {
+      o.begin_request (major_opcode, 3, 3);
+      o.write_int16 (standby);
+      o.write_int16 (suspend);
+      o.write_int16 (off);
+      o.skip (2);
+      o.send ();
+    }
   }
 
 
@@ -113,8 +150,11 @@ public class DPMS extends Extension {
    * @see <a href="DPMSEnable.html">DPMSEnable</a>
    */
   public void enable () {
-    Request request = new Request (display, major_opcode, 4, 1);
-    display.send_request (request);
+    RequestOutputStream o = display.out;
+    synchronized (o) {
+      o.begin_request (major_opcode, 4, 1);
+      o.send ();
+    }
   }
 
 
@@ -123,8 +163,11 @@ public class DPMS extends Extension {
    * @see <a href="DPMSDisable.html">DPMSDisable</a>
    */
   public void disable () {
-    Request request = new Request (display, major_opcode, 5, 1);
-    display.send_request (request);
+    RequestOutputStream o = display.out;
+    synchronized (o) {
+      o.begin_request (major_opcode, 5, 1);
+      o.send ();
+    }
   }
 
 
@@ -149,32 +192,33 @@ public class DPMS extends Extension {
    * @see <a href="DPMSForceLevel.html">DPMSForceLevel</a>
    */
   public void force_level (int level) {
-    Request request = new Request (display, major_opcode, 6, 2);
-    request.write2 (level);
-    display.send_request (request);    
+    RequestOutputStream o = display.out;
+    synchronized (o) {
+      o.begin_request (major_opcode, 6, 2);
+      o.write_int16 (level);
+      o.send ();
+    }
   }
 
 
   /** Reply of {@link #info()} */
-  public static class InfoReply extends Data {
-    public InfoReply (Data data) { super (data); }  
-    public boolean state () { return read_boolean (10); }
-  
-  
+  public static class Info {
+
     /**
-     * @return valid:
-     * {@link #ON},
-     * {@link #STAND_BY},
-     * {@link #SUSPEND},
-     * {@link #OFF}
+     * One of: {@link #ON}, {@link #STAND_BY}, {@link #SUSPEND}, {@link #OFF}.
      */
-    public int level () { return read2 (8); }
-    
-  
+    public int power_level;
+    boolean state;
+
+    Info (ResponseInputStream i) {
+      power_level = i.read_int16 ();
+      state = i.read_bool ();
+    } 
+
     public String toString () {
       return "#InfoReply"
-        + "\n  state: " + state ()
-        + "\n  level: " + LEVEL_STRINGS [level ()];
+        + "\n  state: " + state
+        + "\n  level: " + LEVEL_STRINGS [power_level];
     }
   }
 
@@ -183,9 +227,20 @@ public class DPMS extends Extension {
   /**
    * @see <a href="DPMSInfo.html">DPMSInfo</a>
    */
-  public InfoReply info () {
-    Request request = new Request (display, major_opcode, 7, 1);
-    return new InfoReply (display.read_reply (request));
+  public Info info () {
+    Info info;
+    RequestOutputStream o = display.out;
+    synchronized (o) {
+      o.begin_request (major_opcode, 7, 1);
+      ResponseInputStream i = display.in;
+      synchronized (i) {
+        i.read_reply (o);
+        i.skip (8);
+        info = new Info (i);
+        i.skip (21);
+      }
+    }
+    return info;
   }
 
 
