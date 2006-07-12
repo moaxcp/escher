@@ -169,7 +169,7 @@ public class Input {
       ResponseInputStream i = display.in;
       synchronized (i) {
         i.read_reply (o);
-        assert i.read_int8 () == 1;
+        i.skip (1);
         info = new InputFocusInfo (i);
         i.skip (20);
       }
@@ -191,8 +191,7 @@ public class Input {
       ResponseInputStream i = display.in;
       synchronized (i) {
         i.read_reply (o);
-        assert i.read_int8 () == 1;
-        i.skip (7);
+        i.skip (8);
         i.read_data (data);
       }
     }
@@ -306,6 +305,7 @@ public class Input {
     RequestOutputStream o = display.out;
     synchronized (o) {
       o.begin_request (102, 0, 2 + control.count ());
+      o.write_int32 (control.bitmask);
       control.write (o);
       o.send ();
     }
@@ -324,7 +324,7 @@ public class Input {
       ResponseInputStream i = display.in;
       synchronized (i) {
         i.read_reply (o);
-        assert i.read_int8 () == 1;
+        i.skip (1);
         info = new KeyboardControlInfo (i);
       }
     }
@@ -380,8 +380,7 @@ public class Input {
       ResponseInputStream i = display.in;
       synchronized (i) {
         i.read_reply (o);
-        assert i.read_int8 () == 1;
-        i.skip (7);
+        i.skip (8);
         info = new PointerControlInfo (i);
       }
     }
@@ -416,7 +415,7 @@ public class Input {
       ResponseInputStream i = display.in;
       synchronized (i) {
         i.read_reply (o);
-        assert i.read_int8 () == 1;
+        i.skip (1);
         status = i.read_int8 ();
         i.skip (30);
       }
@@ -438,7 +437,7 @@ public class Input {
       ResponseInputStream i = display.in;
       synchronized (i) {
         i.read_reply (o);
-        assert i.read_int8 () == 1;
+        i.skip (1);
         int len = i.read_int8 ();
         i.skip (30);
         map = new byte [len];
@@ -473,7 +472,7 @@ public class Input {
       ResponseInputStream i = display.in;
       synchronized (i) {
         i.read_reply (o);
-        assert i.read_int8 () == 1;
+        i.skip (1);
         status = i.read_int8 ();
         i.skip (30);
       }
@@ -509,7 +508,7 @@ public class Input {
       ResponseInputStream i = display.in;
       synchronized (i) {
         i.read_reply (o);
-        assert i.read_int8 () == 1;
+        i.skip (1);
         map = new ModifierMapping (i);        
       }
     }
