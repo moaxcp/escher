@@ -936,9 +936,9 @@ public class Display {
     
     if (xcmisc_resource_count == 0) {
       // first time, or used up
-      gnu.x11.extension.XCMisc.XIDRangeReply rr = xcmisc.xid_range ();
-      xcmisc_resource_base = rr.start_id ();
-      xcmisc_resource_count = rr.count ();
+      gnu.x11.extension.XCMisc.XIDRange rr = xcmisc.xid_range ();
+      xcmisc_resource_base = rr.start_id;
+      xcmisc_resource_count = rr.count;
     }
 
     
