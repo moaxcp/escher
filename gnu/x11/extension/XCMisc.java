@@ -1,9 +1,7 @@
 package gnu.x11.extension;
 
-import gnu.x11.Data;
-import gnu.x11.Enum;
-import gnu.x11.Request;
-
+import gnu.x11.RequestOutputStream;
+import gnu.x11.ResponseInputStream;
 
 /** 
  * XC-MISC Extension. The specification can be found <a href= 
@@ -29,38 +27,72 @@ public class XCMisc extends Extension {
     super (display, "XC-MISC", MINOR_OPCODE_STRINGS); 
 
     // check version before any other operations
-    Request request = new Request (display, major_opcode, 0, 2);
-    request.write2 (CLIENT_MAJOR_VERSION);
-    request.write2 (CLIENT_MINOR_VERSION);
+    RequestOutputStream o = display.out;
+    synchronized (o) {
 
-    Data reply = display.read_reply (request);
-    server_major_version = reply.read2 (8);
-    server_minor_version = reply.read2 (10);
+      o.begin_request (major_opcode, 0, 2);
+      o.write_int16 (CLIENT_MAJOR_VERSION);
+      o.write_int16 (CLIENT_MINOR_VERSION);
+      ResponseInputStream i = display.in;
+      synchronized (i) {
+        i.read_reply (o);
+        i.skip (8);
+        server_major_version = i.read_int16 ();
+        server_minor_version = i.read_int16 ();
+        i.skip (20);
+      }
+    }
   }
 
   
   /** Reply of {@link XCMisc#xid_range()} */
-  public static class XIDRangeReply extends Data {
-    public XIDRangeReply (Data data) { super (data); }
-    public int start_id () { return read4 (8); }
-    public int count () { return read4 (12); }
+  public static class XIDRange {
+    public int start_id;
+    public int count;
+    XIDRange (ResponseInputStream i) {
+      start_id = i.read_int32 ();
+      count = i.read_int32 ();
+    }
   }
   
   
   // xc-misc opcode 1 - get xid range
-  public XIDRangeReply xid_range () {
-    Request request = new Request (display, major_opcode, 1, 1);
-    return new XIDRangeReply (display.read_reply (request));
+  public XIDRange xid_range () {
+    XIDRange r;
+    RequestOutputStream o = display.out;
+    synchronized (o) {
+      o.begin_request (major_opcode, 1, 1);
+      ResponseInputStream i = display.in;
+      synchronized (i) {
+        i.read_reply (o);
+        i.skip (8);
+        r = new XIDRange (i);
+        i.skip (16);
+      }
+    }
+    return r;
   }
 
 
   // xc-misc opcode 2 - get xid list
-  public Enum xid_list (int count) {
-    Request request = new Request (display, major_opcode, 2, 2);
-    request.write4 (count);
+  public int [] xid_list (int count) {
 
-    Data reply = display.read_reply (request);
-    return new Enum (reply, 32, reply.read4 (8));
+    int [] ids;
+    RequestOutputStream o = display.out;
+    synchronized (o) {
+      o.begin_request (major_opcode, 2, 2);
+      ResponseInputStream i = display.in;
+      synchronized (i) {
+        i.read_reply (o);
+        i.skip (8);
+        int num = i.read_int32 ();
+        i.skip (20);
+        ids = new int [num];
+        for (int j = 0; j < num; j++)
+          ids [j] = i.read_int32 ();
+      }
+    }
+    return ids;
   }
 
 
