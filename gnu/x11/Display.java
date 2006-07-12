@@ -287,8 +287,7 @@ public class Display {
       ResponseInputStream i = in;
       synchronized (i) {
         i.read_reply(o);
-        assert i.read_int8 () == 1;
-        i.skip (7);
+        i.skip (8);
         owner_id = i.read_int32 ();
         i.skip (20);
       }
@@ -342,8 +341,7 @@ public class Display {
       ResponseInputStream i = in;
       synchronized (i) {
         i.read_reply (o);
-        assert i.read_int8 () == 1;
-        i.skip (3);
+        i.skip (4);
         int len = i.read_int32 () * 4; // Number of bytes for the reply.
         int num_strings = i.read_int16 ();
         i.skip (22);
@@ -418,8 +416,7 @@ public class Display {
       ResponseInputStream i = in;
       synchronized (i) {
         i.read_reply (o);
-        assert i.read_int8 () == 1;
-        i.skip (3);
+        i.skip (4);
         int reply_length = i.read_int32 () * 4;
         int num_strings = i.read_int16 ();
         i.skip (22);
@@ -509,8 +506,7 @@ public class Display {
       ResponseInputStream i = in;
       synchronized (i) {
         i.read_reply (o);
-        assert i.read_int8 () == 1;
-        i.skip (7);
+        i.skip (8);
         info = new ExtensionInfo (i);
         i.skip (20);
       }
@@ -535,7 +531,7 @@ public class Display {
       ResponseInputStream i = in;
       synchronized (i) {
         i.read_reply (o);
-        assert i.read_int8 () == 1;
+        i.skip (1);
         int num_strs = i.read_int16 ();
         i.skip (2);
         int reply_length = i.read_int32 () * 4;
@@ -684,8 +680,7 @@ public class Display {
       ResponseInputStream i = in;      
       synchronized (i) {
         i.read_reply (o);
-        assert i.read_int8 () == 1;
-        i.skip (7);
+        i.skip (8);
         info = new ScreenSaverInfo (i);
         i.skip (18);
       }
@@ -793,7 +788,7 @@ public class Display {
       ResponseInputStream i = in;
       synchronized (i) {
         i.read_reply (o);
-        assert i.read_int8 () == 1;
+        i.skip (1);
         info = new HostsInfo (i);
       }
     }
@@ -1168,7 +1163,7 @@ public class Display {
       // TODO: Evaluate if we gain performance by using BufferedOutputStream
       // here.
       OutputStream o = socket.getOutputStream ();
-      BufferedOutputStream buf_out = new BufferedOutputStream (o, 256);
+      BufferedOutputStream buf_out = new BufferedOutputStream (o, 512);
       out = new RequestOutputStream (buf_out);
 
       // Create buffered response input stream.
@@ -1180,6 +1175,10 @@ public class Display {
     } catch (IOException ex) {
       handle_exception (ex);
     }
+  }
+
+  public void flush () {
+    out.flush ();
   }
 
   private void handle_exception (Throwable ex) {
