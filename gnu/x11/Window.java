@@ -284,6 +284,7 @@ public class Window extends Drawable implements GLXDrawable {
       o.write_int16 (border_width);
       o.write_int16 (klass);
       o.write_int32 (visual_id);
+      o.write_int32 (attr.bitmask);
       attr.write (o);
       o.send ();
     }
@@ -322,6 +323,7 @@ public class Window extends Drawable implements GLXDrawable {
     synchronized (o) {
       o.begin_request (2, 0, 3 + attr.count ());
       o.write_int32 (id);
+      o.write_int32 (attr.bitmask);
       attr.write (o);
       o.send ();
     }
@@ -610,6 +612,8 @@ public class Window extends Drawable implements GLXDrawable {
     synchronized (o) {
       o.begin_request (12, 0, 3 + changes.count ());
       o.write_int32 (id);
+      o.write_int16 (changes.bitmask);
+      o.skip (2);
       changes.write (o);
       o.send ();
     }
@@ -678,8 +682,7 @@ public class Window extends Drawable implements GLXDrawable {
       ResponseInputStream i = display.in;
       synchronized (i) {
         i.read_reply (o);
-        assert i.read_int8 () == 1;
-        i.skip (7);
+        i.skip (8);
         info = new TreeInfo (i);
       }
     }
@@ -828,7 +831,7 @@ public class Window extends Drawable implements GLXDrawable {
       ResponseInputStream i = display.in;
       synchronized (i) {
         i.read_reply (o);
-        assert i.read_int8 () == 1;
+        i.skip (1);
         prop = new Property (i);
       }
     }
@@ -855,8 +858,7 @@ public class Window extends Drawable implements GLXDrawable {
       ResponseInputStream i = display.in;
       synchronized (i) {
         i.read_reply (o);
-        assert i.read_int8 () == 1;
-        i.skip (7);
+        i.skip (8);
         int num_atoms = i.read_int16 ();
         atoms = new Atom [num_atoms];
         i.skip (22);
@@ -977,7 +979,7 @@ public class Window extends Drawable implements GLXDrawable {
       ResponseInputStream i = display.in;
       synchronized (i) {
         i.read_reply (o);
-        assert i.read_int8 () == 1;
+        i.skip (1);
         status = i.read_int8 ();
         i.skip (30);
       }
@@ -1081,7 +1083,7 @@ public class Window extends Drawable implements GLXDrawable {
       ResponseInputStream i = display.in;
       synchronized (i) {
         i.read_reply (o);
-        assert i.read_int8 () == 1;
+        i.skip (1);
         status = i.read_int8 ();
         i.skip (30);
       }
@@ -1196,7 +1198,7 @@ public class Window extends Drawable implements GLXDrawable {
       ResponseInputStream i = display.in;
       synchronized (i) {
         i.read_reply (o);
-        assert i.read_int8 () == 1;
+        i.skip (1);
         info = new PointerInfo (i);
         i.skip (6);
       }
@@ -1237,8 +1239,7 @@ public class Window extends Drawable implements GLXDrawable {
       ResponseInputStream i = display.in;
       synchronized (i) {
         i.read_reply (o);
-        assert i.read_int8 () == 1;
-        i.skip (7);
+        i.skip (8);
         int len = i.read_int32 ();
         timecoords = new TimeCoord [len];
         i.skip (20);
@@ -1287,7 +1288,7 @@ public class Window extends Drawable implements GLXDrawable {
       ResponseInputStream i = display.in;
       synchronized (i) {
         i.read_reply (o);
-        assert i.read_int8 () == 1;
+        i.skip (1);
         coords = new Coordinates (i);
         i.skip (16);
       }
@@ -1465,8 +1466,7 @@ public class Window extends Drawable implements GLXDrawable {
       ResponseInputStream i = display.in;
       synchronized (i) {
         i.read_reply (o);
-        assert i.read_int8 () == 1;
-        i.skip (7);
+        i.skip (8);
         int num_maps = i.read_int16 ();
         maps = new Colormap [num_maps];
         i.skip (22);
