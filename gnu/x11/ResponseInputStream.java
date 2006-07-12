@@ -210,25 +210,30 @@ public class ResponseInputStream extends FilterInputStream {
 
   public Event read_event () {
 
-    // If there are any events already queued up, then return the first
-    // event in the queue.
-    if (events.size () > 0) {
-      Event event = (Event) events.getFirst ();
-      return event;
-    }
-
+    //System.err.println("read_event");
     //System.err.println("read event from stream");
 
     // Otherwise we read and return the first event from the stream.
     Event ev = null;
     do {
-      ev = read_event_from_stream ();
+      // If there are any events already queued up, then return the first
+      // event in the queue.
+      if (events.size () > 0) {
+        ev = (Event) events.getFirst ();
+      } else {
+        ev = read_event_from_stream ();
+      }
+
       // If this returned null, there's a reply in the response stream and
       // some other thread is waiting for it, or there is no event and we keep
       // waiting for one...
-      if (ev == null)
-        Thread.yield ();
+      if (ev == null) {
+        try {Thread.sleep (40); } catch (Exception ex) {}
+        //Thread.yield ();
+      }
+
     } while (ev == null);
+//    System.err.println("event: " + ev);
     return ev;
   }
 
@@ -242,11 +247,12 @@ public class ResponseInputStream extends FilterInputStream {
 
     int available = 0;
     try {
-     available = available ();
+      available = in.available ();
+      //System.err.println("available: " + available);
     } catch (IOException ex) {
       handle_exception (ex);
     }
-    //System.err.println("bytes available in response stream: " + available);
+
     if (available == 0)
       return null;
 
@@ -463,7 +469,7 @@ public class ResponseInputStream extends FilterInputStream {
     int major_opcode = read_int8 ();
     skip (21);
     gnu.x11.Error err = new gnu.x11.Error (display,
-                                           "Error", //gnu.x11.Error.ERROR_STRINGS [code],
+                                           gnu.x11.Error.ERROR_STRINGS [code],
                                            code, seq_no, bad_value,
                                            minor_opcode, major_opcode);
     throw err;
