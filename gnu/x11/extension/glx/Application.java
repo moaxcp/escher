@@ -117,7 +117,8 @@ public abstract class Application extends gnu.x11.Application {
     gl = glx.create_context (vid, display.default_screen_no, GL.NONE0);
 
     // FIXME share colormap
-    Colormap colormap = new Colormap (display.default_root, vid, false);
+    Colormap colormap = new Colormap (display.default_root, vid,
+                                      Colormap.NONE);
     
     Window.Attributes attr = new Window.Attributes ();
     attr.set_colormap (colormap);
