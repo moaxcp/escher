@@ -87,11 +87,11 @@ public class RequestOutputStream extends FilterOutputStream {
     assert Thread.holdsLock (this);
 
     // Send pending request.
-    if (index > 0) {
-      seq_number++;
+    if (index > 0 || request_object != null) {
+      //seq_number++;
       send ();
     }
-
+    assert index == 0;
     write_int8 (opcode);
     write_int8 (second_field);
     write_int16 (request_length);
@@ -294,6 +294,17 @@ public class RequestOutputStream extends FilterOutputStream {
     if (pad > 0)
       pad = 4 - pad;
     return pad;
+  }
+
+  /**
+   * Returns the opcode of the current request or -1 if there is no request
+   * pending.
+   *
+   * @return the opcode of the current request or -1 if there is no request
+   *         pending
+   */
+  public int opcode () {
+    return index > 0 ? buffer [0] : -1;
   }
 
   /**
