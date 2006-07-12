@@ -4,7 +4,8 @@ import gnu.x11.Data;
 import gnu.x11.Display;
 import gnu.x11.Enum;
 import gnu.x11.Error;
-import gnu.x11.Request;
+import gnu.x11.RequestOutputStream;
+import gnu.x11.ResponseInputStream;
 import gnu.x11.Window;
 
 
@@ -71,15 +72,18 @@ public class Print extends gnu.x11.extension.Extension
      */
     public Context (String name) {
       super (Print.this.display);
-  
+
       int len = 4 + Data.unit (name) + Data.unit (locale);
-      Request request = new Request (this.display, major_opcode, 2, len);
-      request.write4 (id);
-      request.write4 (name.length ());
-      request.write4 (locale.length ());
-      request.write1 (name);
-      request.write1 (locale);
-      this.display.send_request (request);
+      RequestOutputStream o = display.out;
+      synchronized (o) {
+        o.begin_request (major_opcode, 2, len);
+        o.write_int32 (id);
+        o.write_int32 (name.length ());
+        o.write_int32 (locale.length ());
+        o.write_string8 (name);
+        o.write_string8 (locale);
+        o.send ();
+      }
     }
   
   
@@ -88,9 +92,12 @@ public class Print extends gnu.x11.extension.Extension
      * @see <a href="XpSetContext.html">XpSetContext</a>
      */
     public void set () {
-      Request request = new Request (this.display, major_opcode, 3, 2);
-      request.write4 (id);
-      this.display.send_request (request);
+      RequestOutputStream o = display.out;
+      synchronized (o) {
+        o.begin_request (major_opcode, 3, 2);
+        o.write_int32 (id);
+        o.send ();
+      }
     }
   
   
@@ -99,9 +106,12 @@ public class Print extends gnu.x11.extension.Extension
      * @see <a href="XpDestroyContext.html">XpDestroyContext</a>
      */
     public void destroy () {
-      Request request = new Request (this.display, major_opcode, 5, 2);
-      request.write4 (id);
-      this.display.send_request (request);
+      RequestOutputStream o = display.out;
+      synchronized (o) {
+        o.begin_request (major_opcode, 5, 2);
+        o.write_int32 (id);
+        o.send ();
+      }
     }
   
   
@@ -110,12 +120,20 @@ public class Print extends gnu.x11.extension.Extension
      * @see <a href="XpGetScreenOfContext.html">XpGetScreenOfContext</a>
      */
     public Window screen () {
-      Request request = new Request (this.display, major_opcode, 6, 2);
-      // error in spec: missing context field
-      request.write4 (id);
-  
-      Data reply = this.display.read_reply (request);
-      int root_id = reply.read4 (8);
+      int root_id;
+      RequestOutputStream o = display.out;
+      synchronized (o) {
+        o.begin_request (major_opcode, 6, 2);
+        // error in spec: missing context field
+        o.write_int32 (id);
+        ResponseInputStream i = display.in;
+        synchronized (i) {
+          i.read_reply (o);
+          i.skip (8);
+          root_id = i.read_int32 ();
+          i.skip (16);
+        }
+      }
       return (Window) Window.intern (this.display, root_id);
     }
   
@@ -125,18 +143,26 @@ public class Print extends gnu.x11.extension.Extension
      * @see <a href="XpSelectInput.html">XpSelectInput</a>
      */
     public void select_input (int event_mask) {
-      Request request = new Request (this.display, major_opcode, 15, 3);
-      request.write4 (id);
-      request.write4 (event_mask);
-      this.display.send_request (request);
+      RequestOutputStream o = display.out;
+      synchronized (o) {
+        o.begin_request (major_opcode, 15, 3);
+        o.write_int32 (id);
+        o.write_int32 (event_mask);
+        o.send ();
+      }
     }
   
   
     /** Reply of {@link #input_selected(int)}. */
-    public class InputSelectedReply extends Data {
-      public InputSelectedReply (Data data) { super (data); }
-      public int event_mask () { return read4 (8); }
-      public int all_events_mask () { return read4 (8); }
+    public class InputSelectedInfo {
+      public int event_mask;
+      public int all_event_masks;
+      InputSelectedInfo (ResponseInputStream i) {
+        event_mask = i.read_int32 ();
+        all_event_masks = i.read_int32 ();
+      }
+      public int event_mask () { return event_mask; }
+      public int all_events_mask () { return all_event_masks; }
     }
   
   
@@ -144,12 +170,22 @@ public class Print extends gnu.x11.extension.Extension
     /**
      * @see <a href="XpInputSelected.html">XpInputSelected</a>
      */
-    public InputSelectedReply input_selected (int event_mask) {
-      Request request = new Request (this.display, major_opcode, 16, 2);
-      request.write4 (id);
-  
-      Data reply = this.display.read_reply (request);
-      return new InputSelectedReply (reply);
+    public InputSelectedInfo input_selected (int event_mask) {
+
+      InputSelectedInfo info;
+      RequestOutputStream o = display.out;
+      synchronized (o) {
+        o.begin_request (major_opcode, 16, 2);
+        o.write_int32 (id);
+        ResponseInputStream i = display.in;
+        synchronized (i) {
+          i.read_reply (o);
+          i.skip (8);
+          info = new InputSelectedInfo (i);
+          i.skip (16);
+        }
+      }
+      return info;
     }
   
   
@@ -176,13 +212,23 @@ public class Print extends gnu.x11.extension.Extension
      * @see <a href="XpGetAttributes.html">XpGetAttributes</a>
      */
     public String attributes (int pool) {
-      Request request = new Request (this.display, major_opcode, 17, 3);
-      request.write4 (id);
-      request.write1 (pool);
-  
-      Data reply = this.display.read_reply (request);
-      int len = reply.read4 (8);
-      return reply.read_string (32, len);
+
+      String atts;
+      RequestOutputStream o = display.out;
+      synchronized (o) {
+        o.begin_request (major_opcode, 17, 3);
+        o.write_int32 (id);
+        o.write_int8 (pool);
+        ResponseInputStream i = display.in;
+        synchronized (i) {
+          i.read_reply (o);
+          i.skip (8);
+          int strlen = i.read_int32 ();
+          i.skip (20);
+          atts = i.read_string8 (strlen);
+        }
+      }
+      return atts;
     }   
   
   
@@ -203,14 +249,17 @@ public class Print extends gnu.x11.extension.Extension
      */
     public void set_attributes (int pool, int rule, String attributes) {
       int len = 4 + Data.unit (attributes);
-      Request request = new Request (this.display, major_opcode, 18, len);
-      request.write4 (id);
-      request.write4 (attributes.length ());
-      request.write1 (pool);
-      request.write1 (rule);
-      request.write2_unused ();
-      request.write1 (attributes);
-      this.display.send_request (request);
+      RequestOutputStream o = display.out;
+      synchronized (o) {
+        o.begin_request (major_opcode, 18, len);
+        o.write_int32 (id);
+        o.write_int32 (attributes.length ());
+        o.write_int8 (pool);
+        o.write_int8 (rule);
+        o.skip (2);
+        o.write_string8 (attributes);
+        o.send ();
+      }
     };   
   
   
@@ -230,29 +279,53 @@ public class Print extends gnu.x11.extension.Extension
      * @see <a href="XpGetOneAttribute.html">XpGetOneAttribute</a>
      */
     public String one_attribute (int pool, String name) {
+      String attr;
       int len = 4 + Data.unit (name);
-      Request request = new Request (this.display, major_opcode, 19, len);
-      request.write4 (id);
-      request.write4 (name.length ());
-      request.write1 (pool);
-      request.write3_unused ();
-      request.write1 (name);
-  
-      Data reply = this.display.read_reply (request);
-      len = reply.read4 (8);
-      return reply.read_string (32, len);
+      RequestOutputStream o = display.out;
+      synchronized (o) {
+        o.begin_request (major_opcode, 19, len);
+        o.write_int32 (id);
+        o.write_int32 (name.length ());
+        o.write_int8 (pool);
+        o.skip (3);
+        o.write_string8 (name);
+        ResponseInputStream i = display.in;
+        synchronized (i) {
+          i.read_reply (o);
+          i.skip (8);
+          int strlen = i.read_int32 ();
+          i.skip (20);
+          attr = i.read_string8 (strlen);
+          i.skip (RequestOutputStream.pad (strlen));
+        }
+      }
+      return attr;
     }
   
   
     /** Reply of {@link #page_dimensions()}. */  
-    public class PageDimensionsReply extends Data {
-      public PageDimensionsReply (Data data) { super (data); }
-      public int width () { return read2 (8); }
-      public int height () { return read2 (10); }
-      public int offset_x () { return read2 (12); }
-      public int offset_y () { return read2 (14); }
-      public int reproducible_x () { return read2 (16); }
-      public int reproducible_y () { return read2 (18); }
+    public class PageDimensions {
+      public int width;
+      public int height;
+      public int offset_x;
+      public int offset_y;
+      public int reproducible_width;
+      public int reproducible_height;
+      PageDimensions (ResponseInputStream i) {
+        width = i.read_int16 ();
+        height = i.read_int16 ();
+        offset_x = i.read_int16 ();
+        offset_y = i.read_int16 ();
+        reproducible_width = i.read_int16 ();
+        reproducible_height = i.read_int16 ();
+      }
+
+      public int width () { return width; }
+      public int height () { return height; }
+      public int offset_x () { return offset_x; }
+      public int offset_y () { return offset_y; }
+      public int reproducible_x () { return reproducible_width; }
+      public int reproducible_y () { return reproducible_height; }
   
   
       public String toString () {
@@ -268,10 +341,16 @@ public class Print extends gnu.x11.extension.Extension
   
   
     /** Reply of {@link #page_dimensions()}. */  
-    public class SetImageResolutionReply extends Data {
-      public SetImageResolutionReply (Data data) { super (data); }
-      public boolean status () { return read_boolean (1); }
-      public int previous_resolution () { return read2 (8); }
+    public class SetImageResolutionInfo {
+      public boolean status;
+      public int previous_resolution;
+      SetImageResolutionInfo (ResponseInputStream i) {
+        status = i.read_bool ();
+        i.skip (6);
+        previous_resolution = i.read_int16 ();
+      }
+      public boolean status () { return status; }
+      public int previous_resolution () { return previous_resolution; }
     }
   
   
@@ -279,12 +358,21 @@ public class Print extends gnu.x11.extension.Extension
     /**
      * @see <a href="XpGetPageDimensions.html">XpGetPageDimensions</a>
      */
-    public PageDimensionsReply page_dimensions () {
-      Request request = new Request (this.display, major_opcode, 21, 2);
-      request.write4 (id);
-  
-      Data reply = this.display.read_reply (request);
-      return new PageDimensionsReply (reply);
+    public PageDimensions page_dimensions () {
+      PageDimensions dim;
+      RequestOutputStream o = display.out;
+      synchronized (o) {
+        o.begin_request (major_opcode, 21, 2);
+        o.write_int32 (id);
+        ResponseInputStream i = display.in;
+        synchronized (i) {
+          i.read_reply (o);
+          i.skip (8);
+          dim = new PageDimensions (i);
+          i.skip (12);
+        }
+      }
+      return dim;
     }
   
   
@@ -292,13 +380,22 @@ public class Print extends gnu.x11.extension.Extension
     /**
      * @see <a href="XpSetImageResolution.html">XpSetImageResolution</a>
      */
-    public SetImageResolutionReply set_image_resolution (int resolution) {
-      Request request = new Request (this.display, major_opcode, 23, 3);
-      request.write4 (id);
-      request.write2 (resolution);
-      
-      Data reply = this.display.read_reply (request);
-      return new SetImageResolutionReply (reply);
+    public SetImageResolutionInfo set_image_resolution (int resolution) {
+
+      SetImageResolutionInfo info;
+      RequestOutputStream o = display.out;
+      synchronized (o) {
+        o.begin_request (major_opcode, 23, 3);
+        o.write_int32 (id);
+        o.write_int16 (resolution);
+        ResponseInputStream i = display.in;
+        synchronized (i) {
+          i.skip (1);
+          info = new SetImageResolutionInfo (i);
+          i.skip (22);
+        }
+      }
+      return info;
     }
       
   
@@ -307,11 +404,20 @@ public class Print extends gnu.x11.extension.Extension
      * @see <a href="XpGetImageResolution.html">XpGetImageResolution</a>
      */
     public int image_resolution () {
-      Request request = new Request (this.display, major_opcode, 24, 2);
-      request.write4 (id);
-      
-      Data reply = this.display.read_reply (request);
-      return reply.read2 (8);
+
+      int res;
+      RequestOutputStream o = display.out;
+      synchronized (o) {
+        o.begin_request (major_opcode, 24, 2);
+        o.write_int32 (id);
+        ResponseInputStream i = display.in;
+        synchronized (i) {
+          i.skip (8);
+          res = i.read_int16 ();
+          i.skip (22);
+        }
+      }
+      return res;
     }
       
   
@@ -346,32 +452,38 @@ public class Print extends gnu.x11.extension.Extension
     super (display, "XpExtension", MINOR_OPCODE_STRINGS, 2, 2);
 
     // check version before any other operations
-    Request request = new Request (display, major_opcode, 0, 1);
-    Data reply = display.read_reply (request);
-    server_major_version = reply.read2 (4);
-    server_minor_version = reply.read2 (4);    
+    RequestOutputStream o = display.out;
+    synchronized (o) {
+      o.begin_request (major_opcode, 0, 1);
+      ResponseInputStream i = display.in;
+      synchronized (i) {
+        i.read_reply (o);
+        i.skip (8);
+        server_major_version = i.read_int16 ();
+        server_minor_version = i.read_int16 ();
+        i.skip (20);
+      }
+    }
   }
 
 
   /** Reply of {@link #printer_list(String)}. */
-  public class Printer extends Data {
-    public Printer (Data data, int offset) { super (data, offset); }
-    public int name_length () { return read4 (0); }
-    public String name () { return read_string (4, name_length ()); }
+  public class Printer {
 
-
-    public int description_length () { 
-      // 4 = length of name length field
-      int offset = Data.len (name_length ()) + 4;
-      return read4 (offset);
+    public String name;
+    public String desc;
+    Printer (ResponseInputStream i) {
+      int name_len = i.read_int32 ();
+      name = i.read_string8 (name_len);
+      i.skip (RequestOutputStream.pad (name_len));
+      int desc_len = i.read_int32 ();
+      desc = i.read_string8 (desc_len);
+      i.skip (RequestOutputStream.pad (desc_len));
     }
 
-
+    public String name () { return name; }
     public String description () {
-      // 4 = length of name length field
-      // 4 = length of description length field
-      int offset = Data.len (name_length ()) + 4 + 4;      
-      return read_string (offset, description_length ()); 
+      return desc;
     }
 
 
@@ -381,15 +493,6 @@ public class Print extends gnu.x11.extension.Extension
     public Context context () {
       return create_context (name ());
     }
-
-
-    public int length () { 
-      // 4 = length of name length field
-      // 4 = length of description length field
-      return Data.len (name_length ()) 
-        + Data.len (description_length ()) + 4 + 4;
-    }
-
 
     public String toString () {
       return "#Printer"
@@ -404,22 +507,28 @@ public class Print extends gnu.x11.extension.Extension
    * @return valid: {@link Enum#next()}
    * @see <a href="XpGetPrinterList.html">XpGetPrinterList</a>
    */
-  public Enum printer_list (String name) {
-    int len = 3 + Data.unit (name) + Data.unit (locale);
-    Request request = new Request (display, major_opcode, 1, len);
-    request.write4 (name.length ());
-    request.write4 (locale.length ());
-    request.write1 (name);
-    request.write1 (locale);
+  public Printer [] printer_list (String name) {
 
-    Data reply = display.read_reply (request);
-    return new Enum (reply, 32, reply.read4 (8)) {
-      public Object next () {
-        Printer printer = new Printer (this, 0);
-        inc (printer.length ());
-        return printer;
+    Printer [] printers;
+    int len = 3 + Data.unit (name) + Data.unit (locale);
+    RequestOutputStream o = display.out;
+    synchronized (o) {
+      o.begin_request(major_opcode, 1, len);
+      o.write_int32 (name.length ());
+      o.write_int32 (locale.length ());
+      o.write_string8 (name);
+      o.write_string8 (locale);
+      ResponseInputStream i = display.in;
+      synchronized (i) {
+        i.skip (8);
+        int num = i.read_int32 ();
+        printers = new Printer [num];
+        for (int j = 0; j < num; j++) {
+          printers [j] = new Printer (i);
+        }
       }
-    };
+    }
+    return printers;
   }
 
 
@@ -428,9 +537,18 @@ public class Print extends gnu.x11.extension.Extension
    * @see <a href="XpGetContext.html">XpGetContext</a>
    */
   public Context context () {
-    Request request = new Request (display, major_opcode, 4, 1);
-    Data reply = display.read_reply (request);
-    int id = reply.read4 (8);
+    int id;
+    RequestOutputStream o = display.out;
+    synchronized (o) {
+      o.begin_request (major_opcode, 4, 1);
+      ResponseInputStream i = display.in;
+      synchronized (i) {
+        i.read_reply (o);
+        i.skip (8);
+        id = i.read_int32 ();
+        i.skip (16);
+      }
+    }
     return new Context (id);
   }
 
@@ -448,9 +566,12 @@ public class Print extends gnu.x11.extension.Extension
    * @see <a href="XpStartJob.html">XpStartJob</a>
    */
   public void start_job (int output_mode) {
-    Request request = new Request (display, major_opcode, 7, 2);
-    request.write1 (output_mode);
-    display.send_request (request);
+    RequestOutputStream o = display.out;
+    synchronized (o) {
+      o.begin_request (major_opcode, 7, 2);
+      o.write_int8 (output_mode);
+      o.send ();
+    }
   }
 
 
@@ -459,9 +580,12 @@ public class Print extends gnu.x11.extension.Extension
    * @see <a href="XpEndJob.html">XpEndJob</a>
    */
   public void end_job (boolean cancel) {
-    Request request = new Request (display, major_opcode, 8, 2);
-    request.write1 (cancel);
-    display.send_request (request);
+    RequestOutputStream o = display.out;
+    synchronized (o) {
+      o.begin_request (major_opcode, 8, 2);
+      o.write_bool (cancel);
+      o.send ();
+    }
   }
 
 
@@ -470,9 +594,12 @@ public class Print extends gnu.x11.extension.Extension
    * @see <a href="XpStartDoc.html">XpStartDoc</a>
    */
   public void start_doc (int type) {
-    Request request = new Request (display, major_opcode, 9, 2);
-    request.write1 (type);
-    display.send_request (request);
+    RequestOutputStream o = display.out;
+    synchronized (o) {
+      o.begin_request (major_opcode, 9, 2);
+      o.write_int8 (type);
+      o.send ();
+    }
   }
 
 
@@ -481,9 +608,12 @@ public class Print extends gnu.x11.extension.Extension
    * @see <a href="XpEndDoc.html">XpEndDoc</a>
    */
   public void end_doc (boolean cancel) {
-    Request request = new Request (display, major_opcode, 10);
-    request.write1 (cancel);
-    display.send_request (request);
+    RequestOutputStream o = display.out;
+    synchronized (o) {
+      o.begin_request (major_opcode, 10, 2);
+      o.write_bool (cancel);
+      o.send ();
+    }
   }
 
 
@@ -492,9 +622,12 @@ public class Print extends gnu.x11.extension.Extension
    * @see <a href="XpStartPage.html">XpStartPage</a>
    */
   public void start_page (Window window) {
-    Request request = new Request (display, major_opcode, 13, 2);
-    request.write4 (window.id);
-    display.send_request (request);
+    RequestOutputStream o = display.out;
+    synchronized (o) {
+      o.begin_request (major_opcode, 13, 2);
+      o.write_int32 (window.id);
+      o.send ();
+    }
   }
 
 
@@ -503,9 +636,12 @@ public class Print extends gnu.x11.extension.Extension
    * @see <a href="XpEndPage.html">XpEndPage</a>
    */
   public void end_page (boolean cancel) {
-    Request request = new Request (display, major_opcode, 14, 2);
-    request.write1 (cancel);
-    display.send_request (request);
+    RequestOutputStream o = display.out;
+    synchronized (o) {
+      o.begin_request (major_opcode, 14, 2);
+      o.write_bool (cancel);
+      o.send ();
+    }
   }
 
 
@@ -514,8 +650,11 @@ public class Print extends gnu.x11.extension.Extension
    * @see <a href="XpRehashPrinterList.html">XpRehashPrinterList</a>
    */
   public void rehash_printer_list () {
-    Request request = new Request (display, major_opcode, 20, 1);
-    display.send_request (request);
+    RequestOutputStream o = display.out;
+    synchronized (o) {
+      o.begin_request (major_opcode, 20, 1);
+      o.send ();
+    }
   }
 
 
@@ -527,17 +666,27 @@ public class Print extends gnu.x11.extension.Extension
    *
    * @see <a href="XpQueryScreens.html">XpQueryScreens</a>
    */
-  public Enum screens () {
-    // error in spec: request length = 1 vs. 2
-    Request request = new Request (display, major_opcode, 22, 1);
-    Data reply = display.read_reply (request);
-    int count = reply.read4 (8);
-
-    return new Enum (reply, 32, count) {
-      public Object next () {
-        return Window.intern (display, next4 ());
+  public Window [] screens () {
+    int [] ids;
+    RequestOutputStream o = display.out;
+    synchronized (o) {
+      // error in spec: request length = 1 vs. 2
+      o.begin_request (major_opcode, 22, 1);
+      ResponseInputStream i = display.in;
+      synchronized (i) {
+        i.read_reply (o);
+        i.skip (8);
+        int count = i.read_int32 ();
+        ids = new int [count + 1];
+        i.skip (20);
+        for (int j = 0; j <= count; j++)
+          ids [j] = i.read_int32 ();
       }
-    };
+    }
+    Window [] windows = new Window [ids.length];
+    for (int j = 0; j < windows.length; j++)
+      windows [j] = (Window) Window.intern (display, ids [j]);
+    return windows;
   }
     
 
@@ -561,9 +710,12 @@ public class Print extends gnu.x11.extension.Extension
   public class AttributeNotifyEvent extends gnu.x11.event.Event {
     public static final int code = 0;
   
-  
-    public AttributeNotifyEvent (Display display, byte [] data) { 
-      super (display, data, 0); 
+
+    public int context_id;
+    AttributeNotifyEvent (Display display, ResponseInputStream in) {
+      super (display, in);
+      context_id = in.read_int32 ();
+      in.skip (24);
     }
   
   
@@ -577,8 +729,8 @@ public class Print extends gnu.x11.extension.Extension
      * {@link Print.Context#MEDIUM_ATTRIBUTE_POOL},
      * {@link Print.Context#SPOOLER_ATTRIBUTE_POOL}
      */
-    public int detail () { return read1 (1); }
-    public int context_id () { return read4 (8); }
+    public int detail () { return detail; }
+    public int context_id () { return context_id; }
   }  
   
   
@@ -587,8 +739,13 @@ public class Print extends gnu.x11.extension.Extension
     public static final int code = 0;
   
   
-    public PrintNotifyEvent (Display display, byte [] data) { 
-      super (display, data, 0); 
+    public int context_id;
+    public boolean cancel;
+    public PrintNotifyEvent (Display display, ResponseInputStream i) { 
+      super (display, i);
+      context_id = i.read_int32 ();
+      cancel = i.read_bool ();
+      i.skip (23);
     }
   
   
@@ -609,11 +766,11 @@ public class Print extends gnu.x11.extension.Extension
      * {@link #START_PAGE_NOTIFY},
      * {@link #END_PAGE_NOTIFY}
      */
-    public int detail () { return read1 (1); }
+    public int detail () { return detail; }
   
   
-    public int context_id () { return read4 (8); }
-    public boolean cancel () { return read_boolean (12); }
+    public int context_id () { return context_id; }
+    public boolean cancel () { return cancel; }
   }
   
   
@@ -635,7 +792,7 @@ public class Print extends gnu.x11.extension.Extension
    */
   public Context create_context (String name) {
     if (name.length () == 0) {
-      Printer printer = (Printer) printer_list ().next ();      
+      Printer printer = (Printer) printer_list () [0];
       name = printer.name ();
     }
 
@@ -678,7 +835,7 @@ public class Print extends gnu.x11.extension.Extension
   /**
    * @see #printer_list(String)
    */
-  public Enum printer_list () {
+  public Printer [] printer_list () {
     return printer_list ("");
   }
 }
