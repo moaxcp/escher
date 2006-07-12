@@ -24,13 +24,13 @@ public class Text {
 
 
   public int length (int bit) {
+
     // 2 = length of string field and delta field
     // 5 = font field
-    int n = font == null ? 2 : 2+5;
+    int n = font == null ? 2 : 5;
 
     if (bit == 8 || s.charAt (0) > 128) // non-ascii	  
       return n + s.length ();
-      
     else
       return n + 2 * s.length ();
   }
