@@ -1,9 +1,8 @@
 package gnu.x11.extension;
 
-import gnu.x11.Data;
 import gnu.x11.Display;
-import gnu.x11.Enum;
-import gnu.x11.Request;
+import gnu.x11.RequestOutputStream;
+import gnu.x11.ResponseInputStream;
 import gnu.x11.Visual;
 
 
@@ -37,62 +36,61 @@ public class EVI extends Extension {
      * minor version, but most implementation (xfree86 3.3/4.0) does not. 
      * Which one is bugged?
      */
-    Request request = new Request (display, major_opcode, 0, 1);
-    Data reply = display.read_reply (request);
-    server_major_version = reply.read2 (8);
-    server_minor_version = reply.read2 (10);
+    RequestOutputStream o = display.out;
+    synchronized (o) {
+      o.begin_request (major_opcode, 0, 1);
+      ResponseInputStream i = display.in;
+      synchronized (i) {
+        i.read_reply (o);
+        i.skip (8);
+        server_major_version = i.read_int16 ();
+        server_minor_version = i.read_int16 ();
+      }
+    }
   }
 
 
   /** EVI visual info. */
-  public static class VisualInfo extends gnu.x11.Data {
-    public Display display;
+  public static class VisualInfo {
 
+    public int core_visual_id;
+    public int screen;
+    public int level;
+    public int transparency_type;
+    public int transparency_value;
+    public int min_hw_colormaps;
+    public int max_hw_colormaps;
+    public int num_colormap_conflicts;
 
-    public VisualInfo (Display display, Data data, int offset) { 
-      super (data, offset); 
-      this.display = display;
+    VisualInfo (ResponseInputStream i) {
+      core_visual_id = i.read_int32 ();
+      screen = i.read_int8 ();
+      level = i.read_int8 ();
+      transparency_type = i.read_int8 ();
+      i.skip (1);
+      transparency_value = i.read_int32 ();
+      min_hw_colormaps = i.read_int8 ();
+      max_hw_colormaps = i.read_int8 ();
+      num_colormap_conflicts = i.read_int8 ();
     }
-  
-  
-    public int core_visual_id () { return read4 (0); }
-    public int screen_id () { return read1 (4); }
-    public int level () { return read1 (5); }
-    public int trasparency_type () { return read1 (6); }
-    public int trasparency_value () { return read4 (8); }
-    public int min_hw_colormaps () { return read1 (12); }
-    public int max_hw_colormaps () { return read1 (13); }
-    public int colormap_conflict_count () { return read2 (14); }
+    
   }
 
 
   /** Reply of {@link #visual_info(Visual[])} */
-  public static class VisualInfoReply extends Data {
-    public Display display;
+  public static class VisualInfoReply {
 
-    public VisualInfoReply (Display display, Data data) { 
-      super (data); 
-      this.display = display;
-    }
+    public int n_conflicts;
+    public VisualInfo [] items;
 
-
-    public int info_count () { return read4 (8); }
-    public int conflicts_count () { return read4 (12); }
-  
-  
-    /**
-     * @return valid: {@link Enum#next()} of type
-     * {@link EVI.VisualInfo}
-     */
-    public Enum items () {
-      return new Enum (this, 32, info_count ()) {
-        public Object next () {
-          // blackdown JDK 1.1.8 fails to compile the following line
-          VisualInfo vi = new VisualInfo (display, this, this.offset);
-          inc (16);
-          return vi;
-        }
-      };
+    VisualInfoReply (ResponseInputStream i) {
+      int n_info = i.read_int32 ();
+      n_conflicts = i.read_int32 ();
+      i.skip (16);
+      items = new VisualInfo [n_info];
+      for (int j = 0; j < n_info; j++) {
+        items [j] = new VisualInfo (i);
+      }
     }
   }
 
@@ -102,13 +100,22 @@ public class EVI extends Extension {
    * @see <a href="XeviGetVisualInfo.html">XeviGetVisualInfo</a>
    */
   public VisualInfoReply visual_info (Visual [] visuals) {
-    Request request = new Request (display, major_opcode, 1, 1);
-    request.write4 (visuals.length);
-
-    for (int i=0; i<visuals.length; i++)
-      request.write4 (visuals [i].id ());
-
-    return new VisualInfoReply (display, display.read_reply (request));
+    VisualInfoReply reply;
+    RequestOutputStream o = display.out;
+    synchronized (o) {
+      o.begin_request (major_opcode, 1, 2 + visuals.length);
+      o.write_int32 (visuals.length);
+      for (int i = 0; i < visuals.length; i++)
+        o.write_int32 (visuals [i].id);
+      ResponseInputStream in = display.in;
+      synchronized (in) {
+        in.read_reply (o);
+        in.skip (8);
+        reply = new VisualInfoReply (in);
+        
+      }
+    }
+    return reply;
   }
 
 
