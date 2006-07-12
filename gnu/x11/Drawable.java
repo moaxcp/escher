@@ -63,7 +63,7 @@ public abstract class Drawable extends Resource {
       ResponseInputStream i = display.in;
       synchronized (i) {
         i.read_reply (o);
-        assert i.read_int8 () == 1;
+        i.skip (1);
         info = new GeometryInfo (i);
       }
     }
@@ -496,11 +496,11 @@ public abstract class Drawable extends Resource {
           o.write_int8 (255);// font-shift indicator
           o.write_int32 (texts [i].font.id); // java = MSB
         }
-
         o.write_int8 (texts [i].s.length ());
         o.write_int8 (texts [i].delta);
         o.write_string8 (texts [i].s);
       }
+      o.skip (p);
       o.send ();
     }
   }
@@ -512,7 +512,7 @@ public abstract class Drawable extends Resource {
    */
   public void poly_text16 (GC gc, int x, int y, Text [] texts) {
 
-    int n = length (texts, 8);
+    int n = length (texts, 16);
     int p = RequestOutputStream.pad (n);
 
     RequestOutputStream o = display.out;
@@ -523,7 +523,6 @@ public abstract class Drawable extends Resource {
       o.write_int32 (gc.id);
       o.write_int16 (x);
       o.write_int16 (y);
-
 
       for (int i = 0; i < texts.length; i++) {
         if (texts [i].font != null) {
@@ -816,10 +815,14 @@ public abstract class Drawable extends Resource {
     poly_text (gc, x, y, new Text [] {new Text (s, 0, null)});
   }
 
+  public void text16 (GC gc, int x, int y, String s) {
+    poly_text16 (gc, x, y, new Text [] {new Text (s, 0, null)});
+  }
+
   private int length (Text [] texts, int bit) {
     int n = 0;
-    for (int i=0; i<texts.length; i++) n += texts [i].length (bit);
-
+    for (int i = 0; i < texts.length; i++)
+      n += texts [i].length (bit);
     return n;
   }
 }
