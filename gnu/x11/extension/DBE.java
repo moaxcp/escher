@@ -2,8 +2,8 @@ package gnu.x11.extension;
 
 import gnu.x11.Data;
 import gnu.x11.Drawable;
-import gnu.x11.Enum;
-import gnu.x11.Request;
+import gnu.x11.RequestOutputStream;
+import gnu.x11.ResponseInputStream;
 import gnu.x11.Window;
 
 
@@ -46,13 +46,21 @@ public class DBE extends Extension implements ErrorFactory {
     super (display, "DOUBLE-BUFFER", MINOR_OPCODE_STRINGS, 1, 0);
 
     // check version before any other operations
-    Request request = new Request (display, major_opcode, 0, 2);
-    request.write1 (CLIENT_MAJOR_VERSION);
-    request.write1 (CLIENT_MINOR_VERSION);
-
-    Data reply = display.read_reply (request);
-    server_major_version = reply.read1 (8);
-    server_minor_version = reply.read1 (9);
+    RequestOutputStream o = display.out;
+    synchronized (o) {
+      o.begin_request (major_opcode, 0, 2);
+      o.write_int8 (CLIENT_MAJOR_VERSION);
+      o.write_int8 (CLIENT_MINOR_VERSION);
+      o.skip (2);
+      ResponseInputStream i = display.in;
+      synchronized (i) {
+        i.read_reply (o);
+        i.skip (8);
+        server_major_version = i.read_int8 ();
+        server_minor_version = i.read_int8 ();
+        i.skip (22);
+      }
+    }
   }
 
 
@@ -68,14 +76,18 @@ public class DBE extends Extension implements ErrorFactory {
    */  
   public void swap (Window [] windows, int [] actions) {
     int n = windows.length;
-    Request request = new Request (this.display, major_opcode, 3, 2+2*n);
-    request.write4 (n);
-    for (int i=0; i<n; i++) {
-      request.write4 (windows [i].id);
-      request.write1 (actions [i]);
-      request.write3_unused ();
+
+    RequestOutputStream o = display.out;
+    synchronized (o) {
+      o.begin_request (major_opcode, 3, 2 + 2 * n);
+      o.write_int32 (n);
+      for (int i = 0; i < n; i++) {
+        o.write_int32 (windows [i].id);
+        o.write_int8 (actions [i]);
+        o.skip (3);
+      }
+      o.send ();
     }
-    this.display.send_request (request);
   }
 
 
@@ -84,8 +96,11 @@ public class DBE extends Extension implements ErrorFactory {
    * @see <a href="XdbeBeginIdiom.html">XdbeBeginIdiom</a>
    */
   public void begin_idiom () {
-    Request request = new Request (this.display, major_opcode, 4, 1);
-    this.display.send_request (request);
+    RequestOutputStream o = display.out;
+    synchronized (o) {
+      o.begin_request (major_opcode, 4, 1);
+      o.send ();
+    }
   }
 
 
@@ -94,56 +109,49 @@ public class DBE extends Extension implements ErrorFactory {
    * @see <a href="XdbeEndIdiom.html">XdbeEndIdiom</a>
    */
   public void end_idiom () {
-    Request request = new Request (this.display, major_opcode, 5, 1);
-    this.display.send_request (request);
+    RequestOutputStream o = display.out;
+    synchronized (o) {
+      o.begin_request (major_opcode, 5, 1);
+      o.send ();
+    }
   }
 
 
   /** DBE visual info. */
-  public static class VisualInfo extends Data {
-    public VisualInfo (Data data, int offset) { super (data, offset); }
-    public int visual_id () { return read4 (0); }
-    public int depth () { return read1 (4); }
-    public int perflevel () { return read1 (5); }
+  public static class VisualInfo {
 
+    public int visual_id;
+    public int depth;
+    public int perflevel;
+    public VisualInfo (ResponseInputStream i) {
+      visual_id = i.read_int32 ();
+      depth = i.read_int8 ();
+      perflevel = i.read_int8 ();
+      i.skip (2);
+    }
 
     public String toString () {
       return "#VisualInfo"
-        + "\n  visual-id: " + visual_id ()
-        + "\n  depth: " + depth ()
-        + "\n  performance hint: " + perflevel ();
+        + "\n  visual-id: " + visual_id
+        + "\n  depth: " + depth
+        + "\n  performance hint: " + perflevel;
     }
   }
 
 
   /** DBE screen visual info. */
-  public static class ScreenVisualInfo extends Data {
-    public ScreenVisualInfo (Data data, int offset) { 
-      super (data, offset); 
+  public static class ScreenVisualInfo {
+
+    public VisualInfo [] infos;
+
+    public ScreenVisualInfo (ResponseInputStream i) { 
+      int number = i.read_int32 ();
+      infos = new VisualInfo [number];
+      for (int j = 0; j < number; j++) {
+        infos [j] = new VisualInfo (i);
+      }
     }
 
-
-    public int visual_info_count () { return read4 (0); }
-    public int length () { return 8 * visual_info_count (); }
-
-
-    public Enum visual_info () {
-      return new Enum (ScreenVisualInfo.this, offset+4,
-        visual_info_count ()) {
-
-        public Object next () {
-          VisualInfo visual_info = new VisualInfo (this, 0);
-          inc (8);
-          return visual_info;
-        }
-      };
-    }
-
-
-    public String toString () {
-      return "#ScreenVisualInfo"
-        + visual_info ().to_string (Enum.NEXT, "\n  ** visual info **\n");
-    }
   }
 
 
@@ -161,22 +169,28 @@ public class DBE extends Extension implements ErrorFactory {
    * @param screen_specifiers valid: {@link #EMPTY}
    * @see <a href="XdbeGetVisualInfo.html">XdbeGetVisualInfo</a>
    */
-  public Enum visual_info (Drawable [] screen_specifiers) {
-    Request request = new Request (display, major_opcode, 6, 
-      2+screen_specifiers.length);
+  public ScreenVisualInfo [] visual_info (Drawable [] screen_specifiers) {
 
-    request.write4 (screen_specifiers.length);
-    for (int i=0; i<screen_specifiers.length; i++)
-      request.write4 (screen_specifiers [i].id);
-
-    Data reply = display.read_reply (request);
-    return new Enum (reply, 32, reply.read4 (8)) {
-      public Object next () {
-        ScreenVisualInfo svi = new ScreenVisualInfo (this, 0);
-        inc (svi.length ());
-        return svi;
+    ScreenVisualInfo[] infos;
+    RequestOutputStream o = display.out;
+    synchronized (o) {
+      o.begin_request (major_opcode, 6, 2 + screen_specifiers.length);
+      o.write_int32 (screen_specifiers.length);
+      for (int i = 0; i < screen_specifiers.length; i++)
+        o.write_int32 (screen_specifiers [i].id);
+      ResponseInputStream i = display.in;
+      synchronized (i) {
+        i.read_reply (o);
+        i.skip (8);
+        int num = i.read_int32 ();
+        i.skip (20);
+        infos = new ScreenVisualInfo [num];
+        for (int j = 0; j < num; j++) {
+          infos [j] = new ScreenVisualInfo (i);
+        }
       }
-    };
+    }
+    return infos;
   }
 
 
@@ -197,12 +211,16 @@ public class DBE extends Extension implements ErrorFactory {
       this.window = window;
       width = window.width;
       height = window.height;
-      
-      Request request = new Request (this.display, major_opcode, 1, 4);
-      request.write4 (window.id);
-      request.write4 (id);
-      request.write1 (swap_action_hint);
-      this.display.send_request (request);
+
+      RequestOutputStream o = display.out;
+      synchronized (o) {
+        o.begin_request (major_opcode, 1, 4);
+        o.write_int32 (window.id);
+        o.write_int32 (id);
+        o.write_int8 (swap_action_hint);
+        o.skip (3);
+        o.send ();
+      }
     }
 
 
@@ -212,9 +230,12 @@ public class DBE extends Extension implements ErrorFactory {
      * XdbeDeallocateBackBufferName</a>
      */
     public void deallocate () {
-      Request request = new Request (this.display, major_opcode, 2, 2);
-      request.write4 (id);
-      this.display.send_request (request);
+      RequestOutputStream o = display.out;
+      synchronized (o) {
+        o.begin_request (major_opcode, 2, 2);
+        o.write_int32 (id);
+        o.send ();
+      }
     }
 
 
@@ -224,11 +245,21 @@ public class DBE extends Extension implements ErrorFactory {
      * XdbeGetBackBufferAttributes</a>
      */
     public Window attributes () {
-      Request request = new Request (this.display, major_opcode, 7, 2);
-      request.write4 (id);
 
-      Data reply = this.display.read_reply (request);
-      return (Window) Window.intern (this.display, reply.read4 (8));
+      int atts;
+      RequestOutputStream o = display.out;
+      synchronized (o) {
+        o.begin_request (major_opcode, 7, 2);
+        o.write_int32 (id);
+        ResponseInputStream i = display.in;
+        synchronized (i) {
+          i.read_reply (o);
+          i.skip (8);
+          atts = i.read_int32 ();
+          i.skip (20);
+        }
+      }
+      return (Window) Window.intern (this.display, atts);
     }
 
 
