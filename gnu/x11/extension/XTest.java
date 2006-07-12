@@ -1,8 +1,8 @@
 package gnu.x11.extension;
 
 import gnu.x11.Cursor;
-import gnu.x11.Data;
-import gnu.x11.Request;
+import gnu.x11.RequestOutputStream;
+import gnu.x11.ResponseInputStream;
 import gnu.x11.Window;
 
 
@@ -36,15 +36,21 @@ public class XTest extends Extension {
   public XTest (gnu.x11.Display display) throws NotFoundException { 
     super (display, "XTEST", MINOR_OPCODE_STRINGS); 
 
-    // check version before any other operations
-    Request request = new Request (display, major_opcode, 0, 2);
-    request.write1 (CLIENT_MAJOR_VERSION);
-    request.write1_unused ();
-    request.write2 (CLIENT_MINOR_VERSION);
-
-    Data reply = display.read_reply (request);
-    server_major_version = reply.read1 (1);
-    server_minor_version = reply.read2 (10);
+    RequestOutputStream o = display.out;
+    synchronized (o) {
+      o.begin_request (major_opcode, 0, 2);
+      o.write_int8 (CLIENT_MAJOR_VERSION);
+      o.skip (1);
+      o.write_int16 (CLIENT_MINOR_VERSION);
+      ResponseInputStream i = display.in;
+      synchronized (i) {
+        i.read_reply (o);
+        i.skip (1);
+        server_major_version = i.read_int8 ();
+        i.skip (6);
+        server_minor_version = i.read_int16 ();
+      }
+    }
   }
 
 
@@ -58,10 +64,22 @@ public class XTest extends Extension {
    * XTestCompareCursorWithWindow</a>
    */
   public boolean compare_cursor (Window window, Cursor cursor) {
-    Request request = new Request (display, major_opcode, 1, 3);
-    request.write4 (window.id);
-    request.write4 (cursor.id);
-    return display.read_reply (request).read_boolean (1);
+
+    boolean same;
+    RequestOutputStream o = display.out;
+    synchronized (o) {
+      o.begin_request (major_opcode, 1, 3);
+      o.write_int32 (window.id);
+      o.write_int32 (cursor.id);
+      ResponseInputStream i = display.in;
+      synchronized (i) {
+        i.read_reply (o);
+        i.skip (1);
+        same = i.read_bool ();
+        i.skip (30);
+      }
+    }
+    return same;
   }
 
 
@@ -84,18 +102,21 @@ public class XTest extends Extension {
    * @param time possible: {@link gnu.x11.Display#CURRENT_TIME}
    */
   public void fake_input (int type, int detail, int delay, Window root, 
-    int x, int y) {
+                          int x, int y) {
 
-    Request request = new Request (display, major_opcode, 2, 9);
-    request.write1 (type);
-    request.write1 (detail);
-    request.write2_unused ();
-    request.write4 (delay);
-    request.write4 (root.id);
-    request.write_unused (8);
-    request.write2 (x);
-    request.write2 (y);
-    display.send_request (request);
+    RequestOutputStream o = display.out;
+    synchronized (o) {
+      o.begin_request (major_opcode, 2, 9);
+      o.write_int8 (type);
+      o.write_int8 (detail);
+      o.skip (2);
+      o.write_int32 (delay);
+      o.write_int32 (root.id);
+      o.skip (8);
+      o.write_int16 (x);
+      o.write_int16 (y);
+      o.send ();
+    }
   }
 
 
@@ -104,9 +125,13 @@ public class XTest extends Extension {
    * @see <a href="XTestGrabControl.html">XTestGrabControl</a>
    */
   public void grab_control (boolean impervious) {
-    Request request = new Request (display, major_opcode, 3, 2);
-    request.write1 (impervious);
-    display.send_request (request);    
+
+    RequestOutputStream o = display.out;
+    synchronized (o) {
+      o.begin_request (major_opcode, 3, 2);
+      o.write_bool (impervious);
+      o.send ();
+    }
   }
 
 
