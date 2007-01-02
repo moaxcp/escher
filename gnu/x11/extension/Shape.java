@@ -382,7 +382,7 @@ public class Shape extends Extension implements EventFactory {
 
 
   /** SHAPE notify event. */
-  public static class ShapeNotifyEvent extends Event {
+  public static class NotifyEvent extends Event {
     public static final int code = 0;
 
     public int window_id;
@@ -393,7 +393,7 @@ public class Shape extends Extension implements EventFactory {
     public int time;
     public boolean shaped;
 
-    ShapeNotifyEvent (Display display, ResponseInputStream i) { 
+    NotifyEvent (Display display, ResponseInputStream i) { 
       super (display, i);
       window_id = i.read_int32 ();
       x = i.read_int16 ();
@@ -428,7 +428,7 @@ public class Shape extends Extension implements EventFactory {
 
   public Event build (Display display, ResponseInputStream i, int code) {
     // only one extension event
-    return new ShapeNotifyEvent (display, i);
+    return new NotifyEvent (display, i);
   }
 
 

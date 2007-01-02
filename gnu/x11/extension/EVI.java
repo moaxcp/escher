@@ -45,6 +45,7 @@ public class EVI extends Extension {
         i.skip (8);
         server_major_version = i.read_int16 ();
         server_minor_version = i.read_int16 ();
+        i.skip (20);
       }
     }
   }

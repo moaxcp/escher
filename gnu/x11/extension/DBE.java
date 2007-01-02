@@ -288,11 +288,11 @@ public class DBE extends Extension implements ErrorFactory {
     = "BAD_DBE_BUFFER: parameter not a DBE back buffer";
 
 
-  public gnu.x11.Error build (gnu.x11.Display display, Data data, 
-    int code, int seq_no, int bad, int minor_opcode, int major_opcode) {
+  public gnu.x11.Error build (gnu.x11.Display display, int code, int seq_no,
+                              int bad, int minor_opcode, int major_opcode) {
 
-    return new gnu.x11.Error (display, ERROR_STRING, code, seq_no, bad, 
-      minor_opcode, major_opcode); 
+    return new gnu.x11.Error (display, ERROR_STRING, code, seq_no, bad,
+                              minor_opcode, major_opcode);
   }
 
 

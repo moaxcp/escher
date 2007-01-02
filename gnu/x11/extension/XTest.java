@@ -49,6 +49,7 @@ public class XTest extends Extension {
         server_major_version = i.read_int8 ();
         i.skip (6);
         server_minor_version = i.read_int16 ();
+        i.skip (22);
       }
     }
   }

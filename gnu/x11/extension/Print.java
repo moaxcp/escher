@@ -697,8 +697,8 @@ public class Print extends gnu.x11.extension.Extension
   };
 
 
-  public Error build (Display display, Data data, int code,
-    int seq_no, int bad, int minor_opcode, int major_opcode) {
+  public Error build (Display display, int code, int seq_no, int bad,
+                      int minor_opcode, int major_opcode) {
 
     String error_string = ERROR_STRINGS [code - first_error];
     return new Error (display, error_string, code, seq_no, bad, 
