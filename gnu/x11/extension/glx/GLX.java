@@ -2,8 +2,8 @@ package gnu.x11.extension.glx;
 
 import gnu.x11.Data;
 import gnu.x11.Display;
-import gnu.x11.Enum;
-import gnu.x11.Request;
+import gnu.x11.RequestOutputStream;
+import gnu.x11.ResponseInputStream;
 
 
 /**
@@ -204,15 +204,20 @@ public class GLX extends gnu.x11.extension.Extension
 
     super (display, "GLX", MINOR_OPCODE_STRINGS, 13, 1);
 
-    // check version before any other operations
-    Request request = new Request (display, major_opcode, 7, 3);
-    request.write4 (CLIENT_MAJOR_VERSION);
-    request.write4 (CLIENT_MINOR_VERSION);
-
-    Data reply = display.read_reply (request);
-    server_major_version = reply.read4 (8);
-    server_minor_version = reply.read4 (12);
-
+    RequestOutputStream o = display.out;
+    synchronized (o) {
+      o.begin_request (major_opcode, 7, 3);
+      o.write_int32 (CLIENT_MAJOR_VERSION);
+      o.write_int32 (CLIENT_MINOR_VERSION);
+      ResponseInputStream i = display.in;
+      synchronized (i) {
+        i.read_reply(o);
+        i.skip (8);
+        server_major_version = i.read_int32 ();
+        server_minor_version = i.read_int32 ();
+        i.skip (16);
+      }
+    }
 
     send_client_info ();
     visual_configs_cache = new VisualConfig [display.screens.length] [];    
@@ -224,20 +229,27 @@ public class GLX extends gnu.x11.extension.Extension
     if (visual_configs_cache [screen_no] != null) 
       return visual_configs_cache [screen_no];
 
-    Request request = new Request (display, major_opcode, 14, 2);
-    request.write4 (screen_no);
-
-    Data reply = display.read_reply (request);
-    int visual_count = reply.read4 (8);
-    int property_count = reply.read4 (12);    
-
-    VisualConfig [] vcs = new VisualConfig [visual_count];
-    for (int i=0, offset=32; i<visual_count; i++) {
-      vcs [i] = new VisualConfig (reply, offset, property_count);
-      offset += vcs [i].length ();
+    RequestOutputStream o = display.out;
+    VisualConfig [] vcs;
+    synchronized (o) {
+      o.begin_request (major_opcode, 14, 2);
+      o.write_int32 (screen_no);
+      ResponseInputStream i = display.in;
+      synchronized (i) {
+        i.read_reply(o);
+        i.skip (4);
+        int n = i.read_int32 ();
+        int visual_count = i.read_int32 ();
+        int property_count = (i.read_int32 () - 18) / 2;
+        i.skip (16);
+        assert n == visual_count * property_count;
+        vcs = new VisualConfig [visual_count];
+        for (int index = 0; index < visual_count; index++) {
+          vcs [index] = new VisualConfig (i, property_count);
+        }
+        visual_configs_cache [screen_no] = vcs;
+      }
     }
-
-    visual_configs_cache [screen_no] = vcs;
     return vcs;
   }
     
@@ -257,13 +269,23 @@ public class GLX extends gnu.x11.extension.Extension
    * @see <a href="glXQueryServerString.html">glXQueryServerString</a>
    */
   public String server_string (int screen_no, int name) {
-    Request request = new Request (display, major_opcode, 19, 3);
-    request.write4 (screen_no);
-    request.write4 (name);
-
-    Data reply = display.read_reply (request);
-    int len = reply.read4 (12);
-    return reply.read_string (32, len-1);
+    String server_string;
+    RequestOutputStream o = display.out;
+    synchronized (o) {
+      o.begin_request (major_opcode, 19, 3);
+      o.write_int32 (screen_no);
+      o.write_int32 (name);
+      ResponseInputStream i = display.in;
+      synchronized (i) {
+        i.read_reply (o);
+        i.skip (12);
+        int len = i.read_int32 ();
+        i.skip (16);
+        server_string = i.read_string8 (len);
+        i.pad (len);
+      }
+    }
+    return server_string;
   }
 
 
@@ -310,23 +332,43 @@ public class GLX extends gnu.x11.extension.Extension
 
   // glx opcode 20 - client info
   private void send_client_info () {
-    Request request = new Request (display, major_opcode, 20, 
-      4+Data.unit (CLIENT_EXTENSION_STRING));
-    request.write4 (CLIENT_MAJOR_VERSION);
-    request.write4 (CLIENT_MINOR_VERSION);
-    request.write4 (CLIENT_EXTENSION_STRING.length ());
-    request.write1 (CLIENT_EXTENSION_STRING);
-    display.send_request (request);
+    RequestOutputStream o = display.out;
+    synchronized (o) {
+      int n = CLIENT_EXTENSION_STRING.length ();
+      int p = RequestOutputStream.pad (n);
+      o.begin_request (major_opcode, 20, 4 + (n + p) / 4);
+      o.write_int32 (CLIENT_MAJOR_VERSION);
+      o.write_int32 (CLIENT_MINOR_VERSION);
+      o.write_int32 (CLIENT_EXTENSION_STRING.length ());
+      o.write_string8 (CLIENT_EXTENSION_STRING);
+      o.skip (p);
+      o.send ();
+    }
   }
 
 
   // glx opcode 21 - get fb configs
-  public Data fb_configs (int screen_no) { // TODO 1.3
-    Request request = new Request (display, major_opcode, 21, 2);
-    request.write4 (screen_no);
-
-    Data reply = display.read_reply (request);
-    return reply;
+  public int[] fb_configs (int screen_no) { // TODO 1.3
+    int[] props;
+    RequestOutputStream o = display.out;
+    synchronized (o) {
+      o.begin_request (major_opcode, 21, 2);
+      o.write_int32 (screen_no);
+      ResponseInputStream i = display.in;
+      synchronized (i) {
+        i.skip (4);
+        int n = i.read_int32 ();
+        // TODO: Build more useful object from this data.
+        int num_fb_configs = i.read_int32 ();
+        int num_props = i.read_int32 ();
+        i.skip (16);
+        props = new int[n];
+        for (int idx = 0; idx < n; idx++) {
+          props[idx] = i.read_int32 ();
+        }
+      }
+    }
+    return props;
   }
 
 
@@ -334,23 +376,23 @@ public class GLX extends gnu.x11.extension.Extension
    * @see GL#GL(GLX, int, int, GL)
    */
   public GL create_context (int visual_id, int screen_no, GL share_list) {    
-    return new GL (this, visual_id, screen_no, share_list);
+    return new GL (this, visual_id, screen_no, share_list, true);
   }
 
 
-  public gnu.x11.Error build (Display display, Data data, int code,
-    int seq_no, int bad, int minor_opcode, int major_opcode) {
+  public gnu.x11.Error build (Display display, int code, int seq_no, int bad,
+                              int minor_opcode, int major_opcode) {
 
-    return new Error (display, data, code-first_error, seq_no, bad, 
-      minor_opcode, major_opcode);
+    return new Error (display, code - first_error, seq_no, bad, minor_opcode,
+                      major_opcode);
   }
 
 
   public gnu.x11.event.Event build (Display display, 
-    byte [] data, int code) {
+    ResponseInputStream i, int code) {
 
     // only one extension event
-    return new PbufferClobberEvent (display, data);
+    return new PbufferClobberEvent (display, i);
   }
 
 

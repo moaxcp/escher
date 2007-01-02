@@ -1,10 +1,11 @@
 package gnu.x11.extension.glx;
 
 import gnu.x11.Data;
+import gnu.x11.ResponseInputStream;
 
 
 /** GLX visual configuration. */ 
-public class VisualConfig extends Data {
+public class VisualConfig {
   public static final int VISUAL_BIT = 1<<0;
   public static final int CLASS_BIT = 1<<1;
   public static final int RGBA_BIT = 1<<2;
@@ -28,64 +29,111 @@ public class VisualConfig extends Data {
   public int bitmask;
   public int count;
 
+  private int visual_id;
+  private int clazz;
+  private boolean rgba;
+  private int red_size;
+  private int green_size;
+  private int blue_size;
+  private int alpha_size;
+  private int accum_red_size;
+  private int accum_green_size;
+  private int accum_blue_size;
+  private int accum_alpha_size;
+  private boolean double_buffer;
+  private boolean stero;
+  private int buffer_size;
+  private int depth_size;
+  private int stencil_size;
+  private int aux_buffers;
+  private int level;
+
+  private int[] more_prop_types;
+  private int[] more_prop_values;
 
   /** Writing. */
-  public VisualConfig () { super (18*4); }
+  public VisualConfig () {
+    
+  }
 
 
   /** Reading. */
-  public VisualConfig (Data data, int offset, int count) { 
-    super (data, offset);
+  public VisualConfig (ResponseInputStream i, int count) {
     this.count = count;
+    visual_id = i.read_int32 ();
+    clazz = i.read_int32 ();
+    rgba = i.read_int32 () == 1;
+    red_size = i.read_int32 ();
+    green_size = i.read_int32 ();
+    blue_size = i.read_int32 ();
+    alpha_size = i.read_int32 ();
+    accum_red_size = i.read_int32 ();
+    accum_green_size = i.read_int32 ();
+    accum_blue_size = i.read_int32 ();
+    accum_alpha_size = i.read_int32 ();
+    double_buffer = i.read_int32 () == 1;
+    stero = i.read_int32 () == 1;
+    buffer_size = i.read_int32 ();
+    depth_size = i.read_int32 ();
+    stencil_size = i.read_int32 ();
+    aux_buffers = i.read_int32 ();
+    level = i.read_int32 ();
+
+    more_prop_types = new int[count];
+    more_prop_values = new int[count];
+    for (int index = 0; index < count; index++) {
+      more_prop_types[index] = i.read_int32 ();
+      more_prop_values[index] = i.read_int32 ();
+    }
   }    
 
 
   //-- reading
 
-  public int visual_id () { return read4 (0); }
-  public int clazz () { return read4 (4); }
-  public boolean rgba  () { return read4_boolean (8); }
-  public int red_size () { return read4 (12); }
-  public int green_size () { return read4 (16); }
-  public int blue_size () { return read4 (20); }
-  public int alpha_size () { return read4 (24); }
-  public int accum_red_size () { return read4 (28); }
-  public int accum_green_size () { return read4 (32); }
-  public int accum_blue_size () { return read4 (36); }
-  public int accum_alpha_size () { return read4 (40); }
-  public boolean double_buffer  () { return read4_boolean (44); }
-  public boolean stero  () { return read4_boolean (48); }
-  public int buffer_size () { return read4 (52); }
-  public int depth_size () { return read4 (56); }
-  public int stencil_size () { return read4 (60); }
-  public int aux_buffers () { return read4 (64); }
-  public int level () { return read4 (68); }
+  public int visual_id () { return visual_id; }
+  public int clazz () { return clazz; }
+  public boolean rgba  () { return rgba; }
+  public int red_size () { return red_size; }
+  public int green_size () { return green_size; }
+  public int blue_size () { return blue_size; }
+  public int alpha_size () { return alpha_size; }
+  public int accum_red_size () { return accum_red_size; }
+  public int accum_green_size () { return accum_green_size; }
+  public int accum_blue_size () { return accum_blue_size; }
+  public int accum_alpha_size () { return accum_alpha_size; }
+  public boolean double_buffer  () { return double_buffer; }
+  public boolean stero  () { return stero; }
+  public int buffer_size () { return buffer_size; }
+  public int depth_size () { return depth_size; }
+  public int stencil_size () { return stencil_size; }
+  public int aux_buffers () { return aux_buffers; }
+  public int level () { return level; }
 
 
-  public int more_property_type (int i) { return read4 (18*4 + i*8); }
-  public int more_property_value (int i) { return read4 (18*4 + i*8 + 4); }
+  public int more_property_type (int i) { return more_prop_types[i]; }
+  public int more_property_value (int i) { return more_prop_values[i]; }
 
 
   //-- writing
 
-  public void set_visual_id (int i) { write4 (0, i); set (0); }
-  public void set_clazz (int i) { write4 (4, i); set (1); }
+  public void set_visual_id (int i) { visual_id = i; set (0); }
+  public void set_clazz (int i) { clazz = i; set (1); }
   public void set_rgba () { set (2); }
-  public void set_red_size (int i) { write4 (12, i); set (3); }
-  public void set_green_size (int i) { write4 (16, i); set (4); }
-  public void set_blue_size (int i) { write4 (20, i); set (5); }
-  public void set_alpha_size (int i) { write4 (24, i); set (6); }
-  public void set_accum_red_size (int i) { write4 (28, i); set (7); }
-  public void set_accum_green_size (int i) { write4 (32, i); set (8); }
-  public void set_accum_blue_size (int i) { write4 (36, i); set (9); }
-  public void set_accum_alpha_size (int i) { write4 (40, i); set (10); }
+  public void set_red_size (int i) { red_size = i; set (3); }
+  public void set_green_size (int i) { green_size = i; set (4); }
+  public void set_blue_size (int i) { blue_size = i; set (5); }
+  public void set_alpha_size (int i) { alpha_size = i; set (6); }
+  public void set_accum_red_size (int i) { accum_red_size = i; set (7); }
+  public void set_accum_green_size (int i) { accum_green_size = i; set (8); }
+  public void set_accum_blue_size (int i) { accum_blue_size = i; set (9); }
+  public void set_accum_alpha_size (int i) { accum_alpha_size = i; set (10); }
   public void set_double_buffer () { set (11); }
   public void set_stero () { set (12); }
-  public void set_buffer_size (int i) { write4 (52, i); set (13); }
-  public void set_depth_size (int i) { write4 (56, i); set (14); }
-  public void set_stencil_size (int i) { write4 (60, i); set (15); }
-  public void set_aux_buffers (int i) { write4 (64, i); set (16); }
-  public void set_level (int i) { write4 (68, i); set (17); }
+  public void set_buffer_size (int i) { buffer_size = i; set (13); }
+  public void set_depth_size (int i) { depth_size = i; set (14); }
+  public void set_stencil_size (int i) { stencil_size = i; set (15); }
+  public void set_aux_buffers (int i) { aux_buffers = i; set (16); }
+  public void set_level (int i) { level = i; set (17); }
 
 
   public void clear () { bitmask = 0; }

@@ -36,8 +36,8 @@ public class Error extends gnu.x11.Error {
   };
 
 
-  public Error (gnu.x11.Display display, gnu.x11.Data data, int code, int seq_no,
-    int bad, int minor_opcode, int major_opcode) {
+  public Error (gnu.x11.Display display, int code, int seq_no, int bad,
+                int minor_opcode, int major_opcode) {
     
     super (display, ERROR_STRINGS [code], code, seq_no, bad, 
       minor_opcode, major_opcode); 
