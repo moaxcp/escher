@@ -11,6 +11,10 @@ public final class KeyPress extends Input {
 
   public static final int CODE = 2;
 
+  public KeyPress (Display display) {
+    super (display, CODE);
+  }
+
   /**
    * Reads a KeyPress event from the input stream.
    *

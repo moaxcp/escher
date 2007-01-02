@@ -76,6 +76,11 @@ public abstract class Event {
   }
 
 
+  public Event (Display disp, int c) {
+    display = disp;
+    code = c;
+  }
+
   public int code () {
     return code;
   }
@@ -102,4 +107,5 @@ public abstract class Event {
 
     // The remaining pieces must be written by the subclasses.
   }
+
 }

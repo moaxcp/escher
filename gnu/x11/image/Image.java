@@ -33,7 +33,6 @@ public class Image {
     int line_pad_count = line_bit_count / pixmap_format.scanline_pad ()
       + (rem == 0 ? 0 : 1);
     line_byte_count = line_pad_count * pixmap_format.scanline_pad () / 8;
-
     left_pad = format == ZPixmap.FORMAT ? 
       0 : line_byte_count * 8 - line_bit_count;
     

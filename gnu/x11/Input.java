@@ -1,6 +1,5 @@
 package gnu.x11;
 
-
 /** X keyboard and pointer. */
 public class Input {
   // KEYBUTMASK - keyboard button mask
@@ -244,11 +243,12 @@ public class Input {
         in.skip (1);
         keysyms_per_keycode = in.read_int8 ();
         in.skip (2); // Unused.
-        in.skip (4); // length.
+        int nm = in.read_int32 (); // length.
+        assert nm == keysyms_per_keycode * keysym_count;
         in.skip (24); // Unused.
-        keysyms = new int [keysym_count * keysyms_per_keycode];
+        keysyms = new int [nm];
 
-        for (int i = 0; i < keysym_count * keysyms_per_keycode; i++) {
+        for (int i = 0; i < nm; i++) {
           keysyms [i] = in.read_int32 ();
         }
       }
@@ -372,7 +372,7 @@ public class Input {
   /**
    * @see <a href="XGetPointerControl.html">XGetPointerControl</a>
    */
-  public PointerControlInfo get_pointer_control () {
+  public PointerControlInfo pointer_control () {
     PointerControlInfo info;
     RequestOutputStream o = display.out;
     synchronized (o) {
@@ -382,6 +382,7 @@ public class Input {
         i.read_reply (o);
         i.skip (8);
         info = new PointerControlInfo (i);
+        i.skip(18);
       }
     }
     return info;

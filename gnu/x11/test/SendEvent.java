@@ -39,7 +39,7 @@ public class SendEvent extends Graphics {
     ButtonPress button_event = new ButtonPress (display);
     key_event.set_window (window);
     window.send_event (false, Event.NO_EVENT_MASK, button_event);
-
+    display.flush ();
     while (!exit_now) {
       dispatch_event ();
       System.out.println ("Received: " + event);

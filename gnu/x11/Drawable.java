@@ -400,12 +400,12 @@ public abstract class Drawable extends Resource {
    * @see <a href="XFillPolygon.html">XFillPolygon</a>
    * @see Request.Aggregate aggregation
    */
-  public void fill_poly (GC gc, Point [] points, int shape, 
+  public void fill_poly (GC gc, Point [] points, int shape,
                          int coordinate_mode) {
 
     RequestOutputStream o = display.out;
     synchronized (o) {
-      o.begin_request (69, 0, 4 * points.length);
+      o.begin_request (69, 0, 4 + points.length);
       o.write_int32 (id);
       o.write_int32 (gc.id);
       o.write_int8 (shape);
@@ -416,6 +416,7 @@ public abstract class Drawable extends Resource {
         o.write_int16 (p.x);
         o.write_int16 (p.y);
       }
+      o.send ();
     }
   }
 
@@ -717,7 +718,28 @@ public abstract class Drawable extends Resource {
       o.write_int16 (y1);
       o.write_int16 (x2);
       o.write_int16 (y2);
-      o.send ();
+    }
+  }
+
+  public void segment (GC gc, int x1, int y1, int x2, int y2) {
+
+    RequestOutputStream o = display.out;
+    synchronized (o) {
+      if (o.current_opcode () == 66 && o.fits (8)) {
+        o.increase_length (2);
+        o.write_int16 (x1);
+        o.write_int16 (y1);
+        o.write_int16 (x2);
+        o.write_int16 (y2);
+      } else {
+        o.begin_request (66, ORIGIN, 5);
+        o.write_int32 (id);
+        o.write_int32 (gc.id);
+        o.write_int16 (x1);
+        o.write_int16 (y1);
+        o.write_int16 (x2);
+        o.write_int16 (y2);
+      }
     }
   }
 
@@ -741,7 +763,17 @@ public abstract class Drawable extends Resource {
   }
 
   public void put_image (GC gc, Image image, int x, int y) {
-    // FIXME: Implement.
+    // TODO: Make use of big requests when possible.
+    int max_data_byte = display.maximum_request_length - 24;
+    int request_height = max_data_byte / image.line_byte_count;
+    int rem = image.height % request_height;
+    int request_count = image.height / request_height + (rem == 0 ? 0 : 1);
+
+    for (int i = 0; i < request_count; i++) {
+      put_small_image (gc, image, i * request_height,
+                       Math.min (image.height, (i + 1) * request_height), x,
+                       y + i * request_height);
+    }
   }
 
   /**
@@ -824,6 +856,16 @@ public abstract class Drawable extends Resource {
     for (int i = 0; i < texts.length; i++)
       n += texts [i].length (bit);
     return n;
+  }
+
+  /**
+   * @deprecated
+   */
+  public void rectangle (GC xgc, int x, int y, int w, int h, boolean fill) {
+    if (fill)
+      fill_rectangle (xgc, x, y, w, h);
+    else
+      rectangle (xgc, x, y, w, h);
   }
 }
 

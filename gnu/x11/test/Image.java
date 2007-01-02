@@ -120,6 +120,7 @@ public class Image extends Graphics {
     window.put_image (display.default_gc, xbm, 20, 25);
     window.put_image (display.default_gc, xpm, 80, 20);
     window.put_image (display.default_gc, ppm, 150, 30);
+    display.flush ();
   }
 
 

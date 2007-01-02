@@ -1,6 +1,7 @@
 package gnu.x11.event;
 
 import gnu.x11.Display;
+import gnu.x11.RequestOutputStream;
 import gnu.x11.ResponseInputStream;
 import gnu.x11.Window;
 
@@ -50,6 +51,11 @@ public abstract class Input extends Event {
   }
 
 
+  public Input (Display display, int code) {
+    super (display, code);
+  }
+
+
   public int detail () {
     return detail;
   }
@@ -94,4 +100,27 @@ public abstract class Input extends Event {
     return (Window) Window.intern (display, child_window_id); 
   }
 
+  public void set_window (Window w) {
+    event_window_id = w.id;
+  }
+
+  public void set_detail (int d) {
+    detail = d;
+  }
+
+  public void write (RequestOutputStream o) {
+    super.write (o);
+    o.write_int32 (time);
+    o.write_int32 (root_window_id);
+    o.write_int32 (event_window_id);
+    o.write_int32 (child_window_id);
+    o.write_int16 (root_x);
+    o.write_int16 (root_y);
+    o.write_int16 (event_x);
+    o.write_int16 (event_y);
+    o.write_int16 (state);
+    o.write_bool (same_screen);
+    o.skip (1); // Unused.
+
+  }
 }

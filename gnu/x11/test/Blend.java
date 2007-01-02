@@ -112,6 +112,7 @@ public class Blend extends Graphics {
 
     render.composite (Render.OVER, color_picture, alpha_picture,
       window_picture, 0, 0, 0, 0, 0, 0, window.width, window.height+10);
+    display.flush ();
   }
 
 

@@ -128,19 +128,13 @@ public abstract class Fontable extends Resource {
     FontInfo info;
     RequestOutputStream o = display.out;
     synchronized (o) {
-      System.err.println("start query font");
       o.begin_request (47, 0, 2);
       o.write_int32 (id);
       ResponseInputStream i = display.in;
-      System.err.println("before syncing on in");
       synchronized (i) {
-        System.err.println("synced on in");
         i.read_reply (o);
         i.skip (8);
         info = new FontInfo (i);
-        System.err.println("read font info complete");
-        try {
-        System.err.println("available: " + i.available ()); } catch (Exception ex) {};
       }
     }
 

@@ -1,7 +1,9 @@
 package gnu.x11.test;
 
 import gnu.util.Misc;
-import gnu.x11.Enum;
+import gnu.x11.Atom;
+import gnu.x11.Font;
+import gnu.x11.Window;
 import gnu.x11.extension.NotFoundException;
 import gnu.x11.extension.render.Render;
 import gnu.x11.extension.glx.GLX;
@@ -38,8 +40,10 @@ public class Info extends gnu.x11.Application {
 
     System.out.println ("\n\n---- display\n" + display);
 
-    System.out.println ("\n\n---- extension"
-      + display.extensions ().to_string (Enum.NEXT_STRING));    
+    System.out.println ("\n\n---- extension");
+    String[] exts = display.extensions ();
+    for (int i = 0; i < exts.length; i++)
+      System.out.println(exts[i]);
 
     extension_details ();
 
@@ -52,18 +56,25 @@ public class Info extends gnu.x11.Application {
     System.out.println ("\n\n---- screen saver\n"
       + display.screen_saver ());
     
-    System.out.println ("\n\n---- font path"
-      + display.font_path ().to_string (Enum.NEXT_STRING));
+    System.out.println ("\n\n---- font path");
+    String[] fontpath = display.font_path ();
+    for (int i = 0; i < fontpath.length; i++)
+      System.out.println(fontpath[i]);
 
-    System.out.println ("\n\n---- first 20 fonts"
-      + display.fonts ("*", 20).to_string (Enum.NEXT_STRING));
+    System.out.println ("\n\n---- first 20 fonts");
+    Font[] fonts = display.fonts ("*", 20);
+    for (int i = 0; i < fonts.length; i++)
+      System.out.println(fonts[i]);
 
-    System.out.println ("\n\n---- children of root"
-      + display.default_root.tree ().children ()
-      .to_string (Enum.NEXT4));
+    System.out.println ("\n\n---- children of root");
+    Window[] children = display.default_root.tree ().children ();
+    for (int i = 0; i < children.length; i++)
+      System.out.println(children[i]);
 
-    System.out.println ("\n\n---- properties of root"
-      + display.default_root.properties ().to_string (Enum.NEXT));
+    System.out.println ("\n\n---- properties of root");
+    Atom[] props = display.default_root.properties ();
+    for (int i = 0; i < props.length; i++)
+      System.out.println(props[i]);
 
     System.out.println ("\n\n---- screens"
       + Misc.to_string (display.screens));

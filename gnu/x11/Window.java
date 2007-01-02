@@ -274,7 +274,7 @@ public class Window extends Drawable implements GLXDrawable {
 
     RequestOutputStream o = display.out;
     synchronized (o) {
-      o.begin_request (1, depth, 8+attr.count ());
+      o.begin_request (1, depth, 8 + attr.count ());
       o.write_int32 (id);
       o.write_int32 (parent.id);
       o.write_int16 (x);
@@ -646,7 +646,7 @@ public class Window extends Drawable implements GLXDrawable {
 
     Window root;
     Window parent;
-    Window [] children;
+    private Window[] children;
 
     TreeInfo (ResponseInputStream i) {
       root = (Window) intern (display, i.read_int32 ());
@@ -665,6 +665,10 @@ public class Window extends Drawable implements GLXDrawable {
       }
     }
 
+    public Window[] children ()
+    {
+      return children;
+    }
   }
 
 
@@ -717,25 +721,27 @@ public class Window extends Drawable implements GLXDrawable {
    * 
    * @see <a href="XChangeProperty.html">XChangeProperty</a>
    */ 
-  public void change_property (int mode, int n, Atom property, Atom type,
-                               int format, byte [] data, int offset, int data_format) {
+  public void change_property (int mode, Atom property, Atom type,
+                               int format, byte [] data, int offset,
+                               int data_format) {
 
     int len = 0;
+    int n = data.length;
     switch (format) {
     case 8:
       len = n;
       break;
     case 16:
-      len = n * 2;
+      len = n / 2;
       break;
     case 32:
-      len = n * 4;
+      len = n / 4;
       break;
     default:
       len = 0;
     }
 
-    int p = RequestOutputStream.pad (len);
+    int p = RequestOutputStream.pad (n);
 
     RequestOutputStream o = display.out;
     synchronized (o) {
@@ -745,7 +751,7 @@ public class Window extends Drawable implements GLXDrawable {
       o.write_int32 (type.id);
       o.write_int8 (format);
       o.skip (3);
-      o.write_int32 (n); // data length in format unit
+      o.write_int32 (len); // data length in format unit
       o.write (data);
       o.skip (p);
       o.send ();
@@ -848,10 +854,11 @@ public class Window extends Drawable implements GLXDrawable {
    * @see <a href="XRotateWindowProperties.html">
    * XRotateWindowProperties</a>
    */
-  public Atom [] list_properties () {
+  public Atom [] properties () {
 
     Atom [] atoms;
     RequestOutputStream o = display.out;
+    int[] atomIds;
     synchronized (o) {
       o.begin_request (21, 0, 2);
       o.write_int32 (id);
@@ -860,13 +867,16 @@ public class Window extends Drawable implements GLXDrawable {
         i.read_reply (o);
         i.skip (8);
         int num_atoms = i.read_int16 ();
-        atoms = new Atom [num_atoms];
+        atomIds = new int [num_atoms];
         i.skip (22);
         for (int j = 0; j < num_atoms; j++) {
-          atoms [j] = (Atom) Atom.intern (display, i.read_int32 ());
+          atomIds [j] = i.read_int32 ();
         }
       }
     }
+    atoms = new Atom [atomIds.length];
+    for (int i = 0; i < atomIds.length; i++)
+      atoms[i] = (Atom) Atom.intern (display, atomIds [i]);
     return atoms;
   }
 
@@ -1506,7 +1516,7 @@ public class Window extends Drawable implements GLXDrawable {
    * @see #change_property(int, int, Atom, Atom, int, Object, int, int)
    */
   public void change_property (Atom property, Atom type, int data) {   
-    change_property (REPLACE, 1, property, type, 32, 
+    change_property (REPLACE, property, type, 32, 
       new byte [] {(byte) (data >> 24), (byte) (data >> 16),
                    (byte) (data >> 8), (byte) data}, 0, 32);
   }
@@ -1857,8 +1867,8 @@ public class Window extends Drawable implements GLXDrawable {
   public void set_wm_class_hint (String res_name, String res_class) {
     String wm_class = res_name + '\0' + res_class + '\0';
 
-    change_property (REPLACE, wm_class.length (), Atom.WM_CLASS,
-      Atom.STRING, 8, wm_class.getBytes (), 0, 8);
+    change_property (REPLACE, Atom.WM_CLASS, Atom.STRING, 8,
+                     wm_class.getBytes (), 0, 8);
   }
 
 
@@ -1911,8 +1921,8 @@ public class Window extends Drawable implements GLXDrawable {
    * @see #change_property(int, int, Atom, Atom, int, Object, int, int)
    */
   public void set_wm_hints (WMHints wm_hints) {
-    change_property (REPLACE, 8, Atom.WM_HINTS, Atom.WM_HINTS,
-      8, wm_hints.data, 32, 8);
+    change_property (REPLACE, Atom.WM_HINTS, Atom.WM_HINTS, 8, wm_hints.data,
+                     32, 8);
   }
 
    
@@ -1977,8 +1987,8 @@ public class Window extends Drawable implements GLXDrawable {
    * @see #change_property(int, int, Atom, Atom, int, Object, int, int)
    */
   public void set_wm_normal_hints (WMSizeHints size_hints) {
-    change_property (REPLACE, 18, Atom.WM_NORMAL_HINTS,
-      Atom.WM_SIZE_HINTS, 32, size_hints.data, 32, 8);
+    change_property (REPLACE, Atom.WM_NORMAL_HINTS, Atom.WM_SIZE_HINTS, 32,
+                     size_hints.data, 32, 8);
   }
 
 
@@ -1987,8 +1997,8 @@ public class Window extends Drawable implements GLXDrawable {
    * @see #change_property(int, int, Atom, Atom, int, Object, int, int)
    */
   public void set_wm_name (String wm_name) {
-    change_property (REPLACE, wm_name.length (), Atom.WM_NAME,
-      Atom.STRING, 8, wm_name.getBytes (), 0, 8); // support other types?
+    change_property (REPLACE, Atom.WM_NAME, Atom.STRING, 8,
+                     wm_name.getBytes (), 0, 8); // support other types?
   }
 
 

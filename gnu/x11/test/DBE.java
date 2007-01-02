@@ -68,6 +68,7 @@ public class DBE extends Graphics {
     }
 
     back_buffer.swap (gnu.x11.extension.DBE.UNDEFINED);
+    display.flush ();
   }
 
 

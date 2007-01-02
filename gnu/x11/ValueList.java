@@ -47,20 +47,16 @@ public class ValueList {
 
 
   public void set (int index, int value) {
-    bitmask |= 1 << index;
+    bitmask |= (1 << index);
     data [index] = value;
   }
 
 
-  public void write (Request request) {
-    for (int i=0; i<data.length && i<32; i++)
-      if ((bitmask & 1 << i) != 0)
-	request.write4 (data [i]);
-  }
-
   public void write (RequestOutputStream o) {
+    
     for (int i = 0; i < data.length && i < 32; i++)
-      if ((bitmask & 1 << i) != 0)
+      if ((bitmask & (1 << i)) != 0) {
         o.write_int32 (data [i]);
+      }
   }
 }

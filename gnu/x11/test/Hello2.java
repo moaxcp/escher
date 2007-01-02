@@ -26,6 +26,7 @@ public class Hello2 extends Graphics {
 
   public void paint () {
     window.text (display.default_gc, 20, 30, "Hello World!");
+    display.flush ();
   }
 
 

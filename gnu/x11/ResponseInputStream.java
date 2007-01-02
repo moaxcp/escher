@@ -34,6 +34,7 @@ import gnu.x11.event.SelectionNotify;
 import gnu.x11.event.SelectionRequest;
 import gnu.x11.event.UnmapNotify;
 import gnu.x11.event.VisibilityNotify;
+import gnu.x11.extension.EventFactory;
 
 import java.io.EOFException;
 import java.io.FilterInputStream;
@@ -78,9 +79,10 @@ public class ResponseInputStream extends FilterInputStream {
   public long skip (long n) {
     assert Thread.holdsLock (this);
 
-    long s = -1;
+    long s = 0;
     try {
-      s = super.skip (n);
+      while (s < n)
+        s += super.skip (n - s);
     } catch (Exception ex) {
       handle_exception (ex);
     }
@@ -130,6 +132,36 @@ public class ResponseInputStream extends FilterInputStream {
     } catch (IOException ex) {
       handle_exception (ex);
     }
+    return v;
+  }
+
+  /**
+   * Reads an INT32 value from the stream.
+   *
+   * @return the value
+   */
+  public long read_int64 () {
+    assert Thread.holdsLock (this);
+
+    long v = -1;
+    try {
+      v = (read () << 56) | (read () << 48) | (read () << 40) | (read () << 32)
+          |(read () << 24) | (read () << 16) | (read () << 8) | read ();
+    } catch (IOException ex) {
+      handle_exception (ex);
+    }
+    return v;
+  }
+
+  public float read_float32 () {
+    int bits = read_int32 ();
+    float v = Float.intBitsToFloat (bits);
+    return v;
+  }
+
+  public double read_float64 () {
+    long bits = read_int64 ();
+    double v = Double.longBitsToDouble (bits);
     return v;
   }
 
@@ -391,9 +423,10 @@ public class ResponseInputStream extends FilterInputStream {
   }
 
   private Event read_extension_event (int code) {
-    // FIXME: Implement extension events.
-    System.err.println("implement extension events: " + code);
-    return null;
+    EventFactory fac = display.extension_event_factories [code - 64];
+    if (fac == null)
+      throw new java.lang.Error("Unsuppored extension event: " + code);
+    return fac.build (display, this, code);
   }
 
   /**
@@ -413,11 +446,13 @@ public class ResponseInputStream extends FilterInputStream {
     assert Thread.holdsLock (this);
     assert Thread.holdsLock (out);
 
-    int exp_seq_no = out.seq_number;
     //System.err.println("reading reply for: " + out.buffer[0] + " seq_no: " + exp_seq_no);
 
     // Flush the current request.
+    out.send();
     out.flush();
+
+    int exp_seq_no = out.seq_number;
 
     // Fetch all events and errors that may come before the reply.
     int code = -1;
@@ -468,10 +503,28 @@ public class ResponseInputStream extends FilterInputStream {
     int minor_opcode = read_int16 ();
     int major_opcode = read_int8 ();
     skip (21);
+    if (code >= 128 && code <= 255)
+      throw build_extension_error (display, code, seq_no, bad_value,
+                                   minor_opcode, major_opcode);
+
     gnu.x11.Error err = new gnu.x11.Error (display,
                                            gnu.x11.Error.ERROR_STRINGS [code],
                                            code, seq_no, bad_value,
                                            minor_opcode, major_opcode);
     throw err;
+  }
+
+  private Error build_extension_error (Display display, int code, int seq_no,
+                                       int bad, int minor_opcode,
+                                       int major_opcode) {
+
+    gnu.x11.extension.ErrorFactory factory = display
+    .extension_error_factories [code-128];
+                                             
+    if (factory == null)
+      throw new java.lang.Error ("Unsupported extension error: " + code);
+
+    return factory.build (display, code, seq_no, bad,
+                          minor_opcode, major_opcode);
   }
 }

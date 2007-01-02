@@ -289,6 +289,7 @@ public class Atom {
         i.read_reply (o);
         i.skip (8); // Unused + sequence number + reply length.
         int len = i.read_int16 ();
+        i.skip (22);
         name = i.read_string8 (len);
         i.pad (len); // Pad.
       }

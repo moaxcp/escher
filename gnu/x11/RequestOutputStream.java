@@ -14,7 +14,9 @@ public class RequestOutputStream extends FilterOutputStream {
   /**
    * The default buffer size.
    */
-  private static final int DEFAULT_BUFFER_SIZE = 255;
+  private static final int DEFAULT_BUFFER_SIZE = 512;
+
+  private static final int FLUSH_THRESHOLD = 512 - 64;
 
   /**
    * The request buffer. It always holds the current request. This can be
@@ -28,6 +30,11 @@ public class RequestOutputStream extends FilterOutputStream {
    * free location inside the buffer.
    */
   public int index;
+
+  /**
+   * The index into the current request.
+   */
+  private int request_index;
 
   /**
    * The request object. This is written to the stream when flushing.
@@ -85,13 +92,16 @@ public class RequestOutputStream extends FilterOutputStream {
                              int request_length) {
 
     assert Thread.holdsLock (this);
-
     // Send pending request.
-    if (index > 0 || request_object != null) {
-      //seq_number++;
-      send ();
+    if (request_object != null || index > request_index) {
+      send();
     }
-    assert index == 0;
+    
+    if (buffer.length - index < request_length * 4) {
+      flush();
+    }
+
+    request_index = index;
     write_int8 (opcode);
     write_int8 (second_field);
     write_int16 (request_length);
@@ -109,19 +119,15 @@ public class RequestOutputStream extends FilterOutputStream {
       request_object.write (this);
       request_object = null;
     }
-    if (index > 0) {
+    if (index > request_index) {
       // Possibly pad request.
       int pad = pad (index);
       if (pad != 0)
         skip (pad);
-      try {
-        //System.err.println("sending request: " + buffer[0] + "seq_no: " + seq_number);
-        out.write (buffer, 0, index);
-      } catch (IOException ex) {
-        handle_exception (ex);
-      }
-      index = 0;
       seq_number = (seq_number + 1) & 0xffff; // This counter is only 16-bit.
+
+      if (index > FLUSH_THRESHOLD)
+        flush();
     }
   }
 
@@ -131,7 +137,7 @@ public class RequestOutputStream extends FilterOutputStream {
    * @return the opcode of the current request
    */
   public int current_opcode () {
-    return buffer [0];
+    return index > request_index ? buffer [request_index] : -1;
   }
 
   /**
@@ -140,7 +146,7 @@ public class RequestOutputStream extends FilterOutputStream {
    * @param i the write index to set
    */
   public void set_index (int i) {
-    index = i;
+    index = i + request_index;
   }
 
   /**
@@ -183,8 +189,28 @@ public class RequestOutputStream extends FilterOutputStream {
    */
   public synchronized void flush () {
     try {
-      send ();
+
+      if (request_object != null) {
+        //System.err.println("request object: " + request_object);
+        request_object.write (this);
+        request_object = null;
+      }
+      if (index > 0) {
+        // Possibly pad request.
+        int pad = pad (index);
+        if (pad != 0)
+          skip (pad);
+        try {
+          //System.err.println("sending request: " + buffer[0] + "seq_no: " + seq_number);
+          out.write (buffer, 0, index);
+        } catch (IOException ex) {
+          handle_exception (ex);
+        }
+
+        index = 0;
+      }
       out.flush ();
+
     } catch (IOException ex) {
       handle_exception (ex);
     }
@@ -225,6 +251,48 @@ public class RequestOutputStream extends FilterOutputStream {
    */
   public void write_int32 (int v) {
     assert Thread.holdsLock (this);
+    buffer [index] = (byte) (v >> 24);
+    index++;
+    buffer [index] = (byte) (v >> 16);
+    index++;
+    buffer [index] = (byte) (v >> 8);
+    index++;
+    buffer [index] = (byte) v;
+    index++;
+  }
+
+  public void write_float (float f) {
+    assert Thread.holdsLock (this);
+
+    int v = Float.floatToIntBits (f);
+    
+    buffer [index] = (byte) (v >> 24);
+    index++;
+    buffer [index] = (byte) (v >> 24);
+    index++;
+    buffer [index] = (byte) (v >> 16);
+    index++;
+    buffer [index] = (byte) (v >> 8);
+    index++;
+    buffer [index] = (byte) v;
+    index++;
+  }
+
+  public void write_double (double d) {
+    assert Thread.holdsLock (this);
+
+    long v = Double.doubleToLongBits (d);
+    
+    buffer [index] = (byte) (v >> 56);
+    index++;
+    buffer [index] = (byte) (v >> 48);
+    index++;
+    buffer [index] = (byte) (v >> 40);
+    index++;
+    buffer [index] = (byte) (v >> 32);
+    index++;
+    buffer [index] = (byte) (v >> 24);
+    index++;
     buffer [index] = (byte) (v >> 24);
     index++;
     buffer [index] = (byte) (v >> 16);
@@ -308,11 +376,41 @@ public class RequestOutputStream extends FilterOutputStream {
   }
 
   /**
+   * Determines if the buffer has room for the specified number of bytes.
+   *
+   * @param num_bytes the number of bytes
+   *
+   * @return <code>true</code> if the buffer has space for the specified number
+   *         of bytes, <code>false</code> otherwise
+   */
+  public boolean fits (int num_bytes) {
+    return index + num_bytes < buffer.length;
+  }
+
+  /**
+   * Updates the length field of the request to reflect the current length.
+   */
+  public void update_length () {
+    int len = (index + 3) / 4;
+    buffer [2] = (byte) (len >> 8);
+    buffer [3] = (byte) (len);
+  }
+
+  /**
    * Handles exceptions that my occur during IO operations.
    *
    * @param ex the exception to handle
    */
   private void handle_exception (Throwable ex) {
     ex.printStackTrace();
+  }
+
+  public void increase_length (int i) {
+    int l = (((int) (buffer[request_index + 2] & 0xff)) << 8)
+            + (buffer[request_index + 3] & 0xff);
+    l += i;
+    buffer [request_index + 2] = (byte) (l >> 8);
+    buffer [request_index + 3] = (byte) l;
+
   }
 }

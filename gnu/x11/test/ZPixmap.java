@@ -24,8 +24,8 @@ public class ZPixmap extends Graphics {
     if (help_option) return;
 
     int len = 256;
-    zpixmap = new gnu.x11.image.ZPixmap (display, len, len, 
-      display.default_pixmap_format);
+    zpixmap = new gnu.x11.image.ZPixmap (display, len, len,
+                                         display.default_pixmap_format);
 
     // straight from XTC
     for (int y=0; y<len; y++) {

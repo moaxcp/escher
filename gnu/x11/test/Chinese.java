@@ -1,5 +1,6 @@
 package gnu.x11.test;
 
+import gnu.x11.Font;
 import gnu.x11.GC;
 
 
@@ -26,8 +27,8 @@ public class Chinese extends Graphics {
     if (help_option) return;
 
     // check if any big5 font is present
-    gnu.x11.Enum fonts = display.fonts ("-*-*-*-*-*-*-*-*-*-*-*-*-big5-*", 1);
-    if (fonts.count == 0)
+    Font[] fonts = display.fonts ("-*-*-*-*-*-*-*-*-*-*-*-*-big5-*", 1);
+    if (fonts.length == 0)
       throw new RuntimeException (
         "No Chinese font defined on this X server");
 
@@ -35,13 +36,13 @@ public class Chinese extends Graphics {
     gv.set_background (display.default_white);
     gv.set_foreground (display.default_black);
     // just pick any of those matching fonts
-    gv.set_font ((gnu.x11.Font) fonts.next ());
+    gv.set_font (fonts[0]);
     gc = new GC (window, gv);
   }
 
   
   public void paint () {    
-    // use `native2ascii' in jdk to get encoding (§A¦n¶Ü)
+    // use `native2ascii' in jdk to get encoding (ï¿½Aï¿½nï¿½ï¿½)
     window.image_text16 (gc, 20, 30,
       "\u00a7A\u00a6n\u00b6\u00dc");
   }

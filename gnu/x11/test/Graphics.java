@@ -22,8 +22,8 @@ public abstract class Graphics extends gnu.x11.Application {
     win_attr.set_border (display.default_black);
     win_attr.set_event_mask (Event.BUTTON_PRESS_MASK
       | Event.EXPOSURE_MASK | Event.KEY_PRESS_MASK);
-    window = new Window (display.default_root, 10, 10,
-      width, height, 5, win_attr);
+    window = new Window (display.default_root, 10, 10, width, height,
+                         5, win_attr);
 
     window.set_wm (this, "main");
     window.set_wm_delete_window ();
@@ -45,6 +45,7 @@ public abstract class Graphics extends gnu.x11.Application {
     if (help_option) return;
 
     window.map ();
+    display.flush ();
     while (!exit_now) dispatch_event ();
     if (!leave_display_open) display.close ();
   }

@@ -91,6 +91,14 @@ public class Screen {
     return (Window) Window.intern (display, root_id);
   }
 
+  public int root_visual_id () {
+    return root_visual_id;
+  }
+
+  public int root_depth() {
+    return root_depth;
+  }
+
   public Colormap default_colormap () {
     return new Colormap (display, default_colormap_id);
   }

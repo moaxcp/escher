@@ -36,7 +36,15 @@ public class Pixmap extends Drawable {
       scanline_pad = in.read_int8 ();
       in.skip (5); // Unused.
     }
-  
+
+    public int bits_per_pixel() {
+      return bits_per_pixel;
+    }
+
+    public int scanline_pad() {
+      return scanline_pad;
+    }
+
     public String toString () {
       return "#Pixmap.Format"
         + "\n  depth: " + depth

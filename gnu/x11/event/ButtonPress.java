@@ -12,4 +12,8 @@ public final class ButtonPress extends Input {
   public ButtonPress (Display display, ResponseInputStream in) {
     super (display, in); 
   }
+
+  public ButtonPress (Display display) {
+    super (display, CODE);
+  }
 }

@@ -345,7 +345,6 @@ public class Display {
         int len = i.read_int32 () * 4; // Number of bytes for the reply.
         int num_strings = i.read_int16 ();
         i.skip (22);
-        len -= 32;
         fonts = new Font[num_strings];
         for (int j = 0; j < num_strings; j++) {
           int strlen = i.read_int8 ();
@@ -407,7 +406,7 @@ public class Display {
    * @see #set_font_path(int, String[])
    * @see <a href="XGetFontPath.html">XGetFontPath</a>
    */
-  public String[] get_font_path () {
+  public String[] font_path () {
 
     RequestOutputStream o = out;
     String[] path;
@@ -522,7 +521,7 @@ public class Display {
    *
    * @see <a href="XListExtensions.html">XListExtensions</a>
    */
-  public String[] list_extensions () {
+  public String[] extensions () {
 
     String [] exts;
     RequestOutputStream o = out;
@@ -532,7 +531,7 @@ public class Display {
       synchronized (i) {
         i.read_reply (o);
         i.skip (1);
-        int num_strs = i.read_int16 ();
+        int num_strs = i.read_int8 ();
         i.skip (2);
         int reply_length = i.read_int32 () * 4;
         exts = new String [num_strs];
@@ -671,7 +670,7 @@ public class Display {
    *
    * @see <a href="XGetScreenSaver.html">XGetScreenSaver</a>
    */
-  public ScreenSaverInfo get_screen_saver () {
+  public ScreenSaverInfo screen_saver () {
 
     ScreenSaverInfo info;
     RequestOutputStream o = out;
@@ -1118,11 +1117,15 @@ public class Display {
     XAuthority found = null;
     for (int i = 0; i < auths.length; i++) {
       XAuthority auth = auths[i];
-      // FIXME: Maybe add handling of IP addresses here.
-      if (auth.hostname != null && auth.hostname.equals (hostname)
-          && auth.display.equals (display_no_str)) {
-        found = auth;
-        break;
+      try {
+        if (auth.hostname != null && auth.display.equals (display_no_str)
+            && InetAddress.getByName(auth.hostname)
+                 .equals(InetAddress.getByName(hostname))) {
+          found = auth;
+          break;
+        }
+      } catch (UnknownHostException ex) {
+         System.err.println("warning unknown host :"+auth.hostname);
       }
     }
     return found;
@@ -1163,8 +1166,8 @@ public class Display {
       // TODO: Evaluate if we gain performance by using BufferedOutputStream
       // here.
       OutputStream o = socket.getOutputStream ();
-      BufferedOutputStream buf_out = new BufferedOutputStream (o, 512);
-      out = new RequestOutputStream (buf_out);
+      //BufferedOutputStream buf_out = new BufferedOutputStream (o, 512);
+      out = new RequestOutputStream (o);
 
       // Create buffered response input stream.
       InputStream sock_in = socket.getInputStream();

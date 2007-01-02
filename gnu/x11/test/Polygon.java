@@ -41,8 +41,9 @@ public class Polygon extends Graphics {
       new Point (100, 75)
       };
 
-    window.fill_poly (display.default_gc, points, 
-      Drawable.CONVEX, Drawable.ORIGIN);
+    window.fill_poly (display.default_gc, points, Drawable.CONVEX,
+                      Drawable.ORIGIN);
+    display.flush ();
   }
 
 

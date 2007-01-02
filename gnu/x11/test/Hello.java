@@ -43,7 +43,7 @@ public class Hello extends gnu.x11.Application {
     window.set_wm (this, "main");
     window.set_wm_delete_window ();
     window.map ();
-
+    display.flush ();
 
     while (!exit_now) {
       Event event = display.next_event ();
@@ -58,8 +58,10 @@ public class Hello extends gnu.x11.Application {
         break;
 
       case Expose.CODE:
-        if (((Expose) event).count () == 0) 
+        if (((Expose) event).count () == 0) {
           window.text (display.default_gc, 20, 30, "Hello World!");
+          display.flush ();
+        }
         break;
 	
       case KeyPress.CODE: {
