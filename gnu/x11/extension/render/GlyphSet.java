@@ -1,6 +1,6 @@
 package gnu.x11.extension.render;
 
-import gnu.x11.Request;
+import gnu.x11.RequestOutputStream;
 
 
 /** GlyphSet in RENDER. */
@@ -16,10 +16,13 @@ public class GlyphSet extends gnu.x11.Resource {
     super (render.display);
     this.render = render;
 
-    Request request = new Request (display, render.major_opcode, 17, 3);
-    request.write4 (id);
-    request.write4 (format.id ());
-    display.send_request (request);
+    RequestOutputStream o = display.out;
+    synchronized (o) {
+      o.begin_request (render.major_opcode, 17, 3);
+      o.write_int32 (id);
+      o.write_int32 (format.id ());
+      o.send ();
+    }
   }
 
 
@@ -32,10 +35,13 @@ public class GlyphSet extends gnu.x11.Resource {
     super (src.display);
     render = src.render;
 
-    Request request = new Request (display, render.major_opcode, 18, 3);
-    request.write4 (id);
-    request.write4 (src.id);
-    display.send_request (request);
+    RequestOutputStream o = display.out;
+    synchronized (o) {
+      o.begin_request (render.major_opcode, 18, 3);
+      o.write_int32 (id);
+      o.write_int32 (src.id);
+      o.send ();
+    }
   }
 
 
@@ -44,8 +50,11 @@ public class GlyphSet extends gnu.x11.Resource {
    * @see <a href="XRenderFreeGlyphSet.html">XRenderFreeGlyphSet</a>
    */
   public void free () {
-    Request request = new Request (display, render.major_opcode, 19, 2);
-    request.write4 (id);
-    display.send_request (request);
+    RequestOutputStream o = display.out;
+    synchronized (o) {
+      o.begin_request (render.major_opcode, 19, 2);
+      o.write_int32 (id);
+      o.send ();
+    }
   }
 }

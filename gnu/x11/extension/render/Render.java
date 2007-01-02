@@ -1,10 +1,13 @@
 package gnu.x11.extension.render;
 
+import java.io.IOException;
+
 import gnu.x11.Data;
 import gnu.x11.Display;
 import gnu.x11.Drawable;
 import gnu.x11.Error;
-import gnu.x11.Request;
+import gnu.x11.RequestOutputStream;
+import gnu.x11.ResponseInputStream;
 
 
 /**
@@ -65,48 +68,67 @@ public class Render extends gnu.x11.extension.Extension
     super (display, "RENDER", MINOR_OPCODE_STRINGS, 5, 0);
 
     // check version before any other operations
-    Request request = new Request (display, major_opcode, 0, 3);
-    request.write4 (CLIENT_MAJOR_VERSION);
-    request.write4 (CLIENT_MINOR_VERSION);    
+    RequestOutputStream o = display.out;
+    synchronized (o) {
+      o.begin_request (major_opcode, 0, 3);
+      o.write_int32 (CLIENT_MAJOR_VERSION);
+      o.write_int32 (CLIENT_MINOR_VERSION);
+      ResponseInputStream i = display.in;
+      synchronized (i) {
+        i.read_reply (o);
+        i.skip (8);
+        server_major_version = i.read_int32 ();
+        server_minor_version = i.read_int32 ();
+        i.skip (16);
+      }
+    }
 
-    Data reply = display.read_reply (request);
-    server_major_version = reply.read4 (8);
-    server_minor_version = reply.read4 (12);    
   }
 
 
   // render opcode 1 - query picture formats
   public Picture.Format [] picture_formats () {
-    if (picture_formats_cache != null)
-      return picture_formats_cache;
-
-    Request request = new Request (display, major_opcode, 1, 1);
-    Data reply = display.read_reply (request);
-    int count = reply.read4 (8);
-
-    Picture.Format [] pfs = new Picture.Format [count];
-    for (int i=0, offset=32; i<count; i++) {
-      pfs [i] = new Picture.Format (reply, offset);
-      offset += Picture.Format.LENGTH;
+    if (picture_formats_cache == null) {
+      RequestOutputStream o = display.out;
+      synchronized (o) {
+        o.begin_request (major_opcode, 1, 1);
+        ResponseInputStream i = display.in;
+        synchronized (i) {
+          i.read_reply (o);
+          i.skip (8);
+          int count = i.read_int32 ();
+          i.skip (20);
+          Picture.Format [] pfs = new Picture.Format [count];
+          for (int idx = 0; idx < count; idx++) {
+            pfs [idx] = new Picture.Format (i);
+          }
+          // TODO: Read LISTofPICTSCREEN and LISTofSUBPIXEL.
+          try { i.skip (i.available ()); } catch (IOException ex) { }
+          picture_formats_cache = pfs;
+        }
+      }
     }
-
-    picture_formats_cache = pfs;
-    return pfs;
+    return picture_formats_cache;
   }
 
 
   // render opcode 2 - query picture index values
   public void picture_index_values () {
-    Request request = new Request (display, major_opcode, 2, 2);
-    display.send_request (request);
+    RequestOutputStream o = display.out;
+    synchronized (o) {
+      o.begin_request (major_opcode, 2, 2);
+      o.send ();
+    }
   }
 
 
   // render opcode 3 - query dithers
   public void dithers (Drawable drawable) {
-    Request request = new Request (display, major_opcode, 3, 2);
-    request.write4 (drawable.id);
-    display.send_request (request);
+    RequestOutputStream o = display.out;
+    synchronized (o) {
+      o.begin_request (major_opcode, 3, 2);
+      o.send ();
+    }
   }
 
   
@@ -153,23 +175,25 @@ public class Render extends gnu.x11.extension.Extension
     int src_x, int src_y, int mask_x, int mask_y, int dst_x, int dst_y, 
     int width, int height) {
 
-    Request request = new Request (display, major_opcode, 8, 9);
-    request.write1 (op);
-    request.write3_unused ();
-    request.write4 (src.id);
-    request.write4 (mask.id);
-    request.write4 (dst.id);
-    request.write2 (src_x);
-    request.write2 (src_y);
-    request.write2 (mask_x);
-    request.write2 (mask_y);
-    request.write2 (dst_x);
-    request.write2 (dst_y);
-    request.write2 (width);
-    request.write2 (height);
-    display.send_request (request);
+    RequestOutputStream o = display.out;
+    synchronized (o) {
+      o.begin_request (major_opcode, 8, 9);
+      o.write_int8 (op);
+      o.skip (3);
+      o.write_int32 (src.id);
+      o.write_int32 (mask.id);
+      o.write_int32 (dst.id);
+      o.write_int16 (src_x);
+      o.write_int16 (src_y);
+      o.write_int16 (mask_x);
+      o.write_int16 (mask_y);
+      o.write_int16 (dst_x);
+      o.write_int16 (dst_y);
+      o.write_int16 (width);
+      o.write_int16 (height);
+      o.send ();
+    }
   }
-    
 
   public static final int BAD_PICTURE_FORMAt = 0;
   public static final int BAD_PICTURE = 1;
@@ -187,8 +211,8 @@ public class Render extends gnu.x11.extension.Extension
   };
 
 
-  public Error build (Display display, Data data, int code,
-    int seq_no, int bad, int minor_opcode, int major_opcode) {
+  public Error build (Display display, int code, int seq_no, int bad,
+                      int minor_opcode, int major_opcode) {
 
     String error_string = ERROR_STRINGS [code - first_error];
     return new Error (display, error_string, code, seq_no, bad, 

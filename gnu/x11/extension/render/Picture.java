@@ -6,7 +6,8 @@ import gnu.x11.Drawable;
 import gnu.x11.GC;
 import gnu.x11.Pixmap;
 import gnu.x11.Rectangle;
-import gnu.x11.Request;
+import gnu.x11.RequestOutputStream;
+import gnu.x11.ResponseInputStream;
 
 
 /** Picture in RENDER. */
@@ -110,7 +111,7 @@ public class Picture extends gnu.x11.Resource {
   
 
   /** RENDER picture format. */
-  public static class Format extends Data {
+  public static class Format {
     public static final int LENGTH = 28;
 
     // GLX uses *_BIT too
@@ -130,91 +131,139 @@ public class Picture extends gnu.x11.Resource {
 
     public int bitmask;
   
-  
-    public Format () { super (LENGTH); }
+
+    private int id;
+    private int type;
+    private int depth;
+    private Direct direct_format;
+    private int colormap_id;
+
+    public Format () {
+      direct_format = new Direct();
+    }
 
 
-    public Format (Data data, int offset) { 
-      super (data, offset); 
+    public Format (ResponseInputStream i) {
+      id = i.read_int32 ();
+      type = i.read_int8 ();
+      depth = i.read_int8 ();
+      i.skip (2);
+      direct_format = new Direct(i);
+      colormap_id = i.read_int32 ();
     }   
   
   
     /** RENDER direct format. */
-    public static class Direct extends Data {
+    public static class Direct {
       public static final int LENGTH = 16;
       public static final int TYPE = 1;
     
 
       public int bitmask;
 
-    
-      public Direct (Data data, int offset) { 
-        super (data, offset); 
+      private int red;
+      private int red_mask;
+      private int green;
+      private int green_mask;
+      private int blue;
+      private int blue_mask;
+      private int alpha;
+      private int alpha_mask;
+
+      Direct () {
+        // Nothing to do here.
+      }
+
+      public Direct (ResponseInputStream i) {
+        red = i.read_int16 ();
+        red_mask = i.read_int16 ();
+        green = i.read_int16 ();
+        green_mask = i.read_int16 ();
+        blue = i.read_int16 ();
+        blue_mask = i.read_int16 ();
+        alpha = i.read_int16 ();
+        alpha_mask = i.read_int16 ();
       }
     
     
       //-- reading
     
-      public int red () { return read2 (0); }
-      public int red_mask () { return read2 (2); }
-      public int green () { return read2 (4); }
-      public int green_mask () { return read2 (6); }
-      public int blue () { return read2 (8); }
-      public int blue_mask () { return read2 (10); }
-      public int alpha () { return read2 (12); }
-      public int alpha_mask () { return read2 (14); }
+      public int red () {
+        return red;
+      }
+
+      public int red_mask () {
+        return red_mask;
+      }
+
+      public int green () {
+        return green;
+      }
+
+      public int green_mask () {
+        return green_mask;
+      }
+
+      public int blue () {
+        return blue;
+      }
+
+      public int blue_mask () {
+        return blue_mask;
+      }
+
+      public int alpha () {
+        return alpha;
+      }
+
+      public int alpha_mask () {
+        return alpha_mask;
+      }
     
     
       //-- writing
 
       public void set_red (int i) { 
-        write2 (0, i); 
+        red = i;
         set (RED_BIT); 
       }
 
 
       public void set_red_mask (int i) {
-        write2 (2, i); 
+        red_mask = i; 
         set (RED_MASK_BIT); 
       }
 
-
       public void set_green (int i) {
-        write2 (4, i); 
+        green = i;
         set (GREEN_BIT); 
       }
 
-
       public void set_green_mask (int i) {
-        write2 (6, i); 
+        green_mask = i; 
         set (GREEN_MASK_BIT);
       }
 
-
       public void set_blue (int i) {
-        write2 (8, i); 
+        blue = i;
         set (BLUE_BIT); 
       }
 
-
       public void set_blue_mask (int i) {
-        write2 (10, i); 
+        blue_mask = i;
         set (BLUE_MASK_BIT); 
       }
 
-
       public void set_alpha (int i) {
-        write2 (12, i); 
-        set (ALPHA_BIT); 
+        alpha = i;
+        set (ALPHA_BIT);
       }
-
 
       public void set_alpha_mask (int i) {
-        write2 (14, i); 
-        set (ALPHA_MASK_BIT); 
+        alpha_mask = i;
+        set (ALPHA_MASK_BIT);
       }
-    
-    
+
       public String toString () {
         return "#Direct"
           + "\n  red: " + red ()
@@ -234,22 +283,30 @@ public class Picture extends gnu.x11.Resource {
 
     //-- reading
   
-    public int id () { return read4 (0); }
-    public int depth () { return read1 (5); }
-    public int colormap_id () { return read4 (24); }
+    public int id () {
+      return id;
+    }
+
+    public int depth () {
+      return depth;
+    }
+
+    public int colormap_id () {
+      return colormap_id;
+    }
   
     
     /** 
      * @return valid:
      * {@link Direct#TYPE}
      */
-    public int type () { 
-      return read1 (4); 
+    public int type () {
+      return type;
     }
   
   
     public Direct direct_format () {
-      return new Direct (this, 8);
+      return direct_format;
     }
   
   
@@ -262,14 +319,14 @@ public class Picture extends gnu.x11.Resource {
 
 
     public void set_id (int i) {
-      write4 (0, i); 
+      id = i; 
       set (ID_BIT); 
     }
 
 
     public void set_depth (int i) {
-      write1 (5, i); 
-      set (DEPTH_BIT); 
+      depth = i;
+      set (DEPTH_BIT);
     }
   
     
@@ -278,7 +335,7 @@ public class Picture extends gnu.x11.Resource {
      * {@link Direct#TYPE}
      */
     public void set_type (int i) {
-      write1 (4, i); 
+      type = i;
       set (TYPE_BIT); 
     }
   
@@ -348,14 +405,16 @@ public class Picture extends gnu.x11.Resource {
     super (render.display);
     this.render = render;
 
-    Request request = new Request (display, render.major_opcode, 4,
-      5+attr.count ());
-    request.write4 (id);
-    request.write4 (drawable.id);
-    request.write4 (format.id ());
-    request.write4 (attr.bitmask);
-    attr.write (request);
-    display.send_request (request);
+    RequestOutputStream o = display.out;
+    synchronized (o) {
+      o.begin_request (render.major_opcode, 4, 5 + attr.count ());
+      o.write_int32 (id);
+      o.write_int32 (drawable.id);
+      o.write_int32 (format.id ());
+      o.write_int32 (attr.bitmask);
+      attr.write (o);
+      o.send ();
+    }
   }
 
 
@@ -364,12 +423,14 @@ public class Picture extends gnu.x11.Resource {
    * @see <a href="XRenderChangePicture.html">XRenderChangePicture</a>
    */
   public void change (Attributes attr) {
-    Request request = new Request (display, render.major_opcode, 5,
-      5+attr.count ());
-    request.write4 (id);
-    request.write4 (attr.bitmask);
-    attr.write (request);
-    display.send_request (request);    
+    RequestOutputStream o = display.out;
+    synchronized (o) {
+      o.begin_request (render.major_opcode, 5, 5+attr.count ());
+      o.write_int32 (id);
+      o.write_int32 (attr.bitmask);
+      attr.write (o);
+      o.send ();    
+    }
   }
 
 
@@ -381,17 +442,19 @@ public class Picture extends gnu.x11.Resource {
   public void set_clip_rectangles (int x_origin, int y_origin,
     Rectangle [] rectangles) {
 
-    Request request = new Request (display, render.major_opcode, 7,
-      3+2*rectangles.length);
-    request.write4 (id);
+    RequestOutputStream o = display.out;
+    synchronized (o) {
+      o.begin_request (render.major_opcode, 7, 3 + 2 * rectangles.length);
+      o.write_int32 (id);
 
-    for (int i=0; i<rectangles.length; i++) {
-      request.write2 (rectangles [i].x);
-      request.write2 (rectangles [i].y);
-      request.write2 (rectangles [i].width);
-      request.write2 (rectangles [i].height);
+      for (int i = 0; i < rectangles.length; i++) {
+        o.write_int16 (rectangles [i].x);
+        o.write_int16 (rectangles [i].y);
+        o.write_int16 (rectangles [i].width);
+        o.write_int16 (rectangles [i].height);
+      }
+      o.send ();
     }
-    display.send_request (request);
   }
 
 
@@ -400,9 +463,12 @@ public class Picture extends gnu.x11.Resource {
    * @see <a href="XRenderFreePicture.html">XRenderFreePicture</a>
    */
   public void free () {
-    Request request = new Request (display, render.major_opcode, 7, 2);
-    request.write4 (id);
-    display.send_request (request);
+    RequestOutputStream o = display.out;
+    synchronized (o) {
+      o.begin_request (render.major_opcode, 7, 2);
+      o.write_int32 (id);
+      o.send ();
+    }
   }
 
 
@@ -411,18 +477,21 @@ public class Picture extends gnu.x11.Resource {
     Picture src, int src_x, int src_y, 
     int dst_x, int dst_y, int width, int height) {
 
-    Request request = new Request (display, render.major_opcode, 9, 8);
-    request.write4 (src.id);
-    request.write4 (id);
-    request.write4 (color_scale);
-    request.write4 (alpha_scale);
-    request.write2 (src_x);
-    request.write2 (src_y);
-    request.write2 (dst_x);
-    request.write2 (dst_y);
-    request.write2 (width);
-    request.write2 (height);
-    display.send_request (request);
+    RequestOutputStream o = display.out;
+    synchronized (o) {
+      o.begin_request (render.major_opcode, 9, 8);
+      o.write_int32 (src.id);
+      o.write_int32 (id);
+      o.write_int32 (color_scale);
+      o.write_int32 (alpha_scale);
+      o.write_int16 (src_x);
+      o.write_int16 (src_y);
+      o.write_int16 (dst_x);
+      o.write_int16 (dst_y);
+      o.write_int16 (width);
+      o.write_int16 (height);
+      o.send ();
+    }
   }
 
 
@@ -433,18 +502,21 @@ public class Picture extends gnu.x11.Resource {
   public void fill_rectangle (int op, Color color, int x, int y, 
     int width, int height) {
 
-    Request request = new Request (display, render.major_opcode, 26, 7);
-    request.write1 (op);
-    request.write3_unused ();
-    request.write4 (id);
-    request.write2 (x);
-    request.write2 (y);
-    request.write2 (width);
-    request.write2 (height);
-    request.write2 (color.red);
-    request.write2 (color.green);
-    request.write2 (color.blue);
-    request.write2 (color.alpha);
-    display.send_request (request);
+    RequestOutputStream o = display.out;
+    synchronized (o) {
+      o.begin_request (render.major_opcode, 26, 7);
+      o.write_int8 (op);
+      o.skip (3);
+      o.write_int32 (id);
+      o.write_int16 (x);
+      o.write_int16 (y);
+      o.write_int16 (width);
+      o.write_int16 (height);
+      o.write_int16 (color.red);
+      o.write_int16 (color.green);
+      o.write_int16 (color.blue);
+      o.write_int16 (color.alpha);
+      o.send ();
+    }
   }
 }
