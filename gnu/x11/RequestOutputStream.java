@@ -94,14 +94,13 @@ public class RequestOutputStream extends FilterOutputStream {
     assert Thread.holdsLock (this);
     // Send pending request.
     if (request_object != null || index > request_index) {
-      send();
+      send ();
     }
-    
+
     if (buffer.length - index < request_length * 4) {
       flush();
     }
 
-    request_index = index;
     write_int8 (opcode);
     write_int8 (second_field);
     write_int16 (request_length);
@@ -115,7 +114,6 @@ public class RequestOutputStream extends FilterOutputStream {
     assert Thread.holdsLock (this);
 
     if (request_object != null) {
-      //System.err.println("request object: " + request_object);
       request_object.write (this);
       request_object = null;
     }
@@ -124,10 +122,11 @@ public class RequestOutputStream extends FilterOutputStream {
       int pad = pad (index);
       if (pad != 0)
         skip (pad);
+      request_index = index;
       seq_number = (seq_number + 1) & 0xffff; // This counter is only 16-bit.
 
       if (index > FLUSH_THRESHOLD)
-        flush();
+        flush ();
     }
   }
 
@@ -208,6 +207,7 @@ public class RequestOutputStream extends FilterOutputStream {
         }
 
         index = 0;
+        request_index = 0;
       }
       out.flush ();
 
