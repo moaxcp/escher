@@ -2166,10 +2166,12 @@ public class Window extends Drawable implements GLXDrawable {
    */
   public boolean wm_protocol (String name) {
     Atom protocol = (Atom) Atom.intern (display, name);
-    Enum list = wm_protocols ();
+    int[] list = wm_protocols ();
 
-    while (list.more ())
-      if (list.next4 () == protocol.id) return true;
+    for (int i : list) {
+      if (i == protocol.id)
+        return true;
+    }
 
     return false;
   }
@@ -2182,10 +2184,10 @@ public class Window extends Drawable implements GLXDrawable {
    *
    * @see #property(boolean, Atom, Atom, int, int)
    */
-  public Enum wm_protocols () {
+  public int[] wm_protocols () {
     // FIXME: Re-think WM -stuff. Maybe do outside of Window as this is
     // not in the core protocol.
-    return null;
+    return new int[0];
 //    Atom wm_protocols = (Atom) Atom.intern (display, "WM_PROTOCOLS");
 //    PropertyReply pi = property (false, wm_protocols, Atom.ATOM, 0,
 //      MAX_WM_LENGTH/4);
