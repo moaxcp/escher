@@ -2,7 +2,6 @@ package gnu.x11.extension;
 
 import gnu.x11.Data;
 import gnu.x11.Display;
-import gnu.x11.Enum;
 import gnu.x11.Error;
 import gnu.x11.RequestOutputStream;
 import gnu.x11.ResponseInputStream;
