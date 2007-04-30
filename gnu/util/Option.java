@@ -117,9 +117,9 @@ public class Option {
   }
 
 
-  public int enum (String name, String description,
+  public int enumerate (String name, String description,
     String [] enum_strings, int default_value) {     
-      
+
     int retval = default_value;
 
     try {
