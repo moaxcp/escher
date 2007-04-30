@@ -1,6 +1,6 @@
-#Tue Sep 26 12:21:02 MESZ 2006
-org.eclipse.jdt.ui.text.custom_code_templates=<?xml version\='1.0'?>\n<templates/>
+#Wed Apr 11 21:29:48 CEST 2007
 eclipse.preferences.version=1
-internal.default.compliance=user
 formatter_profile=_Escher
 formatter_settings_version=8
+internal.default.compliance=default
+org.eclipse.jdt.ui.text.custom_code_templates=<?xml version\='1.0'?>\n<templates/>
