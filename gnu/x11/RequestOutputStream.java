@@ -6,10 +6,14 @@ import java.io.OutputStream;
 
 /**
  * Used to create and manage requests to the X server.
- * 
+ *
  * @author Roman Kennke (roman@kennke.org)
  */
 public class RequestOutputStream extends FilterOutputStream {
+
+  public enum SendMode {
+    ASYNCHRONOUS, SYNCHRONOUS, ROUND_TRIP
+  }
 
   /**
    * The default buffer size.
@@ -44,13 +48,24 @@ public class RequestOutputStream extends FilterOutputStream {
   public int seq_number;
 
   /**
+   * The send mode for this connection. Either {@link SendMode#ASYNCHRONOUS},
+   * {@link SendMode#SYNCHRONOUS} or {@link SendMode#ROUND_TRIP}.
+   */
+  private SendMode send_mode;
+
+  /**
+   * The associated display.
+   */
+  private Display display;
+
+  /**
    * Creates a new RequestOutputStream with the specified sink and a default
    * buffer size.
    *
    * @param sink the output stream to write to
    */
-  RequestOutputStream (OutputStream sink) {
-    this (sink, DEFAULT_BUFFER_SIZE);
+  RequestOutputStream (OutputStream sink, Display d) {
+    this (sink, DEFAULT_BUFFER_SIZE, d);
   }
 
   /**
@@ -60,10 +75,34 @@ public class RequestOutputStream extends FilterOutputStream {
    * @param sink the output stream to write to
    * @param size the buffer size
    */
-  RequestOutputStream (OutputStream sink, int size) {
+  RequestOutputStream (OutputStream sink, int size, Display d) {
     super (sink);
     buffer = new byte [size];
     seq_number = 0;
+    display = d;
+    send_mode = get_default_send_mode ();
+  }
+
+  /**
+   * Determines the default send mode. This can be set by the system property
+   * escher.send_mode that can have the values SYNCRONOUS, ASYNCRONOUS
+   * and ROUND_TRIP. If no such property is specified, the send mode is set
+   * to ASYNCRONOUS, which is the recommended mode for applications. The
+   * other two modes are useful for debugging.
+   *
+   * @return the default send mode
+   */
+  private SendMode get_default_send_mode () {
+    String prop = System.getProperty ("escher.send_mode", "ASYNCHRONOUS");
+    SendMode sm;
+    if (prop.equalsIgnoreCase ("SYNCHRONOUS")) {
+      sm = SendMode.SYNCHRONOUS;
+    } else if (prop.equalsIgnoreCase ("ROUND_TRIP")) {
+      sm = SendMode.ROUND_TRIP;
+    } else {
+      sm = SendMode.ASYNCHRONOUS;
+    }
+    return sm;
   }
 
   /**
@@ -111,6 +150,19 @@ public class RequestOutputStream extends FilterOutputStream {
    * flushing the stream.
    */
   public void send () {
+
+    send_impl ();
+    if (send_mode == SendMode.ROUND_TRIP) {
+      do_roundtrip ();
+    }
+  }
+
+  /**
+   * Performs the same operation as {@link #send()} but without possibly
+   * doing a round-trip check.
+   */
+  void send_impl () {
+
     assert Thread.holdsLock (this);
 
     if (request_object != null) {
@@ -125,9 +177,19 @@ public class RequestOutputStream extends FilterOutputStream {
       request_index = index;
       seq_number = (seq_number + 1) & 0xffff; // This counter is only 16-bit.
 
-      if (index > FLUSH_THRESHOLD)
+      if (index > FLUSH_THRESHOLD || send_mode == SendMode.SYNCHRONOUS)
         flush ();
     }
+  }
+
+  /**
+   * This forces a reply from the X server by sending an input focus request.
+   * This is used for the {@link SendMode#ROUND_TRIP} mode, which is
+   * very useful for debugging because the X errors can be traced to their
+   * corresponding calls.
+   */
+  private void do_roundtrip () {
+    display.input.input_focus ();
   }
 
   /**
@@ -413,4 +475,5 @@ public class RequestOutputStream extends FilterOutputStream {
     buffer [request_index + 3] = (byte) l;
 
   }
+
 }

@@ -449,7 +449,9 @@ public class ResponseInputStream extends FilterInputStream {
     //System.err.println("reading reply for: " + out.buffer[0] + " seq_no: " + exp_seq_no);
 
     // Flush the current request.
-    out.send();
+    // DON'T use plain send() because this could trigger a round-trip check
+    // which would mess up with the reply.
+    out.send_impl();
     out.flush();
 
     int exp_seq_no = out.seq_number;

@@ -8,7 +8,6 @@ import gnu.x11.extension.NotFoundException;
 import gnu.x11.extension.XCMisc;
 
 import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -240,9 +239,17 @@ public class Display {
 
     // authorization protocol
     XAuthority xauth = get_authority ();
-    //System.err.println("xauth: " + xauth);
-    byte[] auth_name = xauth.protocol_name;
-    byte[] auth_data = xauth.protocol_data;
+
+    byte[] auth_name;
+    byte[] auth_data;
+    if (xauth != null) {
+      auth_name = xauth.protocol_name;
+      auth_data = xauth.protocol_data;
+    } else {
+      // In case the X authority couldn't be established...
+      auth_name = new byte[0];
+      auth_data = new byte[0];
+    }
 
     RequestOutputStream o = out;
     synchronized (o) {
@@ -1167,7 +1174,7 @@ public class Display {
       // here.
       OutputStream o = socket.getOutputStream ();
       //BufferedOutputStream buf_out = new BufferedOutputStream (o, 512);
-      out = new RequestOutputStream (o);
+      out = new RequestOutputStream (o, this);
 
       // Create buffered response input stream.
       InputStream sock_in = socket.getInputStream();
