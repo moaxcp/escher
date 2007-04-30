@@ -33,11 +33,9 @@ public class UnProject extends gnu.x11.extension.glx.Application {
     if (button == Input.BUTTON2) exit ();
     if (button != Input.BUTTON1) return;
 
-    int [] viewport = gl.integerv (GL.VIEWPORT).next_integerv (4);
-    double [] modelview = gl.doublev (GL.MODELVIEW_MATRIX)
-      .next_doublev (16);
-    double [] projection = gl.doublev (GL.PROJECTION_MATRIX)
-      .next_doublev (16);
+    int [] viewport = gl.integerv (GL.VIEWPORT);
+    double [] modelview = gl.doublev (GL.MODELVIEW_MATRIX);
+    double [] projection = gl.doublev (GL.PROJECTION_MATRIX);
 
     int real_y = viewport [3] - y - 1;
     double [] world0 = glu.un_project (x, real_y, 0.0, modelview,
