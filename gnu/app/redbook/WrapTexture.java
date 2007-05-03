@@ -121,7 +121,7 @@ public class WrapTexture extends gnu.x11.extension.glx.Application {
 
   private void init_texture () {
     if (support_bind) {
-      texture = gl.gen_textures (1).next4 ();
+      texture = gl.gen_textures (1) [0];
       gl.bind_texture (GL.TEXTURE_2D, texture);
     }
 

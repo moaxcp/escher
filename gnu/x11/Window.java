@@ -1191,6 +1191,10 @@ public class Window extends Drawable implements GLXDrawable {
       win_y = i.read_int16 ();
       mask = i.read_int16 ();
     }
+
+    public Point root_position () {
+      return new Point (root_x, root_y);
+    }
   }
   
   

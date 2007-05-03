@@ -26,8 +26,8 @@ import gnu.x11.Data;
  */
 public class TextureTeapot extends gnu.x11.extension.glx.Application {
   private static final int IMAGE_SIZE = 32;
-  private static Data IMAGE;
-  private static final byte [] [] IMAGE0 = new byte [IMAGE_SIZE] [4];
+  private static byte[] IMAGE;
+  private static final byte [] IMAGE0 = new byte [IMAGE_SIZE * 4];
   private static final float [] TEXTURE_SLANTED = {1.0f, 1.0f, 1.0f, 0.0f};
   private static final float [] TEXTURE_YZ = {1.0f, 0.0f, 0.0f, 0.0f};
 
@@ -125,13 +125,13 @@ public class TextureTeapot extends gnu.x11.extension.glx.Application {
 
   private void init_image () {
     for (int i=0; i<IMAGE_SIZE; i++) {
-      IMAGE0 [i] [0] = (i<=4) ? (byte) 255 : 0;
-      IMAGE0 [i] [1] = (i>=4) ? (byte) 255 : 0;
-      IMAGE0 [i] [2] = (byte) 0;
-      IMAGE0 [i] [3] = (byte) 255;
+      IMAGE0 [i * 4 + 0] = (i <= 4) ? (byte) 255 : 0;
+      IMAGE0 [i * 4 + 1] = (i >= 4) ? (byte) 255 : 0;
+      IMAGE0 [i * 4 + 2] = (byte) 0;
+      IMAGE0 [i * 4 + 3] = (byte) 255;
     }
 
-    IMAGE = new Data (IMAGE0);
+    IMAGE = IMAGE0;
   }
 
 
@@ -147,7 +147,7 @@ public class TextureTeapot extends gnu.x11.extension.glx.Application {
    gl.enable (GL.TEXTURE_GEN_S);
 
     if (support_bind) {
-      texture = gl.gen_textures (1).next4 ();
+      texture = gl.gen_textures (1) [0];
       gl.bind_texture (GL.TEXTURE_2D, texture);
     }
 

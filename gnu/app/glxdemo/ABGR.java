@@ -17,9 +17,8 @@ import gnu.x11.Data;
  */
 public class ABGR extends gnu.x11.extension.glx.Application {
   private static final int IMAGE_SIZE = 128;
-  private static Data IMAGE;
-  private static final byte [] [] [] IMAGE0 =
-    new byte [IMAGE_SIZE] [IMAGE_SIZE] [4];
+  private static byte[] IMAGE;
+  private static final byte [] IMAGE0 = new byte [IMAGE_SIZE * IMAGE_SIZE * 4];
 
 
   public ABGR (String [] args) {
@@ -99,28 +98,28 @@ public class ABGR extends gnu.x11.extension.glx.Application {
     for (int i=0; i<band; i++)
       for (int j=0; j<IMAGE_SIZE; j++) {
              
-        IMAGE0 [i + 0*band] [j] [0] = (byte) 0xff;
-        IMAGE0 [i + 0*band] [j] [1] = (byte) 0x00;
-        IMAGE0 [i + 0*band] [j] [2] = (byte) 0x00;
-        IMAGE0 [i + 0*band] [j] [3] = (byte) 0xff;
+        IMAGE0 [(i + 0*band) * IMAGE_SIZE * 4 + j * 4 + 0] = (byte) 0xff;
+        IMAGE0 [(i + 0*band) * IMAGE_SIZE * 4 + j * 4 + 1] = (byte) 0x00;
+        IMAGE0 [(i + 0*band) * IMAGE_SIZE * 4 + j * 4 + 2] = (byte) 0x00;
+        IMAGE0 [(i + 0*band) * IMAGE_SIZE * 4 + j * 4 + 3] = (byte) 0xff;
 
-        IMAGE0 [i + 1*band] [j] [0] = (byte) 0xff;
-        IMAGE0 [i + 1*band] [j] [1] = (byte) 0x00;
-        IMAGE0 [i + 1*band] [j] [2] = (byte) 0xff;
-        IMAGE0 [i + 1*band] [j] [3] = (byte) 0x00;
+        IMAGE0 [(i + 1*band) * IMAGE_SIZE * 4 + j * 4 + 0] = (byte) 0xff;
+        IMAGE0 [(i + 1*band) * IMAGE_SIZE * 4 + j * 4 + 1] = (byte) 0x00;
+        IMAGE0 [(i + 1*band) * IMAGE_SIZE * 4 + j * 4 + 2] = (byte) 0xff;
+        IMAGE0 [(i + 1*band) * IMAGE_SIZE * 4 + j * 4 + 3] = (byte) 0x00;
 
-        IMAGE0 [i + 2*band] [j] [0] = (byte) 0xff;
-        IMAGE0 [i + 2*band] [j] [1] = (byte) 0xff;
-        IMAGE0 [i + 2*band] [j] [2] = (byte) 0x00;
-        IMAGE0 [i + 2*band] [j] [3] = (byte) 0x00;
+        IMAGE0 [(i + 2*band) * IMAGE_SIZE * 4 + j * 4 + 0] = (byte) 0xff;
+        IMAGE0 [(i + 2*band) * IMAGE_SIZE * 4 + j * 4 + 1] = (byte) 0xff;
+        IMAGE0 [(i + 2*band) * IMAGE_SIZE * 4 + j * 4 + 2] = (byte) 0x00;
+        IMAGE0 [(i + 2*band) * IMAGE_SIZE * 4 + j * 4 + 3] = (byte) 0x00;
 
-        IMAGE0 [i + 3*band] [j] [0] = (byte) 0x00;
-        IMAGE0 [i + 3*band] [j] [1] = (byte) 0xff;
-        IMAGE0 [i + 3*band] [j] [2] = (byte) 0x00;
-        IMAGE0 [i + 3*band] [j] [3] = (byte) 0xff;
+        IMAGE0 [(i + 3*band) * IMAGE_SIZE * 4 + j * 4 + 0] = (byte) 0x00;
+        IMAGE0 [(i + 3*band) * IMAGE_SIZE * 4 + j * 4 + 1] = (byte) 0xff;
+        IMAGE0 [(i + 3*band) * IMAGE_SIZE * 4 + j * 4 + 2] = (byte) 0x00;
+        IMAGE0 [(i + 3*band) * IMAGE_SIZE * 4 + j * 4 + 3] = (byte) 0xff;
       }
 
-    IMAGE = new Data (IMAGE0);
+    IMAGE = IMAGE0;
   }
 
 

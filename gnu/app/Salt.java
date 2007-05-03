@@ -1,6 +1,5 @@
 package gnu.app;
 
-import gnu.x11.Enum;
 import gnu.x11.Window;
 import gnu.x11.event.Event;
 import gnu.x11.event.KeyPress;
@@ -41,10 +40,8 @@ public class Salt extends gnu.x11.Application {
 
     if (help_option) return;
 
-    for (Enum e=display.default_root.tree ().children (); 
-         e.more ();) {
+    for (Window window : display.default_root.tree ().children ()) {
 
-      Window window = (Window) e.next ();
       Window.WMClassHint class_hint = window.wm_class_hint ();
       
       if (class_hint == null) continue;

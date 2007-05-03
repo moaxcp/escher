@@ -55,7 +55,7 @@ public class TextureProxy extends gnu.x11.extension.glx.Application {
     gl.tex_image_2d (GL.PROXY_TEXTURE_2D, 0, GL.RGBA8, 64, 64, 0, GL.RGBA, 
       GL.UNSIGNED_BYTE, null);
     proxy_components = gl.tex_level_parameteriv (GL.PROXY_TEXTURE_2D,
-      0, GL.TEXTURE_INTERNAL_FORMAT).next4 ();
+      0, GL.TEXTURE_INTERNAL_FORMAT) [0];
     System.out.print (
       "Proxying 64x64 level 0 RGBA8 texture... "
       + STRINGS [proxy_components == GL.RGBA8 ? 1 : 0]);
@@ -63,7 +63,7 @@ public class TextureProxy extends gnu.x11.extension.glx.Application {
     gl.tex_image_2d (GL.PROXY_TEXTURE_2D, 0, GL.RGBA16, 2048, 2048, 0, GL.RGBA, 
       GL.UNSIGNED_BYTE, null);
     proxy_components = gl.tex_level_parameteriv (GL.PROXY_TEXTURE_2D,
-      0, GL.TEXTURE_INTERNAL_FORMAT).next4 ();
+      0, GL.TEXTURE_INTERNAL_FORMAT) [0];
     System.out.print (
       "Proxying 2048x2048 level 0 RGBA16 texture... "
       + STRINGS [proxy_components == GL.RGBA8 ? 1 : 0]);   

@@ -8,6 +8,7 @@ import gnu.x11.extension.XTest;
 import gnu.x11.extension.NotFoundException;
 import gnu.x11.keysym.Misc;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Vector;
 
 
@@ -392,7 +393,7 @@ public class Puppet extends Application {
     control_root_window ();
     scan_children ();
 
-    focus = (Client) Client.intern (root.pointer ().child ());
+    focus = (Client) Client.intern (root.query_pointer ().child);
     focus.set_input_focus ();
     
     grab_keybut ();
@@ -544,8 +545,8 @@ public class Puppet extends Application {
     }
 
 
-    int max_width = display.default_screen.width ();
-    int max_height = display.default_screen.height ();
+    int max_width = display.default_screen.width;
+    int max_height = display.default_screen.height;
 
 
     // position      
@@ -723,7 +724,7 @@ public class Puppet extends Application {
 
   public void key_dump_info () {
     System.out.println ("input focus: " + focus);
-    System.out.println ("mouse at: " + root.pointer ().root_position ());
+    System.out.println ("mouse at: " + root.query_pointer ().root_position ());
 
     if (!argument_present) return; // `dump-basic-info'
 
@@ -1072,7 +1073,7 @@ public class Puppet extends Application {
     if (!clients.contains (client)) clients.add (client);
 
     // ready for move and resize
-    client.geometry ();		
+    client.get_geometry ();
 
     // ready for next focus and preference
     client.class_hint = client.wm_class_hint ();   
@@ -1095,8 +1096,8 @@ public class Puppet extends Application {
 
   public void maximize (Client client, boolean full_screen) {
     if (full_screen)
-      client.move_resize (0, 0, display.default_screen.width (), 
-	display.default_screen.height ());
+      client.move_resize (0, 0, display.default_screen.width, 
+	display.default_screen.height);
 
     else
       client.move_resize (space);
@@ -1334,19 +1335,19 @@ public class Puppet extends Application {
     display.grab_server ();
     
     display.check_error ();
-    Vector other_events = display.connection.pull_all_events ();
+    List other_events = display.in.pull_all_events ();
     
     for (Iterator it=other_events.iterator (); it.hasNext ();) {       
       Event event = (Event) it.next ();
 
       if (event.code () == DestroyNotify.CODE) {	
         Client client = (Client) Client.intern (display, 
-          event.window_id ());
+          ((DestroyNotify) event).window_id);
         client.early_destroyed = true;
 
       } else if (event.code () == UnmapNotify.CODE) {
         Client client = (Client) Client.intern (display, 
-          event.window_id ());
+          ((UnmapNotify) event).window_id);
         client.early_unmapped = true;
       }
     }
@@ -1443,8 +1444,9 @@ public class Puppet extends Application {
 
   public void scan_children () {
     // query all top-level windows
-    for (gnu.x11.Enum e=root.tree ().children (); e.more ();) {
-      Client client = (Client) Client.intern (display, e.next4 ());
+    Window[] children = root.tree ().children ();
+    for (Window w : children) {
+      Client client = (Client) Client.intern (display, w.id);
 
       // get override_redirect and map_state
       client.attributes = client.attributes ();
@@ -1581,7 +1583,7 @@ public class Puppet extends Application {
       else {                    // `lower-behind'
 	// give focus to some other window (under pointer)
 	client.lower ();
-	focus = (Client) Client.intern (root.pointer ().child ());
+	focus = (Client) Client.intern (root.query_pointer ().child);
 	focus.set_input_focus ();    
 	update_client_order (focus); // != client
       }
@@ -1592,7 +1594,7 @@ public class Puppet extends Application {
 
   public void when_client_message (ClientMessage event) {
     // client asks to change window state from normal to iconic 
-    Client client = (Client) Client.intern (display, event.window_id ());    
+    Client client = (Client) Client.intern (display, event.window_id);
     if (client.early_unmapped || client.early_destroyed) return;
 
     Atom type = event.type ();
@@ -1612,7 +1614,7 @@ public class Puppet extends Application {
     // @see icccm/sec-4.html#s-4.1.5
 
     // TODO find space in screen to display window?
-    Client client = (Client) Client.intern (display, event.window_id ());
+    Client client = (Client) Client.intern (display, event.window_id);
     if (client.early_unmapped || client.early_destroyed) return;
 
 
@@ -1644,7 +1646,7 @@ public class Puppet extends Application {
 
 
   public void when_destroy_notify (DestroyNotify event) {    
-    Client client = (Client) Client.intern (display, event.window_id ());
+    Client client = (Client) Client.intern (display, event.window_id);
     give_up_focus (client);
     
     register_fall_back (client);
@@ -1745,7 +1747,7 @@ public class Puppet extends Application {
   public void when_property_notify (PropertyNotify event) {
     Atom atom = event.atom (display);
 
-    Client client = (Client) Client.intern (display, event.window_id ());
+    Client client = (Client) Client.intern (display, event.window_id);
     if (client.early_destroyed) return;
 
     if (atom == wm_colormap_windows
@@ -1776,7 +1778,7 @@ public class Puppet extends Application {
   public void when_map_request (MapRequest event) {
     // client asks to change window state from withdrawn to normal/iconic,
     // or from iconic to normal
-    Client client = (Client) Client.intern (display, event.window_id ());
+    Client client = (Client) Client.intern (display, event.window_id);
     if (client.early_unmapped || client.early_destroyed) return;
 
 
@@ -1809,7 +1811,7 @@ public class Puppet extends Application {
 
 
   public void when_map_notify (MapNotify event) {
-    Client client = (Client) Client.intern (display, event.window_id ());
+    Client client = (Client) Client.intern (display, event.window_id);
     if (client.early_unmapped || client.early_destroyed) return;
 
 
@@ -1865,7 +1867,7 @@ public class Puppet extends Application {
      *
      * @see #when_destroy_notify(DestroyNotify)
      */
-    Client client = (Client) Client.intern (display, event.window_id ());
+    Client client = (Client) Client.intern (display, event.window_id);
     if (client.early_destroyed) return;
 
     client.early_unmapped = false; // handled here

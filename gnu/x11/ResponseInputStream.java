@@ -41,6 +41,7 @@ import java.io.FilterInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.LinkedList;
+import java.util.List;
 
 /**
  * Reads response data from the X server.
@@ -267,6 +268,20 @@ public class ResponseInputStream extends FilterInputStream {
     } while (ev == null);
 //    System.err.println("event: " + ev);
     return ev;
+  }
+
+  /**
+   * Pulls all pending events out of the queue.
+   *
+   * @return all pending events
+   */
+  public List pull_all_events () {
+    LinkedList l = new LinkedList(events);
+    Event e = read_event_from_stream ();
+    while (e != null) {
+      l.add (e);
+    }
+    return l;
   }
 
   /**

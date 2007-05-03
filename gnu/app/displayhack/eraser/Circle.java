@@ -33,9 +33,9 @@ public class Circle extends Eraser {
 
 
     for (int i=0; i<step_count; i++) {
-      window.arc (hack.display.default_gc, 
+      window.fill_arc (hack.display.default_gc, 
         window.width/2 - radius, window.height/2 - radius,
-        2*radius, 2*radius, (start+i*delta) % full, delta, true);
+        2*radius, 2*radius, (start+i*delta) % full, delta);
 
       if (sleep (hack)) return;
     }

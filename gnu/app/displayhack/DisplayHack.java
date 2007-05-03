@@ -67,7 +67,7 @@ public abstract class DisplayHack extends gnu.x11.Application
         "delay between iterations of eraser in ms", 10);
       eraser_delta = option.intt ("eraser-delta",
         "granularity of eraser", 5, 1, 10);
-      eraser_mode = option.enum ("eraser-mode",
+      eraser_mode = option.enumerate ("eraser-mode",
         "which eraser", Eraser.ALL_STRINGS, 
         Eraser.RANDOM_ERASER_INDEX);
     }

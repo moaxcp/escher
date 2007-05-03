@@ -83,7 +83,7 @@ public class TextureBind extends gnu.x11.extension.glx.Application {
 
   private void init_texture () {
     gl.enable (GL.TEXTURE_2D);
-    textures = gl.gen_textures (2).next_integerv (2);
+    textures = gl.gen_textures (2);
 
     gl.bind_texture (GL.TEXTURE_2D, textures [0]);
     init_texture_parameter ();

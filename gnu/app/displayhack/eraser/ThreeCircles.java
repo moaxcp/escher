@@ -42,28 +42,28 @@ public class ThreeCircles extends Eraser {
    
     for (int i=0; i<step_count; i++) {
       // first circle
-      window.arc (hack.display.default_gc, 
+      window.fill_arc (hack.display.default_gc, 
         window.width/2 - radius, window.height/2 - radius,
-        2*radius, 2*radius, (start+i*delta) % full, delta, true);
-      window.arc (hack.display.default_gc, 
+        2*radius, 2*radius, (start+i*delta) % full, delta);
+      window.fill_arc (hack.display.default_gc, 
         window.width/2 - radius, window.height/2 - radius,
-        2*radius, 2*radius, (start-i*delta) % full, delta, true);
+        2*radius, 2*radius, (start-i*delta) % full, delta);
       
       // second circle
-      window.arc (hack.display.default_gc, 
+      window.fill_arc (hack.display.default_gc, 
         window.width/2 - radius, window.height/2 - radius,
-        2*radius, 2*radius, (start+third+i*delta) % full, delta, true);
-      window.arc (hack.display.default_gc, 
+        2*radius, 2*radius, (start+third+i*delta) % full, delta);
+      window.fill_arc (hack.display.default_gc, 
         window.width/2 - radius, window.height/2 - radius,
-        2*radius, 2*radius, (start+third-i*delta) % full, delta, true);
+        2*radius, 2*radius, (start+third-i*delta) % full, delta);
 
       // third circle
-      window.arc (hack.display.default_gc, 
+      window.fill_arc (hack.display.default_gc, 
         window.width/2 - radius, window.height/2 - radius,
-        2*radius, 2*radius, (start+2*third+i*delta) % full, delta, true);
-      window.arc (hack.display.default_gc, 
+        2*radius, 2*radius, (start+2*third+i*delta) % full, delta);
+      window.fill_arc (hack.display.default_gc, 
         window.width/2 - radius, window.height/2 - radius,
-        2*radius, 2*radius, (start+2*third-i*delta) % full, delta, true);
+        2*radius, 2*radius, (start+2*third-i*delta) % full, delta);
 
       if (sleep (hack)) return;
     }

@@ -60,13 +60,12 @@ public class Sprites extends DisplayHack {
       sprite_gc.set_foreground (0);
       pixmap.rectangle (sprite_gc, 0, 0, width, height, true);
       sprite_gc.set_foreground (color);
-      pixmap.arc (sprite_gc, 0, 0, width, height, 0, 360*64, true);
+      pixmap.fill_arc (sprite_gc, 0, 0, width, height, 0, 360 * 64);
 
 
       for (int i=0; i<8; i++) {
         sprite_gc.set_foreground (divide_color (color, 1<<(7-i)));
-        pixmap.arc (sprite_gc, i, i, width-2*i, height-2*i, 
-          0, 360*64, true);
+        pixmap.fill_arc (sprite_gc, i, i, width-2*i, height-2*i, 0, 360 * 64);
       }
     }
 
@@ -120,7 +119,8 @@ public class Sprites extends DisplayHack {
     back_buffer_gc = new GC (window);
     back_buffer_gc.set_foreground (display.default_white);
     back_buffer = new Pixmap (window, depth);
-    back_buffer.rectangle_clear (back_buffer_gc);
+    back_buffer.fill_rectangle (back_buffer_gc, 0, 0, back_buffer.width,
+                                back_buffer.height);
 
 
     // back buffer picture (TODO: find visual)
@@ -162,7 +162,8 @@ public class Sprites extends DisplayHack {
   public void paint () {
     for (int i=0; i<COUNT; i++) sprites [i].clear ();
     for (int i=0; i<COUNT; i++) sprites [i].move ();
-    window.copy_area (back_buffer, back_buffer_gc);
+    window.copy_area (back_buffer, back_buffer_gc, 0, 0, back_buffer.width,
+                      back_buffer.height, 0, 0);
   }
 
 

@@ -108,6 +108,10 @@ public abstract class Input extends Event {
     detail = d;
   }
 
+  public void set_state (int s) {
+    state = s;
+  }
+
   public void write (RequestOutputStream o) {
     super.write (o);
     o.write_int32 (time);

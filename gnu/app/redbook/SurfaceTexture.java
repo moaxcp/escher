@@ -19,8 +19,7 @@ import gnu.x11.Data;
 public class SurfaceTexture extends gnu.x11.extension.glx.Application {
   private static final int IMAGE_SIZE = 64;
 
-  private static final byte [] [] [] IMAGE = 
-    new byte [IMAGE_SIZE] [IMAGE_SIZE] [3]; 
+  private static final byte [] IMAGE = new byte [IMAGE_SIZE * IMAGE_SIZE * 3]; 
 
   private static final float [] [] [] CONTROL_POINTS = {
     {{-1.5f, -1.5f, 4.0f},
@@ -116,9 +115,9 @@ public class SurfaceTexture extends gnu.x11.extension.glx.Application {
       for (int j=0; j<IMAGE_SIZE; j++) {
         float tj = (float) (2.0 * Math.PI * j / IMAGE_SIZE);
         
-        IMAGE [i] [j] [0] = (byte) (127 * (1.0 + Math.sin (ti)));
-        IMAGE [i] [j] [1] = (byte) (127 * (1.0 + Math.cos (2 * tj)));
-        IMAGE [i] [j] [2] = (byte) (127 * (1.0 + Math.cos (ti + tj)));
+        IMAGE [i * IMAGE_SIZE * 3 + j * 3 + 0] = (byte) (127 * (1.0 + Math.sin (ti)));
+        IMAGE [i * IMAGE_SIZE * 3 + j * 3 + 1] = (byte) (127 * (1.0 + Math.cos (2 * tj)));
+        IMAGE [i * IMAGE_SIZE * 3 + j * 3 + 2] = (byte) (127 * (1.0 + Math.cos (ti + tj)));
       }
     }
   }
@@ -135,7 +134,7 @@ public class SurfaceTexture extends gnu.x11.extension.glx.Application {
       GL.NEAREST);
 
     gl.tex_image_2d (GL.TEXTURE_2D, 0, GL.RGB, IMAGE_SIZE, IMAGE_SIZE, 
-      0, GL.RGB, GL.UNSIGNED_BYTE, new gnu.x11.Data (IMAGE));
+      0, GL.RGB, GL.UNSIGNED_BYTE, IMAGE);
   }
 
 

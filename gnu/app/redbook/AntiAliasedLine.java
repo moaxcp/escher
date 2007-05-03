@@ -32,11 +32,11 @@ public class AntiAliasedLine extends gnu.x11.extension.glx.Application {
     init_window (200, 200);
 
     System.out.println ("GL_LINE_WIDTH_GRANULARITY = "
-      + gl.floatv (GL.LINE_WIDTH_GRANULARITY).next_float ());
+      + gl.floatv (GL.LINE_WIDTH_GRANULARITY) [0]);
 
-    gnu.x11.Enum fv = gl.floatv (GL.LINE_WIDTH_RANGE);
+    float[] fv = gl.floatv (GL.LINE_WIDTH_RANGE);
     System.out.println ("GL_LINE_WIDTH_RANGE = "
-      + fv.next_float () + " to " + fv.next_float ());
+      + fv [0] + " to " + fv [1]);
 
     gl.enable (GL.LINE_SMOOTH);
     gl.enable (GL.BLEND);

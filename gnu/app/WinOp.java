@@ -1,6 +1,5 @@
 package gnu.app;
 
-import gnu.x11.Enum;
 import gnu.x11.Window;
 
 
@@ -34,7 +33,7 @@ public class WinOp extends gnu.x11.Application {
 
     int window_id = option.intt ("window-id",
       "window id (0 = default root)", 0);
-    int operation = option.enum ("operation",
+    int operation = option.enumerate ("operation",
       "action on window", OPERATION_STRINGS, LIST_TOP_LEVEL);
     
     about ("0.1", "perform action on window given its ID",
@@ -70,10 +69,7 @@ public class WinOp extends gnu.x11.Application {
 
   public void list_top_level () {
     // query all top-level windows
-    for (Enum e=display.default_root.tree ().children (); 
-         e.more ();) {
-
-      Window child = (Window) e.next ();
+    for (Window child : display.default_root.tree ().children ()) {
 
       // selection criteria
       if (child.attributes ().override_redirect ()
@@ -87,8 +83,11 @@ public class WinOp extends gnu.x11.Application {
 
   
   public void list_children () {
-    System.out.println ("---- children of " + window
-      + window.tree ().children ().to_string (Enum.NEXT4));
+    System.out.println ("---- children of " + window);
+    Window [] children = window.tree ().children ();
+    for (Window child : children) {
+      System.out.println(child.toString ());
+    }
   }
 
 
