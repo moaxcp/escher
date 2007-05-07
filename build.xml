@@ -2,6 +2,7 @@
 
   <property name="src" location="src" />
   <property name="build" location="build" />
+  <property name="debug" value="true" />
 
   <target name="init">
   	<tstamp />
@@ -9,7 +10,7 @@
   </target>
 
   <target name="compile" depends="init">
-  	<javac srcdir="${src}" destdir="${build}" />
+  	<javac srcdir="${src}" destdir="${build}" debug="${debug}" />
   </target>
 
   <target name="clean">

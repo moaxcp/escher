@@ -7,6 +7,7 @@
         <fail unless="files">Must set property 'files'</fail>
         <!-- TODO decide on and define some value for ${build.classes.dir} -->
         <mkdir dir="${build.classes.dir}"/>
-        <javac destdir="${build.classes.dir}" includes="${files}" source="1.5" srcdir="src"/>
+        <javac destdir="${build.classes.dir}" includes="${files}" source="1.5"
+               srcdir="src" debug="true"/>
     </target>
 </project>
