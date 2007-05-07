@@ -72,12 +72,15 @@ public class WinOp extends gnu.x11.Application {
     for (Window child : display.default_root.tree ().children ()) {
 
       // selection criteria
-      if (child.attributes ().override_redirect ()
-        || child.attributes ().map_state ()
-        != Window.AttributesReply.VIEWABLE
-	|| child.wm_name () == null) continue;
+      Window.AttributesReply atts = child.attributes ();
+      String name = child.wm_name ();
+      if (! atts.override_redirect ()
+          && atts.map_state () == Window.AttributesReply.VIEWABLE
+	  && name != null) {
 
-      System.out.println (child.id + " " + child.wm_name ());
+        System.out.println (child.id + " " + name);
+
+      }
     }
   }
 
