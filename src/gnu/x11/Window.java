@@ -394,7 +394,6 @@ public class Window extends Drawable implements GLXDrawable {
       in.skip (2); // Unused.
     }
   
-  
     public static final int UNMAPPED = 0;
     public static final int UNVIEWABLE = 1;
     public static final int VIEWABLE = 2;
@@ -515,6 +514,7 @@ public class Window extends Drawable implements GLXDrawable {
       o.begin_request (8, 0, 2);
       o.write_int32 (id);
       o.send ();
+      o.flush ();
     }
   }
 
@@ -778,20 +778,16 @@ public class Window extends Drawable implements GLXDrawable {
   /** Reply of {@link #property(boolean, Atom, Atom, int, int)}. */
   public class Property {
 
-    public int format;
-    public Atom type;
-    public int bytes_after;
-    public int length;
-    public byte [] value;
+    private int format;
+    private int type_id;
+    private int bytes_after;
+    private int length;
+    private byte [] value;
 
     Property (ResponseInputStream i) {
       format = i.read_int8 ();
       i.skip (6);
-      int atom_id = i.read_int32 ();
-      if (atom_id != 0)
-        type = (Atom) Atom.intern (display, atom_id);
-      else
-        type = null;
+      type_id = i.read_int32 ();
       bytes_after = i.read_int32 ();
       length = i.read_int32 ();
       i.skip (12);
@@ -814,6 +810,23 @@ public class Window extends Drawable implements GLXDrawable {
       int p = RequestOutputStream.pad (num_bytes);
       if (p > 0)
         i.skip (p);
+    }
+
+    public int format () {
+      return format;
+    }
+
+    public int type_id () {
+      return type_id;
+    }
+
+    /**
+     * Returns the property value as string.
+     *
+     * @return the property value as string
+     */
+    public String string_value () {
+      return new String (value);
     }
   }
   
@@ -2133,16 +2146,13 @@ public class Window extends Drawable implements GLXDrawable {
    * @see #property(boolean, Atom, Atom, int, int)
    */
   public String wm_name () {
-    // FIXME: Re-think WM -stuff. Maybe do outside of Window as this is
-    // not in the core protocol.
-    return null;
-//    PropertyReply pi = property (false, Atom.WM_NAME, 
-//      Atom.STRING, 0, MAX_WM_LENGTH); // support other types?
-//
-//    if (pi.format () != 8 || pi.type_id () != Atom.STRING.id) 
-//      return null;
-//
-//    return pi.read_string (32, pi.length ());
+    Property pi = get_property (false, Atom.WM_NAME, Atom.STRING, 0,
+                                MAX_WM_LENGTH); // support other types?
+
+    if (pi.format () != 8 || pi.type_id () != Atom.STRING.id) 
+      return null;
+
+    return pi.string_value ();
   }
 
 
@@ -2244,4 +2254,5 @@ public class Window extends Drawable implements GLXDrawable {
   public int id () {
     return id;
   }
+
 }
