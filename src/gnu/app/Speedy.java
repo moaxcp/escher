@@ -57,15 +57,15 @@ public class Speedy extends gnu.app.Application {
       return;
     }
 
-    try {
-      System.loadLibrary ("localsocket");
-      gnu.java.net.local.LocalSocketAddress addr = new gnu.java.net.local.LocalSocketAddress ("/tmp/.X11-unix/X0");
-      gnu.java.net.local.LocalSocket s = new gnu.java.net.local.LocalSocket (addr);
-      display = new Display (s, "localhost", 0, 0);
-    } catch (SocketException ex) {
-      ex.printStackTrace ();
-    }
-//    display = new Display ();
+//    try {
+//      System.loadLibrary ("localsocket");
+//      gnu.java.net.local.LocalSocketAddress addr = new gnu.java.net.local.LocalSocketAddress ("/tmp/.X11-unix/X0");
+//      gnu.java.net.local.LocalSocket s = new gnu.java.net.local.LocalSocket (addr);
+//      display = new Display (s, "localhost", 0, 0);
+//    } catch (SocketException ex) {
+//      ex.printStackTrace ();
+//    }
+    display = new Display ();
     Window.Attributes atts = new Window.Attributes ();
     window = new Window (display.default_root, 0, 0, 600, 400, 0, atts);
     window.map ();
