@@ -252,7 +252,7 @@ public class ResponseInputStream extends FilterInputStream {
       // If there are any events already queued up, then return the first
       // event in the queue.
       if (events.size () > 0) {
-        ev = (Event) events.getFirst ();
+        ev = (Event) events.removeFirst ();
       } else {
         ev = read_event_from_stream ();
       }
@@ -261,7 +261,7 @@ public class ResponseInputStream extends FilterInputStream {
       // some other thread is waiting for it, or there is no event and we keep
       // waiting for one...
       if (ev == null) {
-        try {Thread.sleep (40); } catch (Exception ex) {}
+        try {Thread.sleep (400); } catch (Exception ex) {}
         //Thread.yield ();
       }
 
