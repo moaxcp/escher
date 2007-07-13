@@ -1,20 +1,27 @@
 <project name="escher">
 
+  <property name="version" value="0.2.4" />
   <property name="src" location="src" />
   <property name="build" location="build" />
+  <property name="dir.dist" location="dist" />
   <property name="debug" value="true" />
 
   <target name="init">
-  	<tstamp />
-  	<mkdir dir="${build}" />
+    <tstamp />
+    <mkdir dir="${build}" />
   </target>
 
   <target name="compile" depends="init">
-  	<javac srcdir="${src}" destdir="${build}" debug="${debug}" />
+    <javac srcdir="${src}" destdir="${build}" debug="${debug}" />
   </target>
 
   <target name="clean">
-  	<delete dir="${build}" />
+    <delete dir="${build}" />
+  </target>
+
+  <target name="jar">
+    <mkdir dir="${dir.dist}" />
+    <jar destfile="${dir.dist}/escher-${version}.jar" basedir="${build}" />
   </target>
 
 </project>
