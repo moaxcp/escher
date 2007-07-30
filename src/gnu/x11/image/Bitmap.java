@@ -9,7 +9,7 @@ public class Bitmap extends Image {
 
 
   public Bitmap (Display display, int width, int height) {
-    super (width, height, FORMAT, display.pixmap_formats [0]);
+    super (width, height, Format.BITMAP, display.pixmap_formats [0]);
 
     if (display.image_byte_order != LSB_FIRST
       || display.bitmap_format_bit_order != LEAST_SIGNIFICANT)

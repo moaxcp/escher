@@ -17,7 +17,7 @@ public class XPM extends ZPixmap { // TODO
     int chars_per_pixel = Integer.parseInt (values.nextToken ());
 
     // TODO how to select best SUITABLE format?
-    format = FORMAT;
+    format = Format.ZPIXMAP;
     pixmap_format = display.default_pixmap_format;
     image_byte_order = display.image_byte_order;
     pixel_byte_count = pixmap_format.bits_per_pixel () / 8;
