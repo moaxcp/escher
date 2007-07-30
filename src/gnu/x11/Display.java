@@ -273,7 +273,7 @@ public class Display {
         init_server_info (i);
       }
     }
-    out.set_buffer_size (maximum_request_length);
+    maximum_request_length = out.set_buffer_size (maximum_request_length);
     init_keyboard_mapping ();
     init_defaults ();
     init_big_request_extension ();
@@ -1188,7 +1188,10 @@ public class Display {
   }
 
   public void flush () {
-    out.flush ();
+    synchronized (out) {
+      out.send ();
+      out.flush();
+    }
   }
 
   private void handle_exception (Throwable ex) {

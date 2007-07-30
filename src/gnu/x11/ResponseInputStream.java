@@ -261,7 +261,7 @@ public class ResponseInputStream extends FilterInputStream {
       // some other thread is waiting for it, or there is no event and we keep
       // waiting for one...
       if (ev == null) {
-        try {Thread.sleep (400); } catch (Exception ex) {}
+        try {Thread.sleep (40); } catch (Exception ex) {}
         //Thread.yield ();
       }
 
@@ -461,7 +461,6 @@ public class ResponseInputStream extends FilterInputStream {
     assert Thread.holdsLock (this);
     assert Thread.holdsLock (out);
 
-    //System.err.println("reading reply for: " + out.buffer[0] + " seq_no: " + exp_seq_no);
 
     // Flush the current request.
     // DON'T use plain send() because this could trigger a round-trip check
@@ -489,7 +488,6 @@ public class ResponseInputStream extends FilterInputStream {
           events.addLast (ev);
       }// else // Reply or Exception.
     } while (code != 1);
-
     // Check reply header, especially make sure that the sequence codes match.
     try {
       mark (4);
@@ -497,8 +495,8 @@ public class ResponseInputStream extends FilterInputStream {
       assert reply == 1 : "Reply code must be 1 but is: " + reply;
       skip (1);
       int seq_no = read_int16 ();
-      assert exp_seq_no == seq_no : "expected sequence number: " + exp_seq_no
-                           + " got sequence number: " + seq_no;
+      assert (exp_seq_no == seq_no) : "expected sequence number: " + exp_seq_no
+                                      + " got sequence number: " + seq_no;
       reset ();
     } catch (IOException ex) {
       handle_exception (ex);

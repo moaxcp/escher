@@ -20,7 +20,9 @@ public class RequestOutputStream extends FilterOutputStream {
    */
   private static final int DEFAULT_BUFFER_SIZE = 512;
 
-  private static final int FLUSH_THRESHOLD = 512 - 64;
+  private static final int MAX_BUFFER_SIZE = 8192;
+
+  private static final int FLUSH_THRESHOLD = 64;
 
   /**
    * The request buffer. It always holds the current request. This can be
@@ -109,15 +111,19 @@ public class RequestOutputStream extends FilterOutputStream {
    * Changes the buffer size.
    *
    * @param size the new buffer size
+   *
+   * @return the actually used buffer size
    */
-  public synchronized void set_buffer_size (int size) {
+  public synchronized int set_buffer_size (int size) {
     // First flush all possibly pending request data.
     if (index > 0) {
       System.err.println("WARNING: Unflushed request data.");
       flush ();
     }
-    buffer = new byte [size];
+    int actual_size = Math.min(size, MAX_BUFFER_SIZE);
+    buffer = new byte [actual_size];
     index = 0;
+    return actual_size;
   }
 
   /**
@@ -131,6 +137,7 @@ public class RequestOutputStream extends FilterOutputStream {
                              int request_length) {
 
     assert Thread.holdsLock (this);
+
     // Send pending request.
     if (request_object != null || index > request_index) {
       send ();
@@ -171,14 +178,15 @@ public class RequestOutputStream extends FilterOutputStream {
     }
     if (index > request_index) {
       // Possibly pad request.
-      int pad = pad (index);
+      int pad = pad (index - request_index);
       if (pad != 0)
         skip (pad);
       request_index = index;
       seq_number = (seq_number + 1) & 0xffff; // This counter is only 16-bit.
-
-      if (index > FLUSH_THRESHOLD || send_mode == SendMode.SYNCHRONOUS)
+      if (index > (buffer.length - FLUSH_THRESHOLD)
+          || send_mode == SendMode.SYNCHRONOUS) {
         flush ();
+      }
     }
   }
 
@@ -258,19 +266,18 @@ public class RequestOutputStream extends FilterOutputStream {
       }
       if (index > 0) {
         // Possibly pad request.
-        int pad = pad (index);
+        int pad = pad (index - request_index);
         if (pad != 0)
           skip (pad);
         try {
-          //System.err.println("sending request: " + buffer[0] + "seq_no: " + seq_number);
           out.write (buffer, 0, index);
         } catch (IOException ex) {
           handle_exception (ex);
         }
-
         index = 0;
         request_index = 0;
       }
+
       out.flush ();
 
     } catch (IOException ex) {
@@ -321,6 +328,21 @@ public class RequestOutputStream extends FilterOutputStream {
     index++;
     buffer [index] = (byte) v;
     index++;
+  }
+
+  /**
+   * Returns the INT32 value at the specified index in the buffer inside
+   * the current request.
+   *
+   * @param index the index
+   *
+   * @return the INT32 value at the specified index
+   */
+  public int get_int32 (int index) {
+    int req_index = index + request_index;
+    int int32 = (buffer[req_index] << 24) | (buffer[req_index + 1] << 16)
+                | (buffer[req_index + 2] << 8) | buffer[req_index + 3];
+    return int32;
   }
 
   public void write_float (float f) {
