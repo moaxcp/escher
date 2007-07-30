@@ -822,17 +822,17 @@ public class GC extends Fontable {
   public void set_foreground (int pixel) {
     RequestOutputStream o = display.out;
     synchronized (o) {
-//      if (o.opcode () == 56
-//          && o.request_object instanceof ChangeGCRequestObject) {
-//        // Aggregate request.
-//        ChangeGCRequestObject r = (ChangeGCRequestObject) o.request_object;
-//        r.values.set_foreground (pixel);
-//      } else {
+      if (o.opcode () == 56
+          && o.request_object instanceof ChangeGCRequestObject) {
+        // Aggregate request.
+        ChangeGCRequestObject r = (ChangeGCRequestObject) o.request_object;
+        r.values.set_foreground (pixel);
+      } else {
         o.begin_request (56, 0, 0);
         changeGCRequest.clear ();
         changeGCRequest.values.set_foreground (pixel);
         o.request_object = changeGCRequest;
-//      }
+      }
     }
   }
 

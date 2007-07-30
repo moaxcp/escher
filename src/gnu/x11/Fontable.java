@@ -24,19 +24,19 @@ public abstract class Fontable extends Resource {
   /** Reply of {@link #info()}. */
   public class FontInfo {
 
-    public CharInfo min_bounds;
-    public CharInfo max_bounds;
-    public int min_char_or_byte2;
-    public int max_char_or_byte2;
+    private CharInfo min_bounds;
+    private CharInfo max_bounds;
+    private int min_char_or_byte2;
+    private int max_char_or_byte2;
     public int default_char;
     public int draw_direction;
-    public int min_byte1;
-    public int max_byte1;
+    private int min_byte1;
+    private int max_byte1;
     public boolean all_chars_exist;
-    public int font_ascent;
-    public int font_descent;
+    private int font_ascent;
+    private int font_descent;
     public FontProperty [] properties;
-    public CharInfo [] char_infos;
+    private CharInfo [] char_infos;
 
     FontInfo (ResponseInputStream i) {
       min_bounds = new CharInfo (i);
@@ -111,11 +111,50 @@ public abstract class Fontable extends Resource {
         descent = i.read_int16 ();
         attributes = i.read_int16 ();
       }
+
+      public int character_width () {
+        return character_width;
+      }
     }
 
     public static final int LEFT_TO_RIGHT = 0;
     public static final int RIGHT_TO_LEFT = 1;
-  
+
+    public int font_ascent () {
+      return font_ascent;
+    }
+
+    public int font_descent () {
+      return font_descent;
+    }
+
+    public CharInfo max_bounds () {
+      return max_bounds;
+    }
+
+    public CharInfo min_bounds () {
+      return min_bounds;
+    }
+
+    public int max_byte1 () {
+      return max_byte1;
+    }
+
+    public int min_byte1 () {
+      return min_byte1;
+    }
+
+    public int min_char_or_byte2 () {
+      return min_char_or_byte2;
+    }
+
+    public int max_char_or_byte2 () {
+      return max_char_or_byte2;
+    }
+
+    public CharInfo[] char_infos () {
+      return char_infos;
+    }
   }
   
   
@@ -150,7 +189,7 @@ public abstract class Fontable extends Resource {
     public int font_descent;
     public int overall_ascent;
     public int overall_descent;
-    public int overall_width;
+    private int overall_width;
     public int overall_left;
     public int overall_right;
 
@@ -164,6 +203,10 @@ public abstract class Fontable extends Resource {
       overall_width = i.read_int32 ();
       overall_left = i.read_int32 ();
       overall_right = i.read_int32 ();
+    }
+
+    public int overall_width () {
+      return overall_width;
     }
   }
 

@@ -1,6 +1,7 @@
 package gnu.x11;
 
 import gnu.x11.image.Image;
+import gnu.x11.image.ZPixmap;
 
 
 /** X drawable. */
@@ -444,21 +445,22 @@ public abstract class Drawable extends Resource {
 
     RequestOutputStream o = display.out;
     synchronized (o) {
-      int offset = image.line_byte_count * y1;
-      int length = image.line_byte_count * (y2 - y1);
+      int offset = image.get_line_byte_count () * y1;
+      int length = image.get_line_byte_count () * (y2 - y1);
       int p = RequestOutputStream.pad (length);
 
-      o.begin_request (72, image.format, 6 + (length + p) / 4);
+      Image.Format format = image.get_format ();
+      o.begin_request (72, format.id (), 6 + (length + p) / 4);
       o.write_int32 (id);
       o.write_int32 (gc.id);
-      o.write_int16 (image.width);
+      o.write_int16 (image.get_width ());
       o.write_int16 (y2 - y1);
       o.write_int16 (x);
       o.write_int16 (y);
-      o.write_int8 (image.left_pad);
-      o.write_int8 (image.pixmap_format.depth);
+      o.write_int8 (image.get_left_pad ());
+      o.write_int8 (image.get_pixmap_format ().depth);
       o.skip (2);
-      o.write (image.data, offset, length);
+      o.write (image.get_data (), offset, length);
       o.send ();
     }
   }
@@ -468,11 +470,41 @@ public abstract class Drawable extends Resource {
   /**
    * @see <a href="XGetImage.html">XGetImage</a>
    */
-  public Data image (int x, int y, int width, int height, 
-    int plane_mask, int format) {
-
-    // FIXME: Implement!
-    return null;
+  public Image image (int x, int y, int width, int height, int plane_mask,
+                      Image.Format format) {
+//    System.err.println("params x: " + x + ", y: " + y + ", w: " + width + ", h: " + height + ", plane_mask: " + plane_mask + ", format: " + format);
+//    System.err.println("drawable " + this + ",  w: " + this.width + ", h: " + this.height);
+    RequestOutputStream o = display.out;
+    Image image;
+    synchronized (o) {
+      o.begin_request (73, format.id (), 5);
+      o.write_int32 (id);
+      o.write_int16 (x);
+      o.write_int16 (y);
+      o.write_int16 (width);
+      o.write_int16 (height);
+      o.write_int32 (plane_mask);
+      ResponseInputStream i = display.in;
+      synchronized (i) {
+        i.read_reply (o);
+        i.skip (1);
+        int depth = i.read_int8 ();
+        i.skip (2);
+        int len = i.read_int32 () * 4;
+        int visual_id = i.read_int32 ();
+        i.skip (20);
+        byte[] data = new byte [len];
+        i.read_data (data);
+        // TODO Handle XYPixmap.
+        if (format == Image.Format.ZPIXMAP) {
+          image = new ZPixmap (display, width, height,
+                               display.default_pixmap_format, data);
+        } else {
+          throw new UnsupportedOperationException("Support for XYPixmap not yet implemented");
+        }
+      }
+    }
+    return image;
   }
 
 
@@ -763,15 +795,18 @@ public abstract class Drawable extends Resource {
   }
 
   public void put_image (GC gc, Image image, int x, int y) {
+    
     // TODO: Make use of big requests when possible.
     int max_data_byte = display.maximum_request_length - 24;
-    int request_height = max_data_byte / image.line_byte_count;
-    int rem = image.height % request_height;
-    int request_count = image.height / request_height + (rem == 0 ? 0 : 1);
+    int lbc = image.get_line_byte_count ();
+    int request_height = lbc > 0 ? max_data_byte / image.get_line_byte_count ()
+                                 : 1;
+    int rem = image.get_height () % request_height;
+    int request_count = image.get_height ()/ request_height + (rem == 0 ? 0 : 1);
 
     for (int i = 0; i < request_count; i++) {
       put_small_image (gc, image, i * request_height,
-                       Math.min (image.height, (i + 1) * request_height), x,
+                       Math.min (image.get_height (), (i + 1) * request_height), x,
                        y + i * request_height);
     }
   }
@@ -817,18 +852,29 @@ public abstract class Drawable extends Resource {
    */      
   public void fill_rectangle (GC gc, int x, int y, int width, int height) {
 
-    // FIXME: Handle aggregation.
 
     RequestOutputStream o = display.out;
     synchronized (o) {
-      o.begin_request (70, 0, 5);
-      o.write_int32 (id);
-      o.write_int32 (gc.id);
-      o.write_int16 (x);
-      o.write_int16 (y);
-      o.write_int16 (width);
-      o.write_int16 (height);
-      o.send ();
+    if (o.current_opcode() == 70 && o.get_int32(4) == id
+        && o.get_int32(8) == gc.id)
+      {
+        o.increase_length(2);
+        o.write_int16 (x);
+        o.write_int16 (y);
+        o.write_int16 (width);
+        o.write_int16 (height);
+      }
+    else
+      {
+        o.begin_request (70, 0, 5);
+        o.write_int32 (id);
+        o.write_int32 (gc.id);
+        o.write_int16 (x);
+        o.write_int16 (y);
+        o.write_int16 (width);
+        o.write_int16 (height);
+        o.send ();
+      }
     }
   }
 
