@@ -722,11 +722,38 @@ public class Window extends Drawable implements GLXDrawable {
    * @see <a href="XChangeProperty.html">XChangeProperty</a>
    */ 
   public void change_property (int mode, Atom property, Atom type,
-                               int format, byte [] data, int offset,
+                               int format, Object data, int offset,
                                int data_format) {
 
+    byte [] byteData;
+    switch (format) {
+      case 8:
+        byteData = (byte []) data;
+        break;
+      case 16:
+        short [] shortData = (short []) data;
+        byteData = new byte [shortData.length * 2];
+        for (int i = 0; i < shortData.length; i++) {
+          byteData [i * 2] = (byte) (shortData [i] >> 8);
+          byteData [i * 2 + 1] = (byte) (shortData [i]);
+        }
+        break;
+      case 32:
+        int [] intData = (int []) data;
+        byteData = new byte [intData.length * 4];
+        for (int i = 0; i < intData.length; i++) {
+          byteData [i * 4] = (byte) (intData [i] >> 24);
+          byteData [i * 4 + 1] = (byte) (intData [i] >> 16);
+          byteData [i * 4 + 2] = (byte) (intData [i] >> 8);
+          byteData [i * 4 + 3] = (byte) (intData [i]);
+        }
+        break;
+      default:
+        throw new IllegalArgumentException("Illegal format argument: "
+                                           + format);
+    }
     int len = 0;
-    int n = data.length;
+    int n = byteData.length;
     switch (format) {
     case 8:
       len = n;
@@ -752,7 +779,7 @@ public class Window extends Drawable implements GLXDrawable {
       o.write_int8 (format);
       o.skip (3);
       o.write_int32 (len); // data length in format unit
-      o.write (data);
+      o.write (byteData);
       o.skip (p);
       o.send ();
     }
@@ -818,6 +845,35 @@ public class Window extends Drawable implements GLXDrawable {
 
     public int type_id () {
       return type_id;
+    }
+
+    /**
+     * Returns the value at index <code>i</code>. This interprets the
+     * underlying byte data according to the format of this property.
+     *
+     * @param i the index
+     *
+     * @return the value at the specified index
+     */
+    public int value (int i) {
+      int v;
+      switch (format) {
+      case 8:
+        v = value [i];
+        break;
+      case 16:
+        v = ((0xff & value [i * 2]) << 8) | (0xff & value [i * 2 + 1]);
+        break;
+      case 32:
+        v =   ((0xff & value [i * 4]) << 24)
+            | ((0xff & value [i * 4 + 1]) << 16)
+            | ((0xff & value [i * 4 + 2] << 8))
+            |  (0xff & ((int) value [i * 4 + 3]));
+        break;
+      default:
+        throw new ArrayIndexOutOfBoundsException();
+      }
+      return v;
     }
 
     /**
@@ -2090,10 +2146,10 @@ public class Window extends Drawable implements GLXDrawable {
     // FIXME: Re-think WM -stuff. Maybe do outside of Window as this is
     // not in the core protocol.
 
-//    Atom wm_state = (Atom) Atom.intern (display, "WM_STATE");
-//    int [] data = {state, icon.id};
-//
-//    change_property (REPLACE, 2, wm_state, wm_state, 32, data, 0, 32);
+    Atom wm_state = (Atom) Atom.intern (display, "WM_STATE");
+    int [] data = {state, icon.id};
+
+    change_property (REPLACE, wm_state, wm_state, 32, data, 0, 32);
   }
 
 

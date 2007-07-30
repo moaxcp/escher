@@ -238,7 +238,7 @@ public class Atom {
   /**
    * @see <a href="XInternAtom.html">XInternAtom</a>
    */ 
-  public Atom (Display display, String name, boolean only_if_exists) {
+  private Atom (Display display, String name, boolean only_if_exists) {
 
     this.display = display;
     this.name = name;
@@ -310,7 +310,7 @@ public class Atom {
   /**
    * @see #Atom(Display, String, boolean)
    */
-  public static Object intern (Display display, String name) {
+  public static Atom intern (Display display, String name) {
     return intern (display, name, false);
   }
 
@@ -330,12 +330,16 @@ public class Atom {
   /**
    * @see #Atom(Display, String, boolean)
    */
-  public static Object intern (Display display, String name, 
-    boolean only_if_exists) { 
+  public static Atom intern (Display display, String name,
+                             boolean only_if_exists) { 
 
     Object value = display.atom_names.get (name);
-    if (value != null && value instanceof Atom) return value;
-    return new Atom (display, name, only_if_exists);
+    if (value != null && value instanceof Atom) return (Atom) value;
+    Atom atom = new Atom (display, name, only_if_exists);
+    if (atom.id == 0) {
+      atom = null;
+    }
+    return atom;
   }
 
 
