@@ -533,7 +533,12 @@ public abstract class Drawable extends Resource {
         o.write_int8 (texts [i].delta);
         o.write_string8 (texts [i].s);
       }
-      o.skip (p);
+      // Can't simply skip the padding bytes, otherwise the X server
+      // would think that there are more items if the next byte in the
+      // buffer is != 0, this would produce random errors.
+      for (int i = 0; i < p; i++) {
+        o.write_int8 (0);
+      }
       o.send ();
     }
   }
