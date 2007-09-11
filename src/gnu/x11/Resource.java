@@ -35,4 +35,13 @@ public abstract class Resource {
   public void unintern () {
     display.resources.remove (new Integer (id));
   }
+
+  /**
+   * Returns the resource ID of this resource.
+   *
+   * @return the resource ID of this resource
+   */
+  public int id () {
+    return id;
+  }
 }

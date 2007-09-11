@@ -1108,13 +1108,15 @@ public class Display {
     XAuthority[] auths = XAuthority.get_authorities();
 
     // Fetch hostname.
-    if (hostname == null || hostname.equals ("")
-        || hostname.equals ("localhost")) {
+    if (hostname == null || hostname.equals("")
+        ||hostname.equals ("localhost")) {
       // Translate localhost hostnames to the real hostname of this host.
       try {
         InetAddress local = InetAddress.getLocalHost ();
         hostname = local.getHostName ();
-      } catch (UnknownHostException ex) {}
+      } catch (UnknownHostException ex) {
+        ex.printStackTrace();
+      }
     }
 
     // Fetch display no.

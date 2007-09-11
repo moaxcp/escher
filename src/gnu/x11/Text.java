@@ -30,9 +30,11 @@ public class Text {
     int n = font == null ? 2 : 5;
 
     if (bit == 8 || s.charAt (0) > 128) // non-ascii	  
-      return n + s.length ();
+      n = n + s.length ();
     else
-      return n + 2 * s.length ();
+      n = n + 2 * s.length ();
+
+    return n;
   }
 
 

@@ -2,9 +2,9 @@ package gnu.app.displayhack;
 
 import gnu.x11.GC;
 import gnu.x11.Pixmap;
-import gnu.x11.extension.render.Picture.Format.Direct;
+import gnu.x11.extension.render.DrawablePicture;
+import gnu.x11.extension.render.PictFormat;
 import gnu.x11.extension.render.Picture;
-import gnu.x11.extension.render.Picture.Format;
 import gnu.x11.extension.render.Render;
 
 
@@ -39,7 +39,7 @@ public class Sprites extends DisplayHack {
   
     
     public Sprite (float dx, float dy, int color, int width, int height,
-      Picture.Format pf) {
+      PictFormat pf) {
       
       x = window.width/2;
       y = window.height/2;
@@ -52,7 +52,7 @@ public class Sprites extends DisplayHack {
       pixmap = new Pixmap (display.default_root, width, height, 
         pf.depth ());
       picture = render.create_picture (pixmap, pf,
-        Picture.Attributes.EMPTY); 
+        DrawablePicture.Attributes.EMPTY); 
 
       if (sprite_gc == null)
         sprite_gc = new GC (pixmap);      
@@ -112,9 +112,9 @@ public class Sprites extends DisplayHack {
     if (help_option) return;
 
     render = new Render (display);   
-    Picture.Format pf0 = new Picture.Format (), pf1;
-    Picture.Format.Direct df = pf0.direct_format ();
-
+    PictFormat.Template pf0 = new PictFormat.Template ();
+    PictFormat pf1;
+ 
     int depth = display.default_screen.root_depth ();
     back_buffer_gc = new GC (window);
     back_buffer_gc.set_foreground (display.default_white);
@@ -129,13 +129,13 @@ public class Sprites extends DisplayHack {
     pf1 = render.picture_format (pf0, true);
 
     back_buffer_picture = render.create_picture (back_buffer, pf1,
-      Picture.Attributes.EMPTY);
+      DrawablePicture.Attributes.EMPTY);
 
 
     // sprite picture format
     pf0.clear ();
     pf0.set_depth (32);
-    pf0.set_type (Picture.Format.Direct.TYPE);
+    pf0.set_type (PictFormat.Type.DIRECT);
     pf1 = render.picture_format (pf0, true);
     
     sprites [0] = new Sprite (1.0f, 1.0f, 0x7f7f0000, 150, 150, pf1);

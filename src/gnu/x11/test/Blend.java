@@ -2,6 +2,8 @@ package gnu.x11.test;
 
 import gnu.x11.GC;
 import gnu.x11.Pixmap;
+import gnu.x11.extension.render.DrawablePicture;
+import gnu.x11.extension.render.PictFormat;
 import gnu.x11.extension.render.Render;
 import gnu.x11.extension.render.Picture;
 
@@ -36,8 +38,7 @@ public class Blend extends Graphics {
     if (help_option) return;
 
     render = new Render (display);
-    Picture.Format pf0 = new Picture.Format (), pf1;
-    Picture.Format.Direct df = pf0.direct_format ();
+    PictFormat pf1;
 
     alpha_pixmap = new Pixmap (window, window.width, window.height, 8);
     color_pixmap = new Pixmap (window, 1, 1, 24);
@@ -46,41 +47,33 @@ public class Blend extends Graphics {
 
 
     // window picture (TODO: find visual)
-    pf0.clear ();
+    PictFormat.Template pf0 = new PictFormat.Template ();
     pf0.set_depth (display.default_screen.root_depth ());
     pf1 = render.picture_format (pf0, true);
 
     window_picture = render.create_picture (window, pf1, 
-      Picture.Attributes.EMPTY);
+      DrawablePicture.Attributes.EMPTY);
 
 
     // alpha picture
     pf0.clear ();
     pf0.set_depth (8);
-    pf0.set_type (Picture.Format.Direct.TYPE);
-    df.set_alpha (0);
-    df.set_alpha_mask (0xff);
+    pf0.set_type (PictFormat.Type.DIRECT);
+    pf0.set_direct(0, 0, 0, 0, 0, 0, 0, 0xff);
     pf1 = render.picture_format (pf0, true);
 
     alpha_picture = render.create_picture (alpha_pixmap, pf1,
-      Picture.Attributes.EMPTY);
+      DrawablePicture.Attributes.EMPTY);
 
 
     // color picture
     pf0.clear ();
     pf0.set_depth (24);
-    pf0.set_type (Picture.Format.Direct.TYPE);
-    df.set_alpha (0);
-    df.set_alpha_mask (0);
-    df.set_red (16);
-    df.set_red_mask (0xff);
-    df.set_green (8);
-    df.set_green_mask (0xff);
-    df.set_blue (0);
-    df.set_blue_mask (0xff);
+    pf0.set_type (PictFormat.Type.DIRECT);
+    pf0.set_direct (16, 0xff, 8, 0xff, 0, 0xff, 0, 0);
     pf1 = render.picture_format (pf0, true);
 
-    Picture.Attributes attr = new Picture.Attributes ();
+    DrawablePicture.Attributes attr = new DrawablePicture.Attributes ();
     attr.set_repeat (true);
     color_picture = render.create_picture (color_pixmap, pf1, attr);
   }

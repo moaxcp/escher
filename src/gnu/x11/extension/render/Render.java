@@ -58,7 +58,7 @@ public class Render extends gnu.x11.extension.Extension
   public int server_major_version, server_minor_version;
 
 
-  private Picture.Format [] picture_formats_cache;
+  private PictFormat [] picture_formats_cache;
 
 
   // render opcode 0 - query version
@@ -87,7 +87,7 @@ public class Render extends gnu.x11.extension.Extension
 
 
   // render opcode 1 - query picture formats
-  public Picture.Format [] picture_formats () {
+  public PictFormat [] picture_formats () {
     if (picture_formats_cache == null) {
       RequestOutputStream o = display.out;
       synchronized (o) {
@@ -98,9 +98,9 @@ public class Render extends gnu.x11.extension.Extension
           i.skip (8);
           int count = i.read_int32 ();
           i.skip (20);
-          Picture.Format [] pfs = new Picture.Format [count];
+          PictFormat [] pfs = new PictFormat [count];
           for (int idx = 0; idx < count; idx++) {
-            pfs [idx] = new Picture.Format (i);
+            pfs [idx] = new PictFormat (i);
           }
           // TODO: Read LISTofPICTSCREEN and LISTofSUBPIXEL.
           try { i.skip (i.available ()); } catch (IOException ex) { }
@@ -195,6 +195,34 @@ public class Render extends gnu.x11.extension.Extension
     }
   }
 
+  public void composite_glyphs (int op, Picture src, Picture dst,
+                                PictFormat mask_format, GlyphSet glyphset,
+                                int src_x, int src_y, int dst_x, int dst_y,
+                                Glyph[] glyphs) {
+    // TODO: Replace int op with some enum type.
+    // TODO: Implement 8 and 16 bit versions.
+    RequestOutputStream o = display.out;
+    synchronized (o) {
+      int len = 9 + glyphs.length;
+      o.begin_request (major_opcode, 25, len);
+      o.write_int8 (op);
+      o.skip (3);
+      o.write_int32 (src.id ());
+      o.write_int32 (dst.id ());
+      o.write_int32 (mask_format.id ());
+      o.write_int32 (glyphset.id ());
+      o.write_int16 (src_x);
+      o.write_int16 (src_y);
+      o.write_int8 (glyphs.length);
+      o.skip(3);
+      o.write_int16 (dst_x);
+      o.write_int16 (dst_y);
+      for (int i = 0; i < glyphs.length; i++) {
+        o.write_int32 (glyphs [i].get_id ());
+      }
+    }
+  }
+
   public static final int BAD_PICTURE_FORMAt = 0;
   public static final int BAD_PICTURE = 1;
   public static final int BAD_PICTURE_OPERATIOR = 2;
@@ -221,26 +249,57 @@ public class Render extends gnu.x11.extension.Extension
 
 
   /**
-   * @see Picture#Picture(Render, Drawable, Picture.Format, Picture.Attributes)
+   * @see DrawablePicture#Picture(Render, Drawable, DrawablePicture.Format, DrawablePicture.Attributes)
    */  
-  public Picture create_picture (Drawable drawable, Picture.Format format,
-    Picture.Attributes attr) {
+  public DrawablePicture create_picture (Drawable drawable, PictFormat format,
+                                         DrawablePicture.Attributes attr) {
     
-    return new Picture (this, drawable, format, attr);
+    return new DrawablePicture (this, drawable, format, attr);
   }
 
-  
+  /**
+   * Creates a Picture instance for a solid fill operation with the specified
+   * color. Only the least significant 16 bit of the values are used.
+   *
+   * @param red the red component
+   * @param green the green component
+   * @param blue the blue component
+   * @param alpha the alpha component
+   *
+   * @return a solid fill 
+   */
+  public Picture create_solid_fill (int red, int green, int blue, int alpha) {
+    // Opcode 33.
+    RequestOutputStream o = display.out;
+    Picture pic = new Picture (display);
+    synchronized (o) {
+      o.begin_request (major_opcode, 33, 4);
+      o.write_int32 (pic.id ());
+      o.write_int16 (red);
+      o.write_int16 (green);
+      o.write_int16 (blue);
+      o.write_int16 (alpha);
+      o.send ();
+    }
+    return pic;
+  }
+
   /**
    * @see <a href="XRenderFindFormat.html">XRenderFindFormat</a>
    */
-  public Picture.Format picture_format (Picture.Format template, 
-    boolean must) {
+  public PictFormat picture_format (PictFormat.Template template, 
+                                    boolean must) {
 
-    Picture.Format [] pfs = picture_formats ();
-    for (int i=0; i<pfs.length; i++)
-      if (pfs [i].match (template)) return pfs [i];
-      
-    if (!must) return null;
+    PictFormat [] pfs = picture_formats ();
+    for (int i=0; i<pfs.length; i++) {
+      if (pfs [i].match (template)) {
+        return pfs [i];
+      }
+    }
+
+    if (! must) {
+      return null;
+    }
     throw new Error ("No matching: " + template);
   }
 
