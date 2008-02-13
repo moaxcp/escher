@@ -1,4 +1,19 @@
 -*- outline -*-
+* 0.3
+** Performance optimization
+   - The protocol implementation has been rewritten to avoid excessive
+     allocation of Request objects and instead writes directly to
+     the underlying stream.
+** API changes
+   - Improved image handling.
+   - Improved font support.
+   - Improved Window property support.
+   - Cleanup all over the place. Some obsolete things have been
+     removed.
+   - We now use Java5 language features such as enum.
+** gnu.x11.extensions.render
+   - Added support for glyphs.
+
 * 0.2.3
 ** gnu.x11.Fontable
    - Implemented font metrics queries info () and text_extent ().
