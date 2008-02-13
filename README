@@ -11,7 +11,7 @@ protocol.
 * How To Run
 
   Install a Java VM, for instance from http://java.sun.com .
-  Inside the directory "escher-0.2.3",
+  Inside the directory "escher-0.3",
 
   $ java gnu.x11.test.Hello --help
   $ java gnu.x11.test.Hello
@@ -35,4 +35,6 @@ protocol.
 
 
 Stephen Tse <stse@cis.upenn.edu>
+Roman Kennke <roman@kennke.org>
+
 June 8, 2004
