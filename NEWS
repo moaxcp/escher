@@ -1,4 +1,49 @@
 -*- outline -*-
+* 0.3
+** Performance optimization
+   - The protocol implementation has been rewritten to avoid excessive
+     allocation of Request objects and instead writes directly to
+     the underlying stream.
+** API changes
+   - Improved image handling.
+   - Improved font support.
+   - Improved Window property support.
+   - Cleanup all over the place. Some obsolete things have been
+     removed.
+   - We now use Java5 language features such as enum.
+** gnu.x11.extensions.render
+   - Added support for glyphs.
+
+* 0.2.3
+** gnu.x11.Fontable
+   - Implemented font metrics queries info () and text_extent ().
+** gnu.x11.Display
+   - Added option of using a custom Socket implementation,
+     like Unix sockets for faster communication on Unix systems.
+** gnu.x11.Display
+** gnu.x11.XAuthority
+   - Implemented Xauthority for connection setup.
+** gnu.x11.Input
+   - Fixed keycode to keysym translation to correctly detect
+     shifted or otherwise modified keysyms. Fixed offset error.
+** gnu.x11.Data
+   - Added methods for writing STRING16 values.
+** gnu.x11.event.ResizeRequest
+   - Added method for querying the window ID.
+** gnu.x11.image.ZPixmap
+   - Added method for setting image data.
+** gnu.x11.Data.java
+   - Added pad() function.
+** gnu.app.puppet.Puppet
+   - Fully qualified Enum class, for compatibility with JDK5.
+** gnu.app.redbook.UnProject
+** gnu.x11.tk.Tk
+   - Fixed package declaration to fix build.
+** etc/escher-style-eclipse.xml
+   - Added Eclipse code formatted for the Escher style.
+
+* 0.2.2
+   - dual licenses: GPL and BSD
 
 * 0.2.1    (Feb 11, 2001)
 *** X Print Service Extension
