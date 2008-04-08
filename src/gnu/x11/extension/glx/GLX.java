@@ -240,9 +240,12 @@ public class GLX extends gnu.x11.extension.Extension
         i.skip (4);
         int n = i.read_int32 ();
         int visual_count = i.read_int32 ();
-        int property_count = (i.read_int32 () - 18) / 2;
+        int property_count = i.read_int32 ();
         i.skip (16);
         assert n == visual_count * property_count;
+        if (property_count > 18) {
+          property_count = (property_count - 18) / 2;
+        }
         vcs = new VisualConfig [visual_count];
         for (int index = 0; index < visual_count; index++) {
           vcs [index] = new VisualConfig (i, property_count);

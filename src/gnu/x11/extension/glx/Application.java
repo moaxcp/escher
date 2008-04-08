@@ -136,8 +136,8 @@ public abstract class Application extends gnu.x11.Application {
        more |= Event.BUTTON_PRESS_MASK;
      attr.set_event_mask (event_mask | more);
 
-    window = new Window (display.default_root, 10, 10, width, height);
-    window.create (5, depth, Window.INPUT_OUTPUT, vid, attr);
+    window = new Window (display.default_root, 100, 100, width, height);
+    window.create (5, depth, Window.INPUT_OUTPUT, vid, Window.Attributes.EMPTY/*attr*/);
 
     window.set_wm (this, "main");
     window.set_wm_delete_window ();
