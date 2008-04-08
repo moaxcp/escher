@@ -291,7 +291,10 @@ public class RequestOutputStream extends FilterOutputStream {
   }
 
   public void write_bool (boolean b) {
-    write_int8 (b ? 1 : 0);
+    assert Thread.holdsLock (this);
+    int v = (b ? 1 : 0);
+    buffer [index] = (byte) (v);
+    index++;
   }
 
   /**
