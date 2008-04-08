@@ -468,7 +468,7 @@ public class ResponseInputStream extends FilterInputStream {
     out.send_impl();
     out.flush();
 
-    int exp_seq_no = out.seq_number;
+    int exp_seq_no = out.getSequenceNumber ();
 
     // Fetch all events and errors that may come before the reply.
     int code = -1;

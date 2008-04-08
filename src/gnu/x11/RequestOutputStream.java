@@ -47,7 +47,10 @@ public class RequestOutputStream extends FilterOutputStream {
    */
   public RequestObject request_object;
 
-  public int seq_number;
+  /**
+   * The sequence number of the current request.
+   */
+  private int seq_number;
 
   /**
    * The send mode for this connection. Either {@link SendMode#ASYNCHRONOUS},
@@ -138,6 +141,8 @@ public class RequestOutputStream extends FilterOutputStream {
 
     assert Thread.holdsLock (this);
 
+    this.seq_number = (this.seq_number + 1) & 0xffff;
+    
     // Send pending request.
     if (request_object != null || index > request_index) {
       send ();
@@ -182,9 +187,9 @@ public class RequestOutputStream extends FilterOutputStream {
       if (pad != 0)
         skip (pad);
       request_index = index;
-      seq_number = (seq_number + 1) & 0xffff; // This counter is only 16-bit.
       if (index > (buffer.length - FLUSH_THRESHOLD)
-          || send_mode == SendMode.SYNCHRONOUS) {
+          || send_mode == SendMode.SYNCHRONOUS
+          || send_mode == SendMode.ROUND_TRIP) {
         flush ();
       }
     }
@@ -498,4 +503,7 @@ public class RequestOutputStream extends FilterOutputStream {
 
   }
 
+  public int getSequenceNumber () {
+    return this.seq_number;
+  }
 }
