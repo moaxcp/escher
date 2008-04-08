@@ -277,7 +277,6 @@ public class Display {
     init_keyboard_mapping ();
     init_defaults ();
     init_big_request_extension ();
-    //System.err.println("Connection to X server established");
   }
 
   // opcode 23 - get selection owner
@@ -1171,12 +1170,17 @@ public class Display {
    */
   private void init_streams () {
     
+    String _debug = System.getProperty ("escher.debug_streams", null);
+    
     try {
       // TODO: Evaluate if we gain performance by using BufferedOutputStream
       // here.
       OutputStream o = socket.getOutputStream ();
       //BufferedOutputStream buf_out = new BufferedOutputStream (o, 512);
-      out = new RequestOutputStream (o, this);
+      if (_debug != null)
+        out = new DebugRequestOutputStream (o, this);
+      else
+        out = new RequestOutputStream (o, this);
 
       // Create buffered response input stream.
       InputStream sock_in = socket.getInputStream();
