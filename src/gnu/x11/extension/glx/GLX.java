@@ -379,7 +379,8 @@ public class GLX extends gnu.x11.extension.Extension
    * @see GL#GL(GLX, int, int, GL)
    */
   public GL create_context (int visual_id, int screen_no, GL share_list) {    
-    return new GL (this, visual_id, screen_no, share_list, true);
+    /* Sending direct==true here leads to a bad crasher. */
+    return new GL (this, visual_id, screen_no, share_list, false);
   }
 
 
