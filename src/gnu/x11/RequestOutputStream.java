@@ -141,13 +141,13 @@ public class RequestOutputStream extends FilterOutputStream {
 
     assert Thread.holdsLock (this);
 
-    this.seq_number = (this.seq_number + 1) & 0xffff;
-    
     // Send pending request.
     if (request_object != null || index > request_index) {
       send ();
     }
 
+    this.seq_number = (this.seq_number + 1) & 0xffff;
+    
     if (buffer.length - index < request_length * 4) {
       flush();
     }
