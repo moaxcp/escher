@@ -123,10 +123,8 @@ public abstract class Application extends gnu.x11.Application {
     Window.Attributes attr = new Window.Attributes ();
     attr.set_colormap (colormap);
 
-    // TODO use depth of x visual config instead of
-    // `visual_config.buffer_size'?
-    int depth = visual_config.buffer_size ();
-
+    int depth = visual_config.depth_size ();
+    
     int more = Event.EXPOSURE_MASK | Event.KEY_PRESS_MASK; // compulsory
 
     /* Bugs? Whenever button motion events are selected, it is required to
