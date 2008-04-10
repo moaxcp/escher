@@ -1233,8 +1233,8 @@ public class GL extends gnu.x11.Resource implements GLConstant {
   public void call_list (int list) {
     RequestOutputStream o = display.out;
     synchronized (o) {
-      begin_render_request (o, 1, 8);
-      o.write_int32 (list);
+      GLRenderRequest rr = begin_render_request (o, 1, 8);
+      rr.writeInt32 (list);
     }
   }
     
@@ -1334,8 +1334,8 @@ public class GL extends gnu.x11.Resource implements GLConstant {
   public void list_base (int base) {
     RequestOutputStream o = display.out;
     synchronized (o) {
-      begin_render_request (o, 3, 8);
-      o.write_int32 (base);
+      GLRenderRequest rr = begin_render_request (o, 3, 8);
+      rr.writeInt32 (base);
     }
   }
 
@@ -1392,11 +1392,11 @@ public class GL extends gnu.x11.Resource implements GLConstant {
   public void color3b (int red, int green, int blue) {
     RequestOutputStream o = display.out;
     synchronized (o) {
-      begin_render_request (o, 6, 8);
-      o.write_int8 (red);    
-      o.write_int8 (green);    
-      o.write_int8 (blue);
-      o.write_pad (1);
+      GLRenderRequest rr = begin_render_request (o, 6, 8);
+      rr.writeInt8 (red);    
+      rr.writeInt8 (green);    
+      rr.writeInt8 (blue);
+      rr.writePad (1);
     }
   }
 
@@ -1408,10 +1408,10 @@ public class GL extends gnu.x11.Resource implements GLConstant {
   public void color3d (double red, double green, double blue) {
     RequestOutputStream o = display.out;
     synchronized (o) {
-      begin_render_request (o, 7, 28);
-      o.write_double (red);
-      o.write_double (green);
-      o.write_double (blue);
+      GLRenderRequest rr = begin_render_request (o, 7, 28);
+      rr.writeDouble (red);
+      rr.writeDouble (green);
+      rr.writeDouble (blue);
     }
   }
 
@@ -1450,11 +1450,11 @@ public class GL extends gnu.x11.Resource implements GLConstant {
   public void color3ub (byte red, byte green, byte blue) {
     RequestOutputStream o = display.out;
     synchronized (o) {
-      begin_render_request (o, 11, 8);
-      o.write_int8 (red);    
-      o.write_int8 (green);    
-      o.write_int8 (blue);
-      o.write_pad (1);
+      GLRenderRequest rr = begin_render_request (o, 11, 8);
+      rr.writeInt8 (red);    
+      rr.writeInt8 (green);    
+      rr.writeInt8 (blue);
+      rr.writePad (1);
     }
   }
 
@@ -1485,11 +1485,11 @@ public class GL extends gnu.x11.Resource implements GLConstant {
 
     RequestOutputStream o = display.out;
     synchronized (o) {
-      begin_render_request (o, 14, 8);
-      o.write_int8 (red);
-      o.write_int8 (green);
-      o.write_int8 (blue);
-      o.write_int8 (alpha);
+      GLRenderRequest rr = begin_render_request (o, 14, 8);
+      rr.writeInt8 (red);
+      rr.writeInt8 (green);
+      rr.writeInt8 (blue);
+      rr.writeInt8 (alpha);
     }
   }
 
@@ -1540,11 +1540,11 @@ public class GL extends gnu.x11.Resource implements GLConstant {
 
     RequestOutputStream o = display.out;
     synchronized (o) {
-      begin_render_request (o, 19, 8);
-      o.write_bool (red);    
-      o.write_bool (green);    
-      o.write_bool (blue);
-      o.write_bool (alpha);
+      GLRenderRequest rr = begin_render_request (o, 19, 8);
+      rr.writeBool (red);    
+      rr.writeBool (green);    
+      rr.writeBool (blue);
+      rr.writeBool (alpha);
     }
   }
 
@@ -1556,11 +1556,11 @@ public class GL extends gnu.x11.Resource implements GLConstant {
   public void color4ui (int red, int green, int blue, int alpha) {
     RequestOutputStream o = display.out;
     synchronized (o) {
-      begin_render_request (o, 20, 20);
-      o.write_int32 (red);    
-      o.write_int32 (green);    
-      o.write_int32 (blue);
-      o.write_int32 (alpha);
+      GLRenderRequest rr = begin_render_request (o, 20, 20);
+      rr.writeInt32 (red);    
+      rr.writeInt32 (green);    
+      rr.writeInt32 (blue);
+      rr.writeInt32 (alpha);
     }
   }
 
@@ -1572,11 +1572,11 @@ public class GL extends gnu.x11.Resource implements GLConstant {
   public void color4us (int red, int green, int blue, int alpha) {
     RequestOutputStream o = display.out;
     synchronized (o) {
-      begin_render_request (o, 12, 12);
-      o.write_int16 (red);    
-      o.write_int16 (green);    
-      o.write_int16 (blue);
-      o.write_int16 (alpha);
+      GLRenderRequest rr = begin_render_request (o, 12, 12);
+      rr.writeInt16 (red);    
+      rr.writeInt16 (green);    
+      rr.writeInt16 (blue);
+      rr.writeInt16 (alpha);
     }
   }
 
@@ -1588,9 +1588,9 @@ public class GL extends gnu.x11.Resource implements GLConstant {
   public void edge_flag (boolean flag) {
     RequestOutputStream o = display.out;
     synchronized (o) {
-      begin_render_request (o, 22, 8);
-      o.write_bool (flag);
-      o.write_pad (3);
+      GLRenderRequest rr = begin_render_request (o, 22, 8);
+      rr.writeBool (flag);
+      rr.writePad (3);
     }
   }
 
@@ -1613,8 +1613,8 @@ public class GL extends gnu.x11.Resource implements GLConstant {
   public void indexd (double c) {
     RequestOutputStream o = display.out;
     synchronized (o) {
-      begin_render_request (o, 24, 12);
-      o.write_double (c);
+      GLRenderRequest rr = begin_render_request (o, 24, 12);
+      rr.writeDouble (c);
     }
   }
 
@@ -1626,8 +1626,8 @@ public class GL extends gnu.x11.Resource implements GLConstant {
   public void indexf (float c) {
     RequestOutputStream o = display.out;
     synchronized (o) {
-      begin_render_request (o, 25, 8);
-      o.write_float (c);
+      GLRenderRequest rr = begin_render_request (o, 25, 8);
+      rr.writeFloat (c);
     }
   }
 
@@ -1639,8 +1639,8 @@ public class GL extends gnu.x11.Resource implements GLConstant {
   public void indexi (int c) {
     RequestOutputStream o = display.out;
     synchronized (o) {
-      begin_render_request (o, 26, 8);
-      o.write_int32 (c);
+      GLRenderRequest rr = begin_render_request (o, 26, 8);
+      rr.writeInt32 (c);
     }
   }
 
@@ -1652,9 +1652,9 @@ public class GL extends gnu.x11.Resource implements GLConstant {
   public void indexs (int c) {
     RequestOutputStream o = display.out;
     synchronized (o) {
-      begin_render_request (o, 27, 8);
-      o.write_int16 (c);
-      o.write_pad (2);
+      GLRenderRequest rr = begin_render_request (o, 27, 8);
+      rr.writeInt16 (c);
+      rr.writePad (2);
     }
   }
 
@@ -1666,11 +1666,11 @@ public class GL extends gnu.x11.Resource implements GLConstant {
   public void normal3b (boolean x, boolean y, boolean z) {
     RequestOutputStream o = display.out;
     synchronized (o) {
-      begin_render_request (o, 28, 8);
-      o.write_bool (x);
-      o.write_bool (y);
-      o.write_bool (z);
-      o.write_pad (1);
+      GLRenderRequest rr = begin_render_request (o, 28, 8);
+      rr.writeBool (x);
+      rr.writeBool (y);
+      rr.writeBool (z);
+      rr.writePad (1);
     }
   }
 
@@ -1682,10 +1682,10 @@ public class GL extends gnu.x11.Resource implements GLConstant {
   public void normal3d (double x, double y, double z) {
     RequestOutputStream o = display.out;
     synchronized (o) {
-      begin_render_request (o, 29, 28);
-      o.write_double (x);
-      o.write_double (y);
-      o.write_double (z);
+      GLRenderRequest rr = begin_render_request (o, 29, 28);
+      rr.writeDouble (x);
+      rr.writeDouble (y);
+      rr.writeDouble (z);
     }
   } 
 
@@ -1712,10 +1712,10 @@ public class GL extends gnu.x11.Resource implements GLConstant {
   public void normal3i (int x, int y, int z) {
     RequestOutputStream o = display.out;
     synchronized (o) {
-      begin_render_request (o, 31, 16);
-      o.write_int32 (x);
-      o.write_int32 (y);
-      o.write_int32 (z);
+      GLRenderRequest rr = begin_render_request (o, 31, 16);
+      rr.writeInt32 (x);
+      rr.writeInt32 (y);
+      rr.writeInt32 (z);
     }
   } 
 
@@ -1736,9 +1736,9 @@ public class GL extends gnu.x11.Resource implements GLConstant {
   public void raster_pos2d (double x, double y) {
     RequestOutputStream o = display.out;
     synchronized (o) {
-      begin_render_request (o, 33, 20);
-      o.write_double (x);
-      o.write_double (y);
+      GLRenderRequest rr = begin_render_request (o, 33, 20);
+      rr.writeDouble (x);
+      rr.writeDouble (y);
     }
   } 
 
@@ -1750,9 +1750,9 @@ public class GL extends gnu.x11.Resource implements GLConstant {
   public void raster_pos2f (float x, float y) {
     RequestOutputStream o = display.out;
     synchronized (o) {
-      begin_render_request (o, 34, 12);
-      o.write_float (x);
-      o.write_float (y);
+      GLRenderRequest rr = begin_render_request (o, 34, 12);
+      rr.writeFloat (x);
+      rr.writeFloat (y);
     }
   } 
 
@@ -1764,9 +1764,9 @@ public class GL extends gnu.x11.Resource implements GLConstant {
   public void raster_pos2i (int x, int y) {
     RequestOutputStream o = display.out;
     synchronized (o) {
-      begin_render_request (o, 35, 12);
-      o.write_int32 (x);
-      o.write_int32 (y);
+      GLRenderRequest rr = begin_render_request (o, 35, 12);
+      rr.writeInt32 (x);
+      rr.writeInt32 (y);
     }
   } 
 
@@ -1778,9 +1778,9 @@ public class GL extends gnu.x11.Resource implements GLConstant {
   public void raster_pos2s (int x, int y) {
     RequestOutputStream o = display.out;
     synchronized (o) {
-      begin_render_request (o, 36, 8);
-      o.write_int16 (x);
-      o.write_int16 (y);
+      GLRenderRequest rr = begin_render_request (o, 36, 8);
+      rr.writeInt16 (x);
+      rr.writeInt16 (y);
     }
   } 
 
@@ -1792,10 +1792,10 @@ public class GL extends gnu.x11.Resource implements GLConstant {
   public void raster_pos3d (double x, double y, double z) {
     RequestOutputStream o = display.out;
     synchronized (o) {
-      begin_render_request (o, 37, 28);
-      o.write_double (x);
-      o.write_double (y);
-      o.write_double (z);
+      GLRenderRequest rr = begin_render_request (o, 37, 28);
+      rr.writeDouble (x);
+      rr.writeDouble (y);
+      rr.writeDouble (z);
     }
   } 
 
@@ -1807,10 +1807,10 @@ public class GL extends gnu.x11.Resource implements GLConstant {
   public void raster_pos3f (float x, float y, float z) {
     RequestOutputStream o = display.out;
     synchronized (o) {
-      begin_render_request (o, 38, 16);
-      o.write_float (x);
-      o.write_float (y);
-      o.write_float (z);
+      GLRenderRequest rr = begin_render_request (o, 38, 16);
+      rr.writeFloat (x);
+      rr.writeFloat (y);
+      rr.writeFloat (z);
     }
   } 
 
@@ -1822,10 +1822,10 @@ public class GL extends gnu.x11.Resource implements GLConstant {
   public void raster_pos3i (int x, int y, int z) {
     RequestOutputStream o = display.out;
     synchronized (o) {
-      begin_render_request (o, 39, 16);
-      o.write_int32 (x);
-      o.write_int32 (y);
-      o.write_int32 (z);
+      GLRenderRequest rr = begin_render_request (o, 39, 16);
+      rr.writeInt32 (x);
+      rr.writeInt32 (y);
+      rr.writeInt32 (z);
     }
   } 
 
@@ -1882,11 +1882,11 @@ public class GL extends gnu.x11.Resource implements GLConstant {
   public void rectd (double x1, double x2, double y1, double y2) {
     RequestOutputStream o = display.out;
     synchronized (o) {
-      begin_render_request (o, 45, 36);
-      o.write_double (x1);
-      o.write_double (x2);
-      o.write_double (y1);
-      o.write_double (y2);
+      GLRenderRequest rr = begin_render_request (o, 45, 36);
+      rr.writeDouble (x1);
+      rr.writeDouble (x2);
+      rr.writeDouble (y1);
+      rr.writeDouble (y2);
     }
   } 
 
@@ -1898,11 +1898,11 @@ public class GL extends gnu.x11.Resource implements GLConstant {
   public void rectf (float x1, float x2, float y1, float y2) {
     RequestOutputStream o = display.out;
     synchronized (o) {
-      begin_render_request (o, 46, 20);
-      o.write_float (x1);
-      o.write_float (x2);
-      o.write_float (y1);
-      o.write_float (y2);
+      GLRenderRequest rr = begin_render_request (o, 46, 20);
+      rr.writeFloat (x1);
+      rr.writeFloat (x2);
+      rr.writeFloat (y1);
+      rr.writeFloat (y2);
     }
   } 
 
@@ -1914,11 +1914,11 @@ public class GL extends gnu.x11.Resource implements GLConstant {
   public void recti (int x1, int x2, int y1, int y2) {
     RequestOutputStream o = display.out;
     synchronized (o) {
-      begin_render_request (o, 47, 20);
-      o.write_int32 (x1);
-      o.write_int32 (x2);
-      o.write_int32 (y1);
-      o.write_int32 (y2);
+      GLRenderRequest rr = begin_render_request (o, 47, 20);
+      rr.writeInt32 (x1);
+      rr.writeInt32 (x2);
+      rr.writeInt32 (y1);
+      rr.writeInt32 (y2);
     }
   } 
 
@@ -1930,11 +1930,11 @@ public class GL extends gnu.x11.Resource implements GLConstant {
   public void rects (int x1, int x2, int y1, int y2) {
     RequestOutputStream o = display.out;
     synchronized (o) {
-      begin_render_request (o, 48, 12);
-      o.write_int16 (x1);
-      o.write_int16 (x2);
-      o.write_int16 (y1);
-      o.write_int16 (y2);
+      GLRenderRequest rr = begin_render_request (o, 48, 12);
+      rr.writeInt16 (x1);
+      rr.writeInt16 (x2);
+      rr.writeInt16 (y1);
+      rr.writeInt16 (y2);
     }
   } 
 
@@ -1946,8 +1946,8 @@ public class GL extends gnu.x11.Resource implements GLConstant {
   public void tex_coord1d (double s) {
     RequestOutputStream o = display.out;
     synchronized (o) {
-      begin_render_request (o, 49, 12);
-      o.write_double (s);
+      GLRenderRequest rr = begin_render_request (o, 49, 12);
+      rr.writeDouble (s);
     }
   } 
 
@@ -1959,8 +1959,8 @@ public class GL extends gnu.x11.Resource implements GLConstant {
   public void tex_coord1f (float s) {
     RequestOutputStream o = display.out;
     synchronized (o) {
-      begin_render_request (o, 50, 8);
-      o.write_float (s);
+      GLRenderRequest rr = begin_render_request (o, 50, 8);
+      rr.writeFloat (s);
     }
   } 
 
@@ -1972,8 +1972,8 @@ public class GL extends gnu.x11.Resource implements GLConstant {
   public void tex_coord1i (int s) {
     RequestOutputStream o = display.out;
     synchronized (o) {
-      begin_render_request (o, 51, 8);
-      o.write_int32 (s);
+      GLRenderRequest rr = begin_render_request (o, 51, 8);
+      rr.writeInt32 (s);
     }
   } 
 
@@ -1985,9 +1985,9 @@ public class GL extends gnu.x11.Resource implements GLConstant {
   public void tex_coord1s (int s) {
     RequestOutputStream o = display.out;
     synchronized (o) {
-      begin_render_request (o, 52, 8);
-      o.write_int16 (s);
-      o.write_pad (2);
+      GLRenderRequest rr = begin_render_request (o, 52, 8);
+      rr.writeInt16 (s);
+      rr.writePad (2);
     }
   } 
 
@@ -1999,9 +1999,9 @@ public class GL extends gnu.x11.Resource implements GLConstant {
   public void tex_coord2d (double s, double t) {
     RequestOutputStream o = display.out;
     synchronized (o) {
-      begin_render_request (o, 53, 20);
-      o.write_double (s);
-      o.write_double (t);
+      GLRenderRequest rr = begin_render_request (o, 53, 20);
+      rr.writeDouble (s);
+      rr.writeDouble (t);
     }
   } 
 
@@ -2013,9 +2013,9 @@ public class GL extends gnu.x11.Resource implements GLConstant {
   public void tex_coord2f (float s, float t) {
     RequestOutputStream o = display.out;
     synchronized (o) {
-      begin_render_request (o, 54, 12);
-      o.write_float (s);
-      o.write_float (t);
+      GLRenderRequest rr = begin_render_request (o, 54, 12);
+      rr.writeFloat (s);
+      rr.writeFloat (t);
     }
   } 
 
@@ -2027,9 +2027,9 @@ public class GL extends gnu.x11.Resource implements GLConstant {
   public void tex_coord2i (int s, int t) {
     RequestOutputStream o = display.out;
     synchronized (o) {
-      begin_render_request (o, 55, 12);
-      o.write_int32 (s);
-      o.write_int32 (t);
+      GLRenderRequest rr = begin_render_request (o, 55, 12);
+      rr.writeInt32 (s);
+      rr.writeInt32 (t);
     }
   } 
 
@@ -2041,9 +2041,9 @@ public class GL extends gnu.x11.Resource implements GLConstant {
   public void tex_coord2s (int s, int t) {
     RequestOutputStream o = display.out;
     synchronized (o) {
-      begin_render_request (o, 56, 8);
-      o.write_int16 (s);
-      o.write_int16 (t);
+      GLRenderRequest rr = begin_render_request (o, 56, 8);
+      rr.writeInt16 (s);
+      rr.writeInt16 (t);
     }
   } 
 
@@ -2055,10 +2055,10 @@ public class GL extends gnu.x11.Resource implements GLConstant {
   public void tex_coord3d (double s, double t, double r) {
     RequestOutputStream o = display.out;
     synchronized (o) {
-      begin_render_request (o, 57, 28);
-      o.write_double (s);
-      o.write_double (t);
-      o.write_double (r);
+      GLRenderRequest rr = begin_render_request (o, 57, 28);
+      rr.writeDouble (s);
+      rr.writeDouble (t);
+      rr.writeDouble (r);
     }
   } 
 
@@ -2070,10 +2070,10 @@ public class GL extends gnu.x11.Resource implements GLConstant {
   public void tex_coord3f (float s, float t, float r) {
     RequestOutputStream o = display.out;
     synchronized (o) {
-      begin_render_request (o, 58, 16);
-      o.write_float (s);
-      o.write_float (t);
-      o.write_float (r);
+      GLRenderRequest rr = begin_render_request (o, 58, 16);
+      rr.writeFloat (s);
+      rr.writeFloat (t);
+      rr.writeFloat (r);
     }
   } 
 
@@ -2085,10 +2085,10 @@ public class GL extends gnu.x11.Resource implements GLConstant {
   public void tex_coord3i (int s, int t, int r) {
     RequestOutputStream o = display.out;
     synchronized (o) {
-      begin_render_request (o, 59, 16);
-      o.write_int32 (s);
-      o.write_int32 (t);
-      o.write_int32 (r);
+      GLRenderRequest rr = begin_render_request (o, 59, 16);
+      rr.writeInt32 (s);
+      rr.writeInt32 (t);
+      rr.writeInt32 (r);
     }
   } 
 
@@ -2145,9 +2145,9 @@ public class GL extends gnu.x11.Resource implements GLConstant {
   public void vertex2d (double x, double y) {
     RequestOutputStream o = display.out;
     synchronized (o) {
-      begin_render_request (o, 65, 20);
-      o.write_double (x);
-      o.write_double (y);
+      GLRenderRequest rr = begin_render_request (o, 65, 20);
+      rr.writeDouble (x);
+      rr.writeDouble (y);
     }
   }
 
@@ -2159,9 +2159,9 @@ public class GL extends gnu.x11.Resource implements GLConstant {
   public void vertex2f (float x, float y) {
     RequestOutputStream o = display.out;
     synchronized (o) {
-      begin_render_request (o, 66, 12);
-      o.write_float (x);
-      o.write_float (y);
+      GLRenderRequest rr = begin_render_request (o, 66, 12);
+      rr.writeFloat (x);
+      rr.writeFloat (y);
     }
   }
 
@@ -2173,9 +2173,9 @@ public class GL extends gnu.x11.Resource implements GLConstant {
   public void vertex2i (int x, int y) {
     RequestOutputStream o = display.out;
     synchronized (o) {
-      begin_render_request (o, 67, 12);
-      o.write_int32 (x);
-      o.write_int32 (y);
+      GLRenderRequest rr = begin_render_request (o, 67, 12);
+      rr.writeInt32 (x);
+      rr.writeInt32 (y);
     }
   }
 
@@ -2187,9 +2187,9 @@ public class GL extends gnu.x11.Resource implements GLConstant {
   public void vertex2s (int x, int y) {
     RequestOutputStream o = display.out;
     synchronized (o) {
-      begin_render_request (o, 68, 8);
-      o.write_int16 (x);
-      o.write_int16 (y);
+      GLRenderRequest rr = begin_render_request (o, 68, 8);
+      rr.writeInt16 (x);
+      rr.writeInt16 (y);
     }
   }
 
@@ -2273,12 +2273,12 @@ public class GL extends gnu.x11.Resource implements GLConstant {
   public void clip_plane (int plane, double [] equation) {
     RequestOutputStream o = display.out;
     synchronized (o) {
-      begin_render_request (o, 77, 40);
-      o.write_double (equation [0]);
-      o.write_double (equation [1]);
-      o.write_double (equation [2]);
-      o.write_double (equation [3]);
-      o.write_int32 (plane);
+      GLRenderRequest rr = begin_render_request (o, 77, 40);
+      rr.writeDouble (equation [0]);
+      rr.writeDouble (equation [1]);
+      rr.writeDouble (equation [2]);
+      rr.writeDouble (equation [3]);
+      rr.writeInt32 (plane);
     }
   }
 
@@ -2299,8 +2299,8 @@ public class GL extends gnu.x11.Resource implements GLConstant {
   public void cull_face (int mode) {
     RequestOutputStream o = display.out;
     synchronized (o) {
-      begin_render_request (o, 79, 8);
-      o.write_int32 (mode);
+      GLRenderRequest rr = begin_render_request (o, 79, 8);
+      rr.writeInt32 (mode);
     }
   }
 
@@ -2312,9 +2312,9 @@ public class GL extends gnu.x11.Resource implements GLConstant {
   public void fogf (int pname, float param) {
     RequestOutputStream o = display.out;
     synchronized (o) {
-      begin_render_request (o, 80, 12);
-      o.write_int32 (pname);
-      o.write_float (param);
+      GLRenderRequest rr = begin_render_request (o, 80, 12);
+      rr.writeInt32 (pname);
+      rr.writeFloat (param);
     }
   }
 
@@ -2337,10 +2337,10 @@ public class GL extends gnu.x11.Resource implements GLConstant {
     
     RequestOutputStream o = display.out;
     synchronized (o) {
-      begin_render_request (o, 81, 8 + 4 * n);
-      o.write_int32 (pname);
+      GLRenderRequest rr = begin_render_request (o, 81, 8 + 4 * n);
+      rr.writeInt32 (pname);
       for (int i = 0; i < n; i++)
-        o.write_float (params [i]);
+        rr.writeFloat (params [i]);
     }
   }
 
@@ -2352,9 +2352,9 @@ public class GL extends gnu.x11.Resource implements GLConstant {
   public void fogi (int pname, int param) {
     RequestOutputStream o = display.out;
     synchronized (o) {
-      begin_render_request (o, 82, 12);
-      o.write_int32 (pname);
-      o.write_float (param);
+      GLRenderRequest rr = begin_render_request (o, 82, 12);
+      rr.writeInt32 (pname);
+      rr.writeFloat (param);
     }
   }
 
@@ -2377,10 +2377,10 @@ public class GL extends gnu.x11.Resource implements GLConstant {
     
     RequestOutputStream o = display.out;
     synchronized (o) {
-      begin_render_request (o, 83, 8 + 4 * n);
-      o.write_int32 (pname);
+      GLRenderRequest rr = begin_render_request (o, 83, 8 + 4 * n);
+      rr.writeInt32 (pname);
       for (int i = 0; i < n; i++)
-        o.write_int32 (params [i]);
+        rr.writeInt32 (params [i]);
     }
   }
 
@@ -2391,8 +2391,8 @@ public class GL extends gnu.x11.Resource implements GLConstant {
   public void front_face (int mode) {
     RequestOutputStream o = display.out;
     synchronized (o) {
-      begin_render_request (o, 84, 8);
-      o.write_int32 (mode);
+      GLRenderRequest rr = begin_render_request (o, 84, 8);
+      rr.writeInt32 (mode);
     }
   }
 
@@ -2404,9 +2404,9 @@ public class GL extends gnu.x11.Resource implements GLConstant {
   public void hint (int target, int mode) {
     RequestOutputStream o = display.out;
     synchronized (o) {
-      begin_render_request (o, 85, 12);
-      o.write_int32 (target);
-      o.write_int32 (mode);
+      GLRenderRequest rr = begin_render_request (o, 85, 12);
+      rr.writeInt32 (target);
+      rr.writeInt32 (mode);
     }
   }
 
@@ -2418,10 +2418,10 @@ public class GL extends gnu.x11.Resource implements GLConstant {
   public void lightf (int light, int pname, float param) {
     RequestOutputStream o = display.out;
     synchronized (o) {
-      begin_render_request (o, 86, 16);
-      o.write_int32 (light);
-      o.write_int32 (pname);
-      o.write_float (param);
+      GLRenderRequest rr = begin_render_request (o, 86, 16);
+      rr.writeInt32 (light);
+      rr.writeInt32 (pname);
+      rr.writeFloat (param);
     }
   }
 
@@ -2448,11 +2448,11 @@ public class GL extends gnu.x11.Resource implements GLConstant {
     
     RequestOutputStream o = display.out;
     synchronized (o) {
-      begin_render_request (o, 87, 12 + 4 * n);
-      o.write_int32 (light);
-      o.write_int32 (pname);
+      GLRenderRequest rr = begin_render_request (o, 87, 12 + 4 * n);
+      rr.writeInt32 (light);
+      rr.writeInt32 (pname);
       for (int i = 0; i < n; i++)
-        o.write_float (params [i]);
+        rr.writeFloat (params [i]);
     }
   }
 
@@ -2464,10 +2464,10 @@ public class GL extends gnu.x11.Resource implements GLConstant {
   public void lighti (int light, int pname, int param) {
     RequestOutputStream o = display.out;
     synchronized (o) {
-      begin_render_request (o, 88, 16);
-      o.write_int32 (light);
-      o.write_int32 (pname);
-      o.write_int32 (param);
+      GLRenderRequest rr = begin_render_request (o, 88, 16);
+      rr.writeInt32 (light);
+      rr.writeInt32 (pname);
+      rr.writeInt32 (param);
     }
   }
 
@@ -2494,11 +2494,11 @@ public class GL extends gnu.x11.Resource implements GLConstant {
     
     RequestOutputStream o = display.out;
     synchronized (o) {
-      begin_render_request (o, 89, 12 + 4 * n);
-      o.write_int32 (light);
-      o.write_int32 (pname);
+      GLRenderRequest rr = begin_render_request (o, 89, 12 + 4 * n);
+      rr.writeInt32 (light);
+      rr.writeInt32 (pname);
       for (int i = 0; i < n; i++)
-        o.write_int32 (params [i]);
+        rr.writeInt32 (params [i]);
     }
   }
 
@@ -2510,9 +2510,9 @@ public class GL extends gnu.x11.Resource implements GLConstant {
   public void light_modelf (int pname, float param) {
     RequestOutputStream o = display.out;
     synchronized (o) {
-      begin_render_request (o, 90, 12);
-      o.write_int32 (pname);
-      o.write_float (param);
+      GLRenderRequest rr = begin_render_request (o, 90, 12);
+      rr.writeInt32 (pname);
+      rr.writeFloat (param);
     }
   }
 
@@ -2533,10 +2533,10 @@ public class GL extends gnu.x11.Resource implements GLConstant {
 
     RequestOutputStream o = display.out;
     synchronized (o) {
-      begin_render_request (o, 91, 8 + 4 * n);
-      o.write_int32 (pname);
+      GLRenderRequest rr = begin_render_request (o, 91, 8 + 4 * n);
+      rr.writeInt32 (pname);
       for (int i = 0; i < n; i++)
-        o.write_float (params [i]);
+        rr.writeFloat (params [i]);
     }
   }
 
@@ -2548,9 +2548,9 @@ public class GL extends gnu.x11.Resource implements GLConstant {
   public void light_modeli (int pname, int param) {
     RequestOutputStream o = display.out;
     synchronized (o) {
-      begin_render_request (o, 92, 12);
-      o.write_int32 (pname);
-      o.write_int32 (param);
+      GLRenderRequest rr = begin_render_request (o, 92, 12);
+      rr.writeInt32 (pname);
+      rr.writeInt32 (param);
     }
   }
 
@@ -2571,10 +2571,10 @@ public class GL extends gnu.x11.Resource implements GLConstant {
 
     RequestOutputStream o = display.out;
     synchronized (o) {
-      begin_render_request (o, 93, 8 + 4 * n);
-      o.write_int32 (pname);
+      GLRenderRequest rr = begin_render_request (o, 93, 8 + 4 * n);
+      rr.writeInt32 (pname);
       for (int i = 0; i < n; i++)
-        o.write_int32 (params [i]);
+        rr.writeInt32 (params [i]);
     }
   }
 
@@ -2586,10 +2586,10 @@ public class GL extends gnu.x11.Resource implements GLConstant {
   public void line_stipple (int factor, int pattern) {
     RequestOutputStream o = display.out;
     synchronized (o) {
-      begin_render_request (o, 94, 12);
-      o.write_int32 (factor);
-      o.write_int16 (pattern);
-      o.write_pad (2);
+      GLRenderRequest rr = begin_render_request (o, 94, 12);
+      rr.writeInt32 (factor);
+      rr.writeInt16 (pattern);
+      rr.writePad (2);
     }
   }
 
@@ -2601,8 +2601,8 @@ public class GL extends gnu.x11.Resource implements GLConstant {
   public void line_width (float width) {
     RequestOutputStream o = display.out;
     synchronized (o) {
-      begin_render_request (o, 95, 8);
-      o.write_float (width);
+      GLRenderRequest rr = begin_render_request (o, 95, 8);
+      rr.writeFloat (width);
     }
   }
 
@@ -2614,10 +2614,10 @@ public class GL extends gnu.x11.Resource implements GLConstant {
   public void materialf (int face, int pname, float param) {
     RequestOutputStream o = display.out;
     synchronized (o) {
-      begin_render_request (o, 96, 16);
-      o.write_int32 (face);
-      o.write_int32 (pname);
-      o.write_float (param);
+      GLRenderRequest rr = begin_render_request (o, 96, 16);
+      rr.writeInt32 (face);
+      rr.writeInt32 (pname);
+      rr.writeFloat (param);
     }
   }
 
@@ -2641,11 +2641,11 @@ public class GL extends gnu.x11.Resource implements GLConstant {
 
     RequestOutputStream o = display.out;
     synchronized (o) {
-      begin_render_request (o, 96, 12 + 4 * n);
-      o.write_int32 (face);
-      o.write_int32 (pname);
+      GLRenderRequest rr = begin_render_request (o, 96, 12 + 4 * n);
+      rr.writeInt32 (face);
+      rr.writeInt32 (pname);
       for (int i = 0; i < n; i++)
-        o.write_float (params [i]);
+        rr.writeFloat (params [i]);
     }
   }
 
@@ -2657,10 +2657,10 @@ public class GL extends gnu.x11.Resource implements GLConstant {
   public void materiali (int face, int pname, int param) {
     RequestOutputStream o = display.out;
     synchronized (o) {
-      begin_render_request (o, 98, 16);
-      o.write_int32 (face);
-      o.write_int32 (pname);
-      o.write_int32 (param);
+      GLRenderRequest rr = begin_render_request (o, 98, 16);
+      rr.writeInt32 (face);
+      rr.writeInt32 (pname);
+      rr.writeInt32 (param);
     }
   }
 
@@ -2684,11 +2684,11 @@ public class GL extends gnu.x11.Resource implements GLConstant {
 
     RequestOutputStream o = display.out;
     synchronized (o) {
-      begin_render_request (o, 96, 12 + 4 * n);
-      o.write_int32 (face);
-      o.write_int32 (pname);
+      GLRenderRequest rr = begin_render_request (o, 96, 12 + 4 * n);
+      rr.writeInt32 (face);
+      rr.writeInt32 (pname);
       for (int i = 0; i < n; i++)
-        o.write_int32 (params [i]);
+        rr.writeInt32 (params [i]);
     }
   }
 
@@ -2700,8 +2700,8 @@ public class GL extends gnu.x11.Resource implements GLConstant {
   public void point_size (float size) {
     RequestOutputStream o = display.out;
     synchronized (o) {
-      begin_render_request (o, 100, 8);
-      o.write_float (size);
+      GLRenderRequest rr = begin_render_request (o, 100, 8);
+      rr.writeFloat (size);
     }
   }
 
@@ -2768,10 +2768,10 @@ public class GL extends gnu.x11.Resource implements GLConstant {
   public void tex_parameterf (int target, int pname, float param) {
     RequestOutputStream o = display.out;
     synchronized (o) {
-      begin_render_request (o, 105, 16);
-      o.write_int32 (target);
-      o.write_int32 (pname);
-      o.write_float (param);
+      GLRenderRequest rr = begin_render_request (o, 105, 16);
+      rr.writeInt32(target);
+      rr.writeInt32(pname);
+      rr.writeFloat(param);
     }
   }
 
@@ -2796,11 +2796,11 @@ public class GL extends gnu.x11.Resource implements GLConstant {
 
     RequestOutputStream o = display.out;
     synchronized (o) {
-      begin_render_request (o, 106, 12 + 4 * n);
-      o.write_int32 (target);
-      o.write_int32 (pname);
+      GLRenderRequest rr =  begin_render_request (o, 106, 12 + 4 * n);
+      rr.writeInt32 (target);
+      rr.writeInt32 (pname);
       for (int i = 0; i < n; i++)
-        o.write_float (params [i]);
+        rr.writeFloat (params [i]);
     }
   }
 
@@ -2833,11 +2833,11 @@ public class GL extends gnu.x11.Resource implements GLConstant {
 
     RequestOutputStream o = display.out;
     synchronized (o) {
-      begin_render_request (o, 108, 12 + 4 * n);
-      o.write_int32 (target);
-      o.write_int32 (pname);
+      GLRenderRequest rr = begin_render_request (o, 108, 12 + 4 * n);
+      rr.writeInt32 (target);
+      rr.writeInt32 (pname);
       for (int i = 0; i < n; i++)
-        o.write_int32 (params [i]);
+        rr.writeInt32 (params [i]);
     }
   }
 
@@ -2926,10 +2926,10 @@ public class GL extends gnu.x11.Resource implements GLConstant {
   public void tex_envf (int target, int pname, float param) {
     RequestOutputStream o = display.out;
     synchronized (o) {
-      begin_render_request (o, 111, 16);
-      o.write_int32 (target);
-      o.write_int32 (pname);
-      o.write_float (param);
+      GLRenderRequest rr = begin_render_request (o, 111, 16);
+      rr.writeInt32 (target);
+      rr.writeInt32 (pname);
+      rr.writeFloat (param);
     }
   }
 
@@ -2948,11 +2948,11 @@ public class GL extends gnu.x11.Resource implements GLConstant {
 
     RequestOutputStream o = display.out;
     synchronized (o) {
-      begin_render_request (o, 112, 12 + 4 * n);
-      o.write_int32 (target);
-      o.write_int32 (pname);
+      GLRenderRequest rr = begin_render_request (o, 112, 12 + 4 * n);
+      rr.writeInt32 (target);
+      rr.writeInt32 (pname);
       for (int i = 0; i < n; i++)
-        o.write_float (params [i]);
+        rr.writeFloat (params [i]);
     }
   }
 
@@ -2980,11 +2980,11 @@ public class GL extends gnu.x11.Resource implements GLConstant {
 
     RequestOutputStream o = display.out;
     synchronized (o) {
-      begin_render_request (o, 114, 12 + 4 * n);
-      o.write_int32 (target);
-      o.write_int32 (pname);
+      GLRenderRequest rr = begin_render_request (o, 114, 12 + 4 * n);
+      rr.writeInt32 (target);
+      rr.writeInt32 (pname);
       for (int i = 0; i < n; i++)
-        o.write_int32 (params [i]);
+        rr.writeInt32 (params [i]);
     }
   }
 
@@ -2996,10 +2996,10 @@ public class GL extends gnu.x11.Resource implements GLConstant {
   public void tex_gend (int coord, int pname, double param) {
     RequestOutputStream o = display.out;
     synchronized (o) {
-      begin_render_request (o, 115, 20);
-      o.write_int32 (coord);
-      o.write_int32 (pname);
-      o.write_double (param);
+      GLRenderRequest rr = begin_render_request (o, 115, 20);
+      rr.writeInt32 (coord);
+      rr.writeInt32 (pname);
+      rr.writeDouble (param);
     }
   }
 
@@ -3019,11 +3019,11 @@ public class GL extends gnu.x11.Resource implements GLConstant {
 
     RequestOutputStream o = display.out;
     synchronized (o) {
-      begin_render_request (o, 116, 12 + 8 * n);
-      o.write_int32 (coord);
-      o.write_int32 (pname);
+      GLRenderRequest rr = begin_render_request (o, 116, 12 + 8 * n);
+      rr.writeInt32 (coord);
+      rr.writeInt32 (pname);
       for (int i = 0; i < n; i++)
-        o.write_double (params [i]);
+        rr.writeDouble (params [i]);
     }
   }
 
@@ -3035,10 +3035,10 @@ public class GL extends gnu.x11.Resource implements GLConstant {
   public void tex_genf (int coord, int pname, float param) {
     RequestOutputStream o = display.out;
     synchronized (o) {
-      begin_render_request (o, 117, 16);
-      o.write_int32 (coord);
-      o.write_int32 (pname);
-      o.write_float (param);
+      GLRenderRequest rr = begin_render_request (o, 117, 16);
+      rr.writeInt32 (coord);
+      rr.writeInt32 (pname);
+      rr.writeFloat (param);
     }
   }
 
@@ -3058,11 +3058,11 @@ public class GL extends gnu.x11.Resource implements GLConstant {
 
     RequestOutputStream o = display.out;
     synchronized (o) {
-      begin_render_request (o, 118, 12 + 4 * n);
-      o.write_int32 (coord);
-      o.write_int32 (pname);
+      GLRenderRequest rr = begin_render_request (o, 118, 12 + 4 * n);
+      rr.writeInt32 (coord);
+      rr.writeInt32 (pname);
       for (int i = 0; i < n; i++)
-        o.write_float (params [i]);
+        rr.writeFloat (params [i]);
     }
   }
 
@@ -3091,11 +3091,11 @@ public class GL extends gnu.x11.Resource implements GLConstant {
 
     RequestOutputStream o = display.out;
     synchronized (o) {
-      begin_render_request (o, 120, 12 + 4 * n);
-      o.write_int32 (coord);
-      o.write_int32 (pname);
+      GLRenderRequest rr = begin_render_request (o, 120, 12 + 4 * n);
+      rr.writeInt32 (coord);
+      rr.writeInt32 (pname);
       for (int i = 0; i < n; i++)
-        o.write_int32 (params [i]);
+        rr.writeInt32 (params [i]);
     }
   }
 
@@ -3119,8 +3119,8 @@ public class GL extends gnu.x11.Resource implements GLConstant {
   public void load_name (int name) {
     RequestOutputStream o = display.out;
     synchronized (o) {
-      begin_render_request (o, 122, 8);
-      o.write_int32 (name);
+      GLRenderRequest rr = begin_render_request (o, 122, 8);
+      rr.writeInt32 (name);
     }
   }
 
@@ -3132,8 +3132,8 @@ public class GL extends gnu.x11.Resource implements GLConstant {
   public void pass_through  (float token) {
     RequestOutputStream o = display.out;
     synchronized (o) {
-      begin_render_request (o, 123, 8);
-      o.write_float (token);
+      GLRenderRequest rr = begin_render_request (o, 123, 8);
+      rr.writeFloat (token);
     }
   }
 
@@ -3157,8 +3157,8 @@ public class GL extends gnu.x11.Resource implements GLConstant {
   public void push_name (int name) {
     RequestOutputStream o = display.out;
     synchronized (o) {
-      begin_render_request (o, 125, 8);
-      o.write_int32 (name);
+      GLRenderRequest rr = begin_render_request (o, 125, 8);
+      rr.writeInt32 (name);
     }
   }
 
@@ -3170,8 +3170,8 @@ public class GL extends gnu.x11.Resource implements GLConstant {
   public void draw_buffer (int mode) {
     RequestOutputStream o = display.out;
     synchronized (o) {
-      begin_render_request (o, 126, 8);
-      o.write_int32 (mode);
+      GLRenderRequest rr = begin_render_request (o, 126, 8);
+      rr.writeInt32 (mode);
     }
   }
 
@@ -3205,8 +3205,8 @@ public class GL extends gnu.x11.Resource implements GLConstant {
   public void clear_index (float c) {
     RequestOutputStream o = display.out;
     synchronized (o) {
-      begin_render_request (o, 129, 8);
-      o.write_float (c);
+      GLRenderRequest rr = begin_render_request (o, 129, 8);
+      rr.writeFloat (c);
     }
   }
 
@@ -3227,8 +3227,8 @@ public class GL extends gnu.x11.Resource implements GLConstant {
   public void clear_stencil (int s) {
     RequestOutputStream o = display.out;
     synchronized (o) {
-      begin_render_request (o, 131, 8);
-      o.write_int32 (s);
+      GLRenderRequest rr = begin_render_request (o, 131, 8);
+      rr.writeInt32 (s);
     }
   }
 
@@ -3240,8 +3240,8 @@ public class GL extends gnu.x11.Resource implements GLConstant {
   public void clear_depth (double depth) {
     RequestOutputStream o = display.out;
     synchronized (o) {
-      begin_render_request (o, 132, 12);
-      o.write_double (depth);
+      GLRenderRequest rr = begin_render_request (o, 132, 12);
+      rr.writeDouble (depth);
     }
   }
 
@@ -3253,8 +3253,8 @@ public class GL extends gnu.x11.Resource implements GLConstant {
   public void stencil_mask (int mask) {
     RequestOutputStream o = display.out;
     synchronized (o) {
-      begin_render_request (o, 133, 8);
-      o.write_int32 (mask);
+      GLRenderRequest rr = begin_render_request (o, 133, 8);
+      rr.writeInt32 (mask);
     }
   }
 
@@ -3268,11 +3268,11 @@ public class GL extends gnu.x11.Resource implements GLConstant {
 
     RequestOutputStream o = display.out;
     synchronized (o) {
-      begin_render_request (o, 134, 8);
-      o.write_bool (red);
-      o.write_bool (green);
-      o.write_bool (blue);
-      o.write_bool (alpha);
+      GLRenderRequest rr = begin_render_request (o, 134, 8);
+      rr.writeBool (red);
+      rr.writeBool (green);
+      rr.writeBool (blue);
+      rr.writeBool (alpha);
     }
   }
 
@@ -3284,9 +3284,9 @@ public class GL extends gnu.x11.Resource implements GLConstant {
   public void depth_mask (boolean flag) {
     RequestOutputStream o = display.out;
     synchronized (o) {
-      begin_render_request (o, 135, 8);
-      o.write_bool (flag);
-      o.write_pad (3);
+      GLRenderRequest rr = begin_render_request (o, 135, 8);
+      rr.writeBool (flag);
+      rr.writePad (3);
     }
   }
 
@@ -3298,8 +3298,8 @@ public class GL extends gnu.x11.Resource implements GLConstant {
   public void index_mask (int mask) {
     RequestOutputStream o = display.out;
     synchronized (o) {
-      begin_render_request (o, 136, 8);
-      o.write_int32 (mask);
+      GLRenderRequest rr = begin_render_request (o, 136, 8);
+      rr.writeInt32 (mask);
     }
   }
 
@@ -3311,9 +3311,9 @@ public class GL extends gnu.x11.Resource implements GLConstant {
   public void accum (int op, float value) {
     RequestOutputStream o = display.out;
     synchronized (o) {
-      begin_render_request (o, 137, 12);
-      o.write_int32 (op);
-      o.write_float (value);
+      GLRenderRequest rr = begin_render_request (o, 137, 12);
+      rr.writeInt32 (op);
+      rr.writeFloat (value);
     }
   }
   
@@ -3326,8 +3326,8 @@ public class GL extends gnu.x11.Resource implements GLConstant {
   public void disable (int capability) {
     RequestOutputStream o = display.out;
     synchronized (o) {
-      begin_render_request (o, 138, 8);
-      o.write_int32 (capability);
+      GLRenderRequest rr = begin_render_request (o, 138, 8);
+      rr.writeInt32 (capability);
     }
   }
 
@@ -3339,8 +3339,8 @@ public class GL extends gnu.x11.Resource implements GLConstant {
   public void enable (int capability) {
     RequestOutputStream o = display.out;
     synchronized (o) {
-      begin_render_request (o, 139, 8);
-      o.write_int32 (capability);
+      GLRenderRequest rr = begin_render_request (o, 139, 8);
+      rr.writeInt32 (capability);
     }
   }
 
@@ -3364,8 +3364,8 @@ public class GL extends gnu.x11.Resource implements GLConstant {
   public void push_attrib (int mask) {
     RequestOutputStream o = display.out;
     synchronized (o) {
-      begin_render_request (o, 142, 8);
-      o.write_int32 (mask);
+      GLRenderRequest rr = begin_render_request (o, 142, 8);
+      rr.writeInt32 (mask);
     }
   }
 
@@ -3572,10 +3572,10 @@ public class GL extends gnu.x11.Resource implements GLConstant {
   public void map_grid1d (int un, double u1, double u2) {
     RequestOutputStream o = display.out;
     synchronized (o) {
-      begin_render_request (o, 147, 24);
-      o.write_double (u1);
-      o.write_double (u2);
-      o.write_int32 (un);
+      GLRenderRequest rr = begin_render_request (o, 147, 24);
+      rr.writeDouble (u1);
+      rr.writeDouble (u2);
+      rr.writeInt32 (un);
     }
   }
 
@@ -3587,10 +3587,10 @@ public class GL extends gnu.x11.Resource implements GLConstant {
   public void map_grid1f (int un, float u1, float u2) {
     RequestOutputStream o = display.out;
     synchronized (o) {
-      begin_render_request (o, 148, 16);
-      o.write_float (u1);
-      o.write_float (u2);
-      o.write_int32 (un);
+      GLRenderRequest rr = begin_render_request (o, 148, 16);
+      rr.writeFloat (u1);
+      rr.writeFloat (u2);
+      rr.writeInt32 (un);
     }
   }
 
@@ -3604,13 +3604,13 @@ public class GL extends gnu.x11.Resource implements GLConstant {
 
     RequestOutputStream o = display.out;
     synchronized (o) {
-      begin_render_request (o, 149, 44);
-      o.write_double (u1);
-      o.write_double (u2);
-      o.write_double (v1);
-      o.write_double (v2);
-      o.write_int32 (un);
-      o.write_int32 (vn);
+      GLRenderRequest rr = begin_render_request (o, 149, 44);
+      rr.writeDouble (u1);
+      rr.writeDouble (u2);
+      rr.writeDouble (v1);
+      rr.writeDouble (v2);
+      rr.writeInt32 (un);
+      rr.writeInt32 (vn);
     }
   }
 
@@ -3624,13 +3624,13 @@ public class GL extends gnu.x11.Resource implements GLConstant {
 
     RequestOutputStream o = display.out;
     synchronized (o) {
-      begin_render_request (o, 150, 28);
-      o.write_int32 (un);
-      o.write_float (u1);
-      o.write_float (u2);
-      o.write_int32 (vn);
-      o.write_float (v1);
-      o.write_float (v2);
+      GLRenderRequest rr = begin_render_request (o, 150, 28);
+      rr.writeInt32 (un);
+      rr.writeFloat (u1);
+      rr.writeFloat (u2);
+      rr.writeInt32 (vn);
+      rr.writeFloat (v1);
+      rr.writeFloat (v2);
     }
   }
 
@@ -3642,8 +3642,8 @@ public class GL extends gnu.x11.Resource implements GLConstant {
   public void eval_coord1d (double u) {
     RequestOutputStream o = display.out;
     synchronized (o) {
-      begin_render_request (o, 151, 12);
-      o.write_double (u);
+      GLRenderRequest rr = begin_render_request (o, 151, 12);
+      rr.writeDouble (u);
     }
   }
 
@@ -3655,8 +3655,8 @@ public class GL extends gnu.x11.Resource implements GLConstant {
   public void eval_coord1f (float u) {
     RequestOutputStream o = display.out;
     synchronized (o) {
-      begin_render_request (o, 152, 8);
-      o.write_float (u);
+      GLRenderRequest rr = begin_render_request (o, 152, 8);
+      rr.writeFloat (u);
     }
   }
 
@@ -3668,9 +3668,9 @@ public class GL extends gnu.x11.Resource implements GLConstant {
   public void eval_coord2d (double u, double v) {
     RequestOutputStream o = display.out;
     synchronized (o) {
-      begin_render_request (o, 153, 20);
-      o.write_double (u);
-      o.write_double (v);
+      GLRenderRequest rr = begin_render_request (o, 153, 20);
+      rr.writeDouble (u);
+      rr.writeDouble (v);
     }
   }
 
@@ -3682,9 +3682,9 @@ public class GL extends gnu.x11.Resource implements GLConstant {
   public void eval_coord2f (float u, float v) {
     RequestOutputStream o = display.out;
     synchronized (o) {
-      begin_render_request (o, 154, 12);
-      o.write_float (u);
-      o.write_float (v);
+      GLRenderRequest rr = begin_render_request (o, 154, 12);
+      rr.writeFloat (u);
+      rr.writeFloat (v);
     }
   }
 
@@ -3705,8 +3705,8 @@ public class GL extends gnu.x11.Resource implements GLConstant {
   public void eval_point1 (int i) {
     RequestOutputStream o = display.out;
     synchronized (o) {
-      begin_render_request (o, 156, 8);
-      o.write_int32 (i);
+      GLRenderRequest rr = begin_render_request (o, 156, 8);
+      rr.writeInt32 (i);
     }
   }
 
@@ -3718,12 +3718,12 @@ public class GL extends gnu.x11.Resource implements GLConstant {
   public void eval_mesh2 (int mode, int i1, int i2, int j1, int j2) {
     RequestOutputStream o = display.out;
     synchronized (o) {
-      begin_render_request (o, 157, 24);
-      o.write_int32 (mode);
-      o.write_int32 (i1);
-      o.write_int32 (i2);
-      o.write_int32 (j1);
-      o.write_int32 (j2);
+      GLRenderRequest rr = begin_render_request (o, 157, 24);
+      rr.writeInt32 (mode);
+      rr.writeInt32 (i1);
+      rr.writeInt32 (i2);
+      rr.writeInt32 (j1);
+      rr.writeInt32 (j2);
     }
   }
 
@@ -3762,8 +3762,8 @@ public class GL extends gnu.x11.Resource implements GLConstant {
   public void logic_op (int opcode) {
     RequestOutputStream o = display.out;
     synchronized (o) {
-      begin_render_request (o, 161, 8);
-      o.write_int32 (opcode);
+      GLRenderRequest rr = begin_render_request (o, 161, 8);
+      rr.writeInt32 (opcode);
     }
   }
 
@@ -3793,8 +3793,8 @@ public class GL extends gnu.x11.Resource implements GLConstant {
   public void depth_func (int func) {
     RequestOutputStream o = display.out;
     synchronized (o) {
-      begin_render_request (o, 164, 8);
-      o.write_int32 (func);
+      GLRenderRequest rr = begin_render_request (o, 164, 8);
+      rr.writeInt32 (func);
     }
   }
 
@@ -3815,9 +3815,9 @@ public class GL extends gnu.x11.Resource implements GLConstant {
   public void pixel_transferf (int pname, float param) {
     RequestOutputStream o = display.out;
     synchronized (o) {
-      begin_render_request (o, 166, 12);
-      o.write_int32 (pname);
-      o.write_float (param);
+      GLRenderRequest rr = begin_render_request (o, 166, 12);
+      rr.writeInt32 (pname);
+      rr.writeFloat (param);
     }
   }
 
@@ -3838,8 +3838,8 @@ public class GL extends gnu.x11.Resource implements GLConstant {
   public void read_buffer (int mode) {
     RequestOutputStream o = display.out;
     synchronized (o) {
-      begin_render_request (o, 171, 8);
-      o.write_int32 (mode);
+      GLRenderRequest rr = begin_render_request (o, 171, 8);
+      rr.writeInt32 (mode);
     }
   }
 
@@ -3852,12 +3852,12 @@ public class GL extends gnu.x11.Resource implements GLConstant {
 
     RequestOutputStream o = display.out;
     synchronized (o) {
-      begin_render_request (o, 172, 24);
-      o.write_int32 (x);
-      o.write_int32 (y);
-      o.write_int32 (width);
-      o.write_int32 (height);
-      o.write_int32 (type);
+      GLRenderRequest rr = begin_render_request (o, 172, 24);
+      rr.writeInt32 (x);
+      rr.writeInt32 (y);
+      rr.writeInt32 (width);
+      rr.writeInt32 (height);
+      rr.writeInt32 (type);
     }
   } 
 
@@ -3902,9 +3902,9 @@ public class GL extends gnu.x11.Resource implements GLConstant {
   public void depth_range (double near, double far) {
     RequestOutputStream o = display.out;
     synchronized (o) {
-      begin_render_request (o, 174, 20);
-      o.write_double (near);
-      o.write_double (far);
+      GLRenderRequest rr = begin_render_request (o, 174, 20);
+      rr.writeDouble (near);
+      rr.writeDouble (far);
     }
   }
 
@@ -3948,9 +3948,9 @@ public class GL extends gnu.x11.Resource implements GLConstant {
   public void load_matrixf (float [] matrix) {
     RequestOutputStream o = display.out;
     synchronized (o) {
-      begin_render_request (o, 177, 68);
+      GLRenderRequest rr = begin_render_request (o, 177, 68);
       for (int i = 0; i < 16; i++)
-        o.write_float (matrix [i]);
+        rr.writeFloat (matrix [i]);
     }
   }
 
@@ -3962,9 +3962,9 @@ public class GL extends gnu.x11.Resource implements GLConstant {
   public void load_matrixd (double [] matrix) {
     RequestOutputStream o = display.out;
     synchronized (o) {
-      begin_render_request (o, 178, 132);
+      GLRenderRequest rr = begin_render_request (o, 178, 132);
       for (int i = 0; i < 16; i++)
-        o.write_double (matrix [i]);
+        rr.writeDouble (matrix [i]);
     }
   }
 
@@ -3989,9 +3989,9 @@ public class GL extends gnu.x11.Resource implements GLConstant {
   public void mult_matrixf (float [] matrix) {
     RequestOutputStream o = display.out;
     synchronized (o) {
-      begin_render_request (o, 180, 68);
+      GLRenderRequest rr = begin_render_request (o, 180, 68);
       for (int i = 0; i < 16; i++)
-        o.write_float (matrix [i]);
+        rr.writeFloat (matrix [i]);
     }
   } 
 
@@ -4019,13 +4019,13 @@ public class GL extends gnu.x11.Resource implements GLConstant {
 
     RequestOutputStream o = display.out;
     synchronized (o) {
-      begin_render_request (o, 182, 52);
-      o.write_double (left);
-      o.write_double (right);
-      o.write_double (bottom);
-      o.write_double (top);
-      o.write_double (near);
-      o.write_double (far);
+      GLRenderRequest rr = begin_render_request (o, 182, 52);
+      rr.writeDouble (left);
+      rr.writeDouble (right);
+      rr.writeDouble (bottom);
+      rr.writeDouble (top);
+      rr.writeDouble (near);
+      rr.writeDouble (far);
     }
   }
 
@@ -4124,8 +4124,8 @@ public class GL extends gnu.x11.Resource implements GLConstant {
   public void draw_arrays (int mode) {
     RequestOutputStream o = display.out;
     synchronized (o) {
-      begin_render_request (o, 193, 16);
-      o.write_int32 (mode);
+      GLRenderRequest rr = begin_render_request (o, 193, 16);
+      rr.writeInt32 (mode);
     }
   }
 
@@ -4138,9 +4138,9 @@ public class GL extends gnu.x11.Resource implements GLConstant {
   public void indexub (boolean c) {
     RequestOutputStream o = display.out;
     synchronized (o) {
-      begin_render_request (o, 194, 8);
-      o.write_bool (c);
-      o.write_pad (3);
+      GLRenderRequest rr = begin_render_request (o, 194, 8);
+      rr.writeBool (c);
+      rr.writePad (3);
     }
   }
 
@@ -4154,12 +4154,12 @@ public class GL extends gnu.x11.Resource implements GLConstant {
 
     RequestOutputStream o = display.out;
     synchronized (o) {
-      begin_render_request (o, 196, 24);
-      o.write_int32 (target);
-      o.write_int32 (start);
-      o.write_int32 (x);
-      o.write_int32 (y);
-      o.write_int32 (width);
+      GLRenderRequest rr = begin_render_request (o, 196, 24);
+      rr.writeInt32 (target);
+      rr.writeInt32 (start);
+      rr.writeInt32 (x);
+      rr.writeInt32 (y);
+      rr.writeInt32 (width);
     }
   } 
 
@@ -4171,8 +4171,8 @@ public class GL extends gnu.x11.Resource implements GLConstant {
   public void active_texture_arb (int texture) {
     RequestOutputStream o = display.out;
     synchronized (o) {
-      begin_render_request (o, 197, 8);
-      o.write_int32 (texture);
+      GLRenderRequest rr = begin_render_request (o, 197, 8);
+      rr.writeInt32 (texture);
     }
   }
   
@@ -4184,9 +4184,9 @@ public class GL extends gnu.x11.Resource implements GLConstant {
   public void multi_tex_coord1d_arb (int target, double s) {
     RequestOutputStream o = display.out;
     synchronized (o) {
-      begin_render_request (o, 198, 16);
-      o.write_int32 (target);
-      o.write_double (s);
+      GLRenderRequest rr = begin_render_request (o, 198, 16);
+      rr.writeInt32 (target);
+      rr.writeDouble (s);
     }
   } 
 
@@ -4198,9 +4198,9 @@ public class GL extends gnu.x11.Resource implements GLConstant {
   public void multi_tex_coord1f_arb (int target, float s) {
     RequestOutputStream o = display.out;
     synchronized (o) {
-      begin_render_request (o, 199, 12);
-      o.write_int32 (target);
-      o.write_float (s);
+      GLRenderRequest rr = begin_render_request (o, 199, 12);
+      rr.writeInt32 (target);
+      rr.writeFloat (s);
     }
   } 
 
@@ -4221,10 +4221,10 @@ public class GL extends gnu.x11.Resource implements GLConstant {
   public void multi_tex_coord1s_arb (int target, int s) {
     RequestOutputStream o = display.out;
     synchronized (o) {
-      begin_render_request (o, 201, 12);
-      o.write_int32 (target);
-      o.write_int16 (s);
-      o.write_pad (2);
+      GLRenderRequest rr = begin_render_request (o, 201, 12);
+      rr.writeInt32 (target);
+      rr.writeInt16 (s);
+      rr.writePad (2);
     }
   } 
 
@@ -4236,10 +4236,10 @@ public class GL extends gnu.x11.Resource implements GLConstant {
   public void multi_tex_coord2d_arb (int target, double s, double t) {
     RequestOutputStream o = display.out;
     synchronized (o) {
-      begin_render_request (o, 202, 24);
-      o.write_int32 (target);
-      o.write_double (s);
-      o.write_double (t);
+      GLRenderRequest rr = begin_render_request (o, 202, 24);
+      rr.writeInt32 (target);
+      rr.writeDouble (s);
+      rr.writeDouble (t);
     }
   } 
 
@@ -4251,10 +4251,10 @@ public class GL extends gnu.x11.Resource implements GLConstant {
   public void multi_tex_coord2f_arb (int target, float s, float t) {
     RequestOutputStream o = display.out;
     synchronized (o) {
-      begin_render_request (o, 203, 16);
-      o.write_int32 (target);
-      o.write_float (s);
-      o.write_float (t);
+      GLRenderRequest rr = begin_render_request (o, 203, 16);
+      rr.writeInt32 (target);
+      rr.writeFloat (s);
+      rr.writeFloat (t);
     }
   } 
 
@@ -4275,10 +4275,10 @@ public class GL extends gnu.x11.Resource implements GLConstant {
   public void multi_tex_coord2s_arb (int target, int s, int t) {
     RequestOutputStream o = display.out;
     synchronized (o) {
-      begin_render_request (o, 205, 12);
-      o.write_int32 (target);
-      o.write_int16 (s);
-      o.write_int16 (t);
+      GLRenderRequest rr = begin_render_request (o, 205, 12);
+      rr.writeInt32 (target);
+      rr.writeInt16 (s);
+      rr.writeInt16 (t);
     }
   } 
 
@@ -4291,11 +4291,11 @@ public class GL extends gnu.x11.Resource implements GLConstant {
                                      double r) {
     RequestOutputStream o = display.out;
     synchronized (o) {
-      begin_render_request (o, 206, 32);
-      o.write_int32 (target);
-      o.write_double (s);
-      o.write_double (t);
-      o.write_double (r);
+      GLRenderRequest rr = begin_render_request (o, 206, 32);
+      rr.writeInt32 (target);
+      rr.writeDouble (s);
+      rr.writeDouble (t);
+      rr.writeDouble (r);
     }
   } 
 
@@ -4307,11 +4307,11 @@ public class GL extends gnu.x11.Resource implements GLConstant {
   public void multi_tex_coord3f_arb (int target, float s, float t, float r) {
     RequestOutputStream o = display.out;
     synchronized (o) {
-      begin_render_request (o, 207, 20);
-      o.write_int32 (target);
-      o.write_float (s);
-      o.write_float (t);
-      o.write_float (r);
+      GLRenderRequest rr = begin_render_request (o, 207, 20);
+      rr.writeInt32 (target);
+      rr.writeFloat (s);
+      rr.writeFloat (t);
+      rr.writeFloat (r);
     }
   } 
 
@@ -4332,12 +4332,12 @@ public class GL extends gnu.x11.Resource implements GLConstant {
   public void multi_tex_coord3s_arb (int target, int s, int t, int r) {
     RequestOutputStream o = display.out;
     synchronized (o) {
-      begin_render_request (o, 209, 16);
-      o.write_int32 (target);
-      o.write_int16 (s);
-      o.write_int16 (t);
-      o.write_int16 (r);
-      o.write_pad (2);
+      GLRenderRequest rr = begin_render_request (o, 209, 16);
+      rr.writeInt32 (target);
+      rr.writeInt16 (s);
+      rr.writeInt16 (t);
+      rr.writeInt16 (r);
+      rr.writePad (2);
     }
   } 
 
@@ -4351,12 +4351,12 @@ public class GL extends gnu.x11.Resource implements GLConstant {
 
     RequestOutputStream o = display.out;
     synchronized (o) {
-      begin_render_request (o, 210, 40);
-      o.write_int32 (target);
-      o.write_double (s);
-      o.write_double (t);
-      o.write_double (r);
-      o.write_double (q);
+      GLRenderRequest rr = begin_render_request (o, 210, 40);
+      rr.writeInt32 (target);
+      rr.writeDouble (s);
+      rr.writeDouble (t);
+      rr.writeDouble (r);
+      rr.writeDouble (q);
     }
   } 
 
@@ -4370,12 +4370,12 @@ public class GL extends gnu.x11.Resource implements GLConstant {
 
     RequestOutputStream o = display.out;
     synchronized (o) {
-      begin_render_request (o, 211, 24);
-      o.write_int32 (target);
-      o.write_float (s);
-      o.write_float (t);
-      o.write_float (r);
-      o.write_float (q);
+      GLRenderRequest rr = begin_render_request (o, 211, 24);
+      rr.writeInt32 (target);
+      rr.writeFloat (s);
+      rr.writeFloat (t);
+      rr.writeFloat (r);
+      rr.writeFloat (q);
     }
   } 
 
@@ -4389,12 +4389,12 @@ public class GL extends gnu.x11.Resource implements GLConstant {
 
     RequestOutputStream o = display.out;
     synchronized (o) {
-      begin_render_request (o, 212, 24);
-      o.write_int32 (target);
-      o.write_int32 (s);
-      o.write_int32 (t);
-      o.write_int32 (r);
-      o.write_int32 (q);
+      GLRenderRequest rr = begin_render_request (o, 212, 24);
+      rr.writeInt32 (target);
+      rr.writeInt32 (s);
+      rr.writeInt32 (t);
+      rr.writeInt32 (r);
+      rr.writeInt32 (q);
     }
   } 
 
@@ -4408,12 +4408,12 @@ public class GL extends gnu.x11.Resource implements GLConstant {
 
     RequestOutputStream o = display.out;
     synchronized (o) {
-      begin_render_request (o, 213, 16);
-      o.write_int32 (target);
-      o.write_int16 (s);
-      o.write_int16 (t);
-      o.write_int16 (r);
-      o.write_int16 (q);
+      GLRenderRequest rr = begin_render_request (o, 213, 16);
+      rr.writeInt32 (target);
+      rr.writeInt16 (s);
+      rr.writeInt16 (t);
+      rr.writeInt16 (r);
+      rr.writeInt16 (q);
     }
   } 
 
@@ -4435,10 +4435,10 @@ public class GL extends gnu.x11.Resource implements GLConstant {
 
     RequestOutputStream o = display.out;
     synchronized (o) {
-      begin_render_request (o, 2054, 12+4*n);
-      o.write_int32 (pname);
+      GLRenderRequest rr = begin_render_request (o, 2054, 12+4*n);
+      rr.writeInt32 (pname);
       for (int i = 0; i < n; i++) {
-        o.write_float (params[i]);
+        rr.writeFloat (params[i]);
       }
     }
   }
@@ -4462,10 +4462,10 @@ public class GL extends gnu.x11.Resource implements GLConstant {
 
     RequestOutputStream o = display.out;
     synchronized (o) {
-      begin_render_request (o, 2055, 12+4*n);
-      o.write_int32 (pname);
+      GLRenderRequest rr = begin_render_request (o, 2055, 12+4*n);
+      rr.writeInt32 (pname);
       for (int i = 0; i < n; i++) {
-        o.write_int32 (params[i]);
+        rr.writeInt32 (params[i]);
       }
     }
   }
@@ -4480,12 +4480,12 @@ public class GL extends gnu.x11.Resource implements GLConstant {
 
     RequestOutputStream o = display.out;
     synchronized (o) {
-      begin_render_request (o, 2056, 24);
-      o.write_int32 (target);
-      o.write_int32 (internal_format);
-      o.write_int32 (x);
-      o.write_int32 (y);
-      o.write_int32 (width);
+      GLRenderRequest rr = begin_render_request (o, 2056, 24);
+      rr.writeInt32 (target);
+      rr.writeInt32 (internal_format);
+      rr.writeInt32 (x);
+      rr.writeInt32 (y);
+      rr.writeInt32 (width);
     }
   } 
 
@@ -4499,11 +4499,11 @@ public class GL extends gnu.x11.Resource implements GLConstant {
 
     RequestOutputStream o = display.out;
     synchronized (o) {
-      begin_render_request (o, 4096, 20);
-      o.write_float (red);
-      o.write_float (green);    
-      o.write_float (blue);
-      o.write_float (alpha);
+      GLRenderRequest rr = begin_render_request (o, 4096, 20);
+      rr.writeFloat (red);
+      rr.writeFloat (green);    
+      rr.writeFloat (blue);
+      rr.writeFloat (alpha);
     }
   }
 
@@ -4515,8 +4515,8 @@ public class GL extends gnu.x11.Resource implements GLConstant {
   public void blend_equation (int mode) {
     RequestOutputStream o = display.out;
     synchronized (o) {
-      begin_render_request (o, 4097, 8);
-      o.write_int32 (mode);
+      GLRenderRequest rr = begin_render_request (o, 4097, 8);
+      rr.writeInt32 (mode);
     }
   }
 
@@ -4529,9 +4529,9 @@ public class GL extends gnu.x11.Resource implements GLConstant {
     // TODO 1.3: opcode = 192
     RequestOutputStream o = display.out;
     synchronized (o) {
-      begin_render_request (o, 4098, 12);
-      o.write_float (factor);
-      o.write_float (units);
+      GLRenderRequest rr = begin_render_request (o, 4098, 12);
+      rr.writeFloat (factor);
+      rr.writeFloat (units);
     }
   }
 
@@ -4585,10 +4585,10 @@ public class GL extends gnu.x11.Resource implements GLConstant {
 
     RequestOutputStream o = display.out;
     synchronized (o) {
-      begin_render_request (o, 4103, 16);
-      o.write_int32 (target);
-      o.write_int32 (pname);
-      o.write_float (param);
+      GLRenderRequest rr = begin_render_request (o, 4103, 16);
+      rr.writeInt32 (target);
+      rr.writeInt32 (pname);
+      rr.writeFloat (param);
     }
   }
 
@@ -4616,11 +4616,11 @@ public class GL extends gnu.x11.Resource implements GLConstant {
 
     RequestOutputStream o = display.out;
     synchronized (o) {
-      begin_render_request (o, 4104, 12+4*n);
-      o.write_int32 (target);
-      o.write_int32 (pname);
+      GLRenderRequest rr = begin_render_request (o, 4104, 12+4*n);
+      rr.writeInt32 (target);
+      rr.writeInt32 (pname);
       for (int i = 0; i < n; i++)
-        o.write_float (params[i]);
+        rr.writeFloat (params[i]);
     }
   }
 
@@ -4635,10 +4635,10 @@ public class GL extends gnu.x11.Resource implements GLConstant {
 
     RequestOutputStream o = display.out;
     synchronized (o) {
-      begin_render_request (o, 4105, 16);
-      o.write_int32 (target);
-      o.write_int32 (pname);
-      o.write_int32 (param);
+      GLRenderRequest rr = begin_render_request (o, 4105, 16);
+      rr.writeInt32 (target);
+      rr.writeInt32 (pname);
+      rr.writeInt32 (param);
     }
   }
 
@@ -4666,11 +4666,11 @@ public class GL extends gnu.x11.Resource implements GLConstant {
 
     RequestOutputStream o = display.out;
     synchronized (o) {
-      begin_render_request (o, 4106, 12+4*n);
-      o.write_int32 (target);
-      o.write_int32 (pname);
+      GLRenderRequest rr = begin_render_request (o, 4106, 12+4*n);
+      rr.writeInt32 (target);
+      rr.writeInt32 (pname);
       for (int i = 0; i < n; i++)
-        o.write_int32 (params[i]);
+        rr.writeInt32 (params[i]);
     }
   }
 
@@ -4685,12 +4685,12 @@ public class GL extends gnu.x11.Resource implements GLConstant {
 
     RequestOutputStream o = display.out;
     synchronized (o) {
-      begin_render_request (o, 4107, 24);
-      o.write_int32 (target);
-      o.write_int32 (internal_format);
-      o.write_int32 (x);
-      o.write_int32 (y);
-      o.write_int32 (width);
+      GLRenderRequest rr = begin_render_request (o, 4107, 24);
+      rr.writeInt32 (target);
+      rr.writeInt32 (internal_format);
+      rr.writeInt32 (x);
+      rr.writeInt32 (y);
+      rr.writeInt32 (width);
     }
   }
 
@@ -4705,13 +4705,13 @@ public class GL extends gnu.x11.Resource implements GLConstant {
 
     RequestOutputStream o = display.out;
     synchronized (o) {
-      begin_render_request (o, 4108, 28);
-      o.write_int32 (target);
-      o.write_int32 (internal_format);
-      o.write_int32 (x);
-      o.write_int32 (y);
-      o.write_int32 (width);
-      o.write_int32 (height);
+      GLRenderRequest rr = begin_render_request (o, 4108, 28);
+      rr.writeInt32 (target);
+      rr.writeInt32 (internal_format);
+      rr.writeInt32 (x);
+      rr.writeInt32 (y);
+      rr.writeInt32 (width);
+      rr.writeInt32 (height);
     }
   }
 
@@ -4726,12 +4726,12 @@ public class GL extends gnu.x11.Resource implements GLConstant {
 
     RequestOutputStream o = display.out;
     synchronized (o) {
-      begin_render_request (o, 4110, 20);
-      o.write_int32 (target);
-      o.write_int32 (width);
-      o.write_int32 (internal_format);
-      o.write_bool (sink);
-      o.write_pad (3);
+      GLRenderRequest rr = begin_render_request (o, 4110, 20);
+      rr.writeInt32 (target);
+      rr.writeInt32 (width);
+      rr.writeInt32 (internal_format);
+      rr.writeBool (sink);
+      rr.writePad (3);
     }
   }
 
@@ -4744,11 +4744,11 @@ public class GL extends gnu.x11.Resource implements GLConstant {
   public void minmax (int target, int internal_format, boolean sink) {
     RequestOutputStream o = display.out;
     synchronized (o) {
-      begin_render_request (o, 4111, 16);
-      o.write_int32 (target);
-      o.write_int32 (internal_format);
-      o.write_bool(sink);
-      o.write_pad (3);
+      GLRenderRequest rr = begin_render_request (o, 4111, 16);
+      rr.writeInt32 (target);
+      rr.writeInt32 (internal_format);
+      rr.writeBool(sink);
+      rr.writePad (3);
     }
   }
 
@@ -4760,8 +4760,8 @@ public class GL extends gnu.x11.Resource implements GLConstant {
   public void reset_histogram (int target) {
     RequestOutputStream o = display.out;
     synchronized (o) {
-      begin_render_request (o, 4112, 8);
-      o.write_int32 (target);
+      GLRenderRequest rr = begin_render_request (o, 4112, 8);
+      rr.writeInt32 (target);
     }
   }
 
@@ -4773,8 +4773,8 @@ public class GL extends gnu.x11.Resource implements GLConstant {
   public void reset_minmax (int target) {
     RequestOutputStream o = display.out;
     synchronized (o) {
-      begin_render_request (o, 4113, 8);
-      o.write_int32 (target);
+      GLRenderRequest rr = begin_render_request (o, 4113, 8);
+      rr.writeInt32 (target);
     }
   }
 
@@ -4786,9 +4786,9 @@ public class GL extends gnu.x11.Resource implements GLConstant {
   public void bind_texture (int target, int texture) {
     RequestOutputStream o = display.out;
     synchronized (o) {
-      begin_render_request (o, 4117, 12);
-      o.write_int32 (target);
-      o.write_int32 (texture);
+      GLRenderRequest rr = begin_render_request (o, 4117, 12);
+      rr.writeInt32 (target);
+      rr.writeInt32 (texture);
     }
   }
 
@@ -4800,11 +4800,11 @@ public class GL extends gnu.x11.Resource implements GLConstant {
   public void prioritize_textures (int [] textures, float [] priorities) {
     RequestOutputStream o = display.out;
     synchronized (o) {
-      begin_render_request (o, 4118, 8+textures.length*2*8);
+      GLRenderRequest rr = begin_render_request (o, 4118, 8+textures.length*2*8);
       for (int i = 0; i < textures.length; i++)
-        o.write_int32 (textures[i]);
+        rr.writeInt32 (textures[i]);
       for (int i = 0; i < priorities.length; i++)
-        o.write_float (priorities[i]);
+        rr.writeFloat (priorities[i]);
     }
   }
 
@@ -4818,14 +4818,14 @@ public class GL extends gnu.x11.Resource implements GLConstant {
 
     RequestOutputStream o = display.out;
     synchronized (o) {
-      begin_render_request (o, 4119, 32);
-      o.write_int32 (target);
-      o.write_int32 (level);
-      o.write_int32 (internal_format);
-      o.write_int32 (x);
-      o.write_int32 (y);
-      o.write_int32 (width);
-      o.write_int32 (border);
+      GLRenderRequest rr = begin_render_request (o, 4119, 32);
+      rr.writeInt32 (target);
+      rr.writeInt32 (level);
+      rr.writeInt32 (internal_format);
+      rr.writeInt32 (x);
+      rr.writeInt32 (y);
+      rr.writeInt32 (width);
+      rr.writeInt32 (border);
     }
   } 
 
@@ -4839,15 +4839,15 @@ public class GL extends gnu.x11.Resource implements GLConstant {
 
     RequestOutputStream o = display.out;
     synchronized (o) {
-      begin_render_request (o, 4120, 26);
-      o.write_int32 (target);
-      o.write_int32 (level);
-      o.write_int32 (internal_format);
-      o.write_int32 (x);
-      o.write_int32 (y);
-      o.write_int32 (width);
-      o.write_int32 (height);
-      o.write_int32 (border);
+      GLRenderRequest rr = begin_render_request (o, 4120, 26);
+      rr.writeInt32 (target);
+      rr.writeInt32 (level);
+      rr.writeInt32 (internal_format);
+      rr.writeInt32 (x);
+      rr.writeInt32 (y);
+      rr.writeInt32 (width);
+      rr.writeInt32 (height);
+      rr.writeInt32 (border);
     }
   } 
 
@@ -4861,13 +4861,13 @@ public class GL extends gnu.x11.Resource implements GLConstant {
 
     RequestOutputStream o = display.out;
     synchronized (o) {
-      begin_render_request (o, 4121, 28);
-      o.write_int32 (target);
-      o.write_int32 (level);
-      o.write_int32 (xoffset);
-      o.write_int32 (x);
-      o.write_int32 (y);
-      o.write_int32 (width);
+      GLRenderRequest rr = begin_render_request (o, 4121, 28);
+      rr.writeInt32 (target);
+      rr.writeInt32 (level);
+      rr.writeInt32 (xoffset);
+      rr.writeInt32 (x);
+      rr.writeInt32 (y);
+      rr.writeInt32 (width);
     }
   } 
 
@@ -4881,15 +4881,15 @@ public class GL extends gnu.x11.Resource implements GLConstant {
 
     RequestOutputStream o = display.out;
     synchronized (o) {
-      begin_render_request (o, 4122, 36);
-      o.write_int32 (target);
-      o.write_int32 (level);
-      o.write_int32 (xoffset);
-      o.write_int32 (yoffset);
-      o.write_int32 (x);
-      o.write_int32 (y);
-      o.write_int32 (width);
-      o.write_int32 (height);
+      GLRenderRequest rr = begin_render_request (o, 4122, 36);
+      rr.writeInt32 (target);
+      rr.writeInt32 (level);
+      rr.writeInt32 (xoffset);
+      rr.writeInt32 (yoffset);
+      rr.writeInt32 (x);
+      rr.writeInt32 (y);
+      rr.writeInt32 (width);
+      rr.writeInt32 (height);
     }
   } 
 
@@ -4904,16 +4904,16 @@ public class GL extends gnu.x11.Resource implements GLConstant {
 
     RequestOutputStream o = display.out;
     synchronized (o) {
-      begin_render_request (o, 4123, 40);
-      o.write_int32 (target);
-      o.write_int32 (level);
-      o.write_int32 (xoffset);
-      o.write_int32 (yoffset);
-      o.write_int32 (zoffset);
-      o.write_int32 (x);
-      o.write_int32 (y);
-      o.write_int32 (width);
-      o.write_int32 (height);
+      GLRenderRequest rr = begin_render_request (o, 4123, 40);
+      rr.writeInt32 (target);
+      rr.writeInt32 (level);
+      rr.writeInt32 (xoffset);
+      rr.writeInt32 (yoffset);
+      rr.writeInt32 (zoffset);
+      rr.writeInt32 (x);
+      rr.writeInt32 (y);
+      rr.writeInt32 (width);
+      rr.writeInt32 (height);
     }
   } 
 
@@ -5930,18 +5930,18 @@ public class GL extends gnu.x11.Resource implements GLConstant {
   private void render_2f (int opcode, float p1, float p2) {
     RequestOutputStream o = display.out;
     synchronized (o) {
-      begin_render_request (o, opcode, 12);
-      o.write_float (p1);
-      o.write_float (p2);
+      GLRenderRequest rr = begin_render_request (o, opcode, 12);
+      rr.writeFloat (p1);
+      rr.writeFloat (p2);
     }
   }
 
   private void render_2i (int opcode, int p1, int p2) {
     RequestOutputStream o = display.out;
     synchronized (o) {
-      begin_render_request (o, opcode, 12);
-      o.write_int32 (p1);
-      o.write_int32 (p2);
+      GLRenderRequest rr = begin_render_request (o, opcode, 12);
+      rr.writeInt32 (p1);
+      rr.writeInt32 (p2);
     }
   }
 
@@ -5968,21 +5968,21 @@ public class GL extends gnu.x11.Resource implements GLConstant {
   private void render_3i (int opcode, int p1, int p2, int p3) {
     RequestOutputStream o = display.out;
     synchronized (o) {
-      begin_render_request (o, opcode, 16);
-      o.write_int32 (p1);
-      o.write_int32 (p2);
-      o.write_int32 (p3);
+      GLRenderRequest rr = begin_render_request (o, opcode, 16);
+      rr.writeInt32 (p1);
+      rr.writeInt32 (p2);
+      rr.writeInt32 (p3);
     }
   }
 
   private void render_3s (int opcode, int p1, int p2, int p3) {
     RequestOutputStream o = display.out;
     synchronized (o) {
-      begin_render_request (o, opcode, 12);
-      o.write_int16 (p1);
-      o.write_int16 (p2);
-      o.write_int16 (p3);
-      o.write_pad (2);
+      GLRenderRequest rr = begin_render_request (o, opcode, 12);
+      rr.writeInt16 (p1);
+      rr.writeInt16 (p2);
+      rr.writeInt16 (p3);
+      rr.writePad (2);
     }
   }
 
@@ -5990,11 +5990,11 @@ public class GL extends gnu.x11.Resource implements GLConstant {
                          double p4) {
     RequestOutputStream o = display.out;
     synchronized (o) {
-      begin_render_request (o, opcode, 36);
-      o.write_double (p1);
-      o.write_double (p2);
-      o.write_double (p3);
-      o.write_double (p4);
+      GLRenderRequest rr = begin_render_request (o, opcode, 36);
+      rr.writeDouble (p1);
+      rr.writeDouble (p2);
+      rr.writeDouble (p3);
+      rr.writeDouble (p4);
     }
   }
 
@@ -6002,11 +6002,11 @@ public class GL extends gnu.x11.Resource implements GLConstant {
                          float p4) {
     RequestOutputStream o = display.out;
     synchronized (o) {
-      begin_render_request (o, opcode, 20);
-      o.write_float (p1);
-      o.write_float (p2);
-      o.write_float (p3);
-      o.write_float (p4);
+      GLRenderRequest rr = begin_render_request (o, opcode, 20);
+      rr.writeFloat (p1);
+      rr.writeFloat (p2);
+      rr.writeFloat (p3);
+      rr.writeFloat (p4);
     }
   }
 
@@ -6024,11 +6024,11 @@ public class GL extends gnu.x11.Resource implements GLConstant {
   private void render_4s(int opcode, int p1, int p2, int p3, int p4) {
     RequestOutputStream o = display.out;
     synchronized (o) {
-      begin_render_request (o, opcode, 12);
-      o.write_int16 (p1);
-      o.write_int16 (p2);
-      o.write_int16 (p3);
-      o.write_int16 (p4);
+      GLRenderRequest rr = begin_render_request (o, opcode, 12);
+      rr.writeInt16 (p1);
+      rr.writeInt16 (p2);
+      rr.writeInt16 (p3);
+      rr.writeInt16 (p4);
     }
   }
 
