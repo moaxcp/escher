@@ -361,8 +361,6 @@ public class RequestOutputStream extends FilterOutputStream {
     
     buffer [index] = (byte) (v >> 24);
     index++;
-    buffer [index] = (byte) (v >> 24);
-    index++;
     buffer [index] = (byte) (v >> 16);
     index++;
     buffer [index] = (byte) (v >> 8);
@@ -383,8 +381,6 @@ public class RequestOutputStream extends FilterOutputStream {
     buffer [index] = (byte) (v >> 40);
     index++;
     buffer [index] = (byte) (v >> 32);
-    index++;
-    buffer [index] = (byte) (v >> 24);
     index++;
     buffer [index] = (byte) (v >> 24);
     index++;
