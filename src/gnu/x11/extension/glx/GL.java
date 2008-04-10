@@ -76,13 +76,14 @@ public class GL extends gnu.x11.Resource implements GLConstant {
     void begin (RequestOutputStream o, int opcode, int small_params_length,
                 int large_param_length) {
       out = o;
+      int bufferLength = o.getBufferLength();
       this.large_param_length = large_param_length;
       int length_total = small_params_length + large_param_length;
       int pad = RequestOutputStream.pad (length_total);
       int render_command_length = 4 + length_total + pad; 
-      render_large =  2 + render_command_length / 4 > o.buffer.length;
+      render_large =  2 + render_command_length / 4 > bufferLength;
       if (render_large) {
-        request_total = large_param_length / (o.buffer.length - 16) + 1;
+        request_total = large_param_length / (bufferLength - 16) + 1;
         pad = RequestOutputStream.pad (small_params_length);
         int l = 6 + (small_params_length + pad) / 4;
         out.begin_request(glx.major_opcode, 2, l);
