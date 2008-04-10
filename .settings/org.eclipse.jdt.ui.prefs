@@ -1,6 +1,6 @@
-#Sun Nov 25 22:13:39 GMT 2007
-eclipse.preferences.version=1
-formatter_profile=_Escher
+#Thu Apr 10 14:03:41 CEST 2008
 formatter_settings_version=11
+eclipse.preferences.version=1
 internal.default.compliance=default
 org.eclipse.jdt.ui.text.custom_code_templates=<?xml version\='1.0'?>\n<templates/>
+formatter_profile=_Java Conventions
