@@ -247,4 +247,18 @@ class DebugRequestOutputStream extends RequestOutputStream {
     super (sink, size, d);
   }
 
+  void sendPendingRequest() {
+    int sequenceNumber = getSequenceNumber() + 1;
+    String message = "-----> SEND_PENDING_REQUEST ["
+                     + " | seq_number: "
+                     + sequenceNumber + " ] <-----";
+
+    logger.logp (Level.FINEST, CLASS_NAME, "begin_request", message);
+    super.sendPendingRequest ();
+    message = "-----> SENT_PENDING_REQUEST ["
+      + " | seq_number: "
+      + sequenceNumber + " ] <-----";
+
+    logger.logp (Level.FINEST, CLASS_NAME, "begin_request", message);
+  }
 }

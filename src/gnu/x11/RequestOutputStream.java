@@ -143,9 +143,7 @@ public class RequestOutputStream extends FilterOutputStream {
     assert Thread.holdsLock (this);
 
     // Send pending request.
-    if (request_object != null || index > request_index) {
-      send ();
-    }
+    sendPendingRequest();
 
     this.seq_number = (this.seq_number + 1) & 0xffff;
     
@@ -156,6 +154,12 @@ public class RequestOutputStream extends FilterOutputStream {
     write_int8 (opcode);
     write_int8 (second_field);
     write_int16 (request_length);
+  }
+
+  void sendPendingRequest() {
+    if (request_object != null || index > request_index) {
+      send ();
+    }
   }
 
   /**
