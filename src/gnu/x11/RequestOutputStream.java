@@ -73,7 +73,7 @@ public class RequestOutputStream extends FilterOutputStream {
    * accessed directly for modifications, like when the current request
    * can be aggregated.
    */
-  public byte [] buffer;
+  private byte [] buffer;
 
   /**
    * The current write index in the buffer. This always points to the next
