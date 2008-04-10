@@ -3,6 +3,10 @@ package gnu.x11;
 import java.io.FilterOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.Timer;
+import java.util.TimerTask;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * Used to create and manage requests to the X server.
@@ -15,6 +19,26 @@ public class RequestOutputStream extends FilterOutputStream {
     ASYNCHRONOUS, SYNCHRONOUS, ROUND_TRIP
   }
 
+  /** 
+   * TimerTask for forcing flush of this RequestOutputStream
+   * after at most FLUSH_TIMER_DELAY milliseconds.
+   */
+  private class RequestTimerTask extends TimerTask {
+
+      @Override
+      public void run() {
+
+          if (RequestOutputStream.this.requestLock.tryLock()) {
+              try {
+                  RequestOutputStream.this.flush();
+              } finally {
+                  RequestOutputStream.this.requestLock.unlock();
+              }
+          }
+      }
+      
+  };
+  
   /**
    * The default buffer size.
    */
@@ -24,6 +48,26 @@ public class RequestOutputStream extends FilterOutputStream {
 
   private static final int FLUSH_THRESHOLD = 64;
 
+  /**
+   * Maximum delay time between two flush request.
+   */
+  private static final int FLUSH_TIMER_DELAY = 50;
+  
+  /**
+   * Used to synchronize the request stream with flushTimer.
+   */
+  private Lock requestLock = new ReentrantLock();
+  
+  /**
+   * Flush Timer.
+   */
+  private Timer flushTimer = null;
+    
+  /**
+   * TimerTask used by the flushTimer Timer.
+   */
+  private TimerTask timerTask = null;
+  
   /**
    * The request buffer. It always holds the current request. This can be
    * accessed directly for modifications, like when the current request
@@ -87,6 +131,9 @@ public class RequestOutputStream extends FilterOutputStream {
     seq_number = 0;
     display = d;
     send_mode = get_default_send_mode ();
+    
+    this.timerTask = new RequestTimerTask();
+    this.flushTimer = new Timer("FLUSH REQUEST THREAD", true);
   }
 
   /**
@@ -141,10 +188,14 @@ public class RequestOutputStream extends FilterOutputStream {
                              int request_length) {
 
     assert Thread.holdsLock (this);
-
+ 
     // Send pending request.
     sendPendingRequest();
 
+    this.requestLock.lock();
+    this.timerTask.cancel();
+    this.timerTask = null;
+    
     this.seq_number = (this.seq_number + 1) & 0xffff;
     
     if (buffer.length - index < request_length * 4) {
@@ -198,6 +249,12 @@ public class RequestOutputStream extends FilterOutputStream {
         flush ();
       }
     }
+    
+    assert this.timerTask == null;
+    this.timerTask = new RequestTimerTask();
+    this.flushTimer.schedule(timerTask, FLUSH_TIMER_DELAY);
+    
+    this.requestLock.unlock();
   }
 
   /**
