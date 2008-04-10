@@ -583,4 +583,8 @@ public class RequestOutputStream extends FilterOutputStream {
   public void setRequestObject(RequestObject ro) {
     request_object = ro;
   }
+
+  public int getBufferLength() {
+    return this.buffer.length;
+  }
 }
