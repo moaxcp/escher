@@ -125,6 +125,19 @@ class GLRenderRequest implements RequestObject {
     index++;
   }
 
+  public void writeBool(boolean b) {
+
+    int v = (b ? 1 : 0);
+    
+    buffer [index] = (byte) (v);
+    index++;   
+  }
+  
+  public void writePad(int n) {
+      
+    index += RequestOutputStream.pad(n);
+  }
+ 
   /**
    * Returns <code>true</code> when a request with the specified
    * <code>length</code> would fit into this render request, <code>false</code>
