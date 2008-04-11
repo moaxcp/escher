@@ -28,11 +28,13 @@ public class RequestOutputStream extends FilterOutputStream {
       @Override
       public void run() {
 
-          if (RequestOutputStream.this.requestLock.tryLock()) {
-              try {
-                  RequestOutputStream.this.flush();
-              } finally {
-                  RequestOutputStream.this.requestLock.unlock();
+          synchronized (RequestOutputStream.this) {
+              if (RequestOutputStream.this.requestLock.tryLock()) {
+                  try {
+                      RequestOutputStream.this.flush();
+                  } finally {
+                      RequestOutputStream.this.requestLock.unlock();
+                  }
               }
           }
       }
