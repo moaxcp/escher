@@ -2637,11 +2637,12 @@ public class GL extends gnu.x11.Resource implements GLConstant {
     case SPECULAR:              // fall through
     case EMISSION:              // fall through
     case AMBIENT_AND_DIFFUSE: n = 4; break;
+    default: throw new IllegalArgumentException("Invalid pname");
     }
 
     RequestOutputStream o = display.out;
     synchronized (o) {
-      GLRenderRequest rr = begin_render_request (o, 96, 12 + 4 * n);
+      GLRenderRequest rr = begin_render_request (o, 97, 12 + 4 * n);
       rr.writeInt32 (face);
       rr.writeInt32 (pname);
       for (int i = 0; i < n; i++)
