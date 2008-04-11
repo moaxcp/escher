@@ -290,17 +290,41 @@ class DebugRequestOutputStream extends RequestOutputStream {
         super(sink, size, d);
     }
 
-    void sendPendingRequest() {
+    @Override
+    public void flushPending() {
 
         int sequenceNumber = getSequenceNumber();
-        String message = "-----> SEND_PENDING_REQUEST [" + " seq_number: "
-                + sequenceNumber + " ] <-----";
+        String message = "!!!!! " + FLUSH_THREAD_NAME +
+                         " [ seq_number: " + sequenceNumber + " ] !!!!!";
 
-        logger.logp(Level.FINEST, CLASS_NAME, "begin_request", message);
-        super.sendPendingRequest();
-        message = "-----> SENT_PENDING_REQUEST [ " + " seq_number: "
-                + sequenceNumber + " ] <-----";
+        logger.logp(Level.FINEST, CLASS_NAME, "flushPending", message);
 
+    }
+    
+    @Override
+    boolean sendPendingRequest() {
+
+        int sequenceNumber = getSequenceNumber();
+        
+        String message = "-----> SEARCH_PENDING_REQUEST [ " + " seq_number: "
+                         + sequenceNumber + " ] <-----";
+        
         logger.logp(Level.FINEST, CLASS_NAME, "sendPendingRequest", message);
+        
+        boolean sent = super.sendPendingRequest();
+        
+        if (sent) {
+            message = "-----> PENDING_REQUEST_SENT [ " + " seq_number: "
+                      + sequenceNumber + " ] <-----";
+            logger.logp(Level.FINEST, CLASS_NAME, "sendPendingRequest",
+                        message);
+        } else {
+            message = "-----> NO_PENDING_REQUEST [ " + " seq_number: "
+                      + sequenceNumber + " ] <-----";
+            logger.logp(Level.FINEST, CLASS_NAME, "sendPendingRequest",
+                        message);
+        }
+        
+        return sent;
     }
 }

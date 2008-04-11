@@ -19,6 +19,8 @@ public class RequestOutputStream extends FilterOutputStream {
     ASYNCHRONOUS, SYNCHRONOUS, ROUND_TRIP
   }
 
+  protected static final String FLUSH_THREAD_NAME = "FLUSH REQUEST THREAD";
+  
   /** 
    * TimerTask for forcing flush of this RequestOutputStream
    * after at most FLUSH_TIMER_DELAY milliseconds.
@@ -31,7 +33,7 @@ public class RequestOutputStream extends FilterOutputStream {
           synchronized (RequestOutputStream.this) {
               if (RequestOutputStream.this.requestLock.tryLock()) {
                   try {
-                      RequestOutputStream.this.flush();
+                      RequestOutputStream.this.flushPending();
                   } finally {
                       RequestOutputStream.this.requestLock.unlock();
                   }
@@ -135,7 +137,7 @@ public class RequestOutputStream extends FilterOutputStream {
     send_mode = get_default_send_mode ();
     
     this.timerTask = new RequestTimerTask();
-    this.flushTimer = new Timer("FLUSH REQUEST THREAD", true);
+    this.flushTimer = new Timer(FLUSH_THREAD_NAME, true);
   }
 
   /**
@@ -209,10 +211,14 @@ public class RequestOutputStream extends FilterOutputStream {
     write_int16 (request_length);
   }
 
-  void sendPendingRequest() {
-    if (request_object != null || index > request_index) {
-      send ();
-    }
+  boolean sendPendingRequest() {
+      
+      if (request_object != null || index > request_index) {
+          send ();
+          return true;
+      }
+    
+      return false;
   }
 
   /**
@@ -354,6 +360,10 @@ public class RequestOutputStream extends FilterOutputStream {
     }
   }
 
+  public void flushPending () {
+      this.flush();
+  }
+  
   public void write_bool (boolean b) {
     assert Thread.holdsLock (this);
     int v = (b ? 1 : 0);
