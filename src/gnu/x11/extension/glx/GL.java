@@ -61,11 +61,6 @@ public class GL extends gnu.x11.Resource implements GLConstant {
     private int request_number;
 
     /**
-     * Stores the total length of the large parameter.
-     */
-    private int large_param_length;
-
-    /**
      * Prepares the LargeRenderRequest for sending a new request. This starts
      * the request and writes the render opcode and render request length.
      *
@@ -77,10 +72,11 @@ public class GL extends gnu.x11.Resource implements GLConstant {
                 int large_param_length) {
       out = o;
       int bufferLength = o.getBufferLength();
-      this.large_param_length = large_param_length;
       int length_total = small_params_length + large_param_length;
       int pad = RequestOutputStream.pad (length_total);
-      int render_command_length = 4 + length_total + pad; 
+      int render_command_length = length_total + pad;
+      // The 2 below is the request header (major, minor and length) and the
+      // context tag.
       render_large =  2 + render_command_length / 4 > bufferLength;
       if (render_large) {
         request_total = large_param_length / (bufferLength - 16) + 1;
@@ -107,25 +103,27 @@ public class GL extends gnu.x11.Resource implements GLConstant {
      * Signals the beginning of the large parameter.
      */
     void begin_large_parameter () {
-      if (request_number > 1) {
-        // Update the length fields before sending the previous request.
-        int index = out.index;
-        int ni = out.index - 16;
-        int pi = RequestOutputStream.pad (ni);
-        out.index = 2;
-        out.write_int16 (4 + (ni + pi) / 4);
-        out.index = 12;
-        out.write_int32 (ni);
-        out.index = index;
+      if (render_large) {
+        if (request_number > 1) {
+          // Update the length fields before sending the previous request.
+          int index = out.index;
+          int ni = out.index - 16;
+          int pi = RequestOutputStream.pad (ni);
+          out.index = 2;
+          out.write_int16 (4 + (ni + pi) / 4);
+          out.index = 12;
+          out.write_int32 (ni);
+          out.index = index;
+        }
+
+        request_number++;
+
+        out.begin_request(glx.major_opcode, 2, 0); // Length written later.
+        out.write_int32 (tag);
+        out.write_int16 (request_number);
+        out.write_int16 (request_total);
+        out.write_int32 (0); // ni, written later
       }
-
-      request_number++;
-
-      out.begin_request(glx.major_opcode, 2, 0); // Length written later.
-      out.write_int32 (tag);
-      out.write_int16 (request_number);
-      out.write_int16 (request_total);
-      out.write_int32 (0); // ni, written later.
     }
 
     void write_float32 (float val) {
@@ -3407,13 +3405,6 @@ public class GL extends gnu.x11.Resource implements GLConstant {
 
     int n = order * k * 8;
 
-    byte[] data = new byte [n];
-    for (int i=0; i<order; i++) {
-      for (int j=0; j<k; j++) {
-        write_double (data, i * 8, points [i*stride + j]);
-      }
-    }
-
     RequestOutputStream o = display.out;
     synchronized (o) {
       large_render_request.begin(o, 143, 28, n);
@@ -3422,9 +3413,8 @@ public class GL extends gnu.x11.Resource implements GLConstant {
       large_render_request.write_int32 (target);
       large_render_request.write_int32 (order);
       large_render_request.begin_large_parameter ();
-      for (int i = 0; i < data.length; i++)
-        large_render_request.write_int8 (data [i]);
-      large_render_request.write_pad (RequestOutputStream.pad(data.length));
+      for (int i = 0; i < points.length; i++)
+        large_render_request.write_float64 (points [i]);
     }
   }
 
@@ -3453,13 +3443,6 @@ public class GL extends gnu.x11.Resource implements GLConstant {
 
     int n = order * k * 4;
 
-    byte[] data = new byte [n];
-    for (int i=0; i<order; i++) {
-      for (int j=0; j<k; j++) {
-        write_float32 (data, i * 8, points [i*stride + j]);
-      }
-    }
-
     RequestOutputStream o = display.out;
     synchronized (o) {
       large_render_request.begin(o, 144, 20, n);
@@ -3468,9 +3451,8 @@ public class GL extends gnu.x11.Resource implements GLConstant {
       large_render_request.write_float32 (u2);
       large_render_request.write_int32 (order);
       large_render_request.begin_large_parameter ();
-      for (int i = 0; i < data.length; i++)
-        large_render_request.write_int8 (data [i]);
-      large_render_request.write_pad (RequestOutputStream.pad(data.length));
+      for (int i = 0; i < points.length; i++)
+        large_render_request.write_float32 (points [i]);
     }
   }
 
@@ -3499,15 +3481,6 @@ public class GL extends gnu.x11.Resource implements GLConstant {
 
     int n = vorder * uorder * k * 8;
 
-    byte[] data = new byte [n];
-    for (int i=0; i<vorder; i++) {
-      for (int j=0; j<uorder; j++) {
-        for (int m=0; m<k; m++) {
-          write_double (data, i * 8, points [i*ustride + j*vstride + m]);
-        }
-      }
-    }
-
     RequestOutputStream o = display.out;
     synchronized (o) {
       large_render_request.begin(o, 145, 48, n);
@@ -3519,9 +3492,8 @@ public class GL extends gnu.x11.Resource implements GLConstant {
       large_render_request.write_int32 (uorder);
       large_render_request.write_int32 (vorder);
       large_render_request.begin_large_parameter ();
-      for (int i = 0; i < data.length; i++)
-        large_render_request.write_int8 (data [i]);
-      large_render_request.write_pad (RequestOutputStream.pad(data.length));
+      for (int i = 0; i < points.length; i++)
+        large_render_request.write_float64 (points [i]);
     }
 
   }
@@ -3551,15 +3523,6 @@ public class GL extends gnu.x11.Resource implements GLConstant {
 
     int n = vorder * uorder * k * 4;
 
-    byte[] data = new byte [n];
-    for (int i=0; i<vorder; i++) {
-      for (int j=0; j<uorder; j++) {
-        for (int m=0; m<k; m++) {
-          write_float32 (data, i * 8, points [i*ustride + j*vstride + m]);
-        }
-      }
-    }
-
     RequestOutputStream o = display.out;
     synchronized (o) {
       large_render_request.begin(o, 146, 32, n);
@@ -3571,9 +3534,8 @@ public class GL extends gnu.x11.Resource implements GLConstant {
       large_render_request.write_float32 (v2);
       large_render_request.write_int32 (vorder);
       large_render_request.begin_large_parameter ();
-      for (int i = 0; i < data.length; i++)
-        large_render_request.write_int8 (data [i]);
-      large_render_request.write_pad (RequestOutputStream.pad(data.length));
+      for (int i = 0; i < points.length; i++)
+        large_render_request.write_float32 (points [i]);
     }
   }
 
@@ -6046,41 +6008,5 @@ public class GL extends gnu.x11.Resource implements GLConstant {
     }
   }
 
-  public void write_float32 (byte[] buffer, int index, float f) {
-    int v = Float.floatToIntBits (f);
-    buffer [index] = (byte) (v >> 24);
-    index++;
-    buffer [index] = (byte) (v >> 24);
-    index++;
-    buffer [index] = (byte) (v >> 16);
-    index++;
-    buffer [index] = (byte) (v >> 8);
-    index++;
-    buffer [index] = (byte) v;
-    index++;
-  }
-
-  private void write_double (byte[] buffer, int index, double d) {
-    long v = Double.doubleToLongBits (d);
-    
-    buffer [index] = (byte) (v >> 56);
-    index++;
-    buffer [index] = (byte) (v >> 48);
-    index++;
-    buffer [index] = (byte) (v >> 40);
-    index++;
-    buffer [index] = (byte) (v >> 32);
-    index++;
-    buffer [index] = (byte) (v >> 24);
-    index++;
-    buffer [index] = (byte) (v >> 24);
-    index++;
-    buffer [index] = (byte) (v >> 16);
-    index++;
-    buffer [index] = (byte) (v >> 8);
-    index++;
-    buffer [index] = (byte) v;
-    index++;
-  }
 }
 
