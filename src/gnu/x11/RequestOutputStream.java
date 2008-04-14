@@ -256,13 +256,14 @@ public class RequestOutputStream extends FilterOutputStream {
           || send_mode == SendMode.ROUND_TRIP) {
         flush ();
       }
+
+      assert this.timerTask == null;
+      this.timerTask = new RequestTimerTask();
+      this.flushTimer.schedule(timerTask, FLUSH_TIMER_DELAY);
+      
+      this.requestLock.unlock();
     }
     
-    assert this.timerTask == null;
-    this.timerTask = new RequestTimerTask();
-    this.flushTimer.schedule(timerTask, FLUSH_TIMER_DELAY);
-    
-    this.requestLock.unlock();
   }
 
   /**
