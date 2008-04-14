@@ -5739,6 +5739,7 @@ public class GL extends gnu.x11.Resource implements GLConstant {
       o.write_int32 (par2);
       ResponseInputStream in = display.in;
       synchronized (in) {
+        in.read_reply(o);
         in.skip (12);
         int n = in.read_int32 ();
         ret = new float [n];
@@ -5775,6 +5776,7 @@ public class GL extends gnu.x11.Resource implements GLConstant {
       o.write_int32 (par1);
       ResponseInputStream in = display.in;
       synchronized (in) {
+        in.read_reply(o);
         in.skip (12);
         int n = in.read_int32 ();
         ret = new double [n];
@@ -5813,6 +5815,7 @@ public class GL extends gnu.x11.Resource implements GLConstant {
       o.write_int32 (par2);
       ResponseInputStream in = display.in;
       synchronized (in) {
+        in.read_reply(o);
         in.skip (12);
         int n = in.read_int32 ();
         ret = new double [n];
@@ -5849,6 +5852,7 @@ public class GL extends gnu.x11.Resource implements GLConstant {
       o.write_int32 (par1);
       ResponseInputStream in = display.in;
       synchronized (in) {
+        in.read_reply(o);
         in.skip (12);
         int n = in.read_int32 ();
         ret = new int [n];
@@ -5887,6 +5891,7 @@ public class GL extends gnu.x11.Resource implements GLConstant {
       o.write_int32 (par2);
       ResponseInputStream in = display.in;
       synchronized (in) {
+        in.read_reply(o);
         in.skip (12);
         int n = in.read_int32 ();
         ret = new int [n];
