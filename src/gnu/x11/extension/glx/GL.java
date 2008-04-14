@@ -199,7 +199,7 @@ public class GL extends gnu.x11.Resource implements GLConstant {
   /**
    * A helper for sending large render requests.
    */
-  private LargeRenderRequest large_render_request;
+  private LargeRenderRequest large_render_request = new LargeRenderRequest();
  
   private int render_mode;
   private String version_string_cache;
@@ -5726,6 +5726,7 @@ public class GL extends gnu.x11.Resource implements GLConstant {
       o.write_int32 (par1);
       ResponseInputStream in = display.in;
       synchronized (in) {
+        in.read_reply(o);
         in.skip (12);
         int n = in.read_int32 ();
         ret = new float [n];
