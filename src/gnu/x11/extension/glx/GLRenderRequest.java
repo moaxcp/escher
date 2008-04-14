@@ -12,7 +12,7 @@ class GLRenderRequest implements RequestObject {
   /**
    * The default buffer size to start with.
    */
-  private static final int DEFAULT_BUFFER_SIZE = 256;
+  static final int DEFAULT_BUFFER_SIZE = 256;
 
   /**
    * The request buffer.

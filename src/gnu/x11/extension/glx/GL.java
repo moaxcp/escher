@@ -237,10 +237,7 @@ public class GL extends gnu.x11.Resource implements GLConstant {
       if (ro instanceof GLRenderRequest) {
         rr = (GLRenderRequest) ro;
         if (! rr.fits(length)) {
-          // The pending request is sent automatically.
-          o.begin_request(glx.major_opcode, 1, 1);
-          rr.reset(tag);
-          o.setRequestObject(rr);
+            beginRenderRequest(o, rr);
         }
         // else: nothing to do.
       } else {
@@ -249,15 +246,30 @@ public class GL extends gnu.x11.Resource implements GLConstant {
           rr = new GLRenderRequest();
           renderRequest = rr;
         }
-        rr.reset(tag);
-        o.begin_request(glx.major_opcode, 1, 1);
-        o.setRequestObject(rr);
+        beginRenderRequest(o, rr);
       }
       rr.writeInt16(length);
       rr.writeInt16(opcode);
       
       return rr;
     }
+  }
+
+  /**
+   * Helper method to initialize a new render request on the request output
+   * stream.
+   *
+   * @param o the request output stream
+   * @param rr the render request
+   */
+  private void beginRenderRequest(RequestOutputStream o, GLRenderRequest rr) {
+      // The pending request is sent automatically. We set the request
+      // length pessimistcally, so that we are sure we have enough room
+      // in the buffer.
+      o.begin_request(glx.major_opcode, 1,
+                      GLRenderRequest.DEFAULT_BUFFER_SIZE);
+      rr.reset(tag);
+      o.setRequestObject(rr);
   }
 
   // glx opcode 3 - create context
