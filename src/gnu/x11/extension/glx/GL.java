@@ -61,6 +61,12 @@ public class GL extends gnu.x11.Resource implements GLConstant {
     private int request_number;
 
     /**
+     * The numbers of bytes left for the large parameter. This is used for
+     * calculating the length fields.
+     */
+    private int largeNumBytesLeft;
+
+    /**
      * Prepares the LargeRenderRequest for sending a new request. This starts
      * the request and writes the render opcode and render request length.
      *
@@ -75,15 +81,27 @@ public class GL extends gnu.x11.Resource implements GLConstant {
       int length_total = small_params_length + large_param_length;
       int pad = RequestOutputStream.pad (length_total);
       int render_command_length = length_total + pad;
-      // The 2 below is the request header (major, minor and length) and the
-      // context tag.
-      render_large =  2 + render_command_length / 4 > bufferLength;
+      render_large =  render_command_length > bufferLength;
+      request_number = 0;
+      large_param = false;
       if (render_large) {
-        request_total = large_param_length / (bufferLength - 16) + 1;
+        largeNumBytesLeft = large_param_length;
+        // For the extended fields we need to add 4 bytes.
+        small_params_length += 4;
+        length_total += 4;
+        // We need 16 bytes for the request headers, and 1 additional request
+        // for the 1st piece, containing the small request.
+        int largeRequestLength = bufferLength - 16;
+        // The '+ largeRequestLength - 1' part in the equation below is a
+        // rounding correction. The '+1' at the end is the initial small
+        // parameter request.
+        request_total = (large_param_length + largeRequestLength - 1)
+                        / largeRequestLength + 1;
         pad = RequestOutputStream.pad (small_params_length);
-        int l = 6 + (small_params_length + pad) / 4;
+        int l = 4 + (small_params_length + pad) / 4;
         out.begin_request(glx.major_opcode, 2, l);
         out.write_int32 (tag);
+        // We start counting at 1!
         request_number = 1;
         out.write_int16 (request_number);
         out.write_int16 (request_total);
@@ -103,27 +121,21 @@ public class GL extends gnu.x11.Resource implements GLConstant {
      * Signals the beginning of the large parameter.
      */
     void begin_large_parameter () {
-      if (render_large) {
-        if (request_number > 1) {
-          // Update the length fields before sending the previous request.
-          int index = out.index;
-          int ni = out.index - 16;
-          int pi = RequestOutputStream.pad (ni);
-          out.index = 2;
-          out.write_int16 (4 + (ni + pi) / 4);
-          out.index = 12;
-          out.write_int32 (ni);
-          out.index = index;
+        if (render_large) {
+            preSend();
+            out.send();
+            request_number++;
+
+            // Length written later, we start pessimistic.
+            int len = Math.min(largeNumBytesLeft, out.getBufferLength() - 16);
+            int p = RequestOutputStream.pad(len);
+            out.begin_request(glx.major_opcode, 2, 4 + (len + p) / 4);
+            out.write_int32 (tag);
+            out.write_int16 (request_number);
+            out.write_int16 (request_total);
+            out.write_int32 (len); // ni
+            largeNumBytesLeft -= len;
         }
-
-        request_number++;
-
-        out.begin_request(glx.major_opcode, 2, 0); // Length written later.
-        out.write_int32 (tag);
-        out.write_int16 (request_number);
-        out.write_int16 (request_total);
-        out.write_int32 (0); // ni, written later
-      }
     }
 
     void write_float32 (float val) {
@@ -161,11 +173,11 @@ public class GL extends gnu.x11.Resource implements GLConstant {
       out.write_int8 (val);
     }
 
-    void write_pad (int p) {
-      if (render_large && large_param && ! out.fits (p)) {
-        begin_large_parameter ();
-      }
-      out.write_pad (p);
+    void skip (int n) {
+        if (render_large && large_param && ! out.fits (n)) {
+            begin_large_parameter ();
+        }
+        out.skip(n);
     }
 
     void write_bool (boolean val) {
@@ -175,6 +187,28 @@ public class GL extends gnu.x11.Resource implements GLConstant {
       out.write_bool (val);
     }
 
+    /**
+     * Signals the end of the request.
+     */
+    void send() {
+        preSend();
+        out.send();
+    }
+
+    /**
+     * This methods finishes the first piece of a large render request.
+     */
+    private void preSend() {
+        if (render_large && request_number == 1) {
+            // Finish the initial request.
+            int index = out.getIndex();
+            int p = RequestOutputStream.pad(index);
+            if (p > 0) {
+                out.skip(p);
+            }
+            large_param = true;
+        }
+    }
   }
 
   /**
@@ -635,7 +669,7 @@ public class GL extends gnu.x11.Resource implements GLConstant {
   public void pixel_storei (int pname, int param) {
     RequestOutputStream o = display.out;
     synchronized (o) {
-      o.begin_request (glx.major_opcode, 11, 4);
+      o.begin_request (glx.major_opcode, 110, 4);
       o.write_int32 (tag);
       o.write_int32 (pname);
       o.write_int32 (param);
@@ -1280,7 +1314,7 @@ public class GL extends gnu.x11.Resource implements GLConstant {
       length = ((int []) lists).length * 3;
       break;
     default:
-      return;
+        throw new IllegalArgumentException("Unknown type");
     }
 
     int p = RequestOutputStream.pad (length);
@@ -1331,7 +1365,8 @@ public class GL extends gnu.x11.Resource implements GLConstant {
       default:
         return;
       }
-      large_render_request.write_pad (p);
+      large_render_request.skip (p);
+      large_render_request.send();
     }
 
   }
@@ -1390,7 +1425,8 @@ public class GL extends gnu.x11.Resource implements GLConstant {
       large_render_request.begin_large_parameter();
       for (int i = 0; i < bitmap.length; i++)
         large_render_request.write_int8 (bitmap [i]);
-      large_render_request.write_pad(RequestOutputStream.pad(bitmap.length));
+      large_render_request.skip(RequestOutputStream.pad(bitmap.length));
+      large_render_request.send();
     }
   }
 
@@ -2454,8 +2490,10 @@ public class GL extends gnu.x11.Resource implements GLConstant {
     case DIFFUSE:               // fall through
     case SPECULAR:              // fall through
     case POSITION: n = 4; break;
+    default:
+        throw new IllegalArgumentException("Invalid pname");
     }
-    
+
     RequestOutputStream o = display.out;
     synchronized (o) {
       GLRenderRequest rr = begin_render_request (o, 87, 12 + 4 * n);
@@ -2736,7 +2774,7 @@ public class GL extends gnu.x11.Resource implements GLConstant {
       large_render_request.begin(o, 102, 24, mask.length);
       large_render_request.write_int8 ((byte) 0);  // swap bytes
       large_render_request.write_bool (false); // java = msb = !lsb_first
-      large_render_request.write_pad (2);
+      large_render_request.skip (2);
 
       // FIXME work with other cases??
       large_render_request.write_int32 (0);  // row len
@@ -2747,6 +2785,7 @@ public class GL extends gnu.x11.Resource implements GLConstant {
       large_render_request.begin_large_parameter();
       for (int i = 0; i < mask.length; i++)
         large_render_request.write_int8(mask [i]);
+      large_render_request.send();
     }
   }
 
@@ -2862,10 +2901,10 @@ public class GL extends gnu.x11.Resource implements GLConstant {
 
     RequestOutputStream o = display.out;
     synchronized (o) {
-      large_render_request.begin (o, 109, 52, pixels.length);
+      large_render_request.begin (o, 109, 56, pixels.length);
       large_render_request.write_int8 ((byte) 0);  // swap bytes
       large_render_request.write_bool (false); // java = msb = !lsb_first
-      large_render_request.write_pad (2);
+      large_render_request.skip (2);
 
       // FIXME GL_ABGR_EXT?
 
@@ -2879,14 +2918,15 @@ public class GL extends gnu.x11.Resource implements GLConstant {
       large_render_request.write_int32 (level);
       large_render_request.write_int32 (internal_format);
       large_render_request.write_int32 (width);
-      large_render_request.write_pad (4);
+      large_render_request.skip (4);
       large_render_request.write_int32 (border);
       large_render_request.write_int32 (format);
       large_render_request.write_int32 (type);
       large_render_request.begin_large_parameter ();
       for (int i = 0; i < pixels.length; i++)
         large_render_request.write_int8 (pixels [i]);
-      large_render_request.write_pad (RequestOutputStream.pad(pixels.length));
+      large_render_request.skip (RequestOutputStream.pad(pixels.length));
+      large_render_request.send();
     }
   }
 
@@ -2904,7 +2944,7 @@ public class GL extends gnu.x11.Resource implements GLConstant {
       large_render_request.begin (o, 110, 56, pixels.length);
       large_render_request.write_int8 ((byte) 0);  // swap bytes
       large_render_request.write_bool (false); // java = msb = !lsb_first
-      large_render_request.write_pad (2);
+      large_render_request.skip (2);
 
       // FIXME GL_ABGR_EXT?
 
@@ -2925,7 +2965,11 @@ public class GL extends gnu.x11.Resource implements GLConstant {
       large_render_request.begin_large_parameter ();
       for (int i = 0; i < pixels.length; i++)
         large_render_request.write_int8 (pixels [i]);
-      large_render_request.write_pad (RequestOutputStream.pad(pixels.length));
+      int pad = RequestOutputStream.pad(pixels.length);
+      if (pad > 0) {
+          large_render_request.skip (pad);
+      }
+      large_render_request.send();
     }
   }
 
@@ -3415,6 +3459,7 @@ public class GL extends gnu.x11.Resource implements GLConstant {
       large_render_request.begin_large_parameter ();
       for (int i = 0; i < points.length; i++)
         large_render_request.write_float64 (points [i]);
+      large_render_request.send();
     }
   }
 
@@ -3453,6 +3498,7 @@ public class GL extends gnu.x11.Resource implements GLConstant {
       large_render_request.begin_large_parameter ();
       for (int i = 0; i < points.length; i++)
         large_render_request.write_float32 (points [i]);
+      large_render_request.send();
     }
   }
 
@@ -3494,6 +3540,7 @@ public class GL extends gnu.x11.Resource implements GLConstant {
       large_render_request.begin_large_parameter ();
       for (int i = 0; i < points.length; i++)
         large_render_request.write_float64 (points [i]);
+      large_render_request.send();
     }
 
   }
@@ -3536,6 +3583,7 @@ public class GL extends gnu.x11.Resource implements GLConstant {
       large_render_request.begin_large_parameter ();
       for (int i = 0; i < points.length; i++)
         large_render_request.write_float32 (points [i]);
+      large_render_request.send();
     }
   }
 
@@ -3849,7 +3897,7 @@ public class GL extends gnu.x11.Resource implements GLConstant {
       large_render_request.begin(o, 173, 40, pixels.length);
       large_render_request.write_int8 ((byte) 0);  // swap bytes
       large_render_request.write_bool (false); // java = msb = !lsb_first
-      large_render_request.write_pad (2);
+      large_render_request.skip (2);
 
       // FIXME work with other cases??
       large_render_request.write_int32 (0);  // row len
@@ -3865,7 +3913,8 @@ public class GL extends gnu.x11.Resource implements GLConstant {
       large_render_request.begin_large_parameter ();
       for (int i = 0; i < pixels.length; i++)
         large_render_request.write_int8 (pixels [i]);
-      large_render_request.write_pad (RequestOutputStream.pad(pixels.length));
+      large_render_request.skip (RequestOutputStream.pad(pixels.length));
+      large_render_request.send();
     }
   }
 
@@ -4524,7 +4573,7 @@ public class GL extends gnu.x11.Resource implements GLConstant {
       large_render_request.begin(o, 4100, 60, pixels.length);
       large_render_request.write_int8 ((byte) 0);  // swap bytes
       large_render_request.write_bool (false); // java = msb = !lsb_first
-      large_render_request.write_pad (2);
+      large_render_request.skip (2);
 
     // FIXME work with other cases??
       large_render_request.write_int32 (0);  // row len
@@ -4540,12 +4589,13 @@ public class GL extends gnu.x11.Resource implements GLConstant {
       large_render_request.write_int32 (height);
       large_render_request.write_int32 (format);
       large_render_request.write_int32 (type);
-      large_render_request.write_pad(4);
+      large_render_request.skip(4);
 
       large_render_request.begin_large_parameter ();
       for (int i = 0; i < pixels.length; i++)
         large_render_request.write_int8 (pixels [i]);
-      large_render_request.write_pad (RequestOutputStream.pad(pixels.length));
+      large_render_request.skip (RequestOutputStream.pad(pixels.length));
+      large_render_request.send();
     }
   }
 
