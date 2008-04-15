@@ -556,7 +556,7 @@ public class RequestOutputStream extends FilterOutputStream {
    *         of bytes, <code>false</code> otherwise
    */
   public boolean fits (int num_bytes) {
-    return index + num_bytes < buffer.length;
+    return index + num_bytes <= buffer.length;
   }
 
   /**
