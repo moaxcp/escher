@@ -295,6 +295,15 @@ public class RequestOutputStream extends FilterOutputStream {
   }
 
   /**
+   * Returns the current index in the current request buffer.
+   *
+   * @return the current index in the current request buffer
+   */
+  public int getIndex() {
+      return index - request_index;
+  }
+
+  /**
    * Writes one byte to the stream.
    *
    * @param v
