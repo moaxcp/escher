@@ -98,7 +98,7 @@ class DebugRequestOutputStream extends RequestOutputStream {
 
         int sequenceNumber = getSequenceNumber();
         String message = "[opcode: " + super.opcode() + " | seq_number: "
-                + sequenceNumber + " ]";
+                + sequenceNumber + " | index: " + getIndex() + " ]";
 
         logger.logp(Level.FINEST, CLASS_NAME, "send_impl", message);
 
