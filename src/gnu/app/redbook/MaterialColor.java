@@ -34,7 +34,7 @@ public class MaterialColor extends gnu.x11.extension.glx.Application {
     super (args, BUTTON_PRESS_BIT | KEYBOARD_BIT | RESIZE_BIT);
 
     about ("0.1", "material color",
-      "Stephen Tse <stephent@sfu.ca>",
+      "Stephen Tse <stephent@sfu.ca>, Roman Kennke <roman@kennke.org>",
       "http://escher.sourceforge.net/",
       "\nTo change red value, press 'r', 'R' or BUTTON1."
       + "\nTo change green value, press 'g', 'G' or BUTTON2."

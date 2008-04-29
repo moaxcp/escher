@@ -29,7 +29,7 @@ public class WrapTexture extends gnu.x11.extension.glx.Application {
     super (args, KEYBOARD_BIT | RESIZE_BIT);
 
     about ("0.1", "wrap checkerboard texture",
-      "Stephen Tse <stephent@sfu.ca>",
+      "Stephen Tse <stephent@sfu.ca>, Roman Kennke <roman@kennke.org>",
       "http://escher.sourceforge.net/",
       "\nTo use clamp wrapping for s parameter, press 's'."
       + "\nTo use repeat wrapping for s parameter, press or 'S'."

@@ -162,7 +162,7 @@ public class Squiral extends DisplayHack {
       "total number of worms: 0 = window.width/32", 0);
 
     about ("0.1", "square spirals",
-      "Stephen Tse <stephent@sfu.ca>",
+      "Stephen Tse <stephent@sfu.ca>, Roman Kennke <roman@kennke.org>",
       "http://escher.sourceforge.net/");
 
     if (help_option) return;

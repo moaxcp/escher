@@ -25,7 +25,7 @@ public class DBE extends Graphics {
     super (args, 256, 256); 
     
     about ("0.1", "test double buffer extension",
-      "Stephen Tse <stephent@sfu.ca>",
+      "Stephen Tse <stephent@sfu.ca>, Roman Kennke <roman@kennke.org>",
       "http://escher.sourceforge.net/");
 
     if (help_option) return;

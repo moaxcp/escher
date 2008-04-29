@@ -26,7 +26,7 @@ public class Hello extends gnu.x11.Application {
     super (args);
 
     about ("0.1", "hello world",
-      "Stephen Tse <stephent@sfu.ca>",
+      "Stephen Tse <stephent@sfu.ca>, Roman Kennke <roman@kennke.org>",
       "http://escher.sourceforge.net/",
       "\nTo quit, press 'q', 'Q', ESCAPE, or any button.");
    

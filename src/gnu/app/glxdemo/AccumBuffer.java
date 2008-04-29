@@ -23,7 +23,7 @@ public class AccumBuffer extends gnu.x11.extension.glx.Application {
     super (args, KEYBOARD_BIT | RESIZE_BIT);
 
     about ("0.1", "accumulation buffer",
-      "Stephen Tse <stephent@sfu.ca>",
+      "Stephen Tse <stephent@sfu.ca>, Roman Kennke <roman@kennke.org>",
       "http://escher.sourceforge.net/",
       "\nTo fill rectangles, press '1'."
       + "\nTo draw lines, press '2'.");

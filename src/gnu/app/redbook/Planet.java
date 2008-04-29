@@ -29,7 +29,7 @@ public class Planet extends gnu.x11.extension.glx.Application {
     super (args, KEYBOARD_BIT | RESIZE_BIT);
 
     about ("0.1", "sun and planet",
-      "Stephen Tse <stephent@sfu.ca>",
+      "Stephen Tse <stephent@sfu.ca>, Roman Kennke <roman@kennke.org>",
       "http://escher.sourceforge.net/",
       "\nTo rotate counter-clockwise about planet, press 'd'."
       + "\nTo rotate clockwise about planet, press 'D'."

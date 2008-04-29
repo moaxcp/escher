@@ -29,7 +29,7 @@ public class Pixel extends gnu.x11.extension.glx.Application {
     super (args, BUTTON1_MOTION_BIT | KEYBOARD_BIT | RESIZE_BIT);
 
     about ("0.1", "pixel operations",
-      "Stephen Tse <stephent@sfu.ca>",
+      "Stephen Tse <stephent@sfu.ca>, Roman Kennke <roman@kennke.org>",
       "http://escher.sourceforge.net/",
       "\nTo draw, move pointer while pressing BUTTON1."
       + "\nTo increase zoom factor, press 'z'."

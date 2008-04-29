@@ -53,7 +53,7 @@ public class PolygonOffset extends gnu.x11.extension.glx.Application {
     super (args, BUTTON_PRESS_BIT | KEYBOARD_BIT | RESIZE_BIT);
 
     about ("0.1", "polygon offset",
-      "Stephen Tse <stephent@sfu.ca>",
+      "Stephen Tse <stephent@sfu.ca>, Roman Kennke <roman@kennke.org>",
       "http://escher.sourceforge.net/",
       "\nTo increase t-distance, press 't'."
       + "\nTo decrease t-distance, press 'T'."

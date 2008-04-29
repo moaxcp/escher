@@ -27,7 +27,7 @@ public class Sync extends Graphics implements Runnable {
     super (args, 256, 256);
 
     about ("0.1", "test multi-threading and synchronization",
-      "Stephen Tse <stephent@sfu.ca>",
+      "Stephen Tse <stephent@sfu.ca>, Roman Kennke <roman@kennke.org>",
       "http://escher.sourceforge.net/");
 
     if (help_option) return;

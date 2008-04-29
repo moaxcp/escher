@@ -33,7 +33,7 @@ public class TeapotMaterial extends gnu.x11.extension.glx.Application {
     super (args, RESIZE_BIT);
 
     about ("0.1", "teapots of different material colors",
-      "Stephen Tse <stephent@sfu.ca>",
+      "Stephen Tse <stephent@sfu.ca>, Roman Kennke <roman@kennke.org>",
       "http://escher.sourceforge.net/");
 
     if (help_option) return;

@@ -47,7 +47,7 @@ public class Munch extends DisplayHack {
       "use xor function to draw", true);
 
     about ("0.1", "munching squares",
-      "Stephen Tse <stephent@sfu.ca>",
+      "Stephen Tse <stephent@sfu.ca>, Roman Kennke <roman@kennke.org>",
       "http://escher.sourceforge.net/");
 
     if (help_option) return;

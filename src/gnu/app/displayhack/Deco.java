@@ -29,7 +29,7 @@ public class Deco extends DisplayHack {
       "mimimum size of width and height", 20);
 
     about ("0.1", "draw tacky 70s basement wall panelling",
-      "Stephen Tse <stephent@sfu.ca>",
+      "Stephen Tse <stephent@sfu.ca>, Roman Kennke <roman@kennke.org>",
       "http://escher.sourceforge.net/");
 
     if (help_option) return;

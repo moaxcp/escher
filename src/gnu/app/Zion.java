@@ -45,7 +45,7 @@ public class Zion extends Application {
     super (args);
 
     about ("0.1", "the last mainframe on earth",
-      "Stephen Tse <stephent@sfu.ca>",
+      "Stephen Tse <stephent@sfu.ca>, Roman Kennke <roman@kennke.org>",
       "http://escher.sourceforge.net/",
       "\nCommands: "
       + "\n  exit: terminate Zion"

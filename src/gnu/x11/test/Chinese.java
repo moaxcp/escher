@@ -21,7 +21,7 @@ public class Chinese extends Graphics {
     super (args, 100, 50);
 
     about ("0.1", "test text output with chinese font",
-      "Stephen Tse <stephent@sfu.ca>",
+      "Stephen Tse <stephent@sfu.ca>, Roman Kennke <roman@kennke.org>",
       "http://escher.sourceforge.net/");
 
     if (help_option) return;

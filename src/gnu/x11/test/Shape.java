@@ -37,7 +37,7 @@ public class Shape extends Graphics {
     super (args, 32, 32); 
 
     about ("0.1", "test nonrectangular window extension",
-      "Stephen Tse <stephent@sfu.ca>",
+      "Stephen Tse <stephent@sfu.ca>, Roman Kennke <roman@kennke.org>",
       "http://escher.sourceforge.net/");
 
     if (help_option) return;

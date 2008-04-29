@@ -35,7 +35,7 @@ public class Salt extends gnu.x11.Application {
       "message to be sent", "");
     
     about ("0.1", "send string to top-level windows",
-      "Stephen Tse <stephent@sfu.ca>",
+      "Stephen Tse <stephent@sfu.ca>, Roman Kennke <roman@kennke.org>",
       "http://escher.sourceforge.net/");
 
     if (help_option) return;

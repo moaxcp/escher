@@ -21,7 +21,7 @@ public class UnProject extends gnu.x11.extension.glx.Application {
     super (args, BUTTON_PRESS_BIT | RESIZE_BIT);
 
     about ("0.1", "un-project window coordinates",
-      "Stephen Tse <stephent@sfu.ca>",
+      "Stephen Tse <stephent@sfu.ca>, Roman Kennke <roman@kennke.org>",
       "http://escher.sourceforge.net/");
 
     if (help_option) return;

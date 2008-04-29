@@ -28,7 +28,7 @@ public class LightPosition extends gnu.x11.extension.glx.Application {
     super (args, BUTTON_PRESS_BIT | KEYBOARD_BIT | RESIZE_BIT);
 
     about ("0.1", "light position",
-      "Stephen Tse <stephent@sfu.ca>",
+      "Stephen Tse <stephent@sfu.ca>, Roman Kennke <roman@kennke.org>",
       "http://escher.sourceforge.net/",
       "\nTo rotate position, press 'r', 'R' or BUTTON1.");
 

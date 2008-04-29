@@ -23,7 +23,7 @@ public class SubimageTexture extends gnu.x11.extension.glx.Application {
     super (args, KEYBOARD_BIT | RESIZE_BIT);
 
     about ("0.1", "wrap checkerboard texture",
-      "Stephen Tse <stephent@sfu.ca>",
+      "Stephen Tse <stephent@sfu.ca>, Roman Kennke <roman@kennke.org>",
       "http://escher.sourceforge.net/",
       "\nTo texture subimage, press 's' or 'S'."
       + "\nTo reset, press 'r' or 'R'.");

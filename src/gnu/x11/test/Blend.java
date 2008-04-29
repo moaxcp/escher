@@ -32,7 +32,7 @@ public class Blend extends Graphics {
     super (args, 255, 255);
 
     about ("0.1", "test blending in RENDER",
-      "Stephen Tse <stephent@sfu.ca>",
+      "Stephen Tse <stephent@sfu.ca>, Roman Kennke <roman@kennke.org>",
       "http://escher.sourceforge.net/");
 
     if (help_option) return;

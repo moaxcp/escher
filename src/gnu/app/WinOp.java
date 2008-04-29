@@ -37,7 +37,7 @@ public class WinOp extends gnu.x11.Application {
       "action on window", OPERATION_STRINGS, LIST_TOP_LEVEL);
     
     about ("0.1", "perform action on window given its ID",
-      "Stephen Tse <stephent@sfu.ca>",
+      "Stephen Tse <stephent@sfu.ca>, Roman Kennke <roman@kennke.org>",
       "http://escher.sourceforge.net/");
 
     if (help_option) return;

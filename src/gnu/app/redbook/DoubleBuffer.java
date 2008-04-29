@@ -25,7 +25,7 @@ public class DoubleBuffer extends gnu.x11.extension.glx.Application implements R
     super (args, BUTTON_PRESS_BIT | KEYBOARD_BIT | RESIZE_BIT);
 
     about ("0.1", "double buffer",
-      "Stephen Tse <stephent@sfu.ca>",
+      "Stephen Tse <stephent@sfu.ca>, Roman Kennke <roman@kennke.org>",
       "http://escher.sourceforge.net/",
       "\nTo start spinning, press 's' or BUTTON1."
       + "\nTo stop spinning, press 'S' or BUTTON2.");

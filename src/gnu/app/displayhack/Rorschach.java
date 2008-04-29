@@ -36,7 +36,7 @@ public class Rorschach extends DisplayHack {
       "if symmetry along y-axis", false);
 
     about ("0.1", "simulate ink-blot patterns",
-      "Stephen Tse <stephent@sfu.ca>",
+      "Stephen Tse <stephent@sfu.ca>, Roman Kennke <roman@kennke.org>",
       "http://escher.sourceforge.net/");
 
     if (help_option) return;

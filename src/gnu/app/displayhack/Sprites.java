@@ -106,7 +106,7 @@ public class Sprites extends DisplayHack {
     super (args, false, false, false, 64, 1000);
 
     about ("0.1", "moving sprites to blend colors",
-      "Stephen Tse <stephent@sfu.ca>",
+      "Stephen Tse <stephent@sfu.ca>, Roman Kennke <roman@kennke.org>",
       "http://escher.sourceforge.net/");
 
     if (help_option) return;

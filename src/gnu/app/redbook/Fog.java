@@ -41,7 +41,7 @@ public class Fog extends gnu.x11.extension.glx.Application {
     super (args, RESIZE_BIT);
 
     about ("0.1", "fogged spheres",
-      "Stephen Tse <stephent@sfu.ca>",
+      "Stephen Tse <stephent@sfu.ca>, Roman Kennke <roman@kennke.org>",
       "http://escher.sourceforge.net/",
       "To use exponential fog, press 'e' or 'E'."
       + "To use exponential squared fog, press 's' or 'S'."

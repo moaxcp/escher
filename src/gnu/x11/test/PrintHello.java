@@ -31,7 +31,7 @@ public class PrintHello extends gnu.x11.Application {
       "name of printer", "");
 
     about ("0.1", "print hello world",
-      "Stephen Tse <stephent@sfu.ca>",
+      "Stephen Tse <stephent@sfu.ca>, Roman Kennke <roman@kennke.org>",
       "http://escher.sourceforge.net/");
 
     if (help_option) return;

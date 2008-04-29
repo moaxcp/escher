@@ -22,7 +22,7 @@ public class AlphaOrder extends gnu.x11.extension.glx.Application {
     super (args, KEYBOARD_BIT | RESIZE_BIT);
 
     about ("0.1", "order of alpha blending",
-      "Stephen Tse <stephent@sfu.ca>",
+      "Stephen Tse <stephent@sfu.ca>, Roman Kennke <roman@kennke.org>",
       "http://escher.sourceforge.net/",
       "\nTo toggle order of drawing, press 't' or 'T'.");
 

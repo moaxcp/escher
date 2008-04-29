@@ -41,7 +41,7 @@ public class TextureTeapot extends gnu.x11.extension.glx.Application {
     super (args, KEYBOARD_BIT | RESIZE_BIT);
 
     about ("0.1", "texture map teapot",
-      "Stephen Tse <stephent@sfu.ca>",
+      "Stephen Tse <stephent@sfu.ca>, Roman Kennke <roman@kennke.org>",
       "http://escher.sourceforge.net/",
       "\nTo use eye-coordinate, press 'e' or 'E'."
       + "\nTo use object-coordinate, press 'o' or 'O'."

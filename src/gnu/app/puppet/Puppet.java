@@ -357,7 +357,7 @@ public class Puppet extends Application {
       "workspace for normal windows", pref.space ());
 
     about ("0.1", "puppet window manager",
-      "Stephen Tse <stephent@sfu.ca>",
+      "Stephen Tse <stephent@sfu.ca>, Roman Kennke <roman@kennke.org>",
       "http://escher.sourceforge.net/", 
       "\nFor bindings, check http://escher.sourceforge.net/"
       + "current/doc/gnu/app/puppet/Puppet.html.");

@@ -32,7 +32,7 @@ public class RotateBox extends gnu.x11.extension.glx.Application {
     super (args, BUTTON_PRESS_BIT | RESIZE_BIT);
 
     about ("0.1", "box for rotation",
-      "Stephen Tse <stephent@sfu.ca>",
+      "Stephen Tse <stephent@sfu.ca>, Roman Kennke <roman@kennke.org>",
       "http://escher.sourceforge.net/",
       "\nTo rotate about x-axis, press BUTTON1."
       + "\nTo rotate about y-axis, press BUTTON2."

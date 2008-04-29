@@ -26,7 +26,7 @@ public class Sniff extends Application {
       "port number to talk to", 6000);
 
     about ("0.1", "network middle-layer sniffer",
-      "Stephen Tse <stephent@sfu.ca>",
+      "Stephen Tse <stephent@sfu.ca>, Roman Kennke <roman@kennke.org>",
       "http://escher.sourceforge.net/");
 
     if (help_option) return;    

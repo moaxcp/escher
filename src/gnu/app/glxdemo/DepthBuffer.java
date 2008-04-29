@@ -59,7 +59,7 @@ public class DepthBuffer extends gnu.x11.extension.glx.Application {
     super (args, KEYBOARD_BIT | RESIZE_BIT);
 
     about ("0.1", "depth buffer",
-      "Stephen Tse <stephent@sfu.ca>",
+      "Stephen Tse <stephent@sfu.ca>, Roman Kennke <roman@kennke.org>",
       "http://escher.sourceforge.net/",
       "\nTo toggle anti-aliasing, press '1'."
       + "\nTo toggle stippling, press '2'.");

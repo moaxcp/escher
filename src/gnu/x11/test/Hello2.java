@@ -17,7 +17,7 @@ public class Hello2 extends Graphics {
     super (args, 100, 50);
 
     about ("0.1", "hello world",
-      "Stephen Tse <stephent@sfu.ca>",
+      "Stephen Tse <stephent@sfu.ca>, Roman Kennke <roman@kennke.org>",
       "http://escher.sourceforge.net/");
 
     if (help_option) return;

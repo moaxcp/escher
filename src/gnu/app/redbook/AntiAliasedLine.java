@@ -24,7 +24,7 @@ public class AntiAliasedLine extends gnu.x11.extension.glx.Application {
     super (args, RESIZE_BIT | KEYBOARD_BIT);
 
     about ("0.1", "anti-aliased lines",
-      "Stephen Tse <stephent@sfu.ca>",
+      "Stephen Tse <stephent@sfu.ca>, Roman Kennke <roman@kennke.org>",
       "http://escher.sourceforge.net/",
       "\nTo rotate lines, press 'r' or 'R'.");
 

@@ -102,7 +102,7 @@ public class Image extends Graphics {
     super (args, 200, 80); 
 
     about ("0.1", "test image output of XBM, XPM, and PPM format",
-      "Stephen Tse <stephent@sfu.ca>",
+      "Stephen Tse <stephent@sfu.ca>, Roman Kennke <roman@kennke.org>",
       "http://escher.sourceforge.net/");
 
     if (help_option) return;

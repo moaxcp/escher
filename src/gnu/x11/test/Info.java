@@ -33,7 +33,7 @@ public class Info extends gnu.x11.Application {
       "print all keysyms for debug", false);
 
     about ("0.1", "list info about X server",
-      "Stephen Tse <stephent@sfu.ca>",
+      "Stephen Tse <stephent@sfu.ca>, Roman Kennke <roman@kennke.org>",
       "http://escher.sourceforge.net/");
 
     if (help_option) return;

@@ -17,7 +17,7 @@ public class Hello extends gnu.x11.extension.glx.Application {
     super (args, 0);
 
     about ("0.1", "hello world",
-      "Stephen Tse <stephent@sfu.ca>",
+      "Stephen Tse <stephent@sfu.ca>, Roman Kennke <roman@kennke.org>",
       "http://escher.sourceforge.net/");
 
     if (help_option) return;
