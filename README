@@ -22,6 +22,12 @@ protocol.
 
   You will see a list of X applications and test suits you can run.
 
+* Troubleshooting
+
+  When you get a connection error, the most likely problem is that
+  TCP communication is turned off on your X server. When you start
+  the X server on the command line, leave away the -nolisten tcp option,
+  or configure your login manager to allow TCP connections on the server.
 
 * More information
   
