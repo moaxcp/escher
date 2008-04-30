@@ -31,13 +31,7 @@ public class RequestOutputStream extends FilterOutputStream {
       public void run() {
 
           synchronized (RequestOutputStream.this) {
-              if (RequestOutputStream.this.requestLock.tryLock()) {
-                  try {
-                      RequestOutputStream.this.flushPending();
-                  } finally {
-                      RequestOutputStream.this.requestLock.unlock();
-                  }
-              }
+              flushPending();
           }
       }
       
@@ -56,11 +50,6 @@ public class RequestOutputStream extends FilterOutputStream {
    * Maximum delay time between two flush request.
    */
   private static final int FLUSH_TIMER_DELAY = 50;
-  
-  /**
-   * Used to synchronize the request stream with flushTimer.
-   */
-  private Lock requestLock = new ReentrantLock();
   
   /**
    * Flush Timer.
@@ -196,7 +185,6 @@ public class RequestOutputStream extends FilterOutputStream {
     // Send pending request.
     sendPendingRequest();
 
-    this.requestLock.lock();
     this.timerTask.cancel();
     this.timerTask = null;
     
@@ -261,7 +249,6 @@ public class RequestOutputStream extends FilterOutputStream {
       this.timerTask = new RequestTimerTask();
       this.flushTimer.schedule(timerTask, FLUSH_TIMER_DELAY);
       
-      this.requestLock.unlock();
     }
     
   }
