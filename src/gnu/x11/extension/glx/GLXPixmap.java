@@ -16,7 +16,8 @@ public class GLXPixmap extends gnu.x11.Resource implements GLXDrawable {
     gnu.x11.Pixmap pixmap) {
 
     super (glx.display);
-
+    this.glx = glx;
+    
     RequestOutputStream o = display.out;
     synchronized (o) {
       o.begin_request (glx.major_opcode, 5, 5);
