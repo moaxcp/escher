@@ -8,7 +8,7 @@ public class GLXPixmap extends gnu.x11.Resource implements GLXDrawable {
   public GLX glx;
 
 
-  // glx opcode 5 - create glx pixmap
+  // glx opcode 13 - create glx pixmap
   /**
    * @see <a href="glXCreateGLXPixmap.html">glXCreateGLXPixmap</a>
    */
@@ -20,7 +20,7 @@ public class GLXPixmap extends gnu.x11.Resource implements GLXDrawable {
     
     RequestOutputStream o = display.out;
     synchronized (o) {
-      o.begin_request (glx.major_opcode, 5, 5);
+      o.begin_request (glx.major_opcode, 13, 5);
       o.write_int32 (screen_no);
       o.write_int32 (visual.visual_id ());
       o.write_int32 (pixmap.id);
@@ -30,14 +30,14 @@ public class GLXPixmap extends gnu.x11.Resource implements GLXDrawable {
   } 
 
 
-  // glx opcode 6 - destroy glx pixmap
+  // glx opcode 15 - destroy glx pixmap
   /**
    * @see <a href="glXDestroyContext.html">glXDestroyContext</a>
    */
   public void destroy () {
     RequestOutputStream o = display.out;
     synchronized (o) {
-      o.begin_request (glx.major_opcode, 6, 2);
+      o.begin_request (glx.major_opcode, 15, 2);
       o.write_int32 (id);
       o.send ();
     }
