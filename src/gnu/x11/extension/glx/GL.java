@@ -1,5 +1,9 @@
   package gnu.x11.extension.glx;
 
+import java.nio.Buffer;
+import java.nio.ByteBuffer;
+import java.nio.IntBuffer;
+
 import gnu.x11.Drawable;
 import gnu.x11.RequestObject;
 import gnu.x11.RequestOutputStream;
@@ -438,12 +442,12 @@ public class GL extends gnu.x11.Resource implements GLConstant {
   /**
    * @see <a href="glXSwapBuffers.html">glXSwapBuffers</a>
    */
-  public void swap_buffers (Drawable drawable) {
+  public void swap_buffers (GLXDrawable drawable) {
     RequestOutputStream o = display.out;
     synchronized (o) {
       o.begin_request (glx.major_opcode, 11, 3);
       o.write_int32 (tag);
-      o.write_int32 (drawable.id);
+      o.write_int32 (drawable.id());
       o.send ();
     }
   }
@@ -765,21 +769,54 @@ public class GL extends gnu.x11.Resource implements GLConstant {
 
   // glx opcode 117 - get integerv
   /**
-   * @see <a href="glGetIntegerv.html">glGetIntegerv</a>
+   * @deprecated use {@link #getIntegerv(int, int[], int)} instead.
+   * 
+   * @see <a href="http://www.opengl.org/sdk/docs/man/xhtml/glGet.xml">glGetIntegerv</a>
    */
+  @Deprecated
   public int [] integerv (int pname) {
     return get_iv1 (117, pname);
   }
 
-
+  /**
+   * Return the  
+   * GLX opcode 117.
+   * @see <a href="http://www.opengl.org/sdk/docs/man/xhtml/glGet.xml">glGetIntegerv</a>
+   * 
+   * @param name
+   * @param ret
+   */
+  public void getIntegerv(int name, int [] param, int offset)
+  {
+     this.getIntVector(117, name, param, offset);
+  }
+  
   // glx opcode 118 - get lightfv
   /**
-   * @see <a href="glGetLightfv.html">glGetLightfv</a>
+   * @deprecated use {@link #getLightfv(int, int, float[], int)} instead.
+   * @see <a href="http://www.opengl.org/sdk/docs/man/xhtml/glGetLight.xml">glGetLightfv</a>
    */
+  @Deprecated
   public float [] lightfv (int light, int pname) {
     return get_fv2 (118, light, pname);
   }
 
+  /**
+   * glGetLight returns in params the value or  values  of  a  light  source
+   * parameter.
+   * 
+   * GLX opcode 118.
+   * @see <a href="http://www.opengl.org/sdk/docs/man/xhtml/glGetLight.xml">
+   * glGetLightfv</a>
+   * @param light
+   * @param pname
+   * @param params
+   * @param params_offset
+   */
+  public void getLightfv(int light, int pname, float[] params,
+          int params_offset) {
+      this.getFloatVector(118, light, pname, params, params_offset);
+  }
 
   // glx opcode 119 - get lightiv
   /**
@@ -847,14 +884,87 @@ public class GL extends gnu.x11.Resource implements GLConstant {
 
   // glx opcode 126 - get pixel mapiv
   /**
-   * @see <a href="glGetPixelMapiv.html">
-   * glGetPixelMapiv</a>
+   * @see <a href="http://www.opengl.org/sdk/docs/man/xhtml/glGetPixelMap.xml.html">
+   * glGetPixelMapuiv</a>
    */
+  @Deprecated
   public int [] pixel_mapuiv (int map) {
     return get_iv1 (126, map);
   }
 
-
+  /**
+   * returns in <code>params</code> the contents of the pixel map
+   * specified in map
+   * 
+   * GLX opcode 126.
+   * @see <a href="http://www.opengl.org/sdk/docs/man/xhtml/glGetPixelMap.xml.html">
+   * glGetPixelMapuiv</a>
+   * @param map
+   * @param params
+   * @param offest
+   */
+  public void getPixelMapuiv (int map, int [] params, int offset) {
+      this.getIntVector(126, map, params, offset);
+  }
+  
+  /**
+   * returns pixel data from the frame buffer, starting with the pixel whose
+   * lower left corner is at location (x, y), into client memory starting
+   * at location pixels.
+   * @see <a href='http://www.opengl.org/documentation/specs/man_pages/hardcopy/GL/html/gl/readpixels.html'>
+   * glReadPixels
+   * </a>
+   * GLX opcode 111.
+   * 
+   * @param x
+   * @param y
+   * @param width
+   * @param height
+   * @param format
+   * @param type
+   * @param pixels
+   */
+  public void readPixels(int x, int y, int width, int height, int format,
+                           int type, Buffer pixels) {
+      RequestOutputStream o = display.out;
+        synchronized (o) {
+            o.begin_request(glx.major_opcode, 111, 9);
+            o.write_int32(tag);
+            o.write_int32(x);
+            o.write_int32(y);
+            o.write_int32(width);
+            o.write_int32(height);
+            o.write_int32(format);
+            o.write_int32(type);
+            o.write_bool(false);
+            o.write_bool(false);
+            o.skip(2);
+            ResponseInputStream in = display.in;
+            synchronized (in) {
+                in.read_reply(o);
+                in.skip(4);
+                int len = in.read_int32() * 4;
+                in.skip(24);
+                if (pixels instanceof ByteBuffer) {
+                    ByteBuffer bb = (ByteBuffer) pixels;
+                    for (int i = 0; i < len; i++) {
+                        bb.put((byte) in.read_byte());
+                    }
+                } else if (pixels instanceof IntBuffer) {
+                    IntBuffer ib = (IntBuffer) pixels;
+                    ib.position(0);
+                    for (int i = len / 4 - 1; i >= 0; i--) {
+                        ib.put((byte) in.read_int32());
+                    }
+                } else {
+                    throw new UnsupportedOperationException("Not Yet " +
+                    		"Implemented for Buffer types != ByteBuffer " +
+                    		"or IntBuffer");
+                }
+            }
+        }
+  }
+  
   // glx opcode 127 - get pixel mapusv
   /**
    * @see <a href="glGetPixelMapusv.html">
@@ -2672,33 +2782,59 @@ public class GL extends gnu.x11.Resource implements GLConstant {
 
   // glx render opcode 97 - materialfv
   /**
-   * @see <a href="glMaterialfv.html">glMaterialfv</a>
+   * Assigns values to material parameters.
+   * @see <a href="http://www.opengl.org/sdk/docs/man/xhtml/glMaterial.xml">
+   * glMaterialfv</a>
    */
   public void materialfv (int face, int pname, float [] params) {
-    int n = 0;
-
-    switch (pname) {
-    case SHININESS: n = 1; break;
-    case COLOR_INDEXES: n = 3; break;
-    case AMBIENT:               // fall through
-    case DIFFUSE:               // fall through
-    case SPECULAR:              // fall through
-    case EMISSION:              // fall through
-    case AMBIENT_AND_DIFFUSE: n = 4; break;
-    default: throw new IllegalArgumentException("Invalid pname");
-    }
-
-    RequestOutputStream o = display.out;
-    synchronized (o) {
-      GLRenderRequest rr = begin_render_request (o, 97, 12 + 4 * n);
-      rr.writeInt32 (face);
-      rr.writeInt32 (pname);
-      for (int i = 0; i < n; i++)
-        rr.writeFloat (params [i]);
-    }
+    
+      this.materialfv(face, pname, params, 0);
   }
 
+  /**
+   * Assigns values to material parameters.
+   * GLX opcode 97.
+   * 
+   * @see <a href="http://www.opengl.org/sdk/docs/man/xhtml/glMaterial.xml">
+   * glMaterialfv</a>
+   * 
+   * @param face
+   * @param pname
+   * @param params
+   * @param offset
+   */
+  public void materialfv (int face, int pname, float [] params, int offset) {
+  
+      int n = 0;
 
+        switch (pname) {
+        case SHININESS:
+            n = 1;
+            break;
+        case COLOR_INDEXES:
+            n = 3;
+            break;
+        case AMBIENT: // fall through
+        case DIFFUSE: // fall through
+        case SPECULAR: // fall through
+        case EMISSION: // fall through
+        case AMBIENT_AND_DIFFUSE:
+            n = 4;
+            break;
+        default:
+            throw new IllegalArgumentException("Invalid pname");
+        }
+
+        RequestOutputStream o = display.out;
+        synchronized (o) {
+            GLRenderRequest rr = begin_render_request(o, 97, 12 + 4 * n);
+            rr.writeInt32(face);
+            rr.writeInt32(pname);
+            for (int i = 0; i < n; i++)
+                rr.writeFloat (params [i + offset]);
+      }
+  }
+  
   // glx render opcode 98 - materiali
   /**
    * @see <a href="glMateriali.html">glMateriali</a>
@@ -5775,9 +5911,10 @@ public class GL extends gnu.x11.Resource implements GLConstant {
    * @param opcode the opcode
    * @param par1 the first parameter
    * @param par2 the second parameter
-   *
+   * @deprecated use {@link #getFloatVector(int, int, float[], int)} instead.
    * @return the returned FLOAT32 array
    */
+  @Deprecated
   private float [] get_fv2 (int opcode, int par1, int par2)
   {
     RequestOutputStream o = display.out;
@@ -5806,6 +5943,34 @@ public class GL extends gnu.x11.Resource implements GLConstant {
     return ret;
   }
 
+  private void getFloatVector(int opcode, int param1, int param2,
+                             float[] ret, int offset) {
+      
+      RequestOutputStream o = display.out;
+      synchronized (o) {
+          o.begin_request (glx.major_opcode, opcode, 4);
+          o.write_int32 (tag);
+          o.write_int32 (param1);
+          o.write_int32 (param2);
+          ResponseInputStream in = display.in;
+          synchronized (in) {
+              in.read_reply(o);
+              in.skip (12);
+              int n = in.read_int32 ();
+              if (n == 1) {
+                  ret [offset] = in.read_float32 ();
+                  in.skip (12);
+                  
+              } else {
+                  in.skip (16);
+                  for (int i = offset; i < n; i++) {
+                      ret [i] = in.read_float32 ();
+                  }
+              }
+          }
+      }
+  }
+  
   /**
    * A generic function for a common request pattern in GLX. This sends
    * a request that takes two int-like parameters (a 4 bytes) and returns
@@ -5889,9 +6054,11 @@ public class GL extends gnu.x11.Resource implements GLConstant {
    *
    * @param opcode the opcode
    * @param par1 the first parameter
+   * @deprecated use {@link #getIntVector(int, int, int[])} instead 
    *
    * @return the returned FLOAT32 array
    */
+  @Deprecated
   private int [] get_iv1 (int opcode, int par1)
   {
     RequestOutputStream o = display.out;
@@ -5919,6 +6086,32 @@ public class GL extends gnu.x11.Resource implements GLConstant {
     return ret;
   }
 
+  private void getIntVector (int opcode, int param1, int [] ret, int offset) {
+      
+      RequestOutputStream o = display.out;
+      synchronized (o) {
+          o.begin_request (glx.major_opcode, opcode, 3);
+          o.write_int32 (tag);
+          o.write_int32 (param1);
+          ResponseInputStream in = display.in;
+          synchronized (in) {
+              in.read_reply(o);
+              in.skip (12);
+              int n = in.read_int32 ();
+              if (n == 1) {
+                  ret [offset] = in.read_int32 ();
+                  in.skip (12);
+                  
+              } else {
+                  in.skip (16);
+                  for (int i = offset; i < n; i++) {
+                      ret [i] = in.read_int32 ();
+                  }
+              }
+          }
+      }
+  }
+  
   /**
    * A generic function for a common request pattern in GLX. This sends
    * a request that takes two int-like parameters (a 4 bytes) and returns
