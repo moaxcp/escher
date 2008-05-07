@@ -35,11 +35,17 @@ public final class ClientMessage extends Event {
   }
 
   public int wm_data () {
-    return data [0] << 24 | data [1] << 16 | data [2] << 8 | data [3];
+      return  ((((int) data [0]) & 0xff) << 24 |
+               (((int) data [1]) & 0xff) << 16 |
+               (((int) data [2]) & 0xff) << 8  |
+               (((int) data [3]) & 0xff));
   }
 
   public int wm_time () {
-    return data [4] << 24 | data [5] << 16 | data [6] << 8 | data [7];
+    return ((((int) data [4]) & 0xff) << 24 |
+            (((int) data [5]) & 0xff) << 16 |
+            (((int) data [6]) & 0xff) << 8  |
+            (((int) data [7]) & 0xff));
   }
 
 
