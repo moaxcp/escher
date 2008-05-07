@@ -185,8 +185,10 @@ public class RequestOutputStream extends FilterOutputStream {
     // Send pending request.
     sendPendingRequest();
 
-    this.timerTask.cancel();
-    this.timerTask = null;
+    if (this.timerTask != null) {
+        this.timerTask.cancel();
+        this.timerTask = null;
+    }
     
     this.seq_number = (this.seq_number + 1) & 0xffff;
     
