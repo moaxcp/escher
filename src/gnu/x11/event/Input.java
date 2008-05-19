@@ -5,126 +5,303 @@ import gnu.x11.RequestOutputStream;
 import gnu.x11.ResponseInputStream;
 import gnu.x11.Window;
 
-
 /**
  * X input-related event.
  */
 public abstract class Input extends Event {
 
-  public int time;
+    private int time;
 
-  public int root_window_id;
+    private int root_window_id;
 
-  public int event_window_id;
+    private int event_window_id;
 
-  public int child_window_id;
+    private int child_window_id;
 
-  public int root_x;
+    private int root_x;
 
-  public int root_y;
+    private int root_y;
 
-  public int event_x;
+    private int event_x;
 
-  public int event_y;
+    private int event_y;
 
-  public int state;
+    private int state;
 
-  public boolean same_screen;
+    private boolean same_screen;
 
-  /**
-   * Reads the event from the input stream.
-   */
-  public Input (Display display, ResponseInputStream in) {
+    /**
+     * Reads the event from the input stream.
+     */
+    public Input(Display display, ResponseInputStream in) {
+
+        super(display, in);
+        
+        this.time = in.read_int32();
+        this.root_window_id = in.read_int32();
+        this.event_window_id = in.read_int32();
+        this.child_window_id = in.read_int32();
+        this.root_x = in.read_int16();
+        this.root_y = in.read_int16();
+        this.event_x = in.read_int16();
+        this.event_y = in.read_int16();
+        this.state = in.read_int16();
+        this.same_screen = in.read_bool();
+        
+        in.skip(1); // Unused.
+    }
+
+    public Input(Display display, int code) {
+
+        super(display, code);
+    }
+
+    public int detail() {
+
+        return detail;
+    }
+
+    /**
+     * @param time the time to set
+     */
+    public void setTime(int time) {
+
+        this.time = time;
+    }
+
+    /**
+     * @return the time
+     */
+    public int getTime() {
+
+        return time;
+    }
     
-    super (display, in);
-    time = in.read_int32 ();
-    root_window_id = in.read_int32 ();
-    event_window_id = in.read_int32 ();
-    child_window_id = in.read_int32 ();
-    root_x = in.read_int16 ();
-    root_y = in.read_int16 ();
-    event_x = in.read_int16 ();
-    event_y = in.read_int16 ();
-    state = in.read_int16 ();
-    same_screen = in.read_bool ();
-    in.skip (1); // Unused.
-  }
+    /**
+     * @param root_window_id the root_window_id to set
+     */
+    public void setRootWindowID(int root_window_id) {
 
+        this.root_window_id = root_window_id;
+    }
 
-  public Input (Display display, int code) {
-    super (display, code);
-  }
+    /**
+     * @return the root_window_id
+     */
+    public int getRootWindowID() {
 
+        return root_window_id;
+    }
 
-  public int detail () {
-    return detail;
-  }
+    /**
+     * @param event_window_id the event_window_id to set
+     */
+    public void setEventWindowID(int event_window_id) {
 
-  public int root_id () {
-    return root_window_id;
-  }
+        this.event_window_id = event_window_id;
+    }
 
-  public int child_id () {
-    return child_window_id;
-  }
+    /**
+     * @return the event_window_id
+     */
+    public int getEventWindowID() {
 
-  public int root_x () {
-    return root_x;
-  }
+        return event_window_id;
+    }
 
-  public int root_y () {
-    return root_y;
-  }
+    /**
+     * @param same_screen the same_screen to set
+     */
+    public void setSameScreen(boolean same_screen) {
 
-  public int event_x () {
-    return event_x;
-  }
+        this.same_screen = same_screen;
+    }
 
-  public int event_y () {
-    return event_y;
-  }
+    /**
+     * @return the same_screen
+     */
+    public boolean isSameScreen() {
 
-  public int state () {
-    return state;
-  }
+        return this.same_screen();
+    }
 
-  public boolean same_screen () {
-    return same_screen;
-  }
+    /**
+     * @deprecated Use {@link #getRootID()} instead
+     */
+    public int root_id() {
 
-  public Window root () { 
-    return (Window) Window.intern (display, root_window_id); 
-  }
+        return getRootWindowID();
+    }
 
-  public Window child () {
-    return (Window) Window.intern (display, child_window_id); 
-  }
+    public int getRootID() {
 
-  public void set_window (Window w) {
-    event_window_id = w.id;
-  }
+        return root_id();
+    }
 
-  public void set_detail (int d) {
-    detail = d;
-  }
+    /**
+     * @deprecated Use {@link #childID()} instead
+     */
+    public int child_id() {
+        
+        return child_window_id;
+    }
 
-  public void set_state (int s) {
-    state = s;
-  }
+    public int childID() {
 
-  public void write (RequestOutputStream o) {
-    super.write (o);
-    o.write_int32 (time);
-    o.write_int32 (root_window_id);
-    o.write_int32 (event_window_id);
-    o.write_int32 (child_window_id);
-    o.write_int16 (root_x);
-    o.write_int16 (root_y);
-    o.write_int16 (event_x);
-    o.write_int16 (event_y);
-    o.write_int16 (state);
-    o.write_bool (same_screen);
-    o.skip (1); // Unused.
+        return child_id();
+    }
 
-  }
+    /**
+     * @deprecated Use {@link #getRootX()} instead
+     */
+    public int root_x() {
+        
+        return root_x;
+    }
+
+    public int getRootX() {
+
+        return root_x();
+    }
+
+    /**
+     * @deprecated Use {@link #getRootY()} instead
+     */
+    public int root_y() {
+        
+        return root_y;
+    }
+
+    public int getRootY() {
+
+        return root_y();
+    }
+
+    /**
+     * @deprecated Use {@link #getEventX()} instead
+     */
+    public int event_x() {
+        
+        return event_x;
+    }
+
+    public int getEventX() {
+
+        return event_x();
+    }
+
+    /**
+     * @deprecated Use {@link #getEventY()} instead
+     */
+    public int event_y() {
+        
+        return event_y;
+    }
+
+    public int getEventY() {
+
+        return event_y();
+    }
+
+    /**
+     * @deprecated Use {@link #getState()} instead
+     */
+    public int state() {
+        
+        return state;
+    }
+
+    public int getState() {
+
+        return state();
+    }
+
+    /**
+     * @deprecated use {@link #isSameScreen()} instead
+     */
+    public boolean same_screen() {
+
+        return this.same_screen;
+    }
+
+    /**
+     * @deprecated Use {@link #getRoot()} instead
+     */
+    public Window root() {
+        return (Window) Window.intern(display, getRootWindowID());
+    }
+
+    public Window getRoot() {
+
+        return root();
+    }
+
+    /**
+     * @deprecated Use {@link #getChild()} instead
+     */
+    public Window child() {
+        
+        return (Window) Window.intern(display, child_window_id);
+    }
+
+    public Window getChild() {
+
+        return child();
+    }
+
+    /**
+     * @deprecated Use {@link #setWindow(Window)} instead
+     */
+    public void set_window(Window w) {
+
+        setEventWindowID(w.id);
+    }
+
+    public void setWindow(Window w) {
+
+        set_window(w);
+    }
+
+    /**
+     * @deprecated Use {@link #setDetail(int)} instead
+     */
+    public void set_detail(int d) {
+        
+        detail = d;
+    }
+
+    public void setDetail(int d) {
+
+        set_detail(d);
+    }
+
+    /**
+     * @deprecated Use {@link #setState(int)} instead
+     */
+    public void set_state(int s) {
+        
+        state = s;
+    }
+
+    public void setState(int s) {
+
+        set_state(s);
+    }
+
+    public void write(RequestOutputStream o) {
+
+        super.write(o);
+        o.write_int32(time);
+        o.write_int32(root_window_id);
+        o.write_int32(event_window_id);
+        o.write_int32(child_window_id);
+        o.write_int16(root_x);
+        o.write_int16(root_y);
+        o.write_int16(event_x);
+        o.write_int16(event_y);
+        o.write_int16(state);
+        o.write_bool(same_screen);
+        o.skip(1); // Unused.
+
+    }
 }

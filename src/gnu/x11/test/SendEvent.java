@@ -31,13 +31,13 @@ public class SendEvent extends Graphics {
 
     System.out.println ("Sending a synthetic KeyPress...");
     KeyPress key_event = new KeyPress (display);
-    key_event.set_window (window);
-    key_event.set_detail (display.input.keysym_to_keycode ('t'));
+    key_event.setWindow (window);
+    key_event.setDetail (display.input.keysym_to_keycode ('t'));
     window.send_event (false, Event.NO_EVENT_MASK, key_event);
     
     System.out.println ("Sending a synthetic ButtonPress to exit...");
     ButtonPress button_event = new ButtonPress (display);
-    key_event.set_window (window);
+    key_event.setWindow (window);
     window.send_event (false, Event.NO_EVENT_MASK, button_event);
     display.flush ();
     while (!exit_now) {

@@ -1531,9 +1531,9 @@ public class Puppet extends Application {
      * <code>event.window()</code> since it always equals to
      * {@link #root}. Instead, check <code>event.child()</code>.
      */    
-    boolean control_down = (event.state () & Input.CONTROL_MASK) != 0;
-    boolean meta_down = (event.state () & Input.META_MASK) != 0;
-    boolean on_root = event.child_id () == 0;
+    boolean control_down = (event.getState () & Input.CONTROL_MASK) != 0;
+    boolean meta_down = (event.getState () & Input.META_MASK) != 0;
+    boolean on_root = event.childID () == 0;
 
     if (meta_down && on_root) { // `lanuch-on-root'
       try {
@@ -1552,7 +1552,7 @@ public class Puppet extends Application {
     }
        
 
-    Client client = (Client) Client.intern (display, event.child_id ());
+    Client client = (Client) Client.intern (display, event.childID ());
     if (client.early_unmapped || client.early_destroyed) return;
     if (!control_down) return;
     int button = event.detail ();
@@ -1670,7 +1670,7 @@ public class Puppet extends Application {
 
   public void when_key_press (KeyPress event) {
     keycode = event.detail ();
-    int keystate = event.state ();
+    int keystate = event.getState ();
     keysym = display.input.keycode_to_keysym (keycode, keystate);
 
     shift_down = (keystate & Input.SHIFT_MASK) != 0;
@@ -1725,7 +1725,7 @@ public class Puppet extends Application {
   /** Handle *-TAB key release. */
   public void when_key_release (KeyRelease event) {
     keycode = event.detail ();
-    int keystate = event.state ();
+    int keystate = event.getState ();
     keysym = display.input.keycode_to_keysym (keycode, keystate);
 
     if (!focus_key_pressed
@@ -1745,9 +1745,9 @@ public class Puppet extends Application {
 
   
   public void when_property_notify (PropertyNotify event) {
-    Atom atom = event.atom (display);
+    Atom atom = event.getAtom(display);
 
-    Client client = (Client) Client.intern (display, event.window_id);
+    Client client = (Client) Client.intern (display, event.getWindowID());
     if (client.early_destroyed) return;
 
     if (atom == wm_colormap_windows

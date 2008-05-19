@@ -908,7 +908,7 @@ public class GL extends gnu.x11.Resource implements GLConstant {
   }
   
   /**
-   * returns pixel data from the frame buffer, starting with the pixel whose
+   * Returns pixel data from the frame buffer, starting with the pixel whose
    * lower left corner is at location (x, y), into client memory starting
    * at location pixels.
    * @see <a href='http://www.opengl.org/documentation/specs/man_pages/hardcopy/GL/html/gl/readpixels.html'>

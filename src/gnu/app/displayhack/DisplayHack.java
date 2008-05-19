@@ -149,7 +149,7 @@ public abstract class DisplayHack extends gnu.x11.Application
       KeyPress e = (KeyPress) event;
 	
       int keycode = e.detail ();
-      int keystate = e.state ();
+      int keystate = e.getState ();
       int keysym = display.input.keycode_to_keysym (keycode, keystate);
 
       if (keysym == ' ') restart ();

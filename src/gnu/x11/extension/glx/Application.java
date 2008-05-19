@@ -159,8 +159,8 @@ public abstract class Application extends gnu.x11.Application {
       
     ButtonPress e = (ButtonPress) event;
     int button = e.detail ();
-    int state = e.state ();      
-    handle_button (button, state, e.event_x (), e.event_y ());
+    int state = e.getState ();      
+    handle_button (button, state, e.getEventX (), e.getEventY ());
   }
 
 
@@ -204,11 +204,11 @@ public abstract class Application extends gnu.x11.Application {
   private void dispatch_key_press () {
     KeyPress e = (KeyPress) event;
     int keycode = e.detail ();
-    int keystate = e.state ();
+    int keystate = e.getState ();
     int keysym = display.input.keycode_to_keysym (keycode, keystate);
 
     if ((event_mask & KEYBOARD_BIT) != 0)
-      handle_keyboard (keysym, keystate, e.event_x (), e.event_y ());
+      handle_keyboard (keysym, keystate, e.getEventX (), e.getEventY ());
 
     if (keysym == gnu.x11.keysym.Misc.ESCAPE) exit ();
   }
@@ -218,8 +218,8 @@ public abstract class Application extends gnu.x11.Application {
     if ((event_mask & MOTION_BITS) == 0) return;
 
     MotionNotify e = (MotionNotify) event;
-    int state = e.state ();      
-    handle_motion (state, e.event_x (), e.event_y ());
+    int state = e.getState ();      
+    handle_motion (state, e.getEventX (), e.getEventY ());
   }
 
 

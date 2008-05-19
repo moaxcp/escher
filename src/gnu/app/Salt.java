@@ -69,9 +69,9 @@ public class Salt extends gnu.x11.Application {
     int small_keysym = !capital ? keysym : keysym + ('a' - 'A');
 
     KeyPress key_event = new KeyPress (display);
-    key_event.set_window (window);
-    key_event.set_detail (display.input.keysym_to_keycode (small_keysym));
-    if (capital) key_event.set_state (gnu.x11.Input.SHIFT_MASK);
+    key_event.setWindow (window);
+    key_event.setDetail (display.input.keysym_to_keycode (small_keysym));
+    if (capital) key_event.setState (gnu.x11.Input.SHIFT_MASK);
 
     window.send_event (false, Event.NO_EVENT_MASK, key_event);
   }
