@@ -39,8 +39,8 @@ public class Pixel extends gnu.x11.extension.glx.Application {
     if (help_option) return;
     init_window (250, 250);
 
-    gl.shade_model (GL.FLAT);
-    gl.pixel_storei (GL.UNPACK_ALIGNMENT, 1);
+    gl.shadeModel (GL.FLAT);
+    gl.pixelStorei (GL.UNPACK_ALIGNMENT, 1);
   }
 
 
@@ -93,11 +93,11 @@ public class Pixel extends gnu.x11.extension.glx.Application {
 
   protected void handle_resize (int width, int height) {
     gl.viewport (0, 0, width, height);
-    gl.matrix_mode (GL.PROJECTION);
-    gl.load_identity ();
+    gl.matrixMode (GL.PROJECTION);
+    gl.loadIdentity ();
     glu.ortho_2d (0.0, width, 0.0, height);
-    gl.matrix_mode (GL.MODELVIEW);
-    gl.load_identity ();
+    gl.matrixMode (GL.MODELVIEW);
+    gl.loadIdentity ();
   }
 
 

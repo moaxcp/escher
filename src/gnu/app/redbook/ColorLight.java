@@ -54,7 +54,7 @@ public class ColorLight extends gnu.x11.extension.glx.Application {
     init_window (600, 450);
 
     gl.enable (GL.DEPTH_TEST);
-    gl.clear_color (0.0f, 0.1f, 0.1f, 0.0f);
+    gl.clearColor (0.0f, 0.1f, 0.1f, 0.0f);
     init_light ();
   }
 
@@ -63,7 +63,7 @@ public class ColorLight extends gnu.x11.extension.glx.Application {
     float [] ambient, float [] diffuse, float [] specular, float shininess,
     float [] emission) {
 
-    gl.push_matrix ();
+    gl.pushMatrix ();
     gl.translatef  (x, y, z);
     gl.materialfv (GL.FRONT, GL.AMBIENT, ambient);
     gl.materialfv (GL.FRONT, GL.DIFFUSE, diffuse);
@@ -71,7 +71,7 @@ public class ColorLight extends gnu.x11.extension.glx.Application {
     gl.materialf (GL.FRONT, GL.SHININESS, shininess);
     gl.materialfv (GL.FRONT, GL.EMISSION, emission);
     glut.solid_sphere (1.0, 16, 16);
-    gl.pop_matrix ();       
+    gl.popMatrix ();       
   }
 
 
@@ -146,8 +146,8 @@ public class ColorLight extends gnu.x11.extension.glx.Application {
 
   protected void handle_resize (int width, int height) {
     gl.viewport (0, 0, width, height);
-    gl.matrix_mode (GL.PROJECTION);
-    gl.load_identity ();
+    gl.matrixMode (GL.PROJECTION);
+    gl.loadIdentity ();
 
     double wh = (float) width / (float) height;
     double hw = (float) height / (float) width;
@@ -157,8 +157,8 @@ public class ColorLight extends gnu.x11.extension.glx.Application {
     else
       gl.ortho (-4.0*wh, 4.5*wh, -4.0, 4.0, -4.0, 4.0);
 
-    gl.matrix_mode (GL.MODELVIEW);
-    gl.load_identity ();
+    gl.matrixMode (GL.MODELVIEW);
+    gl.loadIdentity ();
   }
 
 

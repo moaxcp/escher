@@ -32,7 +32,7 @@ public class ABGR extends gnu.x11.extension.glx.Application {
     init_window (400, 400);
     
     gl.disable (GL.DITHER);
-    gl.clear_color (0.0f, 0.0f, 0.0f, 1.0f);
+    gl.clearColor (0.0f, 0.0f, 0.0f, 1.0f);
     init_image ();
   }
 
@@ -85,10 +85,10 @@ public class ABGR extends gnu.x11.extension.glx.Application {
 
   protected void handle_resize (int width, int height) {
     gl.viewport (0, 0, width, height);
-    gl.matrix_mode (GL.PROJECTION);
-    gl.load_identity ();   
+    gl.matrixMode (GL.PROJECTION);
+    gl.loadIdentity ();   
     glu.perspective (60.0, 1.0, 0.1, 1000.0);
-    gl.matrix_mode (GL.MODELVIEW);
+    gl.matrixMode (GL.MODELVIEW);
   }
 
 

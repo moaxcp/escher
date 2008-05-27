@@ -44,8 +44,8 @@ public class RotateBox extends gnu.x11.extension.glx.Application {
     init_window (300, 300);
 
     gl.enable (GL.DEPTH_TEST);
-    gl.matrix_mode (GL.PROJECTION);
-    gl.load_identity ();
+    gl.matrixMode (GL.PROJECTION);
+    gl.loadIdentity ();
     gl.frustum (-1.0, 1.0, -1.0, 1.0, 1.0, 10.0);
     init_view ();
     init_box ();
@@ -66,7 +66,7 @@ public class RotateBox extends gnu.x11.extension.glx.Application {
 
 
   protected void handle_expose () {
-    gl.call_list (1);
+    gl.callList (1);
     gl.swap_buffers (window);
   }
 
@@ -77,7 +77,7 @@ public class RotateBox extends gnu.x11.extension.glx.Application {
 
 
   private void init_box () {
-    gl.new_list (1, GL.COMPILE);
+    gl.newList (1, GL.COMPILE);
     gl.clear (GL.COLOR_BUFFER_BIT | GL.DEPTH_BUFFER_BIT);
 
     gl.begin (GL.QUADS);
@@ -111,13 +111,13 @@ public class RotateBox extends gnu.x11.extension.glx.Application {
     gl.vertex3f (-1.0f, -1.0f, -1.0f);
 
     gl.end ();
-    gl.end_list ();
+    gl.endList ();
   }
 
 
   private void init_view () {
-    gl.matrix_mode (GL.MODELVIEW);
-    gl.load_identity ();
+    gl.matrixMode (GL.MODELVIEW);
+    gl.loadIdentity ();
     gl.translatef (0.0f, 0.0f, -3.0f);
     gl.rotatef (x_angle, 0.1f, 0.0f, 0.0f);
     gl.rotatef (y_angle, 0.0f, 0.1f, 0.0f);

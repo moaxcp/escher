@@ -50,49 +50,49 @@ public class AntiAliasPerspective extends gnu.x11.extension.glx.Application {
     init_window (250, 250);
 
     gl.enable (GL.DEPTH_TEST);
-    gl.shade_model (GL.FLAT);
+    gl.shadeModel (GL.FLAT);
     init_light ();
   }
 
   
   private void draw_scene () {
-    gl.push_matrix ();
+    gl.pushMatrix ();
     gl.translatef (0.0f, 0.0f, -5.0f); // vs. AntiAliasParallel
     gl.rotatef (30.0f, 1.0f, 0.0f, 0.0f);
 
     // torus
-    gl.push_matrix ();
+    gl.pushMatrix ();
     gl.translatef (-0.80f, 0.35f, 0.0f); 
     gl.rotatef (100.0f, 1.0f, 0.0f, 0.0f);
     gl.materialfv (GL.FRONT, GL.DIFFUSE, TORUS_DIFFUSE);
     glut.solid_torus (0.275, 0.85, 16, 16);
-    gl.pop_matrix ();
+    gl.popMatrix ();
 
     // cube
-    gl.push_matrix ();
+    gl.pushMatrix ();
     gl.translatef (-0.75f, -0.50f, 0.0f); 
     gl.rotatef (45.0f, 0.0f, 0.0f, 1.0f);
     gl.rotatef (45.0f, 1.0f, 0.0f, 0.0f);
     gl.materialfv (GL.FRONT, GL.DIFFUSE, CUBE_DIFFUSE);
     glut.solid_cube (1.5f);
-    gl.pop_matrix ();
+    gl.popMatrix ();
 
     // sphere
-    gl.push_matrix ();
+    gl.pushMatrix ();
     gl.translatef (0.75f, 0.60f, 0.0f); 
     gl.rotatef (30.0f, 1.0f, 0.0f, 0.0f);
     gl.materialfv (GL.FRONT, GL.DIFFUSE, SPHERE_DIFFUSE);
     glut.solid_sphere (1.0, 16, 16);
-    gl.pop_matrix ();
+    gl.popMatrix ();
 
     // octahedron
-    gl.push_matrix ();
+    gl.pushMatrix ();
     gl.translatef (0.70f, -0.90f, 0.25f); 
     gl.materialfv (GL.FRONT, GL.DIFFUSE, OCTAHEDRON_DIFFUSE);
     glut.solid_octahedron ();
-    gl.pop_matrix ();
+    gl.popMatrix ();
 
-    gl.pop_matrix ();
+    gl.popMatrix ();
   }
     
   
@@ -101,10 +101,10 @@ public class AntiAliasPerspective extends gnu.x11.extension.glx.Application {
 
     for (int i=0; i<ACCUM_SIZE; i++) {
       gl.clear (GL.COLOR_BUFFER_BIT | GL.DEPTH_BUFFER_BIT);
-      gl.push_matrix ();
+      gl.pushMatrix ();
       jitter_position (i);
       draw_scene ();
-      gl.pop_matrix ();
+      gl.popMatrix ();
       gl.accum (GL.ACCUM, 1.0f/ACCUM_SIZE);
     }
       

@@ -41,14 +41,14 @@ public class Planet extends gnu.x11.extension.glx.Application {
     visual_config.set_double_buffer ();
     init_window (500, 500);
 
-    gl.shade_model (GL.FLAT);
+    gl.shadeModel (GL.FLAT);
   }
 
 
   protected void handle_expose () {
     gl.clear (GL.COLOR_BUFFER_BIT);
     gl.color3f (1.0f, 1.0f, 1.0f);
-    gl.push_matrix ();
+    gl.pushMatrix ();
 
     // sun
     glut.wire_sphere (1.0, 20, 16);
@@ -59,7 +59,7 @@ public class Planet extends gnu.x11.extension.glx.Application {
     gl.rotatef (day, 0.0f, 1.0f, 0.0f);
     glut.wire_sphere (0.2, 10, 8);
 
-    gl.pop_matrix ();
+    gl.popMatrix ();
     gl.swap_buffers (window);
   }
 
@@ -79,12 +79,12 @@ public class Planet extends gnu.x11.extension.glx.Application {
 
   protected void handle_resize (int width, int height) {
     gl.viewport (0, 0, width, height);
-    gl.matrix_mode (GL.PROJECTION);
-    gl.load_identity ();   
+    gl.matrixMode (GL.PROJECTION);
+    gl.loadIdentity ();   
     double wh = (float) width / (float) height;
     glu.perspective (60.0,  wh, 1.0, 20.0);
-    gl.matrix_mode (GL.MODELVIEW);
-    gl.load_identity ();   
+    gl.matrixMode (GL.MODELVIEW);
+    gl.loadIdentity ();   
     glu.look_at (0.0, 0.0, 5.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0);
   }
 

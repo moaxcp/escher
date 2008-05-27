@@ -117,8 +117,8 @@ public class Primitive extends gnu.x11.extension.glx.Application {
 
     gl.color3fv (COLORS [4]);
 
-    gl.pixel_storei (GL.UNPACK_LSB_FIRST, GL.TRUE);
-    gl.pixel_storei (GL.UNPACK_ALIGNMENT, 1);
+    gl.pixelStorei (GL.UNPACK_LSB_FIRST, GL.TRUE);
+    gl.pixelStorei (GL.UNPACK_ALIGNMENT, 1);
 
     gl.raster_pos2i (0, 0);
     gl.bitmap (BITMAP_WIDTH, BITMAP_HEIGHT, 0, 3, 0.0f, 0.0f, BITMAP);
@@ -175,7 +175,7 @@ public class Primitive extends gnu.x11.extension.glx.Application {
 
 
   private void draw_line () {
-    gl.push_matrix ();
+    gl.pushMatrix ();
 
     gl.translatef (-12.0f, 0.0f, 0.0f);
     for (int i=1; i<8; i++) {
@@ -187,7 +187,7 @@ public class Primitive extends gnu.x11.extension.glx.Application {
       gl.translatef (4.0f, 0.0f, 0.0f);
     }
 
-    gl.pop_matrix ();
+    gl.popMatrix ();
 
     gl.color3fv (COLORS [7]);    
     gl.begin (GL.LINES);
@@ -401,12 +401,12 @@ public class Primitive extends gnu.x11.extension.glx.Application {
 
     gl.color_mask (true, true, true, true);
     gl.index_mask (0xff);
-    gl.clear_color (0.0f, 0.0f, 0.0f, 0.0f);
+    gl.clearColor (0.0f, 0.0f, 0.0f, 0.0f);
     gl.clear (GL.COLOR_BUFFER_BIT);
 
     gl.pop_attrib ();
 
-    gl.shade_model (smooth_shade ? GL.SMOOTH : GL.FLAT);
+    gl.shadeModel (smooth_shade ? GL.SMOOTH : GL.FLAT);
     gl.polygon_mode (GL.FRONT_AND_BACK, polygon_fill ? GL.FILL : GL.LINE);
 
     viewport (0, 0); draw_point ();
@@ -442,10 +442,10 @@ public class Primitive extends gnu.x11.extension.glx.Application {
   
   protected void handle_resize (int width, int height) {
     gl.viewport (0, 0, width, height);
-    gl.matrix_mode (GL.PROJECTION);
-    gl.load_identity ();   
+    gl.matrixMode (GL.PROJECTION);
+    gl.loadIdentity ();   
     glu.ortho_2d (-width/2, width/2, -height/2, height/2);
-    gl.matrix_mode (GL.MODELVIEW);
+    gl.matrixMode (GL.MODELVIEW);
   }
 
 
@@ -486,11 +486,11 @@ public class Primitive extends gnu.x11.extension.glx.Application {
     int y = GAP + row * (box_height + GAP);
 
     gl.viewport (x, y, box_width, box_height);
-    gl.matrix_mode (GL.PROJECTION);
-    gl.load_identity ();
+    gl.matrixMode (GL.PROJECTION);
+    gl.loadIdentity ();
     gl.ortho (-box_width/2, box_width/2,
       -box_height/2, box_height/2, 0.0, 1.0);
-    gl.matrix_mode (GL.MODELVIEW);
+    gl.matrixMode (GL.MODELVIEW);
 
     gl.enable (GL.SCISSOR_TEST);
     gl.scissor (x, y, box_width, box_height);

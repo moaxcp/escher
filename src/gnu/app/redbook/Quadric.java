@@ -47,38 +47,38 @@ public class Quadric extends gnu.x11.extension.glx.Application {
 
   protected void handle_expose () {
     gl.clear (GL.COLOR_BUFFER_BIT | GL.DEPTH_BUFFER_BIT);
-    gl.push_matrix ();
+    gl.pushMatrix ();
 
     gl.enable (GL.LIGHTING);
-    gl.shade_model (GL.SMOOTH);
+    gl.shadeModel (GL.SMOOTH);
     gl.translatef (-1.0f, -1.0f, 0.0f);
-    gl.call_list (display_list);
+    gl.callList (display_list);
 
-    gl.shade_model (GL.FLAT);
+    gl.shadeModel (GL.FLAT);
     gl.translatef (0.0f, 2.0f, 0.0f);
-    gl.push_matrix ();
+    gl.pushMatrix ();
     gl.rotatef (300.0f, 1.0f, 0.0f, 0.0f);
-    gl.call_list (display_list+1);
-    gl.pop_matrix ();
+    gl.callList (display_list+1);
+    gl.popMatrix ();
 
     gl.disable (GL.LIGHTING);
     gl.color3f (0.0f, 1.0f, 1.0f);
     gl.translatef (2.0f, -2.0f, 0.0f);
-    gl.call_list (display_list+2);
+    gl.callList (display_list+2);
 
     gl.color3f (1.0f, 1.0f, 0.0f);
     gl.translatef (0.0f, 2.0f, 0.0f);
-    gl.call_list (display_list+3);
+    gl.callList (display_list+3);
 
-    gl.pop_matrix ();   
+    gl.popMatrix ();   
     gl.swap_buffers (window);
   }
 
 
   protected void handle_resize (int width, int height) {
     gl.viewport (0, 0, width, height);
-    gl.matrix_mode (GL.PROJECTION);
-    gl.load_identity ();
+    gl.matrixMode (GL.PROJECTION);
+    gl.loadIdentity ();
 
     double wh = (float) width / (float) height;
     double hw = (float) height / (float) width;
@@ -88,8 +88,8 @@ public class Quadric extends gnu.x11.extension.glx.Application {
     else
       gl.ortho (-2.5*wh, 2.5*wh, -2.5, 2.5, -10.0, 10.0);
 
-    gl.matrix_mode (GL.MODELVIEW);
-    gl.load_identity ();
+    gl.matrixMode (GL.MODELVIEW);
+    gl.loadIdentity ();
   }
 
 
@@ -109,36 +109,36 @@ public class Quadric extends gnu.x11.extension.glx.Application {
   private void init_object () {
     // different drawing styles and surface normal specification
 
-    display_list = gl.gen_lists (4);
+    display_list = gl.genLists (4);
     gnu.x11.extension.glx.Quadric quadric = new gnu.x11.extension.glx.Quadric (gl);
 
     // smooth shaded
     quadric.draw_style = gnu.x11.extension.glx.Quadric.FILL;
     quadric.normals = gnu.x11.extension.glx.Quadric.SMOOTH;
-    gl.new_list (display_list, GL.COMPILE);
+    gl.newList (display_list, GL.COMPILE);
     quadric.sphere (0.75, 15, 10);
-    gl.end_list ();
+    gl.endList ();
 
     // flat shaded
     quadric.draw_style = gnu.x11.extension.glx.Quadric.FILL;
     quadric.normals = gnu.x11.extension.glx.Quadric.FLAT;
-    gl.new_list (display_list+1, GL.COMPILE);
+    gl.newList (display_list+1, GL.COMPILE);
     quadric.cylinder (0.5, 0.3, 1.0, 15, 5);
-    gl.end_list ();
+    gl.endList ();
 
     // all polygon wireframe
     quadric.draw_style = gnu.x11.extension.glx.Quadric.LINE;
     quadric.normals = gnu.x11.extension.glx.Quadric.NONE;
-    gl.new_list (display_list+2, GL.COMPILE);
+    gl.newList (display_list+2, GL.COMPILE);
     quadric.disk (0.25, 1.0, 20, 4);
-    gl.end_list ();
+    gl.endList ();
 
     // boundary only
     quadric.draw_style = gnu.x11.extension.glx.Quadric.SILHOUETTE;
     quadric.normals = gnu.x11.extension.glx.Quadric.NONE;
-    gl.new_list (display_list+3, GL.COMPILE);
+    gl.newList (display_list+3, GL.COMPILE);
     quadric.partial_disk (0.0, 1.0, 20, 4, 0.0, 225.0);
-    gl.end_list ();
+    gl.endList ();
   }
 
 

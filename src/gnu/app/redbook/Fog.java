@@ -52,7 +52,7 @@ public class Fog extends gnu.x11.extension.glx.Application {
     visual_config.set_depth_size (1);
     init_window (500, 500);
 
-    gl.clear_color (0.5f, 0.5f, 0.5f, 1.0f);
+    gl.clearColor (0.5f, 0.5f, 0.5f, 1.0f);
     gl.enable (GL.AUTO_NORMAL);
     gl.enable (GL.DEPTH_TEST);
     gl.enable (GL.FOG);
@@ -64,10 +64,10 @@ public class Fog extends gnu.x11.extension.glx.Application {
 
 
   private void draw_sphere (float x, float y, float z) {
-   gl.push_matrix ();
+   gl.pushMatrix ();
    gl.translatef (x, y, z);
    glut.solid_sphere (0.4, 16, 16);
-   gl.pop_matrix ();
+   gl.popMatrix ();
   }
 
   
@@ -105,8 +105,8 @@ public class Fog extends gnu.x11.extension.glx.Application {
 
   protected void handle_resize (int width, int height) {
     gl.viewport (0, 0, width, height);
-    gl.matrix_mode (GL.PROJECTION);
-    gl.load_identity ();
+    gl.matrixMode (GL.PROJECTION);
+    gl.loadIdentity ();
 
     double wh = (float) width / (float) height;
     double hw = (float) height / (float) width;
@@ -116,8 +116,8 @@ public class Fog extends gnu.x11.extension.glx.Application {
     else
       gl.ortho (-2.5*wh, 2.5*wh, -2.5, 2.5, -10.0, 10.0);
 
-    gl.matrix_mode (GL.MODELVIEW);
-    gl.load_identity ();
+    gl.matrixMode (GL.MODELVIEW);
+    gl.loadIdentity ();
   }
 
 

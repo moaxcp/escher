@@ -32,12 +32,12 @@ class AntiAlias {
     double dx = pixdx*xwsize/window_width + eyedx*near/focus;
     double dy = pixdy*ywsize/window_height + eyedy*near/focus;
 
-    gl.matrix_mode (GL.PROJECTION);
-    gl.load_identity ();    
+    gl.matrixMode (GL.PROJECTION);
+    gl.loadIdentity ();    
     gl.frustum (left-dx, right-dx, bottom-dy, top-dy, near, far);
 
-    gl.matrix_mode (GL.MODELVIEW);
-    gl.load_identity ();
+    gl.matrixMode (GL.MODELVIEW);
+    gl.loadIdentity ();
     gl.translatef ((float) -eyedx, (float) -eyedy, 0.0f);
   }
 

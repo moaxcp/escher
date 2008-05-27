@@ -59,12 +59,12 @@ public class UnProject extends gnu.x11.extension.glx.Application {
 
   protected void handle_resize (int width, int height) {
     gl.viewport (0, 0, width, height);
-    gl.matrix_mode (GL.PROJECTION);
-    gl.load_identity ();   
+    gl.matrixMode (GL.PROJECTION);
+    gl.loadIdentity ();   
     double wh = (float) width / (float) height;
     glu.perspective (45.0,  wh, 1.0, 100.0);
-    gl.matrix_mode (GL.MODELVIEW);
-    gl.load_identity ();
+    gl.matrixMode (GL.MODELVIEW);
+    gl.loadIdentity ();
   }
 
 

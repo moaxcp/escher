@@ -137,9 +137,9 @@ public class BitmapFont extends gnu.x11.extension.glx.Application {
     if (help_option) return;
     init_window (300, 100);
 
-    gl.shade_model (GL.FLAT);
-    gl.pixel_storei (GL.UNPACK_ALIGNMENT, 1);
-    display_list_offset = gl.gen_lists (128);
+    gl.shadeModel (GL.FLAT);
+    gl.pixelStorei (GL.UNPACK_ALIGNMENT, 1);
+    display_list_offset = gl.genLists (128);
 
     init_letters ();
     init_space ();
@@ -168,27 +168,27 @@ public class BitmapFont extends gnu.x11.extension.glx.Application {
 
   protected void handle_resize (int width, int height) {
     gl.viewport (0, 0, width, height);
-    gl.matrix_mode (GL.PROJECTION);
-    gl.load_identity ();   
+    gl.matrixMode (GL.PROJECTION);
+    gl.loadIdentity ();   
     gl.ortho (0.0, width, 0.0, height, -1.0, 1.0);
-    gl.matrix_mode (GL.MODELVIEW);
+    gl.matrixMode (GL.MODELVIEW);
   }
 
 
   private void init_letters () {
     for (int i=0; i<26; i++) {
       int j = i + 'A';
-      gl.new_list (display_list_offset+j, GL.COMPILE);
+      gl.newList (display_list_offset+j, GL.COMPILE);
       gl.bitmap (8, 13, 0.0f, 2.0f, 10.0f, 0.0f, LETTERS [i]);
-      gl.end_list ();
+      gl.endList ();
     }
   }
   
 
   private void init_space () {
-    gl.new_list (display_list_offset + ' ', GL.COMPILE);
+    gl.newList (display_list_offset + ' ', GL.COMPILE);
     gl.bitmap (8, 13, 0.0f, 2.0f, 10.0f, 0.0f, SPACE);
-    gl.end_list ();
+    gl.endList ();
   }
 
 

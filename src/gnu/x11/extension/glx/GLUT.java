@@ -295,7 +295,7 @@ public class GLUT {             // TODO
 
   private void teapot (int grid, double scale, int type) {
     gl.push_attrib (GL.ENABLE_BIT | GL.EVAL_BIT);
-    gl.push_matrix ();
+    gl.pushMatrix ();
 
     gl.enable (GL.AUTO_NORMAL);
     gl.enable (GL.NORMALIZE);
@@ -307,7 +307,7 @@ public class GLUT {             // TODO
     gl.translatef (0.0f, 0.0f, -1.5f);    
     teapot_patch (grid, type);
     
-    gl.pop_matrix ();
+    gl.popMatrix ();
     gl.pop_attrib ();
   }
 

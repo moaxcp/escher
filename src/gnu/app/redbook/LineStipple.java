@@ -23,7 +23,7 @@ public class LineStipple extends gnu.x11.extension.glx.Application {
     if (help_option) return;
     init_window (400, 150);
 
-    gl.shade_model (GL.FLAT);
+    gl.shadeModel (GL.FLAT);
   }
 
 
@@ -88,8 +88,8 @@ public class LineStipple extends gnu.x11.extension.glx.Application {
 
   protected void handle_resize (int width, int height) {
     gl.viewport (0, 0, width, height);
-    gl.matrix_mode (GL.PROJECTION);
-    gl.load_identity ();
+    gl.matrixMode (GL.PROJECTION);
+    gl.loadIdentity ();
     glu.ortho_2d (0.0, (double) width, 0.0, (double) height);
   }
 

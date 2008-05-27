@@ -35,8 +35,8 @@ public class SubimageTexture extends gnu.x11.extension.glx.Application {
     support_bind = gl.support (1, 1) && glx.support (1, 3);
 
     gl.enable (GL.DEPTH_TEST);
-    gl.shade_model (GL.FLAT);
-    gl.pixel_storei (GL.UNPACK_ALIGNMENT, 1);
+    gl.shadeModel (GL.FLAT);
+    gl.pixelStorei (GL.UNPACK_ALIGNMENT, 1);
     init_texture ();
   }
 
@@ -100,12 +100,12 @@ public class SubimageTexture extends gnu.x11.extension.glx.Application {
 
   protected void handle_resize (int width, int height) {
     gl.viewport (0, 0, width, height);
-    gl.matrix_mode (GL.PROJECTION);
-    gl.load_identity ();
+    gl.matrixMode (GL.PROJECTION);
+    gl.loadIdentity ();
     double wh = (float) width / (float) height;
     glu.perspective (60.0, wh, 1.0, 30.0);
-    gl.matrix_mode (GL.MODELVIEW);
-    gl.load_identity ();
+    gl.matrixMode (GL.MODELVIEW);
+    gl.loadIdentity ();
     gl.translatef (0.0f, 0.0f, -3.6f);
   }
 

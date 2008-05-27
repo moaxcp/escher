@@ -66,7 +66,7 @@ public class StrokeFont extends gnu.x11.extension.glx.Application {
     if (help_option) return;
     init_window (440, 120);
 
-    gl.shade_model (GL.FLAT);
+    gl.shadeModel (GL.FLAT);
     init_letters ();
   }
 
@@ -104,18 +104,18 @@ public class StrokeFont extends gnu.x11.extension.glx.Application {
     gl.clear (GL.COLOR_BUFFER_BIT);
 
     // line 1
-    gl.push_matrix ();   
+    gl.pushMatrix ();   
     gl.scalef (2.0f, 2.0f, 2.0f);
     gl.translatef (10.0f, 30.0f, 0.0f);
     gl.call_lists (GL.BYTE, LINE1.getBytes ());
-    gl.pop_matrix ();
+    gl.popMatrix ();
 
     // line 2
-    gl.push_matrix ();
+    gl.pushMatrix ();
     gl.scalef (2.0f, 2.0f, 2.0f);
     gl.translatef (10.0f, 13.0f, 0.0f);
     gl.call_lists (GL.BYTE, LINE2.getBytes ());
-    gl.pop_matrix ();
+    gl.popMatrix ();
 
     gl.swap_buffers (window);
   }
@@ -123,39 +123,39 @@ public class StrokeFont extends gnu.x11.extension.glx.Application {
 
   protected void handle_resize (int width, int height) {
     gl.viewport (0, 0, width, height);
-    gl.matrix_mode (GL.PROJECTION);
-    gl.load_identity ();
+    gl.matrixMode (GL.PROJECTION);
+    gl.loadIdentity ();
     glu.ortho_2d (0.0, width, 0.0, height);
   }
 
 
   private void init_letters () {
-    int base = gl.gen_lists (128);
+    int base = gl.genLists (128);
     gl.list_base (base);
 
-    gl.new_list (base+'A', GL.COMPILE); 
+    gl.newList (base+'A', GL.COMPILE); 
     draw_letter (LETTER_A); 
-    gl.end_list ();
+    gl.endList ();
 
-    gl.new_list (base+'E', GL.COMPILE);
+    gl.newList (base+'E', GL.COMPILE);
     draw_letter (LETTER_E);
-    gl.end_list ();
+    gl.endList ();
 
-    gl.new_list (base+'P', GL.COMPILE);
+    gl.newList (base+'P', GL.COMPILE);
     draw_letter (LETTER_P);
-    gl.end_list ();
+    gl.endList ();
 
-    gl.new_list (base+'R', GL.COMPILE);
+    gl.newList (base+'R', GL.COMPILE);
     draw_letter (LETTER_R); 
-    gl.end_list ();
+    gl.endList ();
 
-    gl.new_list (base+'S', GL.COMPILE); 
+    gl.newList (base+'S', GL.COMPILE); 
     draw_letter (LETTER_S);
-    gl.end_list ();
+    gl.endList ();
 
-    gl.new_list (base+' ', GL.COMPILE); 
+    gl.newList (base+' ', GL.COMPILE); 
     gl.translatef (8.0f, 0.0f, 0.0f);
-    gl.end_list ();
+    gl.endList ();
   }
 
 

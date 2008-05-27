@@ -116,8 +116,8 @@ public class TeapotMaterial extends gnu.x11.extension.glx.Application {
 
   protected void handle_resize (int width, int height) {
     gl.viewport (0, 0, width, height);
-    gl.matrix_mode (GL.PROJECTION);
-    gl.load_identity ();
+    gl.matrixMode (GL.PROJECTION);
+    gl.loadIdentity ();
 
     double wh = (float) width / (float) height;
     double hw = (float) height / (float) width;
@@ -127,7 +127,7 @@ public class TeapotMaterial extends gnu.x11.extension.glx.Application {
     else
       gl.ortho (0.0, 16.0*wh, 0.0, 16.0, -10.0, 10.0);
 
-    gl.matrix_mode (GL.MODELVIEW);
+    gl.matrixMode (GL.MODELVIEW);
   }
 
 

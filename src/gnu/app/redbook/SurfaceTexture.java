@@ -68,7 +68,7 @@ public class SurfaceTexture extends gnu.x11.extension.glx.Application {
     gl.enable (GL.MAP2_VERTEX_3);
     gl.enable (GL.MAP2_TEXTURE_COORD_2);
     gl.enable (GL.TEXTURE_2D);
-    gl.shade_model (GL.FLAT);
+    gl.shadeModel (GL.FLAT);
 
     gl.map2f (GL.MAP2_VERTEX_3, 0.0f, 1.0f, 3, 4, 
       0.0f, 1.0f, 12, 4, Misc.linearize (CONTROL_POINTS));
@@ -90,8 +90,8 @@ public class SurfaceTexture extends gnu.x11.extension.glx.Application {
 
   protected void handle_resize (int width, int height) {
     gl.viewport (0, 0, width, height);
-    gl.matrix_mode (GL.PROJECTION);
-    gl.load_identity ();
+    gl.matrixMode (GL.PROJECTION);
+    gl.loadIdentity ();
 
     double wh = (float) width / (float) height;
     double hw = (float) height / (float) width;
@@ -101,8 +101,8 @@ public class SurfaceTexture extends gnu.x11.extension.glx.Application {
     else
       gl.ortho (-4.0*wh, 4.0*wh, -4.0, 4.0, -4.0, 4.0);
 
-    gl.matrix_mode (GL.MODELVIEW);
-    gl.load_identity ();
+    gl.matrixMode (GL.MODELVIEW);
+    gl.loadIdentity ();
     gl.rotatef (85.0f, 1.0f, 1.0f, 1.0f);
   }
 

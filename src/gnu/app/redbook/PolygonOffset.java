@@ -88,7 +88,7 @@ public class PolygonOffset extends gnu.x11.extension.glx.Application {
 
   protected void handle_expose () {
     gl.clear (GL.COLOR_BUFFER_BIT | GL.DEPTH_BUFFER_BIT);
-    gl.push_matrix ();
+    gl.pushMatrix ();
     gl.translatef (0.0f, 0.0f, t_distance);
     gl.rotatef (x_angle, 1.0f, 0.0f, 0.0f);
     gl.rotatef (y_angle, 0.0f, 1.0f, 0.0f);
@@ -97,17 +97,17 @@ public class PolygonOffset extends gnu.x11.extension.glx.Application {
     gl.enable (GL.LIGHT0);
     gl.enable (GL.POLYGON_OFFSET_FILL);
     gl.polygon_offset (offset_factor, offset_units);
-    gl.call_list (display_list);
+    gl.callList (display_list);
     gl.disable (GL.POLYGON_OFFSET_FILL);
 
     gl.disable (GL.LIGHTING);
     gl.disable (GL.LIGHT0);
     gl.color3f (1.0f, 1.0f, 1.0f);
     gl.polygon_mode (GL.FRONT_AND_BACK, GL.LINE);
-    gl.call_list (display_list);
+    gl.callList (display_list);
     gl.polygon_mode (GL.FRONT_AND_BACK, GL.FILL);
 
-    gl.pop_matrix ();
+    gl.popMatrix ();
     gl.swap_buffers (window);
   }
 
@@ -159,21 +159,21 @@ public class PolygonOffset extends gnu.x11.extension.glx.Application {
 
   protected void handle_resize (int width, int height) {
     gl.viewport (0, 0, width, height);
-    gl.matrix_mode (GL.PROJECTION);
-    gl.load_identity ();
+    gl.matrixMode (GL.PROJECTION);
+    gl.loadIdentity ();
     double wh = (float) width / (float) height;
     glu.perspective (45.0, wh, 1.0, 10.0);
-    gl.matrix_mode (GL.MODELVIEW);
-    gl.load_identity ();   
+    gl.matrixMode (GL.MODELVIEW);
+    gl.loadIdentity ();   
     glu.look_at (0.0, 0.0, 5.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0);
   }
 
 
   private void init_sphere () {
-    display_list = gl.gen_lists (1);
-    gl.new_list (display_list, GL.COMPILE);
+    display_list = gl.genLists (1);
+    gl.newList (display_list, GL.COMPILE);
     glut.solid_sphere (1.0, 20, 12);
-    gl.end_list ();
+    gl.endList ();
   }
 
 

@@ -17,10 +17,10 @@ class Teapot {
     this.glut = glut;
     gl = glut.gl;
 
-    display_list = gl.gen_lists (1);
-    gl.new_list (display_list, GL.COMPILE);
+    display_list = gl.genLists (1);
+    gl.newList (display_list, GL.COMPILE);
     glut.solid_teapot (scale);
-    gl.end_list ();
+    gl.endList ();
   } 
 
 
@@ -32,7 +32,7 @@ class Teapot {
     float [] data = new float [4];
     data [3] = 1.0f;
 
-    gl.push_matrix ();
+    gl.pushMatrix ();
     gl.translatef (x, y, z);
 
     data [0] = ambr;
@@ -51,7 +51,7 @@ class Teapot {
     gl.materialfv (GL.FRONT, GL.SPECULAR, data);
 
     gl.materialf (GL.FRONT, GL.SHININESS, shine*128.0f);
-    gl.call_list (display_list);
-    gl.pop_matrix ();
+    gl.callList (display_list);
+    gl.popMatrix ();
   }
 }

@@ -244,9 +244,6 @@ public class GL extends gnu.x11.Resource implements GLConstant {
   /** Predefined. */
   public GL (int id) { super (id); }
   
-
-  // glx opcode 1 - render
-
   /**
    * Starts a render request. First this makes sure that the current
    * request is a render request, and that the buffer has enough room
@@ -264,6 +261,49 @@ public class GL extends gnu.x11.Resource implements GLConstant {
    *
    * @return the output stream
    */
+  private GLRenderRequest beginRenderRequest(RequestOutputStream o,
+                                            GLXRenderingCommand command) {
+      
+      return beginRenderRequest(o, command, 0);
+  }
+
+  /**
+   * Starts a render request. First this makes sure that the current
+   * request is a render request, and that the buffer has enough room
+   * for the new render command. Then it writes the opcode and length
+   * to the request and returns the stream for the caller to complete the
+   * render command.
+   *
+   * If the current request is a render request, but the buffer hasn't got
+   * enough room for the new command, or the current request is no GLX render
+   * command, the buffer is flushed and a new request
+   * is started. 
+   *
+   * @param opcode the opcode
+   * @param the command length 
+   * @param paramsLength the length of the params field for this rendering
+   * command.
+   * @return the output stream
+   */
+  private GLRenderRequest beginRenderRequest(RequestOutputStream o,
+                                             GLXRenderingCommand command,
+                                             int paramsLength) {
+      
+      return begin_render_request(o, command.getOpcode(),
+                                  command.getLength() +  paramsLength);
+  }
+  
+  // glx opcode 1 - render
+
+  /**
+   * @deprecated use {@link #beginRenderRequest(RequestOutputStream, GLXRenderingCommand)}
+   * instead.
+   * @param opcode the opcode
+   * @param the command length
+   *
+   * @return the output stream
+   */
+  @Deprecated
   private GLRenderRequest begin_render_request (RequestOutputStream o,
                                                 int opcode,
                                                 int length) {
@@ -315,20 +355,26 @@ public class GL extends gnu.x11.Resource implements GLConstant {
   public GL (GLX glx, int visual_id, int screen_no,
              GL share_list, boolean direct) {
     
-    super (glx.display);
-    this.glx = glx;
+      super (glx.display);
+      this.glx = glx;
 
-    RequestOutputStream o = display.out;
-    synchronized (o) {
-      o.begin_request (glx.major_opcode, 3, 6);
-      o.write_int32 (id);
-      o.write_int32 (visual_id);
-      o.write_int32 (screen_no);
-      o.write_int32 (share_list.id);
-      o.write_bool (direct);
-      o.skip (3);
-      o.send ();
-    }
+      RequestOutputStream o = display.out;
+      synchronized (o) {
+        
+          // set only once
+          o.setGLXMajorOpcode(glx.major_opcode);
+        
+          o.beginGLXRequest(GLXCommand.GLXCreateContext);
+        
+          //o.begin_request (glx.major_opcode, 3, 6);
+          o.write_int32 (id);
+          o.write_int32 (visual_id);
+          o.write_int32 (screen_no);
+          o.write_int32 (share_list.id);
+          o.write_bool (direct);
+          o.skip (3);
+          o.send ();
+      }
   }
 
 
@@ -472,35 +518,77 @@ public class GL extends gnu.x11.Resource implements GLConstant {
     }
   }
 
-
-  // glx opcode 101 - new list
   /**
-   * @see <a href="glNewList.html">glNewList</a>
+   * Display lists are groups of GL commands that have been
+   * stored for subsequent execution.  Display lists are created
+   * with glNewList.  All subsequent commands are placed in the
+   * display list, in the order issued, until glEndList is
+   * called.
+   * 
+   * glx opcode 101.
+   * 
+   * @see <a href="http://www.opengl.org/documentation/specs/man_pages/hardcopy/GL/html/gl/newlist.html">glNewList</a>
+   * @deprecated Use {@link #newList(int,int)} instead
    */
+  @Deprecated
   public void new_list (int list, int mode) {
-
-    RequestOutputStream o = display.out;
-    synchronized (o) {
-      o.begin_request (glx.major_opcode,101, 4);
-      o.write_int32 (tag);
-      o.write_int32 (list);
-      o.write_int32 (mode);
-      o.send ();
-    }
+      
+      RequestOutputStream o = display.out;
+      synchronized (o) {
+          o.beginGLXRequest(GLXCommand.NewList);
+          o.write_int32 (tag);
+          o.write_int32 (list);
+          o.write_int32 (mode);
+          o.send ();
+      }
   }
 
-
-  // glx opcode 102 - end list
   /**
-   * @see <a href="glEndList.html">glEndList</a>
+   * Display lists are groups of GL commands that have been
+   * stored for subsequent execution.  Display lists are created
+   * with glNewList.  All subsequent commands are placed in the
+   * display list, in the order issued, until glEndList is
+   * called.
+   * 
+   * glx opcode 101.
+   * 
+   * @see <a href="http://www.opengl.org/documentation/specs/man_pages/hardcopy/GL/html/gl/newlist.html">glNewList</a>
    */
+  public void newList (int list, int mode) {
+
+      this.new_list(list, mode);
+  }
+
+  /**
+   * Display lists are groups of GL commands that have been stored
+   * for subsequent execution.
+   *         
+   * GLX Opcode 102.
+   * 
+   * @see <a href="http://www.opengl.org/sdk/docs/man/xhtml/glNewList.xml">glEndList</a>
+   */
+  @Deprecated
   public void end_list () {
-    RequestOutputStream o = display.out;
-    synchronized (o) {
-      o.begin_request (glx.major_opcode, 102, 2);
-      o.write_int32 (tag);
-      o.send ();
-    }
+    
+      RequestOutputStream o = display.out;
+      synchronized (o) {
+          o.beginGLXRequest(GLXCommand.EndList);
+          o.write_int32 (tag);
+          o.send ();
+      }
+  }
+
+  /**
+   * Display lists are groups of GL commands that have been stored
+   * for subsequent execution.
+   *         
+   * GLX Opcode 102.
+   * 
+   * @see <a href="http://www.opengl.org/sdk/docs/man/xhtml/glNewList.xml">glEndList</a>
+   */
+  public void endList () {
+
+      end_list();
   }
 
 
@@ -519,27 +607,42 @@ public class GL extends gnu.x11.Resource implements GLConstant {
     }
   }
 
-
-  // glx opcode 104 - generate lists
   /**
    * @see <a href="glGenLists.html">glGenLists</a>
+   * @deprecated Use {@link #genLists(int)} instead
    */
+  @Deprecated
   public int gen_lists (int range) {
-    int ret;
-    RequestOutputStream o = display.out;
-    synchronized (o) {
-      o.begin_request (glx.major_opcode, 104, 3);
-      o.write_int32 (tag);
-      o.write_int32 (range);
-      ResponseInputStream i = display.in;
-      synchronized (i) {
-        i.read_reply (o);
-        i.skip (8);
-        ret = i.read_int32 ();
-        i.skip (20);
+      
+      int ret;
+      RequestOutputStream o = display.out;
+      synchronized (o) {
+          o.beginGLXRequest(GLXCommand.GenLists);
+          o.write_int32 (tag);
+          o.write_int32 (range);
+          ResponseInputStream i = display.in;
+          synchronized (i) {
+              i.read_reply (o);
+              i.skip (8);
+              ret = i.read_int32 ();
+              i.skip (20);
+          }
       }
-    }
-    return ret;
+      return ret;
+  }
+
+  /**
+   * glGenLists has one argument, range.  It returns an integer n
+   * such that range contiguous empty display lists, named n,
+   * n+1, ..., n+range -1, are created. 
+   * 
+   * GLX opcode 104.
+   * 
+   * @see <a href="http://www.opengl.org/documentation/specs/man_pages/hardcopy/GL/html/gl/genlists.html">glGenLists</a>
+   */
+  public int genLists (int range) {
+      
+      return this.gen_lists(range);
   }
   
 
@@ -665,22 +768,48 @@ public class GL extends gnu.x11.Resource implements GLConstant {
     }
   }
 
-
-  // glx opcode 110 - pixel storei
   /**
-   * @see <a href="glPixelStorei.html">glPixelStorei</a>
+   * glPixelStore sets pixel storage modes that affect the
+   * operation of subsequent glDrawPixels and glReadPixels as
+   * well as the unpacking of polygon stipple patterns (see
+   * glPolygonStipple), bitmaps (see glBitmap), and texture
+   * patterns (see glTexImage1D, glTexImage2D, glTexSubImage1D,
+   * and glTexSubImage2D).
+   * 
+   * GLX Opcode 110
+   *    
+   * @see <a href="http://www.opengl.org/documentation/specs/man_pages/hardcopy/GL/html/gl/pixelstore.html">glPixelStorei</a>
+   * @deprecated Use {@link #pixelStorei(int,int)} instead
    */
+  @Deprecated
   public void pixel_storei (int pname, int param) {
-    RequestOutputStream o = display.out;
-    synchronized (o) {
-      o.begin_request (glx.major_opcode, 110, 4);
-      o.write_int32 (tag);
-      o.write_int32 (pname);
-      o.write_int32 (param);
-      o.send ();
-    }
+  
+      RequestOutputStream o = display.out;
+      synchronized (o) {
+          o.beginGLXRequest(GLXCommand.PixelStorei);
+          o.write_int32 (tag);
+          o.write_int32 (pname);
+          o.write_int32 (param);
+          o.send ();
+      }
   }
 
+  /**
+   * glPixelStore sets pixel storage modes that affect the
+   * operation of subsequent glDrawPixels and glReadPixels as
+   * well as the unpacking of polygon stipple patterns (see
+   * glPolygonStipple), bitmaps (see glBitmap), and texture
+   * patterns (see glTexImage1D, glTexImage2D, glTexSubImage1D,
+   * and glTexSubImage2D).
+   * 
+   * GLX Opcode 110
+   *    
+   * @see <a href="http://www.opengl.org/documentation/specs/man_pages/hardcopy/GL/html/gl/pixelstore.html">glPixelStorei</a>
+   */
+  public void pixelStorei (int pname, int param) {
+      
+      this.pixel_storei(pname, param);
+  }
 
   // glx opcode 112 - get booleanv
   /**
@@ -767,7 +896,6 @@ public class GL extends gnu.x11.Resource implements GLConstant {
   }
 
 
-  // glx opcode 117 - get integerv
   /**
    * @deprecated use {@link #getIntegerv(int, int[], int)} instead.
    * 
@@ -779,16 +907,18 @@ public class GL extends gnu.x11.Resource implements GLConstant {
   }
 
   /**
-   * Return the  
+   * Return the value or values of a selected parameter.
+   * 
    * GLX opcode 117.
+   * 
    * @see <a href="http://www.opengl.org/sdk/docs/man/xhtml/glGet.xml">glGetIntegerv</a>
    * 
    * @param name
    * @param ret
    */
-  public void getIntegerv(int name, int [] param, int offset)
-  {
-     this.getIntVector(117, name, param, offset);
+  public void getIntegerv(int name, int [] param, int offset) {
+      
+     this.getIntVector(GLXCommand.GetIntegerv, name, param, offset);
   }
   
   // glx opcode 118 - get lightfv
@@ -806,16 +936,20 @@ public class GL extends gnu.x11.Resource implements GLConstant {
    * parameter.
    * 
    * GLX opcode 118.
+   * 
    * @see <a href="http://www.opengl.org/sdk/docs/man/xhtml/glGetLight.xml">
    * glGetLightfv</a>
+   * 
    * @param light
    * @param pname
    * @param params
    * @param params_offset
    */
   public void getLightfv(int light, int pname, float[] params,
-          int params_offset) {
-      this.getFloatVector(118, light, pname, params, params_offset);
+          int paramsOffset) {
+      
+      this.getFloatVector(GLXCommand.GetLightfv, light, pname, params,
+                          paramsOffset);
   }
 
   // glx opcode 119 - get lightiv
@@ -893,7 +1027,7 @@ public class GL extends gnu.x11.Resource implements GLConstant {
   }
 
   /**
-   * returns in <code>params</code> the contents of the pixel map
+   * Returns in <code>params</code> the contents of the pixel map
    * specified in map
    * 
    * GLX opcode 126.
@@ -904,7 +1038,8 @@ public class GL extends gnu.x11.Resource implements GLConstant {
    * @param offest
    */
   public void getPixelMapuiv (int map, int [] params, int offset) {
-      this.getIntVector(126, map, params, offset);
+      
+      this.getIntVector(GLXCommand.GetPixelMapuiv, map, params, offset);
   }
   
   /**
@@ -996,38 +1131,43 @@ public class GL extends gnu.x11.Resource implements GLConstant {
     return ret;
   }
 
-
-  // glx opcode 129 - get string
   /**
-   * @see <a href="glGetString.html">glGetString</a>
+   * glGetString returns a pointer to a static string describing
+   * some aspect of the current GL connection.
+   * 
+   * GLX opcode 129.
+   * 
+   * @see <a href="http://www.opengl.org/documentation/specs/man_pages/hardcopy/GL/html/gl/getstring.html">glGetString</a>
    */
   public String string (int name) {
-    if (name == VERSION && version_string_cache != null)
-      return version_string_cache;
+      
+      if (name == VERSION && version_string_cache != null)
+          return version_string_cache;
 
-    RequestOutputStream o = display.out;
-    String str;
-    synchronized (o) {
-      o.begin_request(glx.major_opcode, 129, 3);
-      o.write_int32 (tag);
-      o.write_int32 (name);
-      ResponseInputStream in = display.in;
-      synchronized (in) {
-        in.read_reply (o);
-        in.skip (12);
-        int n = in.read_int32 ();
-        in.skip (16);
-        str = in.read_string8 (n);
-        in.skip (RequestOutputStream.pad (n));
+      RequestOutputStream o = display.out;
+      String str;
+    
+      synchronized (o) {
+          o.beginGLXRequest(GLXCommand.GetString);
+          o.write_int32 (tag);
+          o.write_int32 (name);
+      
+          ResponseInputStream in = display.in;
+          synchronized (in) {
+              in.read_reply (o);
+              in.skip (12);
+              int n = in.read_int32 ();
+              in.skip (16);
+              str = in.read_string8 (n);
+              in.skip (RequestOutputStream.pad (n));
+          }
       }
-    }
 
-    if (name == VERSION) 
-      version_string_cache = str;
+      if (name == VERSION) 
+          version_string_cache = str;
 
-    return str;
+      return str;
   }
-
 
   // glx opcode 130 - get tex envfv
   /**
@@ -1185,12 +1325,14 @@ public class GL extends gnu.x11.Resource implements GLConstant {
    * @see <a href="glFlush.html">glFlush</a>
    */
   public void flush () {
-    RequestOutputStream o = display.out;
-    synchronized (o) {
-      o.begin_request (glx.major_opcode, 142, 2);
-      o.write_int32 (tag);
-      o.flush ();
-    }
+    
+      RequestOutputStream o = display.out;
+      synchronized (o) {
+          //o.begin_request (glx.major_opcode, 142, 2);
+          o.beginGLXRequest(GLXCommand.Flush);
+          o.write_int32 (tag);
+          o.flush ();
+      }
   }
 
 
@@ -1378,21 +1520,35 @@ public class GL extends gnu.x11.Resource implements GLConstant {
   public int [] minmax_parameteriv (int target, int pname) {
     return get_iv2 (159, target, pname);
   }
-
-
-  // glx render opcode 1 - call list
+  
   /**
    * @see <a href="glCallList.html">glCallList</a>
+   * @deprecated Use {@link #callList(int)} instead
    */
+  @Deprecated
   public void call_list (int list) {
-    RequestOutputStream o = display.out;
-    synchronized (o) {
-      GLRenderRequest rr = begin_render_request (o, 1, 8);
-      rr.writeInt32 (list);
-    }
-  }
-    
 
+      RequestOutputStream o = display.out;
+      
+      synchronized (o) {
+          GLRenderRequest rr =
+              beginRenderRequest(o, GLXRenderingCommand.CallList);
+          rr.writeInt32 (list);
+      }
+  }
+
+  /**
+   * glCallList causes the named display list to be executed.
+   * 
+   * GLX render opcode 1.
+   * 
+   * @see <a href="http://www.opengl.org/documentation/specs/man_pages/hardcopy/GL/html/gl/calllist.html">glCallList</a>
+   */
+  public void callList (int list) {
+      
+      call_list(list);
+  }
+  
   // glx render opcode 2 - call lists
   /**
    * @see <a href="glCallLists.html">glCallLists</a>
@@ -1494,17 +1650,23 @@ public class GL extends gnu.x11.Resource implements GLConstant {
     }
   }
 
-
-  // glx render opcode 4 - begin
   /**
-   * @see <a href="glBegin.html">glBegin</a>
+   * glBegin and glEnd delimit the vertices that define a primitive or a group
+   * of like primitives.
+   *
+   * GLX render opcode 4.
+   *
+   * @see <a href="http://www.opengl.org/documentation/specs/man_pages/hardcopy/GL/html/gl/begin.html">
+   * glBegin
    */
   public void begin (int mode) {
-    RequestOutputStream o = display.out;
-    synchronized (o) {
-      GLRenderRequest rr = begin_render_request(o, 4, 8);
-      rr.writeInt32(mode);
-    }
+      
+      RequestOutputStream o = display.out;
+      synchronized (o) {
+          GLRenderRequest rr = 
+              this.beginRenderRequest(o, GLXRenderingCommand.Begin);
+          rr.writeInt32(mode);
+      }
   }
 
   // glx render opcode 5 - bitmap
@@ -1570,14 +1732,17 @@ public class GL extends gnu.x11.Resource implements GLConstant {
       rr.writeDouble (blue);
     }
   }
-
-
-  // glx render opcode 8 - color3fv
+  
   /**
-   * @see <a href="glColor3f.html">glColor3f</a>
+   * The GL stores both a current single-valued color index and a
+   * current four-valued RGBA color. 
+   * 
+   * GLX render opcode 8.
+   * 
+   * @see <a href="http://www.opengl.org/documentation/specs/man_pages/hardcopy/GL/html/gl/color.html">glColor3f</a>
    */
   public void color3f (float red, float green, float blue) {
-    render_3f (8, red, green, blue);
+      render3f(GLXRenderingCommand.Color3fv, red, green, blue);
   }
 
 
@@ -1750,16 +1915,20 @@ public class GL extends gnu.x11.Resource implements GLConstant {
     }
   }
 
-
-  // glx render opcode 23 - end
   /**
-   * @see <a href="glEnd.html">glEnd</a>
+   * glBegin and glEnd delimit the vertices that define a primitive or
+   * a group of like primitives.
+   *
+   * GLX Render opcode 23
+   * 
+   * @see <a href="http://www.opengl.org/sdk/docs/man/xhtml/glBegin.xml">glEnd</a>
    */
   public void end () {
-    RequestOutputStream o = display.out;
-    synchronized (o) {
-      begin_render_request (o, 23, 4);
-    }
+      
+      RequestOutputStream o = display.out;
+      synchronized (o) {
+          beginRenderRequest(o, GLXRenderingCommand.End);
+      }
   }
 
   // glx render opcode 24 - indexdv
@@ -1845,34 +2014,52 @@ public class GL extends gnu.x11.Resource implements GLConstant {
     }
   } 
 
-
-  // glx render opcode 30 - normal3fv
   /**
-   * @see <a href="glNormal3f.html">glNormal3f</a>
+   * The current normal is set to the given coordinates
+   * whenever glNormal is issued.
+   * Byte, short, or integer arguments are converted to floating-point
+   * format with a linear mapping that maps the most positive representable
+   * integer value to 1.0 and the most negative representable integer value to 
+   * -1.0.
+   * 
+   * GLX Render opcode 30.
+   * 
+   * @see <a href="http://www.opengl.org/sdk/docs/man/xhtml/glNormal.xml">glNormal3f</a>
    */
   public void normal3f (float x, float y, float z) {
-    RequestOutputStream o = display.out;
-    synchronized (o) {
-      GLRenderRequest rr = begin_render_request(o, 30, 16);
-      rr.writeFloat(x);
-      rr.writeFloat(y);
-      rr.writeFloat(z);
-    }
+      
+      RequestOutputStream o = display.out;
+      synchronized (o) {
+          GLRenderRequest rr =
+              beginRenderRequest(o, GLXRenderingCommand.Normal3fv);
+          rr.writeFloat(x);
+          rr.writeFloat(y);
+          rr.writeFloat(z);
+      }
   } 
 
-
-  // glx render opcode 31 - normal3iv
   /**
-   * @see <a href="glNormal3i.html">glNormal3i</a>
+   * The current normal is set to the given coordinates
+   * whenever glNormal is issued.
+   * Byte, short, or integer arguments are converted to floating-point
+   * format with a linear mapping that maps the most positive representable
+   * integer value to 1.0 and the most negative representable integer value to 
+   * -1.0.
+   * 
+   * GLX Render opcode 31.
+   * 
+   * @see <a href="http://www.opengl.org/sdk/docs/man/xhtml/glNormal.xml">glNormal3f</a>
    */
   public void normal3i (int x, int y, int z) {
-    RequestOutputStream o = display.out;
-    synchronized (o) {
-      GLRenderRequest rr = begin_render_request (o, 31, 16);
-      rr.writeInt32 (x);
-      rr.writeInt32 (y);
-      rr.writeInt32 (z);
-    }
+      
+      RequestOutputStream o = display.out;
+      synchronized (o) {
+          GLRenderRequest rr =
+              beginRenderRequest(o, GLXRenderingCommand.Normal3iv);
+          rr.writeInt32 (x);
+          rr.writeInt32 (y);
+          rr.writeInt32 (z);
+      }
   } 
 
 
@@ -2358,13 +2545,19 @@ public class GL extends gnu.x11.Resource implements GLConstant {
     render_3d (69, x, y, z);
   }
 
-
-  // glx render opcode 70 - vertex3fv
   /**
-   * @see <a href="glVertex3f.html">glVertex3f</a>
+   * glVertex commands are used within glBegin/glEnd pairs to
+   * specify point, line, and polygon vertices. The current
+   * color, normal, and texture coordinates are associated with
+   * the vertex when glVertex is called.
+   * 
+   * GLX Render opcode 70.
+   * 
+   * @see <a href="http://www.opengl.org/documentation/specs/man_pages/hardcopy/GL/html/gl/vertex.html">glVertex3f</a>
    */
   public void vertex3f (float x, float y, float z) {
-    render_3f (70, x, y, z);
+   
+      render3f (GLXRenderingCommand.Vertex3fv, x, y, z);
   }
 
 
@@ -2779,8 +2972,6 @@ public class GL extends gnu.x11.Resource implements GLConstant {
     }
   }
 
-
-  // glx render opcode 97 - materialfv
   /**
    * Assigns values to material parameters.
    * @see <a href="http://www.opengl.org/sdk/docs/man/xhtml/glMaterial.xml">
@@ -2793,7 +2984,8 @@ public class GL extends gnu.x11.Resource implements GLConstant {
 
   /**
    * Assigns values to material parameters.
-   * GLX opcode 97.
+   * 
+   * GLX Render opcode 97.
    * 
    * @see <a href="http://www.opengl.org/sdk/docs/man/xhtml/glMaterial.xml">
    * glMaterialfv</a>
@@ -2804,35 +2996,36 @@ public class GL extends gnu.x11.Resource implements GLConstant {
    * @param offset
    */
   public void materialfv (int face, int pname, float [] params, int offset) {
-  
+
       int n = 0;
 
-        switch (pname) {
-        case SHININESS:
-            n = 1;
-            break;
-        case COLOR_INDEXES:
-            n = 3;
-            break;
-        case AMBIENT: // fall through
-        case DIFFUSE: // fall through
-        case SPECULAR: // fall through
-        case EMISSION: // fall through
-        case AMBIENT_AND_DIFFUSE:
-            n = 4;
-            break;
-        default:
-            throw new IllegalArgumentException("Invalid pname");
-        }
-
-        RequestOutputStream o = display.out;
-        synchronized (o) {
-            GLRenderRequest rr = begin_render_request(o, 97, 12 + 4 * n);
-            rr.writeInt32(face);
-            rr.writeInt32(pname);
-            for (int i = 0; i < n; i++)
-                rr.writeFloat (params [i + offset]);
+      switch (pname) {
+      case SHININESS:
+          n = 1;
+          break;
+      case COLOR_INDEXES:
+          n = 3;
+          break;
+      case AMBIENT: // fall through
+      case DIFFUSE: // fall through
+      case SPECULAR: // fall through
+      case EMISSION: // fall through
+      case AMBIENT_AND_DIFFUSE:
+          n = 4;
+          break;
+      default:
+          throw new IllegalArgumentException("Invalid pname");
       }
+
+      RequestOutputStream o = display.out;
+      synchronized (o) {
+          GLRenderRequest rr =
+              beginRenderRequest(o, GLXRenderingCommand.Materialfv, 4 * n);
+          rr.writeInt32(face);
+          rr.writeInt32(pname);
+          for (int i = 0; i < n; i++)
+              rr.writeFloat (params [i + offset]);
+          }
   }
   
   // glx render opcode 98 - materiali
@@ -2934,17 +3127,51 @@ public class GL extends gnu.x11.Resource implements GLConstant {
     render_4i (103, x, y, width, height);
   } 
 
-  
-  // glx render opcode 104 - shade model
   /**
-   * @see <a href="glShadeModel.html">glShadeModel</a>
+   * GL  primitives  can have either flat or smooth shading. 
+   * Smooth shading, the default, causes the computed colors of vertices to
+   * be interpolated as the primitive is rasterized,
+   * typically assigning different colors to each resulting pixel fragment.
+   * Flat shading selects the computed color of just one vertex and assigns
+   * it to all  the  pixel  fragments generated  by  rasterizing 
+   * a single primitive.  In either case, the computed color of a vertex is
+   * the result of lighting if lighting is enabled, or it is the current
+   * color at the time the vertex was specified if lighting is disabled.
+   * 
+   * GLX Render opcode 104.
+   * 
+   * @see <a href="http://www.opengl.org/documentation/specs/man_pages/hardcopy/GL/html/gl/shademodel.html">glShadeModel</a>
+   * @deprecated Use {@link #shadeModel(int)} instead
    */
+  @Deprecated
   public void shade_model (int mode) {
-    RequestOutputStream o = display.out;
-    synchronized (o) {
-      GLRenderRequest rr = begin_render_request(o, 104, 8);
-      rr.writeInt32(mode);
-    }
+      
+      RequestOutputStream o = display.out;
+      synchronized (o) {
+          GLRenderRequest rr =
+              beginRenderRequest(o, GLXRenderingCommand.ShadeModel);
+          rr.writeInt32(mode);
+      }
+  }
+
+  /**
+   * GL  primitives  can have either flat or smooth shading. 
+   * Smooth shading, the default, causes the computed colors of vertices to
+   * be interpolated as the primitive is rasterized,
+   * typically assigning different colors to each resulting pixel fragment.
+   * Flat shading selects the computed color of just one vertex and assigns
+   * it to all  the  pixel  fragments generated  by  rasterizing 
+   * a single primitive.  In either case, the computed color of a vertex is
+   * the result of lighting if lighting is enabled, or it is the current
+   * color at the time the vertex was specified if lighting is disabled.
+   * 
+   * GLX Render opcode 104.
+   * 
+   * @see <a href="http://www.opengl.org/documentation/specs/man_pages/hardcopy/GL/html/gl/shademodel.html">glShadeModel</a>
+   */
+  public void shadeModel (int mode) {
+    
+      shade_model(mode);
   }
 
   // glx render opcode 105 - texture parameterf
@@ -3366,17 +3593,25 @@ public class GL extends gnu.x11.Resource implements GLConstant {
     }
   }
 
-
-  // glx render opcode 127 - clear
   /**
-   * @see <a href="glClear.html">glClear</a>
+   * glClear sets the bitplane area of the window to values previously selected
+   * by glClearColor, glClearIndex, glClearDepth, glClearStencil, and
+   * glClearAccum.
+   * 
+   * GLX Render opcode.
+   *
+   * @see <a href="http://www.opengl.org/documentation/specs/man_pages/hardcopy/GL/html/gl/clear.html">
+   * glClear
+   * </a>
    */
   public void clear (int mask) {
-    RequestOutputStream o = display.out;
-    synchronized (o) {
-      GLRenderRequest rr = begin_render_request(o, 127, 8);
-      rr.writeInt32(mask);
-    }
+      
+      RequestOutputStream o = display.out;
+      synchronized (o) {
+          GLRenderRequest rr =
+              beginRenderRequest(o, GLXRenderingCommand.Clear);
+          rr.writeInt32(mask);
+      }
   }
 
 
@@ -3400,14 +3635,28 @@ public class GL extends gnu.x11.Resource implements GLConstant {
       rr.writeFloat (c);
     }
   }
-
-
-  // glx render opcode 130 - clear color
+  
   /**
    * @see <a href="glClearColor.html">glClearColor</a>
+   * @deprecated Use {@link #clearColor(float,float,float,float)} instead
    */
+  @Deprecated
   public void clear_color (float red, float green, float blue, float alpha) {
-    render_4f (130, red, green, blue, alpha);
+      
+      render4f(GLXRenderingCommand.ClearColor, red, green, blue, alpha);
+      // (130, red, green, blue, alpha);
+  }
+
+  /**
+   * glClearColor specifies the red, green, blue, and alpha values used by
+   * glClear to clear the color buffers.
+   * 
+   * GLX Render opcode 130.
+   * @see <a href="http://www.opengl.org/documentation/specs/man_pages/hardcopy/GL/html/gl/clearcolor.html">glClearColor</a>
+   */
+  public void clearColor (float red, float green, float blue, float alpha) {
+    
+      clear_color(red, green, blue, alpha);
   }
 
 
@@ -3522,17 +3771,21 @@ public class GL extends gnu.x11.Resource implements GLConstant {
     }
   }
 
-
-  // glx render opcode 139 - enable
   /**
-   * @see <a href="glEnable.html">glEnable</a>
+   * glEnable and glDisable enable and disable various capabilities.
+   *  
+   * GLX render opcode 139.
+   * 
+   * @see <a href="http://www.opengl.org/documentation/specs/man_pages/hardcopy/GL/html/gl/enable.html">glEnable</a>
    */
   public void enable (int capability) {
-    RequestOutputStream o = display.out;
-    synchronized (o) {
-      GLRenderRequest rr = begin_render_request (o, 139, 8);
-      rr.writeInt32 (capability);
-    }
+
+      RequestOutputStream o = display.out;
+      synchronized (o) {
+          GLRenderRequest rr =
+              beginRenderRequest(o, GLXRenderingCommand.Enable);
+          rr.writeInt32 (capability);
+      }
   }
 
 
@@ -3989,17 +4242,41 @@ public class GL extends gnu.x11.Resource implements GLConstant {
     render_2i (167, pname, param);
   }
 
-
-  // glx render opcode 171 - read buffer
   /**
-   * @see <a href="glReadBuffer.html">glReadBuffer</a>
+   * glReadBuffer specifies a color buffer as the source for
+   * subsequent glReadPixels, glCopyTexImage1D, glCopyTexImage2D,
+   * glCopyTexSubImage1D, glCopyTexSubImage2D, and glCopyPixels
+   * commands.
+   * 
+   * GLX Rendering opcode 171.
+   * 
+   * @see <a href="http://www.opengl.org/documentation/specs/man_pages/hardcopy/GL/html/gl/readbuffer.html">glReadBuffer</a>
+   * @deprecated Use {@link #readBuffer(int)} instead
    */
+  @Deprecated
   public void read_buffer (int mode) {
-    RequestOutputStream o = display.out;
-    synchronized (o) {
-      GLRenderRequest rr = begin_render_request (o, 171, 8);
-      rr.writeInt32 (mode);
-    }
+      
+      RequestOutputStream o = display.out;
+      synchronized (o) {
+          GLRenderRequest rr =
+              beginRenderRequest(o, GLXRenderingCommand.ReadBuffer);
+          rr.writeInt32 (mode);
+      }
+  }
+
+  /**
+   * glReadBuffer specifies a color buffer as the source for
+   * subsequent glReadPixels, glCopyTexImage1D, glCopyTexImage2D,
+   * glCopyTexSubImage1D, glCopyTexSubImage2D, and glCopyPixels
+   * commands.
+   * 
+   * GLX Rendering opcode 171.
+   * 
+   * @see <a href="http://www.opengl.org/documentation/specs/man_pages/hardcopy/GL/html/gl/readbuffer.html">glReadBuffer</a>
+   */
+  public void readBuffer (int mode) {
+
+      read_buffer(mode);
   }
 
 
@@ -4068,36 +4345,59 @@ public class GL extends gnu.x11.Resource implements GLConstant {
     }
   }
 
-
-  // glx render opcode 175 - frustum
   /**
-   * @see <a href="glFrustum.html">glFrustum</a>
+   * glFrustum describes a perspective matrix that produces a
+   * perspective projection.
+   * 
+   * GLX render opcode 175.
+   * 
+   * @see <a href="http://www.opengl.org/documentation/specs/man_pages/hardcopy/GL/html/gl/frustum.html">glFrustum</a>
    */
   public void frustum (double left, double right, double bottom, double top,
                        double near, double far) {
 
-    RequestOutputStream o = display.out;
-    synchronized (o) {
-      GLRenderRequest rr = begin_render_request(o, 175, 52);
-      rr.writeDouble(left);
-      rr.writeDouble(right);
-      rr.writeDouble(bottom);
-      rr.writeDouble(top);
-      rr.writeDouble(near);
-      rr.writeDouble(far);
-    }
+      RequestOutputStream o = display.out;
+      synchronized (o) {
+          GLRenderRequest rr =
+              beginRenderRequest(o, GLXRenderingCommand.Frustum);
+          rr.writeDouble(left);
+          rr.writeDouble(right);
+          rr.writeDouble(bottom);
+          rr.writeDouble(top);
+          rr.writeDouble(near);
+          rr.writeDouble(far);
+      }
   }
 
-
-  // glx render opcode 176 - load identity
   /**
-   * @see <a href="glLoadIdentity.html">glLoadIdentity</a>
+   * glLoadIdentity replaces the current matrix with the identity
+   * matrix.
+   * 
+   * GLX Render opcode 176.
+   * 
+   * @see <a href="http://www.opengl.org/documentation/specs/man_pages/hardcopy/GL/html/gl/loadidentity.html">glLoadIdentity</a>
+   * @deprecated Use {@link #loadIdentity()} instead
    */
+  @Deprecated
   public void load_identity () {
-    RequestOutputStream o = display.out;
-    synchronized (o) {
-      begin_render_request (o, 176, 4);
-    }
+  
+      RequestOutputStream o = display.out;
+      synchronized (o) {
+          beginRenderRequest(o, GLXRenderingCommand.LoadIdentity);
+      }
+  }
+
+  /**
+   * glLoadIdentity replaces the current matrix with the identity
+   * matrix.
+   * 
+   * GLX Render opcode 176.
+   * 
+   * @see <a href="http://www.opengl.org/documentation/specs/man_pages/hardcopy/GL/html/gl/loadidentity.html">glLoadIdentity</a>
+   */
+  public void loadIdentity () {
+  
+      load_identity();
   }
 
 
@@ -4128,17 +4428,34 @@ public class GL extends gnu.x11.Resource implements GLConstant {
     }
   }
 
-
-  // glx render opcode 179 - matrix mode
   /**
+   * glMatrixMode sets the current matrix mode.
+   * 
+   * GLX Render opcode 179.
+   * 
    * @see <a href="glMatrixMode.html">glMatrixMode</a>
    */
+  @Deprecated
   public void matrix_mode (int mode) {
-    RequestOutputStream o = display.out;
-    synchronized (o) {
-      GLRenderRequest rr = begin_render_request (o, 179, 8);
-      rr.writeInt32(mode);
-    }
+      
+      RequestOutputStream o = display.out;
+      synchronized (o) {
+          GLRenderRequest rr =
+              beginRenderRequest(o, GLXRenderingCommand.MatrixMode);
+          rr.writeInt32(mode);
+      }
+  }
+
+  /**
+   * glMatrixMode sets the current matrix mode.
+   * 
+   * GLX Render opcode 179.
+   * 
+   * @see <a href="glMatrixMode.html">glMatrixMode</a>
+   */
+  public void matrixMode (int mode) {
+    
+      matrix_mode(mode);
   }
 
 
@@ -4170,16 +4487,19 @@ public class GL extends gnu.x11.Resource implements GLConstant {
   } 
 
   
-  // glx render opcode 182 - ortho
   /**
-   * @see <a href="glOrtho.html">glOrtho</a>
+   * glOrtho describes a transformation that produces a parallel projection.
+   * 
+   * GLX Render opcode 182.
+   * 
+   * @see <a href="http://www.opengl.org/sdk/docs/man/xhtml/glOrtho.xml">glPopMatrix</a>
    */
   public void ortho (double left, double right, double bottom, double top,
                      double near, double far) {
 
     RequestOutputStream o = display.out;
     synchronized (o) {
-      GLRenderRequest rr = begin_render_request (o, 182, 52);
+      GLRenderRequest rr = beginRenderRequest(o, GLXRenderingCommand.Ortho);
       rr.writeDouble (left);
       rr.writeDouble (right);
       rr.writeDouble (bottom);
@@ -4189,28 +4509,118 @@ public class GL extends gnu.x11.Resource implements GLConstant {
     }
   }
 
-
-  // glx render opcode 183 - pop matrix
   /**
-   * @see <a href="glPopMatrix.html">glPopMatrix</a>
+   * There is a stack of matrices for each of the matrix modes.
+   * 
+   * In GL_MODELVIEW mode, the stack depth is at least 32.
+   * In the other modes,
+   * GL_COLOR, GL_PROJECTION, and GL_TEXTURE, the depth is at least 2.
+   * The current matrix in any mode is the matrix on the top of the stack
+   * for that mode.
+   * 
+   * glPushMatrix pushes the current matrix stack down by one,
+   * duplicating the current matrix.
+   * That is, after a glPushMatrix call, the matrix on top of the stack is
+   * identical to the one below it.
+   * 
+   * glPopMatrix pops the current matrix stack,
+   * replacing the current matrix with the one below it on the stack.   
+   * 
+   * GLX Render opcode 183.
+   * 
+   * @see <a href="http://www.opengl.org/sdk/docs/man/xhtml/glPopMatrix.xml">glPopMatrix</a>
+   * @deprecated Use {@link #popMatrix()} instead
    */
+  @Deprecated
   public void pop_matrix () {
-    RequestOutputStream o = display.out;
-    synchronized (o) {
-      begin_render_request (o, 183, 4);
-    }
+      
+      RequestOutputStream o = display.out;
+      synchronized (o) {
+          beginRenderRequest(o, GLXRenderingCommand.PopMatrix);
+      }
   }
 
-
-  // glx render opcode 184 - push matrix
-  /**
-   * @see <a href="glPushMatrix.html">glPushMatrix</a>
+/**
+   * There is a stack of matrices for each of the matrix modes.
+   * 
+   * In GL_MODELVIEW mode, the stack depth is at least 32.
+   * In the other modes,
+   * GL_COLOR, GL_PROJECTION, and GL_TEXTURE, the depth is at least 2.
+   * The current matrix in any mode is the matrix on the top of the stack
+   * for that mode.
+   * 
+   * glPushMatrix pushes the current matrix stack down by one,
+   * duplicating the current matrix.
+   * That is, after a glPushMatrix call, the matrix on top of the stack is
+   * identical to the one below it.
+   * 
+   * glPopMatrix pops the current matrix stack,
+   * replacing the current matrix with the one below it on the stack.   
+   * 
+   * GLX Render opcode 183.
+   * 
+   * @see <a href="http://www.opengl.org/sdk/docs/man/xhtml/glPopMatrix.xml">glPopMatrix</a>
    */
+  public void popMatrix () {
+      
+      this.pop_matrix();
+  }
+
+  /**
+   * There is a stack of matrices for each of the matrix modes.
+   * 
+   * In GL_MODELVIEW mode, the stack depth is at least 32.
+   * In the other modes,
+   * GL_COLOR, GL_PROJECTION, and GL_TEXTURE, the depth is at least 2.
+   * The current matrix in any mode is the matrix on the top of the stack
+   * for that mode.
+   * 
+   * glPushMatrix pushes the current matrix stack down by one,
+   * duplicating the current matrix.
+   * That is, after a glPushMatrix call, the matrix on top of the stack is
+   * identical to the one below it.
+   * 
+   * glPopMatrix pops the current matrix stack,
+   * replacing the current matrix with the one below it on the stack.   
+   * 
+   * GLX Render opcode 184.
+   * 
+   * @see <a href="http://www.opengl.org/sdk/docs/man/xhtml/glPopMatrix.xml">glPopMatrix</a>
+   * @deprecated Use {@link #pushMatrix()} instead
+   */
+  @Deprecated
   public void push_matrix () {
-    RequestOutputStream o = display.out;
-    synchronized (o) {
-      begin_render_request (o, 184, 4);
-    }
+      
+      RequestOutputStream o = display.out;
+      synchronized (o) {
+          beginRenderRequest(o, GLXRenderingCommand.PushMatrix);
+      }
+  }
+
+/**
+   * There is a stack of matrices for each of the matrix modes.
+   * 
+   * In GL_MODELVIEW mode, the stack depth is at least 32.
+   * In the other modes,
+   * GL_COLOR, GL_PROJECTION, and GL_TEXTURE, the depth is at least 2.
+   * The current matrix in any mode is the matrix on the top of the stack
+   * for that mode.
+   * 
+   * glPushMatrix pushes the current matrix stack down by one,
+   * duplicating the current matrix.
+   * That is, after a glPushMatrix call, the matrix on top of the stack is
+   * identical to the one below it.
+   * 
+   * glPopMatrix pops the current matrix stack,
+   * replacing the current matrix with the one below it on the stack.   
+   * 
+   * GLX Render opcode 184.
+   * 
+   * @see <a href="http://www.opengl.org/sdk/docs/man/xhtml/glPopMatrix.xml">glPopMatrix</a>
+   */
+  public void pushMatrix () {
+    
+      this.push_matrix();
   }
 
 
@@ -4222,13 +4632,17 @@ public class GL extends gnu.x11.Resource implements GLConstant {
     render_4d (185, angle, x, y, z);
   } 
 
-
-  // glx render opcode 186 - rotatef
   /**
-   * @see <a href="glRotatef.html">glRotatef</a>
+   * glRotate produces a rotation of angle degrees around the
+   * vector (x,y,z). 
+   * 
+   * GLX Render opcode 186.
+   * 
+   * @see <a href="http://www.opengl.org/documentation/specs/man_pages/hardcopy/GL/html/gl/rotate.html">glRotatef</a>
    */
   public void rotatef (float angle, float x, float y, float z) {
-    render_4f (186, angle, x, y, z);
+      
+      render4f(GLXRenderingCommand.Rotatef, angle, x, y, z);
   } 
 
 
@@ -4258,22 +4672,29 @@ public class GL extends gnu.x11.Resource implements GLConstant {
     render_3d (189, x, y, z);
   } 
 
-
-  // glx render opcode 190 - translatef
   /**
-   * @see <a href="glTranslatef.html">glTranslatef</a>
+   * glTranslate produces a translation by (x,y,z).
+   * 
+   * GLX Render opcode 190.
+   *   
+   * @see <a href="http://www.opengl.org/documentation/specs/man_pages/hardcopy/GL/html/gl/translate.html">glTranslatef</a>
    */
   public void translatef (float x, float y, float z) {
-    render_3f (190, x, y, z);
+   
+      render3f (GLXRenderingCommand.Translatef, x, y, z);
   } 
 
-
-  // glx render opcode 191 - viewport
   /**
-   * @see <a href="glViewport.html">glViewport</a>
+   * glViewport specifies the affine transformation of x and y
+   * from normalized device coordinates to window coordinates.
+   * 
+   * GLX Render opcode 191.
+   * 
+   * @see <a href="http://www.opengl.org/documentation/specs/man_pages/hardcopy/GL/html/gl/viewport.html">glViewport</a>
    */
   public void viewport (int x, int y, int width, int height) {
-    render_4i (191, x, y, width, height);
+    
+      render4i (GLXRenderingCommand.Viewport, x, y, width, height);
   } 
 
 
@@ -5623,7 +6044,8 @@ public class GL extends gnu.x11.Resource implements GLConstant {
    * @see <a href="GLVertex3fv.html">GLVertex3fv</a>
    */
   public void vertex3fv (float [] v) {
-    vertex3f (v [0], v [1], v [2]);
+    
+      vertex3f (v [0], v [1], v [2]);
   }
 
 
@@ -5943,12 +6365,12 @@ public class GL extends gnu.x11.Resource implements GLConstant {
     return ret;
   }
 
-  private void getFloatVector(int opcode, int param1, int param2,
+  private void getFloatVector(GLXCommand command, int param1, int param2,
                              float[] ret, int offset) {
       
       RequestOutputStream o = display.out;
       synchronized (o) {
-          o.begin_request (glx.major_opcode, opcode, 4);
+          o.beginGLXRequest(command);
           o.write_int32 (tag);
           o.write_int32 (param1);
           o.write_int32 (param2);
@@ -6086,11 +6508,12 @@ public class GL extends gnu.x11.Resource implements GLConstant {
     return ret;
   }
 
-  private void getIntVector (int opcode, int param1, int [] ret, int offset) {
+  private void getIntVector (GLXCommand command, int param1, int [] ret,
+                             int offset) {
       
       RequestOutputStream o = display.out;
       synchronized (o) {
-          o.begin_request (glx.major_opcode, opcode, 3);
+          o.beginGLXRequest(command);
           o.write_int32 (tag);
           o.write_int32 (param1);
           ResponseInputStream in = display.in;
@@ -6179,6 +6602,19 @@ public class GL extends gnu.x11.Resource implements GLConstant {
     }
   }
 
+  private void render3f (GLXRenderingCommand command, float p1, float p2,
+                         float p3) {
+      
+      RequestOutputStream o = display.out;
+      synchronized (o) {
+          GLRenderRequest rr = beginRenderRequest(o, command);
+          rr.writeFloat(p1);
+          rr.writeFloat(p2);
+          rr.writeFloat(p3);
+      }
+  }
+  
+  @Deprecated
   private void render_3f (int opcode, float p1, float p2, float p3) {
     RequestOutputStream o = display.out;
     synchronized (o) {
@@ -6222,6 +6658,20 @@ public class GL extends gnu.x11.Resource implements GLConstant {
     }
   }
 
+  private void render4f(GLXRenderingCommand command, float p1, float p2,
+                        float p3, float p4) {
+
+      RequestOutputStream o = display.out;
+      synchronized (o) {
+          GLRenderRequest rr = beginRenderRequest(o, command);
+          rr.writeFloat (p1);
+          rr.writeFloat (p2);
+          rr.writeFloat (p3);
+          rr.writeFloat (p4);
+      }
+  }
+  
+  @Deprecated
   private void render_4f(int opcode, float p1, float p2, float p3,
                          float p4) {
     RequestOutputStream o = display.out;
@@ -6234,6 +6684,21 @@ public class GL extends gnu.x11.Resource implements GLConstant {
     }
   }
 
+  private void render4i(GLXRenderingCommand command, int p1, int p2, int p3,
+                        int p4) {
+      
+      RequestOutputStream o = display.out;
+      synchronized (o) {
+        GLRenderRequest rr = beginRenderRequest(o, command);
+        rr.writeInt32(p1);
+        rr.writeInt32(p2);
+        rr.writeInt32(p3);
+        rr.writeInt32(p4);
+      }
+    }
+
+  
+  @Deprecated
   private void render_4i(int opcode, int p1, int p2, int p3, int p4) {
     RequestOutputStream o = display.out;
     synchronized (o) {

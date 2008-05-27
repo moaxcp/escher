@@ -63,10 +63,10 @@ public class LightPosition extends gnu.x11.extension.glx.Application {
 
   protected void handle_expose () {
     gl.clear (GL.COLOR_BUFFER_BIT | GL.DEPTH_BUFFER_BIT);
-    gl.push_matrix ();
+    gl.pushMatrix ();
     glu.look_at (0.0, 0.0, 5.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0);
 
-    gl.push_matrix ();
+    gl.pushMatrix ();
     gl.rotated (rotate_angle, 1.0, 0.0, 0.0);
     gl.lightfv (GL.LIGHT0, GL.POSITION, LIGHT_POSITION);
 
@@ -76,11 +76,11 @@ public class LightPosition extends gnu.x11.extension.glx.Application {
     gl.color3f (0.0f, 1.0f, 1.0f);
     glut.wire_cube (0.1f);
     gl.enable (GL.LIGHTING);
-    gl.pop_matrix ();
+    gl.popMatrix ();
 
     // torus
     glut.solid_torus (0.275, 0.85, 8, 15);
-    gl.pop_matrix ();
+    gl.popMatrix ();
 
     gl.swap_buffers (window);
   }
@@ -88,12 +88,12 @@ public class LightPosition extends gnu.x11.extension.glx.Application {
 
   protected void handle_resize (int width, int height) {
     gl.viewport (0, 0, width, height);
-    gl.matrix_mode (GL.PROJECTION);
-    gl.load_identity ();   
+    gl.matrixMode (GL.PROJECTION);
+    gl.loadIdentity ();   
     double wh = (float) width / (float) height;
     glu.perspective (40.0, wh, 1.0, 20.0);
-    gl.matrix_mode (GL.MODELVIEW);
-    gl.load_identity ();
+    gl.matrixMode (GL.MODELVIEW);
+    gl.loadIdentity ();
   }
 
 

@@ -24,7 +24,7 @@ public class ModelTransform extends gnu.x11.extension.glx.Application {
     if (help_option) return;
     init_window (500, 500);
 
-    gl.shade_model (GL.FLAT);
+    gl.shadeModel (GL.FLAT);
   }
 
 
@@ -41,25 +41,25 @@ public class ModelTransform extends gnu.x11.extension.glx.Application {
     gl.clear (GL.COLOR_BUFFER_BIT);
 
     // original triangle (solid line)
-    gl.load_identity ();
+    gl.loadIdentity ();
     draw_triangle ();
 
     // translated triangle (widely-dotted line)
     gl.enable (GL.LINE_STIPPLE);
     gl.line_stipple (1, 0xf0f0);
-    gl.load_identity ();
+    gl.loadIdentity ();
     gl.translatef (-20.0f, 0.0f, 0.0f);
     draw_triangle ();
 
     // scaled triangle (dotted line)
     gl.line_stipple (1, 0xf00f);
-    gl.load_identity ();
+    gl.loadIdentity ();
     gl.scalef (1.5f, 0.5f, 1.0f);
     draw_triangle ();
 
     // rotated triangle (closely-dotted line)
     gl.line_stipple (1, 0x8888);
-    gl.load_identity ();
+    gl.loadIdentity ();
     gl.rotatef (90.0f, 0.0f, 0.0f, 1.0f);
     draw_triangle ();
     gl.disable (GL.LINE_STIPPLE);
@@ -70,8 +70,8 @@ public class ModelTransform extends gnu.x11.extension.glx.Application {
 
   protected void handle_resize (int width, int height) {
     gl.viewport (0, 0, width, height);
-    gl.matrix_mode (GL.PROJECTION);
-    gl.load_identity ();
+    gl.matrixMode (GL.PROJECTION);
+    gl.loadIdentity ();
 
     double wh = (float) width / (float) height;
     double hw = (float) height / (float) width;
@@ -81,7 +81,7 @@ public class ModelTransform extends gnu.x11.extension.glx.Application {
     else
       gl.ortho (-50.0*wh, 50.0*wh, -50.0, 50.0, -1.0, 1.0);
 
-    gl.matrix_mode (GL.MODELVIEW);
+    gl.matrixMode (GL.MODELVIEW);
   }
 
 

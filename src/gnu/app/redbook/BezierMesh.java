@@ -74,18 +74,18 @@ public class BezierMesh extends gnu.x11.extension.glx.Application {
 
   protected void handle_expose () {
     gl.clear (GL.COLOR_BUFFER_BIT | GL.DEPTH_BUFFER_BIT);
-    gl.push_matrix ();
+    gl.pushMatrix ();
     gl.rotatef (85.0f, 1.0f, 1.0f, 1.0f);
     gl.eval_mesh2 (GL.FILL, 0, 20, 0, 20);
-    gl.pop_matrix ();
+    gl.popMatrix ();
     gl.swap_buffers (window);
   }
 
 
   protected void handle_resize (int width, int height) {
     gl.viewport (0, 0, width, height);
-    gl.matrix_mode (GL.PROJECTION);
-    gl.load_identity ();
+    gl.matrixMode (GL.PROJECTION);
+    gl.loadIdentity ();
 
     double wh = (float) width / (float) height;
     double hw = (float) height / (float) width;
@@ -95,8 +95,8 @@ public class BezierMesh extends gnu.x11.extension.glx.Application {
     else
       gl.ortho (-4.0*wh, 4.0*wh, -4.0, 4.0, -4.0, 4.0);
 
-    gl.matrix_mode (GL.MODELVIEW);
-    gl.load_identity ();
+    gl.matrixMode (GL.MODELVIEW);
+    gl.loadIdentity ();
   }
 
 

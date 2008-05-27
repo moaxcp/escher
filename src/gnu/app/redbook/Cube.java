@@ -25,14 +25,14 @@ public class Cube extends gnu.x11.extension.glx.Application {
     if (help_option) return;
     init_window (500, 500);
 
-    gl.shade_model (GL.FLAT);
+    gl.shadeModel (GL.FLAT);
   }
 
 
   protected void handle_expose () {
     gl.clear (GL.COLOR_BUFFER_BIT);
 
-    gl.load_identity ();
+    gl.loadIdentity ();
     glu.look_at (0.0, 0.0, 5.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0);
     gl.scalef (1.0f, 2.0f, 1.0f);
     glut.wire_cube (1.0f);
@@ -43,10 +43,10 @@ public class Cube extends gnu.x11.extension.glx.Application {
 
   protected void handle_resize (int width, int height) {
     gl.viewport (0, 0, width, height);
-    gl.matrix_mode (GL.PROJECTION);
-    gl.load_identity ();   
+    gl.matrixMode (GL.PROJECTION);
+    gl.loadIdentity ();   
     gl.frustum (-1.0, 1.0, -1.0, 1.0, 1.5, 20.0);
-    gl.matrix_mode (GL.MODELVIEW);
+    gl.matrixMode (GL.MODELVIEW);
   }
 
 

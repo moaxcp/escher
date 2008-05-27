@@ -1,5 +1,8 @@
 package gnu.x11;
 
+import gnu.x11.extension.glx.GLXCommand;
+import gnu.x11.extension.glx.GLXRenderingCommand;
+
 import java.io.FilterOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -50,6 +53,12 @@ public class RequestOutputStream extends FilterOutputStream {
    * Maximum delay time between two flush request.
    */
   private static final int FLUSH_TIMER_DELAY = 50;
+
+  /**
+   * Defines the GLX opcode as returned by the server, in case
+   * we are using the GLX extension.
+   */
+  private int glxMajorOpcode = -1;
   
   /**
    * Flush Timer.
@@ -170,6 +179,17 @@ public class RequestOutputStream extends FilterOutputStream {
     return actual_size;
   }
 
+  /**
+   *  Begins a new GLX request. This flushes all pending request data.
+   * 
+   * @param command
+   */
+  public void beginGLXRequest(GLXCommand command) {
+        
+      begin_request(this.glxMajorOpcode, command.getOpcode(),
+                    command.getLength());
+  }
+  
   /**
    * Begins a new request. This flushes all pending request data.
    *
@@ -597,5 +617,14 @@ public class RequestOutputStream extends FilterOutputStream {
 
   public int getBufferLength() {
     return this.buffer.length;
+  }
+  
+  /**
+   * Set the opcode returned by the server for the GLX extension. 
+   * @param majorOpcode
+   */
+  public void setGLXMajorOpcode(int majorOpcode) {
+          
+      this.glxMajorOpcode = majorOpcode;
   }
 }

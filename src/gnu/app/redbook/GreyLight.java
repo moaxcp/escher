@@ -40,38 +40,38 @@ public class GreyLight extends gnu.x11.extension.glx.Application {
 
   protected void handle_expose () {
     gl.clear (GL.COLOR_BUFFER_BIT | GL.DEPTH_BUFFER_BIT);
-    gl.push_matrix ();
+    gl.pushMatrix ();
     gl.rotatef (20.0f, 1.0f, 0.0f, 0.0f);
 
     // torus
-    gl.push_matrix ();
+    gl.pushMatrix ();
     gl.translatef (-0.75f, 0.5f, 0.0f); 
     gl.rotatef (90.0f, 1.0f, 0.0f, 0.0f);
     glut.solid_torus (0.275f, 0.85f, 15, 15);
-    gl.pop_matrix ();
+    gl.popMatrix ();
 
     // cone
-    gl.push_matrix ();
+    gl.pushMatrix ();
     gl.translatef (-0.75f, -0.5f, 0.0f); 
     gl.rotatef (270.0f, 1.0f, 0.0f, 0.0f);
     glut.solid_cone (1.0f, 2.0f, 15, 15);
-    gl.pop_matrix ();
+    gl.popMatrix ();
 
     // sphere
-    gl.push_matrix ();
+    gl.pushMatrix ();
     gl.translatef (0.75f, 0.0f, -1.0f); 
     glut.solid_sphere (1.0f, 15, 15);
-    gl.pop_matrix ();
+    gl.popMatrix ();
    
-    gl.pop_matrix ();
+    gl.popMatrix ();
     gl.swap_buffers (window);
   }
 
 
   protected void handle_resize (int width, int height) {
     gl.viewport (0, 0, width, height);
-    gl.matrix_mode (GL.PROJECTION);
-    gl.load_identity ();
+    gl.matrixMode (GL.PROJECTION);
+    gl.loadIdentity ();
 
     double wh = (float) width / (float) height;
     double hw = (float) height / (float) width;
@@ -81,8 +81,8 @@ public class GreyLight extends gnu.x11.extension.glx.Application {
     else
       gl.ortho (-2.5*wh, 2.5*wh, -2.5, 2.5, -10.0, 10.0);
 
-    gl.matrix_mode (GL.MODELVIEW);
-    gl.load_identity ();
+    gl.matrixMode (GL.MODELVIEW);
+    gl.loadIdentity ();
   }
 
 

@@ -50,7 +50,7 @@ public class BezierSurface extends gnu.x11.extension.glx.Application {
 
     gl.enable (GL.DEPTH_TEST);
     gl.enable (GL.MAP2_VERTEX_3);
-    gl.shade_model (GL.FLAT);
+    gl.shadeModel (GL.FLAT);
 
     gl.map2f (GL.MAP2_VERTEX_3, 0.0f, 1.0f, 3, 4, 
       0.0f, 1.0f, 12, 4, gnu.util.Misc.linearize (CONTROL_POINTS));
@@ -62,7 +62,7 @@ public class BezierSurface extends gnu.x11.extension.glx.Application {
   protected void handle_expose () {
     gl.clear (GL.COLOR_BUFFER_BIT | GL.DEPTH_BUFFER_BIT);
 
-    gl.push_matrix ();
+    gl.pushMatrix ();
     gl.rotatef (85.0f, 1.0f, 1.0f, 1.0f);
     for (int j=0; j<=8; j++) {
       gl.begin (GL.LINE_STRIP);
@@ -76,15 +76,15 @@ public class BezierSurface extends gnu.x11.extension.glx.Application {
       gl.end ();
     }
 
-    gl.pop_matrix ();
+    gl.popMatrix ();
     gl.swap_buffers (window);
   }
 
 
   protected void handle_resize (int width, int height) {
     gl.viewport (0, 0, width, height);
-    gl.matrix_mode (GL.PROJECTION);
-    gl.load_identity ();
+    gl.matrixMode (GL.PROJECTION);
+    gl.loadIdentity ();
 
     double wh = (float) width / (float) height;
     double hw = (float) height / (float) width;
@@ -94,8 +94,8 @@ public class BezierSurface extends gnu.x11.extension.glx.Application {
     else
       gl.ortho (-4.0*wh, 4.0*wh, -4.0, 4.0, -4.0, 4.0);
 
-    gl.matrix_mode (GL.MODELVIEW);
-    gl.load_identity ();
+    gl.matrixMode (GL.MODELVIEW);
+    gl.loadIdentity ();
   }
 
 

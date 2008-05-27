@@ -36,7 +36,7 @@ public class DoubleBuffer extends gnu.x11.extension.glx.Application implements R
     init_window (250, 250);
     leave_display_open = true;
 
-    gl.shade_model (GL.FLAT);
+    gl.shadeModel (GL.FLAT);
   }
 
 
@@ -59,10 +59,10 @@ public class DoubleBuffer extends gnu.x11.extension.glx.Application implements R
 
     gl.clear (GL.COLOR_BUFFER_BIT);
 
-    gl.push_matrix ();
+    gl.pushMatrix ();
     gl.rotatef (rotate_angle, 0.0f, 0.0f, 1.0f);
     gl.rectf (-25.0f, -25.0f, 25.0f, 25.0f);
-    gl.pop_matrix ();
+    gl.popMatrix ();
 
     gl.swap_buffers (window);
   }
@@ -76,11 +76,11 @@ public class DoubleBuffer extends gnu.x11.extension.glx.Application implements R
 
   protected void handle_resize (int width, int height) {
     gl.viewport (0, 0, width, height);
-    gl.matrix_mode (GL.PROJECTION);
-    gl.load_identity ();
+    gl.matrixMode (GL.PROJECTION);
+    gl.loadIdentity ();
     gl.ortho (-50.0, 50.0, -50.0, 50.0, -1.0, 1.0);
-    gl.matrix_mode (GL.MODELVIEW);
-    gl.load_identity ();
+    gl.matrixMode (GL.MODELVIEW);
+    gl.loadIdentity ();
   }
 
 

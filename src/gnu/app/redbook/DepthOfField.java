@@ -53,8 +53,8 @@ public class DepthOfField extends gnu.x11.extension.glx.Application {
     gl.enable (GL.NORMALIZE);
     gl.front_face (GL.CW);
 
-    gl.matrix_mode (GL.MODELVIEW);
-    gl.load_identity ();
+    gl.matrixMode (GL.MODELVIEW);
+    gl.loadIdentity ();
     init_light ();
   }
 

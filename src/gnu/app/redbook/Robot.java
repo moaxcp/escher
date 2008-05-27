@@ -33,7 +33,7 @@ public class Robot extends gnu.x11.extension.glx.Application {
     visual_config.set_double_buffer ();
     init_window (500, 500);
 
-    gl.shade_model (GL.FLAT);
+    gl.shadeModel (GL.FLAT);
   }
 
 
@@ -48,27 +48,27 @@ public class Robot extends gnu.x11.extension.glx.Application {
 
   protected void handle_expose () {
     gl.clear (GL.COLOR_BUFFER_BIT);
-    gl.push_matrix ();
+    gl.pushMatrix ();
 
     // shoulder
     gl.translatef (-1.0f, 0.0f, 0.0f);
     gl.rotatef (shoulder_angle, 0.0f, 0.0f, 1.0f);
     gl.translatef (1.0f, 0.0f, 0.0f);
-    gl.push_matrix ();
+    gl.pushMatrix ();
     gl.scalef (2.0f, 0.4f, 1.0f);
     glut.wire_cube (1.0f);
-    gl.pop_matrix ();
+    gl.popMatrix ();
 
     // elbow
     gl.translatef (1.0f, 0.0f, 0.0f);
     gl.rotatef (elbow_angle, 0.0f, 0.0f, 1.0f);
     gl.translatef (1.0f, 0.0f, 0.0f);
-    gl.push_matrix ();
+    gl.pushMatrix ();
     gl.scalef (2.0f, 0.4f, 1.0f);
     glut.wire_cube (1.0f);
-    gl.pop_matrix ();
+    gl.popMatrix ();
 
-    gl.pop_matrix ();
+    gl.popMatrix ();
     gl.swap_buffers (window);
   }
 
@@ -88,12 +88,12 @@ public class Robot extends gnu.x11.extension.glx.Application {
 
   protected void handle_resize (int width, int height) {
     gl.viewport (0, 0, width, height);
-    gl.matrix_mode (GL.PROJECTION);
-    gl.load_identity ();    
+    gl.matrixMode (GL.PROJECTION);
+    gl.loadIdentity ();    
     double wh = (float) width / (float) height;
     glu.perspective (65.0, wh, 1.0, 20.0);
-    gl.matrix_mode (GL.MODELVIEW);
-    gl.load_identity ();
+    gl.matrixMode (GL.MODELVIEW);
+    gl.loadIdentity ();
     gl.translatef (0.0f, 0.0f, -5.0f);
   }
 

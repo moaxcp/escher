@@ -28,7 +28,7 @@ public class DisplayList extends gnu.x11.extension.glx.Application {
     if (help_option) return;
     init_window (650, 50);
 
-    gl.shade_model (GL.FLAT);
+    gl.shadeModel (GL.FLAT);
     init_triangle ();
   }
 
@@ -37,7 +37,7 @@ public class DisplayList extends gnu.x11.extension.glx.Application {
     gl.clear (GL.COLOR_BUFFER_BIT);
     gl.color3f (0.0f, 1.0f, 0.0f); // green
 
-    for (int i=0; i<10; i++) gl.call_list (display_list);
+    for (int i=0; i<10; i++) gl.callList (display_list);
     
     /* Note that the following line is drawn with red color instead of
      * green, and drawn after the triangles instead of origin. It is
@@ -55,8 +55,8 @@ public class DisplayList extends gnu.x11.extension.glx.Application {
 
   protected void handle_resize (int width, int height) {
     gl.viewport (0, 0, width, height);
-    gl.matrix_mode (GL.PROJECTION);
-    gl.load_identity ();
+    gl.matrixMode (GL.PROJECTION);
+    gl.loadIdentity ();
 
     double wh = (float) width / (float) height;
     double hw = (float) height / (float) width;
@@ -66,15 +66,15 @@ public class DisplayList extends gnu.x11.extension.glx.Application {
     else
       glu.ortho_2d (0.0, 2.0*wh, -0.5, 1.5);
 
-    gl.matrix_mode (GL.MODELVIEW);
-    gl.load_identity ();
+    gl.matrixMode (GL.MODELVIEW);
+    gl.loadIdentity ();
   }
 
 
   private void init_triangle () {
-    display_list = gl.gen_lists (1);
+    display_list = gl.genLists (1);
 
-    gl.new_list (display_list, GL.COMPILE);
+    gl.newList (display_list, GL.COMPILE);
     gl.color3f (1.0f, 0.0f, 0.0f);
 
     gl.begin (GL.TRIANGLES);
@@ -84,7 +84,7 @@ public class DisplayList extends gnu.x11.extension.glx.Application {
     gl.end ();
 
     gl.translatef (1.5f, 0.0f, 0.0f);
-    gl.end_list ();
+    gl.endList ();
   }
 
 

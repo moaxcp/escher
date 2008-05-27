@@ -35,12 +35,12 @@ public class Torus extends gnu.x11.extension.glx.Application {
     if (help_option) return;
     init_window (200, 200);
 
-    gl.shade_model (GL.FLAT);
+    gl.shadeModel (GL.FLAT);
 
-    display_list = gl.gen_lists (1);
-    gl.new_list (display_list, GL.COMPILE);
+    display_list = gl.genLists (1);
+    gl.newList (display_list, GL.COMPILE);
     draw_torus (8, 25);
-    gl.end_list ();
+    gl.endList ();
   }
 
 
@@ -69,7 +69,7 @@ public class Torus extends gnu.x11.extension.glx.Application {
 
   protected void handle_expose () {
     gl.clear (GL.COLOR_BUFFER_BIT);
-    gl.call_list (display_list);
+    gl.callList (display_list);
     gl.swap_buffers (window);
   }
 
@@ -83,7 +83,7 @@ public class Torus extends gnu.x11.extension.glx.Application {
     case 'r':                   // fall through
 
     case 'R':
-      gl.load_identity ();
+      gl.loadIdentity ();
       glu.look_at (0.0, 0.0, 10.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0);
       break;
     }
@@ -94,12 +94,12 @@ public class Torus extends gnu.x11.extension.glx.Application {
 
   protected void handle_resize (int width, int height) {
     gl.viewport (0, 0, width, height);
-    gl.matrix_mode (GL.PROJECTION);
-    gl.load_identity ();    
+    gl.matrixMode (GL.PROJECTION);
+    gl.loadIdentity ();    
     double wh = (float) width / (float) height;
     glu.perspective (30.0, wh, 1.0, 100.0);
-    gl.matrix_mode (GL.MODELVIEW);
-    gl.load_identity ();
+    gl.matrixMode (GL.MODELVIEW);
+    gl.loadIdentity ();
     glu.look_at (0.0, 0.0, 10.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0);
   }
 

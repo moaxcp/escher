@@ -81,7 +81,7 @@ public class Line extends gnu.x11.extension.glx.Application {
     gl.capability (GL.LINE_SMOOTH, smoothing);
     gl.capability (GL.LINE_STIPPLE, stippling);
 
-    gl.push_matrix ();
+    gl.pushMatrix ();
 
     for (int i=0; i<360; i+=5) {
       gl.rotatef (5.0f, 0.0f, 0.0f, 1.0f);
@@ -89,7 +89,7 @@ public class Line extends gnu.x11.extension.glx.Application {
       draw_point ();
     }
 
-    gl.pop_matrix ();
+    gl.popMatrix ();
     gl.swap_buffers (window);
   }
 
@@ -116,10 +116,10 @@ public class Line extends gnu.x11.extension.glx.Application {
   
   protected void handle_resize (int width, int height) {
     gl.viewport (0, 0, width, height);
-    gl.matrix_mode (GL.PROJECTION);
-    gl.load_identity ();   
+    gl.matrixMode (GL.PROJECTION);
+    gl.loadIdentity ();   
     glu.ortho_2d (-175, 175, -175, 175);
-    gl.matrix_mode (GL.MODELVIEW);
+    gl.matrixMode (GL.MODELVIEW);
   }
 
 

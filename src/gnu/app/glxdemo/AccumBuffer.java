@@ -41,19 +41,19 @@ public class AccumBuffer extends gnu.x11.extension.glx.Application {
   protected void handle_expose () {
     gl.rectf (-1.0f, -1.0f, 1.0f, 0.0f);
 
-    gl.push_matrix ();
+    gl.pushMatrix ();
     gl.scalef (0.8f, 0.8f, 1.0f);
 
     gl.clear (GL.COLOR_BUFFER_BIT);
-    gl.call_list (rectangle1);
+    gl.callList (rectangle1);
     gl.accum (GL.LOAD, 0.5f);
 
     gl.clear (GL.COLOR_BUFFER_BIT);
-    gl.call_list (rectangle2);
+    gl.callList (rectangle2);
     gl.accum (GL.ACCUM, 0.5f);
 
     gl.accum (GL.RETURN, 1.0f);
-    gl.pop_matrix ();
+    gl.popMatrix ();
     gl.swap_buffers (window);
   }
 
@@ -71,25 +71,25 @@ public class AccumBuffer extends gnu.x11.extension.glx.Application {
 
   protected void handle_resize (int width, int height) {
     gl.viewport (0, 0, width, height);
-    gl.matrix_mode (GL.PROJECTION);
-    gl.load_identity ();
-    gl.matrix_mode (GL.MODELVIEW);
-    gl.load_identity ();
+    gl.matrixMode (GL.PROJECTION);
+    gl.loadIdentity ();
+    gl.matrixMode (GL.MODELVIEW);
+    gl.loadIdentity ();
   }
 
 
   private void init_rectangles () {
-    rectangle1 = gl.gen_lists (1);
-    gl.new_list (rectangle1, GL.COMPILE);
+    rectangle1 = gl.genLists (1);
+    gl.newList (rectangle1, GL.COMPILE);
     gl.color3f (1.0f, 0.0f, 0.0f);
     gl.rectf (-1.0f, -1.0f, 1.0f, 0.0f);
-    gl.end_list ();
+    gl.endList ();
 
-    rectangle2 = gl.gen_lists (1);
-    gl.new_list (rectangle2, GL.COMPILE);
+    rectangle2 = gl.genLists (1);
+    gl.newList (rectangle2, GL.COMPILE);
     gl.color3f (0.0f, 1.0f, 0.0f);
     gl.rectf (0.0f, -1.0f, 1.0f, 1.0f);
-    gl.end_list ();
+    gl.endList ();
   }
 
 

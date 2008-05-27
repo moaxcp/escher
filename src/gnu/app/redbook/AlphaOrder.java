@@ -31,7 +31,7 @@ public class AlphaOrder extends gnu.x11.extension.glx.Application {
 
     gl.enable (GL.BLEND);
     gl.blend_func (GL.SRC_ALPHA, GL.ONE_MINUS_SRC_ALPHA);
-    gl.shade_model (GL.FLAT);
+    gl.shadeModel (GL.FLAT);
   }
 
 
@@ -80,8 +80,8 @@ public class AlphaOrder extends gnu.x11.extension.glx.Application {
 
   protected void handle_resize (int width, int height) {
     gl.viewport (0, 0, width, height);
-    gl.matrix_mode (GL.PROJECTION);
-    gl.load_identity ();
+    gl.matrixMode (GL.PROJECTION);
+    gl.loadIdentity ();
 
     double wh = (float) width / (float) height;
     double hw = (float) height / (float) width;
@@ -91,7 +91,7 @@ public class AlphaOrder extends gnu.x11.extension.glx.Application {
     else
       glu.ortho_2d (0.0, 1.0*wh, 0.0, 1.0);
 
-    gl.matrix_mode (GL.MODELVIEW);
+    gl.matrixMode (GL.MODELVIEW);
   }
 
 

@@ -24,8 +24,8 @@ public class Hello extends gnu.x11.extension.glx.Application {
     init_window (250, 250);
 
     // initialize viewing values
-    gl.matrix_mode (GL.PROJECTION);
-    gl.load_identity ();
+    gl.matrixMode (GL.PROJECTION);
+    gl.loadIdentity ();
     gl.ortho (-1.0, 1.0, -1.0, 1.0, -1.0, 1.0);
   }
 

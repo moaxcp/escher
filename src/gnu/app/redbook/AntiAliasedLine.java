@@ -51,23 +51,23 @@ public class AntiAliasedLine extends gnu.x11.extension.glx.Application {
 
     // green line
     gl.color3f (0.0f, 1.0f, 0.0f);
-    gl.push_matrix ();
+    gl.pushMatrix ();
     gl.rotatef (-rotate_angle, 0.0f, 0.0f, 0.1f);
     gl.begin (GL.LINES);
     gl.vertex2f (-0.5f, 0.5f);
     gl.vertex2f (0.5f, -0.5f);
     gl.end ();
-    gl.pop_matrix ();
+    gl.popMatrix ();
 
     // blue line
     gl.color3f (0.0f, 0.0f, 1.0f);
-    gl.push_matrix ();
+    gl.pushMatrix ();
     gl.rotatef (rotate_angle, 0.0f, 0.0f, 0.1f);
     gl.begin (GL.LINES);
     gl.vertex2f (0.5f, 0.5f);
     gl.vertex2f (-0.5f, -0.5f);
     gl.end ();
-    gl.pop_matrix ();
+    gl.popMatrix ();
     
     gl.swap_buffers (window);
   }
@@ -83,8 +83,8 @@ public class AntiAliasedLine extends gnu.x11.extension.glx.Application {
 
   protected void handle_resize (int width, int height) {
     gl.viewport (0, 0, width, height);
-    gl.matrix_mode (GL.PROJECTION);
-    gl.load_identity ();
+    gl.matrixMode (GL.PROJECTION);
+    gl.loadIdentity ();
 
     double wh = (float) width / (float) height;
     double hw = (float) height / (float) width;
@@ -94,8 +94,8 @@ public class AntiAliasedLine extends gnu.x11.extension.glx.Application {
     else
       gl.ortho (-1.0*wh, 1.0*wh, -1.0, 1.0, -1.0, 1.0);
 
-    gl.matrix_mode (GL.MODELVIEW);
-    gl.load_identity ();
+    gl.matrixMode (GL.MODELVIEW);
+    gl.loadIdentity ();
   }
 
 

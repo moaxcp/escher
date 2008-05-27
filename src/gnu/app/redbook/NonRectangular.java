@@ -39,21 +39,21 @@ public class NonRectangular extends gnu.x11.extension.glx.Application {
     gl.enable (GL.STENCIL_TEST);
     init_light ();
 
-    gl.matrix_mode (GL.MODELVIEW);
-    gl.load_identity ();
+    gl.matrixMode (GL.MODELVIEW);
+    gl.loadIdentity ();
     gl.translatef (0.0f, 0.0f, -5.0f);
   }
 
 
   private void draw_diamond () {
-    gl.matrix_mode (GL.PROJECTION);
-    gl.push_matrix ();
-    gl.load_identity ();
+    gl.matrixMode (GL.PROJECTION);
+    gl.pushMatrix ();
+    gl.loadIdentity ();
     gl.ortho (-3.0, 3.0, -3.0, 3.0, -1.0, 1.0);
 
-    gl.matrix_mode (GL.MODELVIEW);
-    gl.push_matrix ();
-    gl.load_identity ();
+    gl.matrixMode (GL.MODELVIEW);
+    gl.pushMatrix ();
+    gl.loadIdentity ();
 
     // disable color buffer update
     gl.color_mask (false, false, false, false);
@@ -68,12 +68,12 @@ public class NonRectangular extends gnu.x11.extension.glx.Application {
     gl.vertex3f (0.0f, -1.0f, 0.0f);
     gl.end ();
 
-    gl.pop_matrix ();
+    gl.popMatrix ();
 
-    gl.matrix_mode (GL.PROJECTION);
-    gl.pop_matrix ();
+    gl.matrixMode (GL.PROJECTION);
+    gl.popMatrix ();
 
-    gl.matrix_mode (GL.MODELVIEW);
+    gl.matrixMode (GL.MODELVIEW);
     
     // enable color buffer update
     gl.color_mask (true, true, true, true);
@@ -96,17 +96,17 @@ public class NonRectangular extends gnu.x11.extension.glx.Application {
     gl.materialf (GL.FRONT, GL.SHININESS, 64.0f);
 
     // first torus
-    gl.push_matrix ();
+    gl.pushMatrix ();
     gl.rotatef (45.0f, 0.0f, 0.0f, 1.0f);
     gl.rotatef (45.0f, 0.0f, 1.0f, 0.0f);
     glut.solid_torus (0.275, 0.85, 15, 15);
 
     // second torus
-    gl.push_matrix ();
+    gl.pushMatrix ();
     gl.rotatef (90.0f, 1.0f, 0.0f, 0.0f);
     glut.solid_torus (0.275, 0.85, 15, 15);
-    gl.pop_matrix ();
-    gl.pop_matrix ();
+    gl.popMatrix ();
+    gl.popMatrix ();
   }
 
 
@@ -126,11 +126,11 @@ public class NonRectangular extends gnu.x11.extension.glx.Application {
 
   protected void handle_resize (int width, int height) {
     gl.viewport (0, 0, width, height);
-    gl.matrix_mode (GL.PROJECTION);
-    gl.load_identity ();
+    gl.matrixMode (GL.PROJECTION);
+    gl.loadIdentity ();
     double wh = (float) width / (float) height;
     glu.perspective (45.0,  wh, 3.0, 7.0);
-    gl.matrix_mode (GL.MODELVIEW);
+    gl.matrixMode (GL.MODELVIEW);
   }
 
 

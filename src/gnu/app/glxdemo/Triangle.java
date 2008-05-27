@@ -102,7 +102,7 @@ public class Triangle extends gnu.x11.extension.glx.Application {
   private void draw_bottom () {
     if (!show_bottom) return;
 
-    gl.push_matrix ();
+    gl.pushMatrix ();
 
     gl.scalef (zoom, zoom, zoom);
     gl.rotatef (z_angle, 0.0f, 0.0f, 1.0f);
@@ -120,7 +120,7 @@ public class Triangle extends gnu.x11.extension.glx.Application {
     gl.end ();
     
     draw_vertex ();
-    gl.pop_matrix ();
+    gl.popMatrix ();
   }
 
 
@@ -191,10 +191,10 @@ public class Triangle extends gnu.x11.extension.glx.Application {
     draw_bottom ();
 
     init_view2 ();
-    gl.push_matrix ();
+    gl.pushMatrix ();
     draw_prism ();
     draw_outline ();  
-    gl.pop_matrix ();  
+    gl.popMatrix ();  
  
     gl.swap_buffers (window);
   }
@@ -271,16 +271,16 @@ public class Triangle extends gnu.x11.extension.glx.Application {
     if (anti_aliasing) gl.blend_func (GL.SRC_ALPHA, GL.ONE);
     gl.cull_face (cull_front ? GL.FRONT : GL.BACK);    
     gl.front_face (winding ? GL.CCW : GL.CW);
-    gl.shade_model (shading ? GL.SMOOTH : GL.FLAT);
+    gl.shadeModel (shading ? GL.SMOOTH : GL.FLAT);
   }
 
   
   private void init_view1 () {
     gl.viewport (0, 0, window.width, window.height);
-    gl.matrix_mode (GL.PROJECTION);
-    gl.load_identity ();   
+    gl.matrixMode (GL.PROJECTION);
+    gl.loadIdentity ();   
     glu.ortho_2d (-175, 175, -175, 175);
-    gl.matrix_mode (GL.MODELVIEW);
+    gl.matrixMode (GL.MODELVIEW);
     gl.scissor (0, 0, window.width, window.height);
   }
 
@@ -293,10 +293,10 @@ public class Triangle extends gnu.x11.extension.glx.Application {
     int scale_height = (int) (window.height - 2.0f * scale_y);
 
     gl.viewport (scale_x, scale_y, scale_width, scale_height);
-    gl.matrix_mode (GL.PROJECTION);
-    gl.load_identity ();
+    gl.matrixMode (GL.PROJECTION);
+    gl.loadIdentity ();
     glu.ortho_2d (-100, 100, -100, 100);
-    gl.matrix_mode (GL.MODELVIEW);
+    gl.matrixMode (GL.MODELVIEW);
     gl.scissor (scale_x, scale_y, scale_width, scale_height);
   }
 
