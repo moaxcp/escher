@@ -110,8 +110,8 @@ public class GL extends gnu.x11.Resource implements GLConstant {
                         / largeRequestLength + 1;
                 pad = RequestOutputStream.pad(small_params_length);
                 int l = 4 + (small_params_length + pad) / 4;
-                out.begin_request(glx.major_opcode, 2, l);
-                out.write_int32(tag);
+                out.begin_request(getGLX().major_opcode, 2, l);
+                out.write_int32(getTag());
                 // We start counting at 1!
                 request_number = 1;
                 out.write_int16(request_number);
@@ -121,9 +121,9 @@ public class GL extends gnu.x11.Resource implements GLConstant {
                 out.write_int32(opcode);
                 large_param = false;
             } else {
-                out.begin_request(glx.major_opcode, 1,
+                out.begin_request(getGLX().major_opcode, 1,
                         2 + render_command_length / 4);
-                out.write_int32(tag);
+                out.write_int32(getTag());
                 out.write_int16(render_command_length);
                 out.write_int16(opcode);
             }
@@ -143,8 +143,8 @@ public class GL extends gnu.x11.Resource implements GLConstant {
                 int len = Math.min(largeNumBytesLeft,
                         out.getBufferLength() - 16);
                 int p = RequestOutputStream.pad(len);
-                out.begin_request(glx.major_opcode, 2, 4 + (len + p) / 4);
-                out.write_int32(tag);
+                out.begin_request(getGLX().major_opcode, 2, 4 + (len + p) / 4);
+                out.write_int32(getTag());
                 out.write_int16(request_number);
                 out.write_int16(request_total);
                 out.write_int32(len); // ni
@@ -246,8 +246,8 @@ public class GL extends gnu.x11.Resource implements GLConstant {
      */
     public static final GL NONE0 = new GL(0);
 
-    public GLX glx;
-    public int tag;
+    private GLX glx;
+    private int tag;
 
     /**
      * A helper for sending large render requests.
@@ -401,6 +401,38 @@ public class GL extends gnu.x11.Resource implements GLConstant {
             o.skip(3);
             o.send();
         }
+    }
+
+    /**
+     * @param glx the glx to set
+     */
+    public void setGLX(GLX glx) {
+
+        this.glx = glx;
+    }
+
+    /**
+     * @return the glx
+     */
+    public GLX getGLX() {
+
+        return glx;
+    }
+
+    /**
+     * @param tag the tag to set
+     */
+    public void setTag(int tag) {
+
+        this.tag = tag;
+    }
+
+    /**
+     * @return the tag
+     */
+    public int getTag() {
+
+        return tag;
     }
 
     // glx opcode 4 - destroy context
