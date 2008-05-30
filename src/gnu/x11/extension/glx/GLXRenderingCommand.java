@@ -27,6 +27,7 @@ public enum GLXRenderingCommand implements X11Command {
     Clear(8, 127),
     ClearColor(20, 130),
     Color3fv(16, 8),
+    DepthMask(8, 135),
     Enable(8, 139),
     End(4, 23),
     Frustum(52, 175),

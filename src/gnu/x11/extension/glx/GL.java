@@ -391,8 +391,6 @@ public class GL extends gnu.x11.Resource implements GLConstant {
             o.setGLXMajorOpcode(glx.major_opcode);
 
             o.beginGLXRequest(GLXCommand.GLXCreateContext);
-
-            // o.begin_request (glx.major_opcode, 3, 6);
             o.write_int32(id);
             o.write_int32(visual_id);
             o.write_int32(screen_no);
@@ -3845,18 +3843,41 @@ public class GL extends gnu.x11.Resource implements GLConstant {
         }
     }
 
-    // glx render opcode 135 - depth mask
     /**
-     * @see <a href="glDepthMask.html">glDepthMask</a>
+     * glDepthMask specifies whether the depth buffer is enabled
+     * for writing. If flag is GL_FALSE, depth buffer writing is
+     * disabled. Otherwise, it is enabled. Initially, depth
+     * buffer writing is enabled.
+     * 
+     * GLX Render opcode 135.
+     * 
+     * @see <a href="http://www.opengl.org/documentation/specs/man_pages/hardcopy/GL/html/gl/depthmask.html">glDepthMask</a>
+     * @deprecated Use {@link #depthMask(boolean)} instead
      */
     public void depth_mask(boolean flag) {
-
+       
         RequestOutputStream o = display.out;
         synchronized (o) {
-            GLRenderRequest rr = begin_render_request(o, 135, 8);
+            GLRenderRequest rr =
+                beginRenderRequest(o, GLXRenderingCommand.DepthMask);
             rr.writeBool(flag);
             rr.writePad(3);
         }
+    }
+
+    /**
+     * glDepthMask specifies whether the depth buffer is enabled
+     * for writing. If flag is GL_FALSE, depth buffer writing is
+     * disabled. Otherwise, it is enabled. Initially, depth
+     * buffer writing is enabled.
+     * 
+     * GLX Render opcode 135.
+     * 
+     * @see <a href="http://www.opengl.org/documentation/specs/man_pages/hardcopy/GL/html/gl/depthmask.html">glDepthMask</a>
+     */
+    public void depthMask(boolean flag) {
+
+        this.depth_mask(flag);
     }
 
     // glx render opcode 136 - index mask
