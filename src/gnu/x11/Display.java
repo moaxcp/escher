@@ -1024,14 +1024,57 @@ public class Display {
   private void init_server_info (ResponseInputStream i) {
 
     int accepted = i.read_int8();
-    if (accepted == 0) { System.err.println ("failed"); }
-    if (accepted == 2) { System.err.println ("more auth data not yet implemented"); }
-
-    i.skip (1); // Unused.
+    boolean connectionFailed = false;
+    if (accepted == 0) {
+        System.err.println("Connection to the XServer failed.");
+        System.err.println("Try to set DISPLAY variable or to give proper " +
+        		   "permissions (eg. edit .Xauthority or run xhost+)");
+        System.err.println("NOTE: leaving xhost+ and allowing remote tcp "  +
+        		   "connections to the XServer can be a potential " +
+        		   "security risk.");
+        
+        connectionFailed = true;
+    }
+    
+    if (accepted == 2) {
+        System.err.println ("more auth data not yet implemented");
+    }
+   
+    int failedLength = 0;
+    if (connectionFailed) {
+        // length of reason
+        failedLength = i.read_byte();
+        
+    } else {
+        // Unused.
+        i.skip (1);
+    }
+    
     i.skip (2); // protocol-major-version.
     i.skip (2); // protocol-minor-version.
     i.skip (2); // Length.
-
+    
+    // try to print some more (maybe not so) meaningful messages to
+    // understand the failure
+    if (connectionFailed) {
+        
+        System.err.println("XServer returned " + failedLength + " error " +
+                           (failedLength > 1 ? "codes" : "code"));
+        int reason = 0;
+        for (int n = 0; n < failedLength; n++) {
+            reason = i.read_int32();
+            System.err.println("XServer returned error code: " + reason);
+        }
+        
+        System.err.println("XServer are allowed to use non standard errors " +
+        		   "codes");
+        System.err.println("Please, consult the manual of your XServer to " +
+        		   "map the error codes to human readable values.");
+        
+        // return here
+        return;
+    }
+    
     release_no = i.read_int32 ();
     resource_base = i.read_int32 ();
     resource_mask = i.read_int32 ();
