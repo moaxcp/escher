@@ -1,5 +1,6 @@
 package gnu.x11;
 
+import gnu.x11.extension.glx.GLConstant;
 import gnu.x11.extension.glx.GLXCommand;
 import gnu.x11.extension.glx.GLXRenderingCommand;
 
@@ -178,7 +179,7 @@ public class RequestOutputStream extends FilterOutputStream {
     index = 0;
     return actual_size;
   }
-
+ 
   /**
    *  Begins a new GLX request. This flushes all pending request data.
    * 
@@ -191,12 +192,22 @@ public class RequestOutputStream extends FilterOutputStream {
   }
   
   /**
+   * Begins a new X11 Core request.
+   * 
+   * @param command
+   */
+  public void beginX11CoreRequest(X11CoreCommand command, int secondField) {
+      this.begin_request(command.getOpcode(), secondField, command.getLength());
+  }
+  
+  /**
    * Begins a new request. This flushes all pending request data.
    *
    * @param opcode the opcode for the request
    * @param second_field the second field for the request
    * @param request_length the length of the request
    */
+  @Deprecated
   public void begin_request (int opcode, int second_field,
                              int request_length) {
 
