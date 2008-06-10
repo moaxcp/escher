@@ -1111,7 +1111,9 @@ public class GL extends gnu.x11.Resource implements GLConstant {
      * 
      * @see <a
      *      href='http://www.opengl.org/documentation/specs/man_pages/hardcopy/GL/html/gl/readpixels.html'>
-     *      glReadPixels </a> GLX opcode 111.
+     *      glReadPixels </a>
+     *      
+     * GLX opcode 111.
      * 
      * @param x
      * @param y
@@ -1126,8 +1128,19 @@ public class GL extends gnu.x11.Resource implements GLConstant {
 
         RequestOutputStream o = display.out;
         synchronized (o) {
-            o.begin_request(glx.major_opcode, 111, 9);
-            o.write_int32(tag);
+            o.beginGLXRequest(GLXCommand.ReadPixels);
+            
+            System.err.println(GLXCommand.ReadPixels);
+            System.err.println("tag: " + tag);
+            System.err.println("x: " + x);
+            System.err.println("y: " + y);
+            System.err.println("width: " + width);
+            System.err.println("height" + height);
+            System.err.println("format" + format);
+            System.err.println("type" + type);
+            
+            
+            o.write_int32(tag);           
             o.write_int32(x);
             o.write_int32(y);
             o.write_int32(width);
@@ -1482,16 +1495,22 @@ public class GL extends gnu.x11.Resource implements GLConstant {
         return textures;
     }
 
-    // glx opcode 146 - is texture
     /**
-     * @see <a href="glXIsTexture.html">glXIsTexture</a>
+     * glIsTexture returns GL_TRUE if texture is currently the name
+     * of a texture. If texture is zero, or is a non-zero value
+     * that is not currently the name of a texture, or if an error
+     * occurs, glIsTexture returns GL_FALSE.
+     * 
+     * GLX Opcode 146.
+     * 
+     * @see <a href="http://www.opengl.org/documentation/specs/man_pages/hardcopy/GL/html/gl/istexture.html">glXIsTexture</a>
      */
     public boolean texture(int texture) {
 
         RequestOutputStream o = display.out;
         boolean ret;
         synchronized (o) {
-            o.begin_request(glx.major_opcode, 146, 3);
+            o.beginGLXRequest(GLXCommand.IsTexture);
             o.write_int32(tag);
             o.write_int32(texture);
             ResponseInputStream in = display.in;

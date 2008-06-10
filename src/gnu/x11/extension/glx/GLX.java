@@ -262,20 +262,27 @@ public class GLX extends gnu.x11.extension.Extension
   public final static int EXTENSIONS = 0x3;
 
 
-  // glx opcode 19 - query server string
   /**
+   * Returns a string describing some aspect of the server's GLX
+   * extension.
+   * 
+   * glx opcode 19.
+   * 
+   * @deprecated use {@link #queryServerString(int, int)} instead
+   * 
    * @param name valid:
    * {@link #VENDOR},
    * {@link #VERSION},
    * {@link #EXTENSIONS}
    * 
-   * @see <a href="glXQueryServerString.html">glXQueryServerString</a>
+   * @see <a href="http://www.opengl.org/documentation/specs/man_pages/hardcopy/GL/html/glx/xqueryserverstring.html">glXQueryServerString</a>
    */
+  @Deprecated
   public String server_string (int screen_no, int name) {
     String server_string;
     RequestOutputStream o = display.out;
     synchronized (o) {
-      o.begin_request (major_opcode, 19, 3);
+      o.beginGLXRequest(GLXCommand.GLXQueryServerString);
       o.write_int32 (screen_no);
       o.write_int32 (name);
       ResponseInputStream i = display.in;
@@ -291,6 +298,22 @@ public class GLX extends gnu.x11.extension.Extension
     return server_string;
   }
 
+  /**
+   * Returns a string describing some aspect of the server's GLX
+   * extension.
+   * 
+   * glx opcode 19.
+   * 
+   * @param name valid:
+   * {@link #VENDOR},
+   * {@link #VERSION},
+   * {@link #EXTENSIONS}
+   * 
+   * @see <a href="http://www.opengl.org/documentation/specs/man_pages/hardcopy/GL/html/glx/xqueryserverstring.html">glXQueryServerString</a>
+   */
+  public String queryServerString(int screen_no, int name) {
+      return this.server_string(screen_no, name);
+  }
 
   // TODO
   private static final String CLIENT_EXTENSION_STRING =

@@ -1,5 +1,7 @@
 package gnu.x11.extension.glx;
 
+import gnu.x11.X11Command;
+
 /**
  * Enum class describing GLX Rendering commands.
  * 

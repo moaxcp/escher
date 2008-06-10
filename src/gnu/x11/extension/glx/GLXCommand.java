@@ -1,5 +1,7 @@
 package gnu.x11.extension.glx;
 
+import gnu.x11.X11Command;
+
 /**
  * Enum class describing GLX and OpenGL commands.
  * 
@@ -23,6 +25,7 @@ public enum GLXCommand implements X11Command {
     /* ***** GLX Commands ***** */
     
     GLXCreateContext(3, 6),
+    GLXQueryServerString(19, 3),
     
     /* ***** OpenGL Commands ***** */
     
@@ -33,14 +36,16 @@ public enum GLXCommand implements X11Command {
     GetLightfv(118, 4),
     GetPixelMapuiv(126, 3),
     GetString(129, 3),
+    IsTexture(146, 3),
     NewList(101, 4),
-    PixelStorei(110, 4);
+    PixelStorei(110, 4),
+    ReadPixels(111, 9);
     
     private final int opcode;
     private final int length;
     
-    GLXCommand(int opcode, int length)
-    {
+    GLXCommand(int opcode, int length) {
+        
         this.opcode = opcode;
         this.length = length;
     }
