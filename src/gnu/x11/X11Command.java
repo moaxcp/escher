@@ -1,7 +1,7 @@
 /**
  * 
  */
-package gnu.x11.extension.glx;
+package gnu.x11;
 
 /**
  * Interface implement by the various X11 command enums.
