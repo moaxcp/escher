@@ -465,46 +465,62 @@ public abstract class Drawable extends Resource {
     }
   }
 
-
-  // opcode 73 - get image TODO
   /**
-   * @see <a href="XGetImage.html">XGetImage</a>
+   * Returns the contents of the specified rectangle of the drawable in the
+   * format you specify.
+   * 
+   * opcode 73.
+   * 
    */
-  public Image image (int x, int y, int width, int height, int plane_mask,
-                      Image.Format format) {
-//    System.err.println("params x: " + x + ", y: " + y + ", w: " + width + ", h: " + height + ", plane_mask: " + plane_mask + ", format: " + format);
-//    System.err.println("drawable " + this + ",  w: " + this.width + ", h: " + this.height);
-    RequestOutputStream o = display.out;
-    Image image;
-    synchronized (o) {
-      o.begin_request (73, format.id (), 5);
-      o.write_int32 (id);
-      o.write_int16 (x);
-      o.write_int16 (y);
-      o.write_int16 (width);
-      o.write_int16 (height);
-      o.write_int32 (plane_mask);
-      ResponseInputStream i = display.in;
-      synchronized (i) {
-        i.read_reply (o);
-        i.skip (1);
-        int depth = i.read_int8 ();
-        i.skip (2);
-        int len = i.read_int32 () * 4;
-        int visual_id = i.read_int32 ();
-        i.skip (20);
-        byte[] data = new byte [len];
-        i.read_data (data);
-        // TODO Handle XYPixmap.
-        if (format == Image.Format.ZPIXMAP) {
-          image = new ZPixmap (display, width, height,
-                               display.default_pixmap_format, data);
-        } else {
-          throw new UnsupportedOperationException("Support for XYPixmap not yet implemented");
-        }
+  public Image image(int x, int y, int width, int height, int planeMask,
+                     Image.Format format)
+  {
+
+      RequestOutputStream o = display.out;
+      Image image;
+
+      synchronized (o) {
+          
+          o.beginX11CoreRequest(X11CoreCommand.GetImage, format.id());
+          o.write_int32(id);
+          o.write_int16(x);
+          o.write_int16(y);
+          o.write_int16(width);
+          o.write_int16(height);
+          o.write_int32(planeMask);
+
+          ResponseInputStream i = display.in;
+          synchronized (i) {
+              i.read_reply(o);
+              i.skip(1);
+              int depth = i.read_int8();
+              i.skip(2);
+              int len = i.read_int32() * 4;
+              int visual_id = i.read_int32();
+              i.skip(20);
+              byte[] data = new byte[len];
+              i.read_data(data);
+              // TODO Handle XYPixmap. 
+              if (format == Image.Format.ZPIXMAP) {
+                  image = new ZPixmap(display, width, height,
+                                      display.default_pixmap_format, data);
+              } else {
+                  // I will quote this, about our TODO few lines above:
+                  // "Now XYPixmaps are something that I never use, and
+                  // I don't think anyone else uses either, they appear to be
+                  // an insane Pixmap where the data is divided into three
+                  // parts, first all the red pixel values, then all the green
+                  // pixels, and then all the blue pixels. I'm sure with some
+                  // thought I could make up a reasonable sounding excuse for
+                  // this, though it escapes me right now."
+                  // From Caolan McNamara
+                  // http://www.linux.ie/old-list/23540.html
+                  throw new UnsupportedOperationException("Support for " +
+                  		"XYPixmap not yet implemented");
+              }
+          }
       }
-    }
-    return image;
+      return image;
   }
 
 
