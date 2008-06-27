@@ -315,9 +315,6 @@ public class ResponseInputStream extends FilterInputStream {
 
     public Event read_event() {
 
-        // System.err.println("read_event");
-        // System.err.println("read event from stream");
-
         // Otherwise we read and return the first event from the stream.
         Event ev = null;
         do {

@@ -4,6 +4,7 @@ import java.nio.Buffer;
 import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
 
+import java.nio.DoubleBuffer;
 import gnu.x11.Drawable;
 import gnu.x11.RequestObject;
 import gnu.x11.RequestOutputStream;
@@ -307,7 +308,6 @@ public class GL extends gnu.x11.Resource implements GLConstant {
     private GLRenderRequest beginRenderRequest(RequestOutputStream o,
                                                GLXRenderingCommand command,
                                                int paramsLength) {
-
         return begin_render_request(o, command.getOpcode(), command.getLength()
                 + paramsLength);
     }
@@ -386,10 +386,6 @@ public class GL extends gnu.x11.Resource implements GLConstant {
 
         RequestOutputStream o = display.out;
         synchronized (o) {
-
-            // set only once
-            o.setGLXMajorOpcode(glx.major_opcode);
-
             o.beginGLXRequest(GLXCommand.GLXCreateContext);
             o.write_int32(id);
             o.write_int32(visual_id);
@@ -449,13 +445,25 @@ public class GL extends gnu.x11.Resource implements GLConstant {
 
     // glx opcode 5 - make current
     /**
-     * @see <a href="glXMakeCurrent.html">glXMakeCurrent</a>
+     * glXMakeCurrent does two things:  It makes ctx the current
+     * GLX rendering context of the calling thread, replacing the
+     * previously current context if there was one, and it attaches
+     * ctx to a GLX drawable, either a window or a GLX pixmap.  As
+     * a result of these two actions, subsequent GL rendering calls
+     * use rendering context ctx to modify GLX drawable drawable.
+     * Because glXMakeCurrent always replaces the current rendering
+     * context with ctx, there can be only one current context per
+     * thread.
+     * 
+     * glx opcode 5 - make current
+     * 
+     * @see <a href="http://www.opengl.org/documentation/specs/man_pages/hardcopy/GL/html/glx/xmakecurrent.html">glXMakeCurrent</a>
      */
     public void make_current(GLXDrawable drawable) {
-
+ 
         RequestOutputStream o = display.out;
         synchronized (o) {
-            o.begin_request(glx.major_opcode, 5, 4);
+            o.beginGLXRequest(GLXCommand.GLXMakeCurrent);
             o.write_int32(drawable.id());
             o.write_int32(id);
             o.write_int32(tag);
@@ -1129,17 +1137,6 @@ public class GL extends gnu.x11.Resource implements GLConstant {
         RequestOutputStream o = display.out;
         synchronized (o) {
             o.beginGLXRequest(GLXCommand.ReadPixels);
-            
-            System.err.println(GLXCommand.ReadPixels);
-            System.err.println("tag: " + tag);
-            System.err.println("x: " + x);
-            System.err.println("y: " + y);
-            System.err.println("width: " + width);
-            System.err.println("height" + height);
-            System.err.println("format" + format);
-            System.err.println("type" + type);
-            
-            
             o.write_int32(tag);           
             o.write_int32(x);
             o.write_int32(y);
@@ -1150,6 +1147,7 @@ public class GL extends gnu.x11.Resource implements GLConstant {
             o.write_bool(false);
             o.write_bool(false);
             o.skip(2);
+            
             ResponseInputStream in = display.in;
             synchronized (in) {
                 in.read_reply(o);
@@ -1165,7 +1163,7 @@ public class GL extends gnu.x11.Resource implements GLConstant {
                     IntBuffer ib = (IntBuffer) pixels;
                     ib.position(0);
                     for (int i = len / 4 - 1; i >= 0; i--) {
-                        ib.put((byte) in.read_int32());
+                        ib.put(in.read_int32());
                     }
                 } else {
                     throw new UnsupportedOperationException("Not Yet "
@@ -1208,8 +1206,8 @@ public class GL extends gnu.x11.Resource implements GLConstant {
     }
 
     /**
-     * glGetString returns a pointer to a static string describing some aspect
-     * of the current GL connection.
+     * glGetString returns a string describing some aspect of the current
+     * GL connection.
      * 
      * GLX opcode 129.
      * 
@@ -3819,17 +3817,38 @@ public class GL extends gnu.x11.Resource implements GLConstant {
         }
     }
 
-    // glx render opcode 132 - clear depth
     /**
-     * @see <a href="glClearDepth.html">glClearDepth</a>
+     * glClearDepth specifies the depth value used by glClear to clear the
+     * depth buffer.
+     * Values specified by glClearDepth are clamped to the range [0, 1].
+     * 
+     * glx render opcode 132 - clear depth
+     * 
+     * @see <a href="http://www.opengl.org/sdk/docs/man/xhtml/glClearDepth.xml">glClearDepth</a>
+     * @deprecated Use {@link #clearDepth(double)} instead
      */
     public void clear_depth(double depth) {
-
+        
         RequestOutputStream o = display.out;
         synchronized (o) {
-            GLRenderRequest rr = begin_render_request(o, 132, 12);
+            GLRenderRequest rr =
+                beginRenderRequest(o, GLXRenderingCommand.ClearDepth);
             rr.writeDouble(depth);
         }
+    }
+
+    /**
+     * glClearDepth specifies the depth value used by glClear to clear the
+     * depth buffer.
+     * Values specified by glClearDepth are clamped to the range [0, 1].
+     * 
+     * glx render opcode 132 - clear depth
+     * 
+     * @see <a href="http://www.opengl.org/sdk/docs/man/xhtml/glClearDepth.xml">glClearDepth</a>
+     */
+    public void clearDepth(double depth) {
+
+        this.clear_depth(depth);
     }
 
     // glx render opcode 133 - stencil mask
@@ -4664,6 +4683,19 @@ public class GL extends gnu.x11.Resource implements GLConstant {
         }
     }
 
+    public void multMatrixd(DoubleBuffer buffer) {
+
+        RequestOutputStream o = display.out;
+        synchronized (o) {
+            GLRenderRequest rr =
+                beginRenderRequest(o, GLXRenderingCommand.MultMatrixd);
+            buffer.position(0);
+            while (buffer.remaining()> 0) {
+                rr.writeDouble(buffer.get());
+            }            
+        }
+    }
+    
     // glx render opcode 181 - mult matrixd
     /**
      * @see <a href="glMultMatrixd.html">glMultMatrixd</a>

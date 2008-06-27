@@ -186,7 +186,7 @@ public class RequestOutputStream extends FilterOutputStream {
    * @param command
    */
   public void beginGLXRequest(GLXCommand command) {
-        
+      
       begin_request(this.glxMajorOpcode, command.getOpcode(),
                     command.getLength());
   }
@@ -197,6 +197,7 @@ public class RequestOutputStream extends FilterOutputStream {
    * @param command
    */
   public void beginX11CoreRequest(X11CoreCommand command, int secondField) {
+      
       this.begin_request(command.getOpcode(), secondField, command.getLength());
   }
   

@@ -1,5 +1,6 @@
 package gnu.x11.extension.glx;
 
+import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 import gnu.x11.Data;
 import gnu.x11.Display;
 import gnu.x11.RequestOutputStream;
@@ -18,6 +19,74 @@ import gnu.x11.ResponseInputStream;
 public class GLX extends gnu.x11.extension.Extension implements
         gnu.x11.extension.ErrorFactory, gnu.x11.extension.EventFactory {
 
+    /**
+     * The minimum OpenGL version supported by Escher.
+     * 
+     * This constant can be meaningless depending on your use, as Escher
+     * supports some extension from later GLX versions. You should query
+     * the server to get the GLX version in use in the connection associated
+     * with the current display. Also, You should query both server and client
+     * to get a full list of all the supported commands and extension.
+     * 
+     * @see #queryExtensionsString(int)
+     * @see #queryServerString(int, int)
+     * @see #queryVersion()
+     */
+    public static final GLXVersion SUPPORTED_GLX_VERSION = new GLXVersion(1, 2);
+    private final GLXVersion glxVersion;
+    
+    /**
+     * Separator used to separate extensions in the extension strings.
+     */
+    private static final String EXT_SEPARATOR = " ";
+
+    /**
+     * List all the extension implemented by Escher.
+     * 
+     * This is to be considered deprecated. Use the GLXExtension enum instead. 
+     */
+    @Deprecated
+    private static final String CLIENT_EXTENSION_STRING =
+        "GL_EXT_abgr"                   + EXT_SEPARATOR +
+        "GL_EXT_blend_color"            + EXT_SEPARATOR +
+        "GL_EXT_blend_func_separate "   + EXT_SEPARATOR +
+        "GL_EXT_blend_logic_op"         + EXT_SEPARATOR +
+        "GL_EXT_blend_minmax"           + EXT_SEPARATOR +
+        "GL_EXT_blend_subtract"         + EXT_SEPARATOR +
+        "GL_ARB_vertex_program";
+
+    // GL_ARB_multitexture
+    // GL_ARB_texture_cube_map
+    // GL_ARB_tranpose_matrix
+    // GL_EXT_clip_volume_hint
+    // GL_EXT_compiled_vertex_array
+    // GL_EXT_histogram
+    // GL_EXT_packed_pixels
+    // GL_EXT_paletted_texture
+    // GL_EXT_point_parameters
+    // GL_EXT_polygon_offset
+    // GL_EXT_rescale_normal
+    // GL_EXT_shared_texture_palette
+    // GL_EXT_stencil_wrap
+    // GL_EXT_texture3D
+    // GL_EXT_texture_env_add
+    // GL_EXT_texture_env_combine
+    // GL_EXT_texture_object
+    // GL_EXT_texture_lod_bias
+    // GL_EXT_vertex_array
+    // GL_HP_occlusion_test
+    // GL_INGR_blend_func_separate
+    // GL_MESA_window_pos
+    // GL_MESA_resize_buffers
+    // GL_NV_texgen_reflection
+    // GL_PGI_misc_hints
+    // GL_SGI_color_matrix
+    // GL_SGI_color_table
+    // GL_SGIS_pixel_texture
+    // GL_SGIS_texture_edge_clamp
+    // GL_SGIX_pixel_texture
+
+    
     public static final String[] MINOR_OPCODE_STRINGS = {
     // GLX commands
             "", // 0
@@ -184,52 +253,67 @@ public class GLX extends gnu.x11.extension.Extension implements
             "GetMinmaxParameterfv", // 158
             "GetMinmaxParameteriv", // 159
     };
+    
+    private VisualConfig[][] visualConfigs;
 
-    public static final int CLIENT_MAJOR_VERSION = 1;
-    public static final int CLIENT_MINOR_VERSION = 2;
-
-    public int server_major_version, server_minor_version;
-    private VisualConfig[][] visual_configs_cache;
-
-    // glx opcode 7 - get version
     /**
-     * @see <a href="glXQueryVersion.html">glXQueryVersion</a>
+     * Initialize a new GLX context to the given display.
      */
     public GLX(gnu.x11.Display display)
         throws gnu.x11.extension.NotFoundException {
 
         super(display, "GLX", MINOR_OPCODE_STRINGS, 13, 1);
 
+        int major = 0;
+        int minor = 0;
+        
         RequestOutputStream o = display.out;
         synchronized (o) {
-            o.begin_request(major_opcode, 7, 3);
-            o.write_int32(CLIENT_MAJOR_VERSION);
-            o.write_int32(CLIENT_MINOR_VERSION);
+            
+            // set only once
+            o.setGLXMajorOpcode(major_opcode);
+            
+            o.beginGLXRequest(GLXCommand.GLXQueryVersion);
+            o.write_int32(SUPPORTED_GLX_VERSION.major);
+            o.write_int32(SUPPORTED_GLX_VERSION.minor);
+            
             ResponseInputStream i = display.in;
             synchronized (i) {
                 i.read_reply(o);
                 i.skip(8);
-                server_major_version = i.read_int32();
-                server_minor_version = i.read_int32();
+                major = i.read_int32();
+                minor = i.read_int32();
+                this.glxVersion = new GLXVersion(major, minor);
+                
                 i.skip(16);
             }
         }
 
         send_client_info();
-        visual_configs_cache = new VisualConfig[display.screens.length][];
+        
+        // get a listing of visual configs and store them for later use
+        
+        visualConfigs = new VisualConfig[display.screens.length][];
     }
 
-    // glx opcode 14 - get visual configs
-    public VisualConfig[] visual_configs(int screen_no) {
+    /**
+     * Get an array of supported Visual Configurations.
+     * 
+     * GLX opcode 14.
+     * @deprecated Use {@link #getVisualConfigs(int)} instead
+     */
+    @Deprecated
+    public VisualConfig[] visual_configs(int screenNo) {
 
-        if (visual_configs_cache[screen_no] != null)
-            return visual_configs_cache[screen_no];
+        if (visualConfigs[screenNo] != null)
+            return visualConfigs[screenNo];
 
         RequestOutputStream o = display.out;
         VisualConfig[] vcs;
         synchronized (o) {
-            o.begin_request(major_opcode, 14, 2);
-            o.write_int32(screen_no);
+            o.beginGLXRequest(GLXCommand.GLXGetVisualConfigs);
+            o.write_int32(screenNo);
+            
             ResponseInputStream i = display.in;
             synchronized (i) {
                 i.read_reply(o);
@@ -246,10 +330,20 @@ public class GLX extends gnu.x11.extension.Extension implements
                 for (int index = 0; index < visual_count; index++) {
                     vcs[index] = new VisualConfig(i, property_count);
                 }
-                visual_configs_cache[screen_no] = vcs;
+                visualConfigs[screenNo] = vcs;
             }
         }
         return vcs;
+    }
+
+    /**
+     * Get an array of supported Visual Configurations on the given screen.
+     * 
+     * GLX opcode 14.
+     */
+    public VisualConfig[] getVisualConfigs(int screenNo) {
+        
+        return this.visual_configs(screenNo);
     }
 
     public final static int VENDOR = 0x1;
@@ -304,48 +398,78 @@ public class GLX extends gnu.x11.extension.Extension implements
      * @see <a
      *      href="http://www.opengl.org/documentation/specs/man_pages/hardcopy/GL/html/glx/xqueryserverstring.html">glXQueryServerString</a>
      */
-    public String queryServerString(int screen_no, int name) {
+    public String queryServerString(int screenNo, int name) {
 
-        return this.server_string(screen_no, name);
+        return this.server_string(screenNo, name);
     }
 
-    // TODO
-    private static final String CLIENT_EXTENSION_STRING = "GL_EXT_abgr"
-            + " GL_EXT_blend_color" + " GL_EXT_blend_func_separate"
-            + " GL_EXT_blend_logic_op" + " GL_EXT_blend_minmax"
-            + " GL_EXT_blend_subtract";
-
-    // GL_ARB_multitexture
-    // GL_ARB_texture_cube_map
-    // GL_ARB_tranpose_matrix
-    // GL_EXT_clip_volume_hint
-    // GL_EXT_compiled_vertex_array
-    // GL_EXT_histogram
-    // GL_EXT_packed_pixels
-    // GL_EXT_paletted_texture
-    // GL_EXT_point_parameters
-    // GL_EXT_polygon_offset
-    // GL_EXT_rescale_normal
-    // GL_EXT_shared_texture_palette
-    // GL_EXT_stencil_wrap
-    // GL_EXT_texture3D
-    // GL_EXT_texture_env_add
-    // GL_EXT_texture_env_combine
-    // GL_EXT_texture_object
-    // GL_EXT_texture_lod_bias
-    // GL_EXT_vertex_array
-    // GL_HP_occlusion_test
-    // GL_INGR_blend_func_separate
-    // GL_MESA_window_pos
-    // GL_MESA_resize_buffers
-    // GL_NV_texgen_reflection
-    // GL_PGI_misc_hints
-    // GL_SGI_color_matrix
-    // GL_SGI_color_table
-    // GL_SGIS_pixel_texture
-    // GL_SGIS_texture_edge_clamp
-    // GL_SGIX_pixel_texture
-
+    public String getClentString (int screenNo, int name)
+    {
+        // TODO
+        return "";
+    }
+    
+    /**
+     * glXQueryVersion returns the major and minor version numbers
+     * of the GLX extension implemented by the server associated
+     * with connection dpy. Implementations with the same major
+     * version number are upward compatible, meaning that the
+     * implementation with the higher minor number is a superset of
+     * the version with the lower minor number.
+     * 
+     * <a href='http://www.opengl.org/documentation/specs/man_pages/hardcopy/GL/html/glx/xqueryversion.html'>glXQueryVersion</a>
+     */
+    public GLXVersion queryVersion() {
+        
+        return this.glxVersion;
+    }
+    
+    /**
+     * Returns a string describing which GLX extensions are supported on
+     * the connection. The string contains a space-separated list of 
+     * extension names (The extension names themselves never contain 
+     * spaces). If there are no extensions to GLX, then the empty string is 
+     * returned. 
+     * 
+     * glx opcode 18.
+     *  
+     * @see <a
+     *      href="http://www.opengl.org/sdk/docs/man/xhtml/glXQueryExtensionsString.xml">
+     *      glXQueryExtensionsString
+     *      </a>
+     */
+    public String queryExtensionsString(int screenNo) {
+              
+        // It seems that this is not a real GLX command, so
+        // we just add a list of "known" extensions to the list
+        // returned by the server.
+        //
+        // This is more or less how MESA implements this routine:
+        //
+        // " An extension is supported if the client-side (i.e., libGL)
+        // supports it and the "server" supports it.
+        // In this case that means that either the true server supports
+        // it or it is only for direct-rendering and the direct rendering
+        // driver supports it.
+        // 
+        // If the display is not capable of direct rendering, then the
+        // extension is enabled if and only if the client-side library and
+        // the server support it."
+        
+        String serverExtensions =
+            this.queryServerString(screenNo, GLX.EXTENSIONS);
+        
+        // we maintain a list of known exentions depending on the version
+        // of OpenGL actually implemented by the server.
+        String serverVersion = this.queryServerString(screenNo, GLX.VERSION);
+        
+        // FIXME: this is not correct, we don't want CLIENT_EXTENSION_STRING
+        // here, see the notice above.
+        return serverVersion.trim() + EXT_SEPARATOR +
+               serverExtensions.trim() + EXT_SEPARATOR + 
+               CLIENT_EXTENSION_STRING;
+    }
+    
     // glx opcode 20 - client info
     private void send_client_info() {
 
@@ -354,8 +478,8 @@ public class GLX extends gnu.x11.extension.Extension implements
             int n = CLIENT_EXTENSION_STRING.length();
             int p = RequestOutputStream.pad(n);
             o.begin_request(major_opcode, 20, 4 + (n + p) / 4);
-            o.write_int32(CLIENT_MAJOR_VERSION);
-            o.write_int32(CLIENT_MINOR_VERSION);
+            o.write_int32(this.SUPPORTED_GLX_VERSION.major);
+            o.write_int32(this.SUPPORTED_GLX_VERSION.minor);
             o.write_int32(CLIENT_EXTENSION_STRING.length());
             o.write_string8(CLIENT_EXTENSION_STRING);
             o.skip(p);
@@ -412,28 +536,90 @@ public class GLX extends gnu.x11.extension.Extension implements
     }
 
     /**
-     * @see #visual_config(int, VisualConfig, boolean)
+     * glXChooseVisual returns a XVisualInfo describing the visual that best
+     * meets the template XVisualInfo specification, or null, if not matching
+     * configuration can be found.
+     * 
+     * @see <a href="http://www.opengl.org/documentation/specs/man_pages/hardcopy/GL/html/glx/xchoosevisual.html">glXChooseVisual</a>
      */
-    public VisualConfig visual_config(VisualConfig template) {
-
-        return visual_config(display.default_screen_no, template, true);
+    public XVisualInfo chooseVisual(XVisualInfo info) {
+        
+        // TODO
+        throw new NotImplementedException();
     }
-
+    
     /**
-     * @see <a href="glXChooseVisual.html">glXChooseVisual</a>
+     * glXChooseVisual returns a XVisualInfo describing the visual that best
+     * meets the template XVisualInfo specification, or null, if not matching
+     * configuration can be found.
+     * 
+     * @see <a href="http://www.opengl.org/documentation/specs/man_pages/hardcopy/GL/html/glx/xchoosevisual.html">glXChooseVisual</a>
      */
-    public VisualConfig visual_config(int screen_no, VisualConfig template,
-                                      boolean must) {
-
-        VisualConfig[] vcs = visual_configs(screen_no);
-        for (int i = 0; i < vcs.length; i++)
-            if (vcs[i].match(template))
-                return vcs[i];
-
-        if (!must)
-            return null;
-        throw new java.lang.Error("No matching: " + template);
+    public XVisualInfo chooseVisual(int screenNo, int [] attributeList) {
+        
+        // get a list of all visuals
+        VisualConfig[] vcs = getVisualConfigs(screenNo);
+        
+        // create a template object from the attributeList
+        VisualConfig template = new VisualConfig(attributeList);
+        VisualConfig bestMatch = null;
+        
+        // see if we can eliminate some visuals
+        for (VisualConfig config : vcs) {
+            if (config.compatible(template) &&
+                ((bestMatch == null) || (config.compare(bestMatch) < 0))) {
+                bestMatch = config;
+            }
+        }
+        
+        // then build an XVisualInfo object from the attribute list
+        if (bestMatch != null) {
+            XVisualInfo visual = new XVisualInfo();
+            visual.setID(bestMatch.getVisualID());
+            return visual; 
+        }
+        
+        return null;
     }
+
+    // NOTE: as of 2008-06-25 we simply give away the full visual_config
+    // family of methods.
+    // Being it quite sensitive method call, we expect some code to break.
+    // Please, just use chooseVisual and getVisualConfigs instead.
+//   /**
+//    * @see <a href="http://www.opengl.org/documentation/specs/man_pages/hardcopy/GL/html/glx/xchoosevisual.html">glXChooseVisual</a>
+//    * @deprecated Use {@link #chooseVisual(VisualConfig)} instead
+//    */
+//    @Deprecated
+//    public VisualConfig visual_config(VisualConfig template) {
+//        return visual_config(display.default_screen_no, template, true);
+//    }
+//    
+//    /** 
+//     * @deprecated Use {@link #chooseVisual(int, VisualConfig)} instead
+//     */
+//    @Deprecated
+//    public VisualConfig visual_config(int screen_no, VisualConfig template,
+//                                      boolean must) {
+//        
+//        // we usually try to be compatible with the old code, but
+//        // this method, like all the visual_config are proven to be completely
+//        // broken, so we need to break compatibilty in this case.
+//        throw new NotImplementedException();
+//        
+////        VisualConfig[] vcs = getVisualConfigs(screen_no);
+////        
+////        for (int i = 0; i < vcs.length; i++) {
+////            if (vcs[i].match(template)) {
+////                return vcs[i];
+////            }
+////        }
+////        
+////        if (!must)
+////            return null;
+////        
+////      throw new java.lang.Error("No matching: " + template);
+//    }
 
     /**
      * @see GLX#server_string(int, int)
@@ -444,15 +630,15 @@ public class GLX extends gnu.x11.extension.Extension implements
 
         // TODO output like `glxinfo'
 
-        return "\n  client-version: " + CLIENT_MAJOR_VERSION + "."
-                + CLIENT_MINOR_VERSION + "\n  server-version: "
-                + server_major_version + "." + server_minor_version
+        return "\n  client-version: " + SUPPORTED_GLX_VERSION.major + "."
+                + SUPPORTED_GLX_VERSION.minor + "\n  server-version: "
+                + glxVersion.major + "." + glxVersion.minor
                 + "\n  vendor: " + server_string(screen, VENDOR)
                 + "\n  extensions: " + server_string(screen, EXTENSIONS);
     }
 
     public boolean support(int major, int minor) {
 
-        return server_major_version == major && server_minor_version >= minor;
+        return glxVersion.major == major && glxVersion.minor >= minor;
     }
 }

@@ -12,7 +12,7 @@ public class GLXPixmap extends gnu.x11.Resource implements GLXDrawable {
   /**
    * @see <a href="glXCreateGLXPixmap.html">glXCreateGLXPixmap</a>
    */
-  public GLXPixmap (GLX glx, int screen_no, VisualConfig visual, 
+  public GLXPixmap (GLX glx, int screen_no, XVisualInfo visual, 
     gnu.x11.Pixmap pixmap) {
 
     super (glx.display);
@@ -21,8 +21,9 @@ public class GLXPixmap extends gnu.x11.Resource implements GLXDrawable {
     RequestOutputStream o = display.out;
     synchronized (o) {
       o.begin_request (glx.major_opcode, 13, 5);
+      
       o.write_int32 (screen_no);
-      o.write_int32 (visual.visual_id ());
+      o.write_int32 (visual.getID());
       o.write_int32 (pixmap.id);
       o.write_int32 (id);
       o.send ();

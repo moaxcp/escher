@@ -112,7 +112,7 @@ public abstract class Application extends gnu.x11.Application {
 
 
   protected void init_window (int width, int height) {
-    visual_config = glx.visual_config (visual_config);
+    visual_config = null;//glx.chooseVisual(visual_config);
     int vid = visual_config.visual_id ();
     gl = glx.create_context (vid, display.default_screen_no, GL.NONE0);
 

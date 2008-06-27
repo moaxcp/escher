@@ -25,7 +25,11 @@ public enum GLXCommand implements X11Command {
     /* ***** GLX Commands ***** */
     
     GLXCreateContext(3, 6),
+    GLXGetVisualConfigs(14, 2),
+    GLXQueryExtensionString(18, 2),
     GLXQueryServerString(19, 3),
+    GLXQueryVersion(7, 3),
+    GLXMakeCurrent(5, 4),
     
     /* ***** OpenGL Commands ***** */
     

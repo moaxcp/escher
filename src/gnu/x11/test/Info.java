@@ -131,7 +131,7 @@ public class Info extends gnu.x11.Application {
 
     try {
       GLX glx = new GLX (display);
-      System.out.println (glx + Misc.to_string (glx.visual_configs (0)));
+      System.out.println (glx + Misc.to_string (glx.getVisualConfigs (0)));
 
       GL gl = glx.create_context (display.default_screen.root_visual_id (),
         display.default_screen_no, GL.NONE0);

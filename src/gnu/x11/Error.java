@@ -388,12 +388,12 @@ public class Error extends java.lang.Error {
         : display.extension_opcode_strings [major_opcode - 128]);
     
 
-    //-- minor opcode
-
+    //-- minor opcode    
+    
     String minor_opcode_string = major_opcode < 128 ? ""
       : "\n  minor-opcode: " + minor_opcode
-      + " " + display.extension_minor_opcode_strings 
-      [major_opcode - 128] [minor_opcode];
+      + " " +
+      display.extension_minor_opcode_strings[major_opcode - 128][minor_opcode];
 
 
     //-- output
