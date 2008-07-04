@@ -3,9 +3,8 @@ package gnu.x11.extension.glx;
 import java.nio.Buffer;
 import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
-
 import java.nio.DoubleBuffer;
-import gnu.x11.Drawable;
+
 import gnu.x11.RequestObject;
 import gnu.x11.RequestOutputStream;
 import gnu.x11.ResponseInputStream;
@@ -4689,10 +4688,11 @@ public class GL extends gnu.x11.Resource implements GLConstant {
         synchronized (o) {
             GLRenderRequest rr =
                 beginRenderRequest(o, GLXRenderingCommand.MultMatrixd);
-            buffer.position(0);
+            int position = buffer.position();
             while (buffer.remaining()> 0) {
                 rr.writeDouble(buffer.get());
-            }            
+            }
+            buffer.position(position);
         }
     }
     
