@@ -1,4 +1,18 @@
 -*- outline -*-
+* 1.9.90
+** API Changes
+   - Many new things in preparation of 2.0 release.
+   - Moved gnu.app.* gnu.test.* and *Application to a escher-demos subproject.
+   - Better GLX implementation.
+** Performance optimization
+   - many Improvements here and there.
+** General changes
+   - Removed screenshots subdirectory. Screenshots will be maintained on
+     the website if needed.
+   - Removed project directory for NetBeans (not maintained anymore).
+   - Removed manpage subdirectory. When appropriate, the javadoc
+     will refer to XLib or GLX documentation.
+     
 * 0.3
 ** Performance optimization
    - The protocol implementation has been rewritten to avoid excessive

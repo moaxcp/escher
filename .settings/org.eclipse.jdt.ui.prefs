@@ -1,6 +1,6 @@
-#Tue Jun 10 17:18:23 CEST 2008
+#Mon Jul 14 16:56:33 CEST 2008
 eclipse.preferences.version=1
-formatter_profile=_Escher
+formatter_profile=_Classpath profile
 formatter_settings_version=11
 internal.default.compliance=default
 org.eclipse.jdt.ui.text.custom_code_templates=<?xml version\="1.0" encoding\="UTF-8" standalone\="no"?><templates/>
