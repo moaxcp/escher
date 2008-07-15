@@ -1,6 +1,5 @@
 package gnu.x11.extension.glx;
 
-import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 import gnu.x11.Data;
 import gnu.x11.Display;
 import gnu.x11.RequestOutputStream;
@@ -545,7 +544,7 @@ public class GLX extends gnu.x11.extension.Extension implements
     public XVisualInfo chooseVisual(XVisualInfo info) {
         
         // TODO
-        throw new NotImplementedException();
+        throw new UnsupportedOperationException();
     }
     
     /**
