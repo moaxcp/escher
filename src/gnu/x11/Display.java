@@ -2,7 +2,6 @@
 
 package gnu.x11;
 
-import gnu.util.Logger;
 import gnu.x11.event.Event;
 import gnu.x11.extension.ErrorFactory;
 import gnu.x11.extension.EventFactory;
@@ -18,10 +17,18 @@ import java.net.InetAddress;
 import java.net.Socket;
 import java.net.UnknownHostException;
 import java.util.Hashtable;
+import java.util.logging.Level;
 
 /** X server connection. */
 public class Display
 {
+    private static java.util.logging.Logger logger;
+    static {
+        // FIXME, allow runtime configuration
+        logger = java.util.logging.Logger.getLogger("gnu.x11.Display");
+        logger.setLevel(Level.ALL);
+    }
+
   public static final int CURRENT_TIME = 0;
 
   // TODO better handling debug flag
@@ -150,11 +157,10 @@ public class Display
   /**
    * #Display(String, int, int)
    * 
-   * @throws EscherServerConnectionError
+   * @throws EscherServerConnectionException
    */
-  public Display() throws EscherServerConnectionError
+  public Display() throws EscherServerConnectionException
   {
-
     this("", 0, 0);
   }
 
@@ -212,9 +218,9 @@ public class Display
   /**
    * #Display(String, int, int)
    * 
-   * @throws EscherServerConnectionError
+   * @throws EscherServerConnectionException
    */
-  public Display(Name name) throws EscherServerConnectionError
+  public Display(Name name) throws EscherServerConnectionException
   {
 
     this(name.hostname, name.display_no, name.screen_no);
@@ -223,10 +229,10 @@ public class Display
   /**
    * #Display(String, int, int)
    * 
-   * @throws EscherServerConnectionError
+   * @throws EscherServerConnectionException
    */
   public Display(String hostname, int display_no)
-      throws EscherServerConnectionError
+      throws EscherServerConnectionException
   {
 
     this(hostname, display_no, 0);
@@ -246,10 +252,10 @@ public class Display
    *            the display number
    * @param screen_no
    *            the screen number
-   * @throws EscherServerConnectionError
+   * @throws EscherServerConnectionException
    */
   public Display(Socket socket, String hostname, int display_no, int screen_no)
-      throws EscherServerConnectionError
+      throws EscherServerConnectionException
   {
 
     default_screen_no = screen_no;
@@ -261,11 +267,11 @@ public class Display
   }
 
   /**
-   * @throws EscherServerConnectionError
+   * @throws EscherServerConnectionException
    * @see <a href="XOpenDisplay.html">XOpenDisplay</a>
    */
   public Display(String hostname, int display_no, int screen_no)
-      throws EscherServerConnectionError
+      throws EscherServerConnectionException
   {
     default_screen_no = screen_no;
     this.display_no = display_no;
@@ -282,7 +288,7 @@ public class Display
     init();
   }
 
-  private void init() throws EscherServerConnectionError
+  private void init() throws EscherServerConnectionException
   {
 
     // authorization protocol
@@ -1099,10 +1105,10 @@ public class Display
    * Reads the server information after connection setup. The information is
    * read from the connection's ResponseInputStream.
    * 
-   * @throws EscherServerConnectionError
+   * @throws EscherServerConnectionException
    */
   private void init_server_info(ResponseInputStream i)
-      throws EscherServerConnectionError
+      throws EscherServerConnectionException
   {
 
     int accepted = i.read_int8();
@@ -1124,11 +1130,11 @@ public class Display
 
         break;
       case 1:
-        Logger.warning(this, "more auth data not yet implemented");
+          logger.warning("more auth data not yet implemented");
         break;
 
       default:
-        Logger.severe(this, "init_server_info::Unknown server reply!");
+          logger.warning("init_server_info::Unknown server reply!");
         break;
       }
 
@@ -1178,9 +1184,9 @@ public class Display
                                 + "values.\n");
           }
 
-        Logger.debug(this, debugMessage);
+        logger.severe(debugMessage.toString());
 
-        throw new EscherServerConnectionError(
+        throw new EscherServerConnectionException(
                                               "Connection to the XServer failed.");
       }
 
