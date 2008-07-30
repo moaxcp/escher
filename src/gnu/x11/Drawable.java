@@ -771,6 +771,7 @@ public abstract class Drawable extends Resource {
       o.write_int16 (y1);
       o.write_int16 (x2);
       o.write_int16 (y2);
+      o.send();
     }
   }
 
