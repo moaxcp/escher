@@ -10,14 +10,19 @@ public abstract class FocusEvent extends Event {
   public static final int UNGRAB = 2;
   public static final int WHILE_GRABBED = 3;
 
-  public int event_window_id;
+  private int eventWindowID;
 
   public int mode;
 
   public FocusEvent (Display display, ResponseInputStream in) {
     super (display, in);
-    event_window_id = in.read_int32 ();
+    eventWindowID = in.read_int32 ();
     mode = in.read_int8 ();
     in.skip (23); // Unused.
   }
+
+    public int getEventWindowID() {
+        // Should really return the Window object here.
+        return eventWindowID;
+    }
 }
