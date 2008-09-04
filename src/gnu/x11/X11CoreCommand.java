@@ -16,7 +16,8 @@ package gnu.x11;
  */
 public enum X11CoreCommand implements X11Command
 {
-    GetImage(73, 5);
+    GetImage(73, 5),
+    SetInputFocus(42, 3);
 
     private final int opcode;
     private final int length;
