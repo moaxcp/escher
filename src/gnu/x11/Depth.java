@@ -1,26 +1,49 @@
-package gnu.x11;
 
+package gnu.x11;
 
 /** X depth. */
 public class Depth {
 
-  public int depth;
-  public Visual[] visual_types;
+    private int depth;
+    private VisualInfo[] visualTypes;
+    
+    private Screen screen = null;
+    
+    public Depth(ResponseInputStream in, Screen screen) {
 
-  public Depth (ResponseInputStream in) {
-    depth = in.read_int8 ();
-    in.skip(1);
-    int visual_count = in.read_int16 ();
-    in.skip (4);
-    visual_types = new Visual [visual_count];
-    for (int i = 0; i < visual_count; i++) {
-      visual_types [i] = new Visual (in);
+        this.screen = screen;
+        
+        depth = in.read_int8();
+        in.skip(1);
+        int visualCount = in.read_int16();
+        in.skip(4);
+
+        visualTypes = new VisualInfo[visualCount];
+        
+        for (int i = 0; i < visualCount; i++) {
+            visualTypes[i] = new VisualInfo(in, this);
+            screen.getDisplay().addVisual(visualTypes[i]);
+        }
     }
-  }
 
-  public String toString () {
-    return "#Depth"
-      + "\n  depth: " + depth
-      + "\n  visual-count: " + visual_types.length;
-  }
+    public int getDepth() {
+
+        return this.depth;
+    }
+
+    public Screen getScreen() {
+        
+        return this.screen;
+    }
+    
+    public VisualInfo[] getVisuals() {
+        
+        return this.visualTypes;
+    }
+     
+    public String toString() {
+
+        return "#Depth" + "\n  depth: " + depth + "\n  visual-count: "
+                + visualTypes.length;
+    }
 }

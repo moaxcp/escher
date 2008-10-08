@@ -1,142 +1,210 @@
+
 package gnu.x11.image;
 
+import gnu.x11.Display;
 import gnu.x11.Pixmap;
-
 
 public abstract class Image {
 
-  /**
-   * The possible pixmap formats for client side images.
-   */
-  public static enum Format {
-    BITMAP   { public int id() { return 0; } },
-    XYPIXMAP { public int id() { return 1; } },
-    ZPIXMAP  { public int id() { return 2; } };
+    /**
+     * The possible pixmap formats for client side images.
+     */
+    public static enum Format {
+        
+        BITMAP(0),        
+        XYPIXMAP(1),        
+        ZPIXMAP(2);
+        
+        private int id;        
+        Format(int id) {
+         
+            this.id = id;
+        }
+        
+        public int getID() {
+            return this.id;
+        }
+    }
 
-    public abstract int id ();
-  }
+    /*
+    public static enum ByteOrder {
+        LSB_FIRST(0),
+        MSB_FIRST(1);
+        
+        private int id;
+        ByteOrder(int id) {
+            this.id = id;
+        }
+        
+        public int getID() {
+            return this.id;
+        }
+    }
+    */
+    // TODO: change this with the above enum
+    public static final int LSB_FIRST = 0;
+    public static final int MSB_FIRST = 1;
 
-  public static final int LSB_FIRST = 0;
-  public static final int MSB_FIRST = 1;
-  public static final int LEAST_SIGNIFICANT = 0;
-  public static final int MOST_SIGNIFICANT = 1;
+    public static final int LEAST_SIGNIFICANT = 0;
 
-  byte [] data;
-  int width;
-  int height;
-  int left_pad;
-  Format format;
-  int line_byte_count;
+    public static final int MOST_SIGNIFICANT = 1;
 
-  Pixmap.Format pixmap_format;
+    byte[] data;
 
-  Image (Format f, Pixmap.Format pf) {
-    init (0, 0, f, pf);
-  }
+    int width;
 
-  /**
-   * Constructs an Image object and creates a new backing array.
-   *
-   * @param width the width in pixels
-   * @param height the height in pixels
-   * @param format the image format
-   * @param pixmap_format the pixmap format
-   */
-  Image (int width, int height, Format format, Pixmap.Format pixmap_format) {
-    
-    init (width, height, format, pixmap_format);
+    int height;
 
-    data = new byte [line_byte_count * height];
-  }
+    protected int leftPad;
 
-  /**
-   * Constructs a new Image object with an existing data array.
-   *
-   * @param width the width in pixels
-   * @param height the height in pixels
-   * @param format the image format
-   * @param pixmap_format the pixmap format
-   * @param data the underlying data array
-   */
-  Image (int width, int height, Format format, Pixmap.Format pixmap_format,
-         byte[] data) {
-    init (width, height, format, pixmap_format);
-    this.data = data;
-  }
+    Format format;
 
-  /**
-   * Initializes the internal state of the Image object.
-   *
-   * @param w the width
-   * @param h the height
-   * @param f the image format
-   * @param pf the pixmap format
-   */
-  private void init (int w, int h, Format f, Pixmap.Format pf) {
+    protected int lineByteCount;
 
-    width = w;
-    height = h;
-    format = f;
-    pixmap_format = pf;
+    protected Pixmap.Format pixmapFormat;
 
-    init ();
-  }
+    Image(Format f, Pixmap.Format pf) {
 
-  /**
-   * Calculates the internal state.
-   */
-  void init () {
+        init(0, 0, f, pf);
+    }
 
-    // compute line_byte_count
-    int line_bit_count = width * pixmap_format.bits_per_pixel ();
-    int rem = line_bit_count % pixmap_format.scanline_pad ();
-    int line_pad_count = line_bit_count / pixmap_format.scanline_pad ()
-      + (rem == 0 ? 0 : 1);
-    line_byte_count = line_pad_count * pixmap_format.scanline_pad () / 8;
-    left_pad = format == Format.ZPIXMAP ? 0 
-                                        : line_byte_count * 8 - line_bit_count;
-  }
+    /**
+     * Constructs an Image object and creates a new backing array.
+     * 
+     * @param width
+     *                the width in pixels
+     * @param height
+     *                the height in pixels
+     * @param format
+     *                the image format
+     * @param pixmapFormat
+     *                the pixmap format
+     */
+    Image(int width, int height, Format format, Pixmap.Format pixmap_format) {
 
-  /**
-   * Returns the width of the image in pixels.
-   *
-   * @return the width of the image in pixels
-   */
-  public int get_width () {
-    return width;
-  }
+        init(width, height, format, pixmap_format);
 
-  /**
-   * Returns the height of the image in pixels.
-   *
-   * @return the height of the image in pixels
-   */
-  public int get_height () {
-    return height;
-  }
+        data = new byte[lineByteCount * height];
+    }
 
-  /**
-   * Returns the image format.
-   *
-   * @return the image format
-   */
-  public Format get_format () {
-    return format;
-  }
+    /**
+     * Constructs a new Image object with an existing data array.
+     * 
+     * @param width
+     *                the width in pixels
+     * @param height
+     *                the height in pixels
+     * @param format
+     *                the image format
+     * @param pixmapFormat
+     *                the pixmap format
+     * @param data
+     *                the underlying data array
+     */
+    Image(int width, int height, Format format, Pixmap.Format pixmap_format,
+            byte[] data) {
 
-  public byte[] get_data () {
-    return data;
-  }
+        init(width, height, format, pixmap_format);
+        this.data = data;
+    }
 
-  public int get_left_pad () {
-    return left_pad;
-  }
+    /**
+     * Initializes the internal state of the Image object.
+     * 
+     * @param w
+     *                the width
+     * @param h
+     *                the height
+     * @param f
+     *                the image format
+     * @param pf
+     *                the pixmap format
+     */
+    private void init(int w, int h, Format f, Pixmap.Format pf) {
 
-  public Pixmap.Format get_pixmap_format () {
-    return pixmap_format;
-  }
+        width = w;
+        height = h;
+        format = f;
+        pixmapFormat = pf;
 
-  public int get_line_byte_count () {
-    return line_byte_count;
-  }
+        init();
+    }
+
+    /**
+     * Calculates the internal state.
+     */
+    void init() {
+
+        int lineBitCount = width * pixmapFormat.getBitsPerPixel();
+
+//        System.err.println("getBitsPerPixel: " + pixmapFormat.getBitsPerPixel());
+//        System.err.println("lineBitCount: " + lineBitCount);
+        
+        int scanlinePad = pixmapFormat.getScanlinePad();
+
+        // do we have to pad?
+        int rem = lineBitCount % scanlinePad;
+        
+//        System.err.println("scanlinePad: " + scanlinePad);
+//        System.err.println("rem: " + rem);
+        
+        // and if so, how much?
+        int linePadCount = (lineBitCount / scanlinePad) + (rem == 0 ? 0 : 1);
+        lineByteCount = (linePadCount * scanlinePad) / 8;
+
+//        System.err.println("lineByteCount: " + lineByteCount);
+        
+        leftPad = format == Format.ZPIXMAP ? 0 : lineByteCount * 8
+                - linePadCount;
+    }
+
+    /**
+     * Returns the width of the image in pixels.
+     * 
+     * @return the width of the image in pixels
+     */
+    public int get_width() {
+
+        return width;
+    }
+
+    /**
+     * Returns the height of the image in pixels.
+     * 
+     * @return the height of the image in pixels
+     */
+    public int get_height() {
+
+        return height;
+    }
+
+    /**
+     * Returns the image format.
+     * 
+     * @return the image format
+     */
+    public Format get_format() {
+
+        return format;
+    }
+
+    public byte[] get_data() {
+
+        return data;
+    }
+
+    public int getLeftPad() {
+
+        return leftPad;
+    }
+
+    public Pixmap.Format get_pixmap_format() {
+
+        return pixmapFormat;
+    }
+
+    public int getLineByteCount() {
+
+        return lineByteCount;
+    }
 }

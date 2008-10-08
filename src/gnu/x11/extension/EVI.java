@@ -3,7 +3,7 @@ package gnu.x11.extension;
 import gnu.x11.Display;
 import gnu.x11.RequestOutputStream;
 import gnu.x11.ResponseInputStream;
-import gnu.x11.Visual;
+import gnu.x11.VisualInfo;
 
 
 /**
@@ -52,7 +52,7 @@ public class EVI extends Extension {
 
 
   /** EVI visual info. */
-  public static class VisualInfo {
+  public static class ExtendedVisualInfo {
 
     public int core_visual_id;
     public int screen;
@@ -63,7 +63,7 @@ public class EVI extends Extension {
     public int max_hw_colormaps;
     public int num_colormap_conflicts;
 
-    VisualInfo (ResponseInputStream i) {
+    ExtendedVisualInfo (ResponseInputStream i) {
       core_visual_id = i.read_int32 ();
       screen = i.read_int8 ();
       level = i.read_int8 ();
@@ -82,15 +82,15 @@ public class EVI extends Extension {
   public static class VisualInfoReply {
 
     public int n_conflicts;
-    public VisualInfo [] items;
+    public ExtendedVisualInfo [] items;
 
     VisualInfoReply (ResponseInputStream i) {
       int n_info = i.read_int32 ();
       n_conflicts = i.read_int32 ();
       i.skip (16);
-      items = new VisualInfo [n_info];
+      items = new ExtendedVisualInfo [n_info];
       for (int j = 0; j < n_info; j++) {
-        items [j] = new VisualInfo (i);
+        items [j] = new ExtendedVisualInfo (i);
       }
     }
   }
@@ -100,14 +100,14 @@ public class EVI extends Extension {
   /**
    * @see <a href="XeviGetVisualInfo.html">XeviGetVisualInfo</a>
    */
-  public VisualInfoReply visual_info (Visual [] visuals) {
+  public VisualInfoReply visual_info (VisualInfo [] visuals) {
     VisualInfoReply reply;
     RequestOutputStream o = display.out;
     synchronized (o) {
       o.begin_request (major_opcode, 1, 2 + visuals.length);
       o.write_int32 (visuals.length);
       for (int i = 0; i < visuals.length; i++)
-        o.write_int32 (visuals [i].id);
+        o.write_int32 (visuals [i].getID());
       ResponseInputStream in = display.in;
       synchronized (in) {
         in.read_reply (o);

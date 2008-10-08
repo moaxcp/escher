@@ -118,12 +118,12 @@ public class DBE extends Extension implements ErrorFactory {
 
 
   /** DBE visual info. */
-  public static class VisualInfo {
+  public static class XdbeScreenVisualInfo {
 
     public int visual_id;
     public int depth;
     public int perflevel;
-    public VisualInfo (ResponseInputStream i) {
+    public XdbeScreenVisualInfo (ResponseInputStream i) {
       visual_id = i.read_int32 ();
       depth = i.read_int8 ();
       perflevel = i.read_int8 ();
@@ -131,7 +131,7 @@ public class DBE extends Extension implements ErrorFactory {
     }
 
     public String toString () {
-      return "#VisualInfo"
+      return "#XdbeScreenVisualInfo"
         + "\n  visual-id: " + visual_id
         + "\n  depth: " + depth
         + "\n  performance hint: " + perflevel;
@@ -142,13 +142,13 @@ public class DBE extends Extension implements ErrorFactory {
   /** DBE screen visual info. */
   public static class ScreenVisualInfo {
 
-    public VisualInfo [] infos;
+    public XdbeScreenVisualInfo [] infos;
 
     public ScreenVisualInfo (ResponseInputStream i) { 
       int number = i.read_int32 ();
-      infos = new VisualInfo [number];
+      infos = new XdbeScreenVisualInfo [number];
       for (int j = 0; j < number; j++) {
-        infos [j] = new VisualInfo (i);
+        infos [j] = new XdbeScreenVisualInfo (i);
       }
     }
 

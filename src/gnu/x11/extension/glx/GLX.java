@@ -292,7 +292,7 @@ public class GLX extends gnu.x11.extension.Extension implements
         
         // get a listing of visual configs and store them for later use
         
-        visualConfigs = new VisualConfig[display.screens.length][];
+        visualConfigs = new VisualConfig[display.getScreens().length][];
     }
 
     /**
@@ -532,19 +532,6 @@ public class GLX extends gnu.x11.extension.Extension implements
 
         // only one extension event
         return new PbufferClobberEvent(display, i);
-    }
-
-    /**
-     * glXChooseVisual returns a XVisualInfo describing the visual that best
-     * meets the template XVisualInfo specification, or null, if not matching
-     * configuration can be found.
-     * 
-     * @see <a href="http://www.opengl.org/documentation/specs/man_pages/hardcopy/GL/html/glx/xchoosevisual.html">glXChooseVisual</a>
-     */
-    public XVisualInfo chooseVisual(XVisualInfo info) {
-        
-        // TODO
-        throw new UnsupportedOperationException();
     }
     
     /**

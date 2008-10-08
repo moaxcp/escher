@@ -27,11 +27,11 @@ public class Bitmap extends Image {
     // bitmap unit, bit order, padding:    32, LSBFirst, 32
     // image byte order:    LSBFirst
 
-    int xx = left_pad + x;	// shifted x
+    int xx = leftPad + x;	// shifted x
     int unit_index = xx / scanline_unit;
     int unit_byte_index = (xx % scanline_unit) / 8; // LSBFirst
     int bit_index = xx % 8; // LeastSignificant
-    int index = y * line_byte_count 
+    int index = y * lineByteCount
       + unit_index * unit_byte_count
       + unit_byte_index;
     

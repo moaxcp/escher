@@ -1,181 +1,366 @@
+
 package gnu.x11.image;
 
 import gnu.x11.Color;
 import gnu.x11.Display;
+import gnu.x11.EscherUnsupportedScreenBitDepthException;
 import gnu.x11.Pixmap;
-
+import gnu.x11.RGB;
+import gnu.x11.VisualInfo;
+import gnu.x11.color.ColorMapper;
+import gnu.x11.image.Image.Format;
 
 public class ZPixmap extends Image {
 
-  int image_byte_order;
-  int pixel_byte_count;
+    protected int imageByteOrder;
 
-  ZPixmap (Display display) {        // for subclass loading
-    super(Format.ZPIXMAP, display.default_pixmap_format);
-    image_byte_order = display.image_byte_order;
-    pixel_byte_count = pixmap_format.bits_per_pixel () / 8;
+    protected VisualInfo xVisual = null;
 
-    if (display.default_depth < 24)
-      throw new Error ("Unsupported root depth < 24: " +
-        display.default_depth);
-  }
+    protected Display display;
 
-  /**
-   * Creates a new ZPixmap with the specified width and height and with
-   * the default pixmap format from the display.
-   *
-   * @param display the display on which to create the pixmap
-   * @param width the width in pixels
-   * @param height the height in pixels
-   */
-  public ZPixmap (Display display, int width, int height)
-  {
-    this (display, width, height, display.default_pixmap_format);
-  }
+    protected ZPixmapDelegate delegate = null;
 
-  public ZPixmap (Display display, int width, int height,
-                  Pixmap.Format format) {
+    /**
+     * Creates a ZPixmap using the specified Visual.
+     * 
+     * @param display
+     * @param xVisual
+     * @throws EscherUnsupportedScreenBitDepthException
+     */
+    ZPixmap(Display display, VisualInfo xVisual)
+            throws EscherUnsupportedScreenBitDepthException {
 
-    super (width, height, Format.ZPIXMAP, format);
+        super(Format.ZPIXMAP, display.default_pixmap_format);
 
-    image_byte_order = display.image_byte_order;
-    pixel_byte_count = pixmap_format.bits_per_pixel () / 8;
-
-    if (display.default_depth < 24)
-      throw new Error ("Unsupported root depth < 24: " +
-        display.default_depth);
-  }
-
-  /**
-   * Creates a ZPixmap with the specified size and format, and initializes
-   * the underlying data array with an existing one.
-   *
-   * @param display the
-   * @param width
-   * @param height
-   * @param format
-   * @param data
-   */
-  public ZPixmap (Display display, int width, int height, Pixmap.Format format,
-                  byte[] data) {
-    this (display, width, height, format);
-    this.data = data; 
-  }
-
-  public void set (int x, int y, Color color) {
-    set (x, y, color.pixel);
-  }
-
-
-  public void set (int x, int y, int pixel) {
-    int i = y * line_byte_count + pixel_byte_count * x;
-
-    // outside for loop for speed
-    if (image_byte_order == LSB_FIRST)
-      for (int j=0; j<pixel_byte_count; j++)
-	data [i+j] = (byte) (0xff & (pixel >> j*8));
-
-    else			// MSB_FIRST
-      for (int j=0; j<pixel_byte_count; j++)
-	data [i+j] = (byte) (0xff & (pixel >> (pixel_byte_count-1-j)*8));
-  }
-
-
-  public void set_red (int x, int y, int r) {
-    int i = y * line_byte_count + pixel_byte_count * x;
-    if (image_byte_order == LSB_FIRST) i += 2;
-    data [i] = (byte) r;
-  }
-
-  public int get_red (int x, int y) {
-    int i = y * line_byte_count + pixel_byte_count * x;
-    if (image_byte_order == LSB_FIRST) i += 2;
-    return 0xff & data [i];
-  }
-
-  public void set_green (int x, int y, int g) {
-    int i = y * line_byte_count + pixel_byte_count * x + 1;
-    data [i] = (byte) g;
-  }
-
-  public int get_green (int x, int y) {
-    int i = y * line_byte_count + pixel_byte_count * x + 1;
-    return 0xff & data [i];
-  }
-
-  public void set_blue (int x, int y, int b) {
-    int i = y * line_byte_count + pixel_byte_count * x;
-    if (image_byte_order == MSB_FIRST) i += 2;
-    data [i] = (byte) b;
-  }
-
-  public int get_blue (int x, int y) {
-    int i = y * line_byte_count + pixel_byte_count * x;
-    if (image_byte_order == MSB_FIRST) i += 2;
-    return 0xff & data [i];
-  }
-
-  public void set (int x, int y, int r, int g, int b) {
-    int i = y * line_byte_count + pixel_byte_count * x;
-
-    // outside for loop for speed
-    if (image_byte_order == LSB_FIRST) {
-      data [i] = (byte) b;
-      data [i+1] = (byte) g;
-      data [i+2] = (byte) r;
-
-    } else {			// MSB_FIRST
-      data [i] = (byte) r;
-      data [i+1] = (byte) g;
-      data [i+2] = (byte) b;
+        imageByteOrder = display.image_byte_order;
+        this.xVisual = xVisual;
+        this.delegate = getDelegate(display.default_pixmap_format.getDepth());
     }
-  }
 
-  /**
-   * Puts the image data into this image. This data must be in the same format
-   * as specified in this image.
-   *
-   * @param image_data the data to set
-   */
-  public void set_data (int[] image_data) {
-    int len = pixel_byte_count * width * height;
-    len = Math.min(len, data.length);
-    System.arraycopy(image_data, 0, data, 0, len);
-  }
+    /**
+     * Creates a ZPixmap with the specified size and format, and initializes the
+     * underlying data array with an existing one.
+     * 
+     * @param display
+     *                the
+     * @param width
+     * @param height
+     * @param format
+     * @param data
+     * @throws EscherUnsupportedScreenBitDepthException 
+     * @throws UnsupportedBitDepthException
+     */
+    public ZPixmap(Display display, int width, int height,
+                   Pixmap.Format format, byte[] data, VisualInfo xVisual)
+            throws EscherUnsupportedScreenBitDepthException {
 
-  /**
-   * Sets a data element in the ZPixmap directly.
-   *
-   * This manipulates the underlying data directly. It is recommended
-   * to use one of the other accessor methods instead.
-   *
-   * @param index the index of the data element to set
-   * @param val the value
-   */  
-  public void set_data_element (int index, byte val) {
-    data[index] = val;
-  }
+        this(display, width, height, format, xVisual);
+        this.data = data;
+    }
+    
+    /**
+     * Creates a new ZPixmap with the specified width and height and with the
+     * default pixmap format from the display.
+     * 
+     * @param display
+     *                the display on which to create the pixmap
+     * @param width
+     *                the width in pixels
+     * @param height
+     *                the height in pixels
+     * @throws EscherUnsupportedScreenBitDepthException
+     * @throws UnsupportedBitDepthException
+     */
+    public ZPixmap(Display display, int width, int height, VisualInfo xVisual)
+            throws EscherUnsupportedScreenBitDepthException {
+        
+        this(display, width, height, display.default_pixmap_format, xVisual);
+    }
 
-  /**
-   * Returns the data element at the specified index.
-   *
-   * This manipulates the underlying data directly. It is recommended
-   * to use one of the other accessor methods instead.
-   *
-   * @param index the index of the data element
-   *
-   * @return the data element at the specified index
-   */
-  public byte get_data_element (int index) {
-    return data[index];
-  }
+    public ZPixmap(Display display, int width, int height,
+                   Pixmap.Format format, VisualInfo xVisual)
+            throws EscherUnsupportedScreenBitDepthException {
 
-  /**
-   * Returns the length of the underlying data array.
-   *
-   * @return the length of the underlying data array
-   */
-  public int get_data_length () {
-    return data.length;
-  }
+        super(width, height, Format.ZPIXMAP, format);
+
+        imageByteOrder = display.image_byte_order;
+        // pixelByteCount = pixmapFormat.bits_per_pixel() / 8;
+        this.xVisual = xVisual;
+        this.delegate = getDelegate(format.getDepth());
+    }
+
+    private ZPixmapDelegate getDelegate(int bitDepth)
+            throws EscherUnsupportedScreenBitDepthException {
+
+        switch (bitDepth) {
+        case 24:
+            return new ZPixmap24();
+
+        case 16:
+            return new ZPixmap16();
+
+        case 8:
+            return new ZPixmap8();
+            
+        default:
+            throw new EscherUnsupportedScreenBitDepthException("Unsupported "
+                    + "Screen Depth for creating Pixmaps: " + bitDepth);
+        }
+
+    }
+
+    /**
+     * Puts the image data into this image. This data must be in the same format
+     * as specified in this image.
+     * 
+     * @param imageData the data to set
+     */
+    public void setData(int[] imageData) {
+
+        throw new UnsupportedOperationException("Not yet implemented.");
+ //       int len = pixelByteCount * width * height;
+    //    len = Math.min(len, data.length);
+//        System.arraycopy(image_data, 0, data, 0, len);
+    }
+
+    /**
+     * Sets a data element in the ZPixmap directly.
+     * 
+     * This manipulates the underlying data directly. It is recommended to use
+     * one of the other accessor methods instead.
+     * 
+     * @param index
+     *                the index of the data element to set
+     * @param val
+     *                the value
+     */
+    public void setDataElement(int index, byte val) {
+
+        data[index] = val;
+    }
+
+    /**
+     * Returns the data element at the specified index.
+     * 
+     * This manipulates the underlying data directly. It is recommended to use
+     * one of the other accessor methods instead.
+     * 
+     * @param index
+     *                the index of the data element
+     * 
+     * @return the data element at the specified index
+     */
+    public byte getDataElement(int index) {
+
+        return data[index];
+    }
+
+    /**
+     * Returns the length of the underlying data array.
+     * 
+     * @return the length of the underlying data array
+     */
+    public int getDataLength() {
+
+        return data.length;
+    }
+
+    public void putPixel(int x, int y, int pixel) {
+
+        delegate.putPixel(x, y, pixel);
+    }
+
+    @Deprecated
+    public void putPixel(int x, int y, Color color) {
+
+        delegate.putPixel(x, y, color.pixel);
+    }
+
+    public void putRGB(int x, int y, int r, int g, int b) {
+
+        int pixel = delegate.getPixelFromRGB(r, g, b);
+        delegate.putPixel(x, y, pixel);
+    }
+    
+    public void putRGB(int x, int y, RGB rgb) {
+
+        int pixel = delegate.getPixelFromRGB(rgb.red, rgb.green, rgb.blue);
+        delegate.putPixel(x, y, pixel);
+    }
+
+    public int getPixel(int x, int y) {
+        
+        return delegate.getPixel(x, y);
+    }
+    
+    public RGB getRGB(int x, int y) {
+        
+        int pixel = getPixel(x, y);
+        return delegate.getRGBFromPixel(pixel);
+    }
+    
+    /* ***** delegate classes ***** */
+
+    abstract class ZPixmapDelegate {
+
+        protected static final int MASK = 0x01;
+                       
+        /**
+         * How many bits we have to shift to get the real number of
+         * bits for a give bit depth in one byte.
+         */
+        protected int redScaleShift = 0;
+        protected int greenScaleShift = 0;
+        protected int blueScaleShift = 0;
+        
+        public ZPixmapDelegate() {
+
+            this.redScaleShift = 8 - ZPixmap.this.xVisual.getRedBits();
+            this.greenScaleShift = 8 - ZPixmap.this.xVisual.getGreenBits();
+            this.blueScaleShift = 8 - ZPixmap.this.xVisual.getBlueBits();
+        }
+        
+        public void putPixel(int x, int y, int pixel) {
+
+            int bytesPerPixel = getBytesPerPixel();            
+            int i = (y * getLineByteCount()) + (x * bytesPerPixel);
+            
+            // outside for loop for speed
+            if (imageByteOrder == LSB_FIRST) {
+                for (int j = 0; j < bytesPerPixel; j++)
+                    data[i + j] = (byte) (0xff & (pixel >> (j * 8)));
+            } else {
+                // MSB_FIRST
+                for (int j = 0; j < bytesPerPixel; j++)
+                    data[i + j] = 
+                        (byte) (0xff & (pixel >> (bytesPerPixel - 1 - j) * 8));
+            }
+        }
+     
+        public int getPixel(int x, int y) {
+
+            int pixel = 0;
+            int bytesPerPixel = getBytesPerPixel();
+
+            int i = (y * getLineByteCount()) + (x * bytesPerPixel);
+            
+            // outside for loop for speed
+            if (imageByteOrder == LSB_FIRST) {
+                for (int j = 0; j < bytesPerPixel; j++) {
+                    pixel |=  (((int) data[i + j]) & 0xff) << (j * 8);
+                }
+            } else {
+                // MSB_FIRST
+                for (int j = 0; j < bytesPerPixel; j++) {
+                    pixel |= (((int) data[i + j]) & 0xff)
+                                << ((bytesPerPixel - 1 - j) * 8);
+                }
+            }
+
+            return pixel;
+        }
+        
+        public RGB getRGBFromPixel(int pixel) {
+            
+            int red = (pixel & ZPixmap.this.xVisual.getRedMask()) >>>
+                    ZPixmap.this.xVisual.getRedShiftCount();
+                
+            int green = (pixel & ZPixmap.this.xVisual.getGreenMask()) >>>
+                    ZPixmap.this.xVisual.getGreenShiftCount();
+                
+            int blue = (pixel & ZPixmap.this.xVisual.getBlueMask()) >>>
+                    ZPixmap.this.xVisual.getBlueShiftCount();
+        
+            return new RGB(red, green, blue);
+        }
+        
+        abstract public int getPixelFromRGB(int r, int g, int b);        
+        abstract public int getBytesPerPixel();
+    }
+
+    /**
+     * Implements handling of 24 bit images in ZPixmap format.
+     * 
+     * @author Mario Torre <neugens@aics.com>
+     */
+    class ZPixmap24 extends ZPixmapDelegate {
+  
+        @Override
+        public int getPixelFromRGB(int r, int g, int b) {
+
+            return (r <<  ZPixmap.this.xVisual.getRedShiftCount())
+                    | (g << ZPixmap.this.xVisual.getGreenShiftCount())
+                    | (b << ZPixmap.this.xVisual.getBlueShiftCount());
+        }
+        
+        @Override
+        public int getBytesPerPixel() {
+          
+            return pixmapFormat.getBitsPerPixel() / 8;
+        }
+    }
+
+    /**
+     * Implements handling of 16 bit images in ZPixmap format.
+     * 
+     * @author Mario Torre <neugens@aics.com>
+     */
+    class ZPixmap16 extends ZPixmapDelegate {
+   
+        @Override
+        public RGB getRGBFromPixel(int pixel) {
+         
+            RGB rgb = super.getRGBFromPixel(pixel);
+            
+            rgb.red = rgb.red << this.redScaleShift;
+            rgb.green = rgb.green << this.greenScaleShift;
+            rgb.blue = rgb.blue << this.blueScaleShift;
+            
+            return rgb;
+        }
+        
+        public int getPixelFromRGB(int r, int g, int b) {
+             
+            int red = (r >>> this.redScaleShift) <<
+                ZPixmap.this.xVisual.getRedShiftCount();
+            
+            int green = (g >>> this.greenScaleShift) <<
+                ZPixmap.this.xVisual.getGreenShiftCount();
+            
+            int blue = (b >>> this.blueScaleShift) <<
+                ZPixmap.this.xVisual.getBlueShiftCount();
+            
+            return (red | green | blue);
+        }
+        
+        @Override
+        public int getBytesPerPixel() {
+
+            return 2;
+        }
+    }
+    
+    /**
+     * Implements handling of 8 bit images in ZPixmap format.
+     * 
+     * @author Mario Torre <neugens@aics.com>
+     */
+    class ZPixmap8 extends ZPixmapDelegate {
+
+        public RGB getRGBFromPixel(int pixel) {
+            
+            throw new UnsupportedOperationException("Not yet implemented");
+        }
+        
+        public int getPixelFromRGB(int r, int g, int b) {
+
+            throw new UnsupportedOperationException("Not yet implemented");
+        }
+        
+        @Override
+        public int getBytesPerPixel() {
+
+            return 1;
+        }
+    }
 }

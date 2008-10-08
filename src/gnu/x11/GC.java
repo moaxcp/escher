@@ -348,7 +348,7 @@ public class GC extends Fontable {
 
 
   public GC (Display display, Values values) {
-    this (display.default_root, values);
+    this (display.getRootWindow(), values);
   }
 
 
@@ -519,7 +519,7 @@ public class GC extends Fontable {
    * @see #GC(Drawable)
    */
   public static GC build (Display display) {
-    return new GC (display.default_root);
+    return new GC (display.getRootWindow());
   }
 
 
@@ -535,7 +535,7 @@ public class GC extends Fontable {
    * @see #create(Drawable, GC.Values)
    */
   public void create (Values values) {
-    create (display.default_root, values);
+    create (display.getRootWindow(), values);
   }
 
 

@@ -3,12 +3,16 @@ package gnu.x11.image;
 import gnu.x11.Color;
 import gnu.x11.Colormap;
 import gnu.x11.Display;
+import gnu.x11.EscherUnsupportedScreenBitDepthException;
+import gnu.x11.VisualInfo;
+
 import java.util.StringTokenizer;
 
 
 public class XPM extends ZPixmap { // TODO
-  public XPM (Display display, String [] xpm) {
-    super (display);
+  public XPM (Display display, String [] xpm, VisualInfo xVisual)
+          throws EscherUnsupportedScreenBitDepthException {
+    super (display, xVisual);
 
     StringTokenizer values = new StringTokenizer (xpm [0]);
     width = Integer.parseInt (values.nextToken ());
@@ -18,9 +22,10 @@ public class XPM extends ZPixmap { // TODO
 
     // TODO how to select best SUITABLE format?
     format = Format.ZPIXMAP;
-    pixmap_format = display.default_pixmap_format;
-    image_byte_order = display.image_byte_order;
-    pixel_byte_count = pixmap_format.bits_per_pixel () / 8;
+    pixmapFormat = display.default_pixmap_format;
+    imageByteOrder = display.image_byte_order;
+    // FIXME
+    //pixelByteCount = pixmapFormat.bits_per_pixel () / 8;
     init ();
 
     java.util.Hashtable mapping = new java.util.Hashtable (2*num_colors);
@@ -54,7 +59,7 @@ public class XPM extends ZPixmap { // TODO
 	String symbol = pixels.substring (x*chars_per_pixel,
 	  (x+1)*chars_per_pixel);
 	Color color = (Color) mapping.get (symbol);
-	set (x, y, color.pixel);
+	putPixel (x, y, color.pixel);
       }
     }
   }

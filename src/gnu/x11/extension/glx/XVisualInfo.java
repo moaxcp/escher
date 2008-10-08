@@ -37,6 +37,16 @@ import gnu.x11.ResponseInputStream;
  */
 public class XVisualInfo {
     
+    // NOTE: in theory this class should extend the VisualInfo class
+    // We also have few other "visual" classes, and they are all related.
+    // The reason for this screwed design is that there is no clear
+    // documentation about all this stuff, they are just randomly
+    // referenced any here and there in the various GLX and X11 docs,
+    // so we had no clue on what to do before hitting some problems
+    // and working on them.
+    // I feel really sorry for the design, but also quite disappointed, indeed,
+    // by the bad docs.
+    
     private int count = 0;
     
     /** Visual ID */
