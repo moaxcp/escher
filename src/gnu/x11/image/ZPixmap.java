@@ -84,7 +84,6 @@ public class ZPixmap extends Image {
         super(width, height, Format.ZPIXMAP, format);
 
         imageByteOrder = display.image_byte_order;
-        // pixelByteCount = pixmapFormat.bits_per_pixel() / 8;
         this.xVisual = xVisual;
         this.delegate = getDelegate(format.getDepth());
     }
@@ -117,10 +116,10 @@ public class ZPixmap extends Image {
      */
     public void setData(int[] imageData) {
 
-        throw new UnsupportedOperationException("Not yet implemented.");
- //       int len = pixelByteCount * width * height;
-    //    len = Math.min(len, data.length);
-//        System.arraycopy(image_data, 0, data, 0, len);
+        int pixelByteCount = pixmapFormat.getBitsPerPixel() / 8;
+        int len = pixelByteCount * width * height;
+        len = Math.min(len, data.length);
+        System.arraycopy(imageData, 0, data, 0, len);
     }
 
     /**
