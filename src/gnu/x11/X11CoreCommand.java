@@ -28,14 +28,14 @@ public enum X11CoreCommand implements X11Command
         this.length = length;
     }
     
-    @Override
+    //@Override
     public int getLength()
     {
         // TODO Auto-generated method stub
         return this.length;
     }
 
-    @Override
+    //@Override
     public int getOpcode()
     {
         // TODO Auto-generated method stub

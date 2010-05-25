@@ -54,13 +54,13 @@ public enum GLXCommand implements X11Command {
         this.length = length;
     }
 
-    @Override
+    // @Override
     public int getLength() {
 
         return this.length;
     }
 
-    @Override
+    // @Override
     public int getOpcode() {
 
         return this.opcode;
