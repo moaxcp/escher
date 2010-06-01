@@ -307,9 +307,9 @@ public class ResponseInputStream extends FilterInputStream {
                     minor_opcode, major_opcode);
         }
 
-        gnu.x11.Error.ErrorCode error = gnu.x11.Error.getErrorCode(code);
+        gnu.x11.Error.ErrorCode error = gnu.x11.Error.ErrorCode.getError(code);
         gnu.x11.Error err = new gnu.x11.Error(this.display,
-                error.getErrorMessage(), error.getErrorId(), seq_no, bad_value,
+                error.getErrorMessage(), error, seq_no, bad_value,
                 minor_opcode, major_opcode);
         throw err;
     }

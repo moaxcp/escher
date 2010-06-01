@@ -1,5 +1,10 @@
 package gnu.x11;
 
+import static gnu.x11.Error.ErrorCode.BAD_COLORMAP;
+
+import java.util.HashMap;
+import java.util.Map;
+
 
 /**
  * X server core error.
@@ -20,7 +25,7 @@ public class Error extends java.lang.Error {
   /**
    * This enum represents an Error Code from a request with X server.
    */
-  public enum ErrorCode {
+  public enum ErrorCode {      
     SUCCESS(0, "SUCCESS: everything okay"),
 
     /**
@@ -147,13 +152,35 @@ public class Error extends java.lang.Error {
      * error is not listed for any of the requests, but clients should be
      * prepared to receive such errors and handle or discard them.
      */
-    BAD_IMPLEMENTATION(17, "BAD_IMPLEMENTATION: server defective");
+    BAD_IMPLEMENTATION(17, "BAD_IMPLEMENTATION: server defective"),
+    
+    /**
+     * Unkown Error Code
+     */
+    UNKNOWN_ERROR(-1, "UNKNOWN ERROR: unknown error");
     
     private int errorID;
     private String errorMsg;
+    private static Map<Integer, ErrorCode> errorCodes;
+    
+    private static Map<Integer, ErrorCode> getErrorCodes() {
+        if (errorCodes == null) {
+            errorCodes = new HashMap<Integer, ErrorCode>();
+            for (ErrorCode code : ErrorCode.values())
+                errorCodes.put(code.errorID, code);
+        }
+        
+        return errorCodes;
+    }
+    
+    public static ErrorCode getError(int id) {
+      ErrorCode error = getErrorCodes().get(id);
+      return (error == null) ? error : UNKNOWN_ERROR;
+    }
     
     ErrorCode(int id, String errorMS) {
       this.errorID = id;
+      this.errorMsg = errorMS;
     }
     
     public int getErrorId() {
@@ -168,7 +195,7 @@ public class Error extends java.lang.Error {
 
   public static final String [] OPCODE_STRINGS = {
     null,                       // 0
-    "CreateWindow",   // 1
+    "CreateWindow",             // 1
     "ChangeWindowAttributes",   // 2
     "GetWindowAttributes",      // 3
     "DestroyWindow",            // 4
@@ -237,7 +264,7 @@ public class Error extends java.lang.Error {
     "PolyRectangle",            // 67
     "PolyArc",                  // 68
     "FillPoly",                 // 69
-    "PolyFillRectangle",  // 70
+    "PolyFillRectangle",        // 70
     "PolyFillArc",              // 71
     "PutImage",                 // 72
     "GetImage",                 // 73
@@ -311,31 +338,14 @@ public class Error extends java.lang.Error {
     this.bad = bad;
     this.minor_opcode = minor_opcode;
     this.major_opcode = major_opcode;
-  }
+  }  
   
-  public Error (Display display, String error_string, int code, int seq_no, 
-      int bad, int minor_opcode, int major_opcode) {
-      
-      super (init (display, error_string, getErrorCode(code), seq_no, bad, minor_opcode, major_opcode));
-      this.code = getErrorCode(code);
-      this.seq_no = seq_no;
-      this.bad = bad;
-      this.minor_opcode = minor_opcode;
-      this.major_opcode = major_opcode;
-    }
-
-  public static ErrorCode getErrorCode(int errorID) throws IllegalArgumentException {
-    for (ErrorCode err : ErrorCode.values()) {
-      if (err.errorID == errorID) return err;
-    }
-    throw new IllegalArgumentException("Invalid Error Code: " + errorID + " not found");
-  }
-
+  // <---- Methods ---> //
   public static String init (Display display, String error_string, ErrorCode code,
     int seq_no, int bad, int minor_opcode, int major_opcode) {
 
     //-- code
-    String code_string = "\n  code: " + code + " " + error_string;
+    String code_string = "\n  code: " + code.getErrorId() + " " + error_string;
 
 
     //-- sequence number
@@ -345,7 +355,7 @@ public class Error extends java.lang.Error {
     //-- bad
 
     String bad_string = "";
-    if (code == ErrorCode.BAD_COLORMAP
+    if (code == BAD_COLORMAP
       || code == ErrorCode.BAD_CURSOR
       || code == ErrorCode.BAD_DRAWABLE
       || code == ErrorCode.BAD_FONT
@@ -365,8 +375,11 @@ public class Error extends java.lang.Error {
         "\n  bad-atom-id: " + bad
         : "\n  bad-atom: " + bad_atom;
 
-    } else if (code == ErrorCode.BAD_VALUE)
+    } else if (code == ErrorCode.BAD_VALUE) {
       bad_string = "\n  bad-value: " + bad;
+    } else if (code == ErrorCode.UNKNOWN_ERROR) {
+      bad_string = "\n unkown-error: " + bad;
+    }
 
 
     //-- major opcode

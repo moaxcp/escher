@@ -5,6 +5,7 @@ import gnu.x11.Drawable;
 import gnu.x11.RequestOutputStream;
 import gnu.x11.ResponseInputStream;
 import gnu.x11.Window;
+import gnu.x11.Error.ErrorCode;
 
 
 /** 
@@ -290,8 +291,8 @@ public class DBE extends Extension implements ErrorFactory {
 
   public gnu.x11.Error build (gnu.x11.Display display, int code, int seq_no,
                               int bad, int minor_opcode, int major_opcode) {
-
-    return new gnu.x11.Error (display, ERROR_STRING, code, seq_no, bad,
+    ErrorCode errorCd = ErrorCode.getError(code);
+    return new gnu.x11.Error (display, ERROR_STRING, errorCd, seq_no, bad,
                               minor_opcode, major_opcode);
   }
 
