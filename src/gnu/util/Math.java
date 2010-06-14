@@ -7,6 +7,9 @@ package gnu.util;
  * limit, if it's not we attribute the respective limit.
  * 
  * For example, suppose we can only have values between -2 and 3.
+ * Clamp(value, lowlimit, highlimit)
+ * ---------------------------------
+ * 
  * Clamp(1, -2, 3) = 1
  * Clamp(-8, -2, 3) = -2
  * Clamp(3.4, -2, 3) = 3.4

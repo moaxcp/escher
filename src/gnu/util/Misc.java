@@ -12,6 +12,7 @@ public class Misc {
 
   //-- linearize array
 
+  // Can be removed
   public static float [] linearize (float [] [] src) {
     int s1 = src [0].length;
     int s2 = src.length;   
@@ -42,6 +43,7 @@ public class Misc {
 
   //-- string
 
+  // Can be removed
   public static boolean empty (String s) {
     return s == null || trim (s).length () == 0;
   }
@@ -50,6 +52,7 @@ public class Misc {
   /**
    * @see #tokenize(String, String)
    */
+  // Can be removed
   public static String [] tokenize (String s) {
     return tokenize (s, " \t\n\r\f");
   }
@@ -66,7 +69,8 @@ public class Misc {
     return tokens;
   }
 
-
+  
+  // Can be removed
   public static String to_string (double [] d, String prefix) {
     StringBuffer sb = new StringBuffer ();
     for (int i=0; i<d.length; i++) {
@@ -77,7 +81,8 @@ public class Misc {
     return sb.toString ();
   }
 
-
+  
+  // Can be removed
   public static String to_string (int [] j, String prefix) {
     StringBuffer sb = new StringBuffer ();
     for (int i=0; i<j.length; i++) {
@@ -92,6 +97,7 @@ public class Misc {
   /**
    * @see #to_string(Object[], String)
    */
+  // Can be removed
   public static String to_string (Object [] objects) {
     return to_string (objects, "\n");
   }
@@ -128,6 +134,7 @@ public class Misc {
 
   //-- system functions
 
+  // Can be removed
   public static void sleep (long millis) {
     try {
       Thread.sleep (millis);
