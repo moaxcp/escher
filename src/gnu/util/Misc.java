@@ -10,34 +10,6 @@ public class Misc {
   public static final String VERSION = "0.2.0";
 
 
-  //-- copy array
-
-  public static double [] copy (double [] src, 
-    int src_offset, int length) {
-
-    double [] dst = new double [length];
-    System.arraycopy (src, src_offset, dst, 0, length);
-    return dst;
-  }
-
-  
-  public static double [] copy (double [] src, int src_offset) {
-    return copy (src, src_offset, src.length-src_offset);
-  }
-
-
-  public static float [] copy (float [] src, int src_offset, int length) {
-    float [] dst = new float [length];
-    System.arraycopy (src, src_offset, dst, 0, length);
-    return dst;
-  }
-
-  
-  public static float [] copy (float [] src, int src_offset) {
-    return copy (src, src_offset, src.length-src_offset);
-  }
-
-
   //-- linearize array
 
   public static float [] linearize (float [] [] src) {

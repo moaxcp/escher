@@ -1,12 +1,15 @@
 package gnu.util;
 
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.util.StringTokenizer;
 
 
-/** Classpath utility. */
+/**
+ * Classpath utility.
+ * This class job is to abstract the manipulation/search for Java Class. It's
+ * needed because we need a ClassLoader that can Reload Classes so we need to
+ * constant find their absolute path for loading.
+ */
 public class Classpath {
   public static final String CLASSPATH 
     = System.getProperty ("java.class.path");
@@ -22,8 +25,7 @@ public class Classpath {
       CLASSPATH_DIRS [i] = new File (st.nextToken());
   }
 
-
-
+  
   /**
    * Find a class file in default classpath.
    * 
@@ -31,16 +33,6 @@ public class Classpath {
    */
   public static File find_class (String name) {
     return find_file (to_class_filename (name));
-  }
-
-
-  /**
-   * Find a class file given search path directories.
-   * 
-   * @see #find_file(File[], String)
-   */
-  public static File find_class (File [] dirs, String name) {
-    return find_file (dirs, to_class_filename (name));
   }
 
 
