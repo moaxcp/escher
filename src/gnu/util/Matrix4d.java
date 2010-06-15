@@ -312,7 +312,7 @@ public class Matrix4d {
     return A;
   }
 
-
+  // Can be removed
   public Matrix4d set_row (Vector4d V0, Vector4d V1, 
     Vector4d V2, Vector4d V3) {
 
@@ -320,7 +320,7 @@ public class Matrix4d {
     return this;
   }
 
-
+  // Can be removed
   /** <code>A(0,j) = V0, A(1,j) = V1, A(2,j) = V2, A(3,j) = V3</code>. */
   public static double [] set_row (double [] A, double [] V0, double [] V1,
     double [] V2, double [] V3) {

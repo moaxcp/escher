@@ -230,6 +230,7 @@ public class ReloadableClassLoader extends ClassLoader {
    * method resets all caches and starts with a brand new classloader so
    * as to trade caching for correctness.
    */
+  // Can be removed
   public static void reset () {
     instance = new gnu.util.ReloadableClassLoader ();
     classes.clear ();
