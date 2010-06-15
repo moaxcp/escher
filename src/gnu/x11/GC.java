@@ -150,7 +150,7 @@ public class GC extends Fontable {
     /**
      * @see #set_foreground(int)
      */
-    public void set_foreground (Color c) { set_foreground (c.pixel); }
+    public void set_foreground (Color c) { set_foreground (c.getPixel()); }
   
   
     /** 
@@ -162,7 +162,7 @@ public class GC extends Fontable {
     /**
      * @see #set_background(int)
      */
-    public void set_background (Color c) { set_background (c.pixel); }
+    public void set_background (Color c) { set_background (c.getPixel()); }
   
   
     /** 
@@ -583,7 +583,7 @@ public class GC extends Fontable {
    * @see #set_background(int)
    */
   public void set_background (Color c) {
-    set_background (c.pixel);
+    set_background (c.getPixel());
   }
 
 
@@ -811,7 +811,7 @@ public class GC extends Fontable {
    * @see #set_foreground(int)
    */
   public void set_foreground (Color c) {
-    set_foreground (c.pixel);
+    set_foreground (c.getPixel());
   }
 
 

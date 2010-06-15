@@ -176,7 +176,7 @@ public class Colormap extends Resource {
         int p = i.read_int32 ();
         i.skip (12);
         c = new Color(p);
-        c.exact = new RGB (r, g, b);
+        c.setExact(new RGB (r, g, b));
       }
     }
     return c;
@@ -224,8 +224,8 @@ public class Colormap extends Resource {
         int vb = i.read_int16 ();
         i.skip (8);
         c = new Color (pixel);
-        c.exact = new RGB (er, eg, eb);
-        c.visual = new RGB (vr, vg, vb);
+        c.setExact(new RGB (er, eg, eb));
+        c.setVisual(new RGB (vr, vg, vb));
       }
     }
     return c;
@@ -519,8 +519,8 @@ public class Colormap extends Resource {
         int vb = i.read_int16 ();
         i.skip (12);
         c = new Color (0);
-        c.exact = new RGB (er, eg, eb);
-        c.visual = new RGB (vr, vg, vb);
+        c.setExact(new RGB (er, eg, eb));
+        c.setVisual(new RGB (vr, vg, vb));
       }
     }
     return c;

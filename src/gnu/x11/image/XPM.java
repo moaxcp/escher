@@ -59,7 +59,7 @@ public class XPM extends ZPixmap { // TODO
 	String symbol = pixels.substring (x*chars_per_pixel,
 	  (x+1)*chars_per_pixel);
 	Color color = (Color) mapping.get (symbol);
-	putPixel (x, y, color.pixel);
+	putPixel (x, y, color.getPixel());
       }
     }
   }

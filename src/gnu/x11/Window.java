@@ -98,7 +98,7 @@ public class Window extends Drawable implements GLXDrawable {
          */
         public void set_background(Color c) {
 
-            set_background(c.pixel);
+            set_background(c.getPixel());
         }
 
         public void set_background(int pixel) {
@@ -120,7 +120,7 @@ public class Window extends Drawable implements GLXDrawable {
          */
         public void set_border(Color c) {
 
-            set_border(c.pixel);
+            set_border(c.getPixel());
         }
 
         public void set_border(int pixel) {
@@ -192,7 +192,7 @@ public class Window extends Drawable implements GLXDrawable {
          */
         public void set_backing(Color c) {
 
-            set_backing(c.pixel);
+            set_backing(c.getPixel());
         }
 
         /**

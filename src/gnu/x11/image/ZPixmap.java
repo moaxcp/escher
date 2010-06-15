@@ -172,7 +172,7 @@ public class ZPixmap extends Image {
     @Deprecated
     public void putPixel(int x, int y, Color color) {
 
-        delegate.putPixel(x, y, color.pixel);
+        delegate.putPixel(x, y, color.getPixel());
     }
 
     public void putRGB(int x, int y, int r, int g, int b) {

@@ -388,12 +388,12 @@ public abstract class Drawable extends Resource {
             o.write_int32(gc.id);
             for (int i = 0; i < arcs.length; i++) {
                 Arc arc = arcs[i];
-                o.write_int16(arc.x);
-                o.write_int16(arc.y);
-                o.write_int16(arc.width);
-                o.write_int16(arc.height);
-                o.write_int16(arc.angle1);
-                o.write_int16(arc.angle2);
+                o.write_int16(arc.getX());
+                o.write_int16(arc.getY());
+                o.write_int16(arc.getWidth());
+                o.write_int16(arc.getHeight());
+                o.write_int16(arc.getAngle1());
+                o.write_int16(arc.getAngle2());
             }
         }
     }
@@ -408,12 +408,12 @@ public abstract class Drawable extends Resource {
             o.write_int32(gc.id);
             for (int i = 0; i < arcs.length; i++) {
                 Arc arc = arcs[i];
-                o.write_int16(arc.x);
-                o.write_int16(arc.y);
-                o.write_int16(arc.width);
-                o.write_int16(arc.height);
-                o.write_int16(arc.angle1);
-                o.write_int16(arc.angle2);
+                o.write_int16(arc.getX());
+                o.write_int16(arc.getY());
+                o.write_int16(arc.getWidth());
+                o.write_int16(arc.getHeight());
+                o.write_int16(arc.getAngle1());
+                o.write_int16(arc.getAngle2());
             }
         }
     }
