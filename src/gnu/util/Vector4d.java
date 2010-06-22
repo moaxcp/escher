@@ -4,29 +4,27 @@ package gnu.util;
 /** 4-element vector of <code>double</code> in mathematics. */
 public class Vector4d {
   public static final Vector4d ZERO = new Vector4d ();
-
-
-  public double [] v = new double [4];
+  private double [] vector = new double [4];
 
 
   public Vector4d () {}
 
 
   public Vector4d (double [] v) {
-    this.v = v;
+    this.vector = v;
   }
 
 
   public Vector4d (double x, double y, double z, double w) {
-    v [0] = x;
-    v [1] = y;
-    v [2] = z;
-    v [3] = w;
+    vector [0] = x;
+    vector [1] = y;
+    vector [2] = z;
+    vector [3] = w;
   }
 
 
   /** <code>C = A x B</code>. */
-  public static double [] cross (double [] A, double [] B, double [] C) {
+  private double [] cross (double [] A, double [] B, double [] C) {
     C [0] = A [1] * B [2] - A [2] * B [1];
     C [1] = -A [0] * B [2] + A [2] * B [0];
     C [2] = A [0] * B [1] - A [1] * B [0];
@@ -35,42 +33,42 @@ public class Vector4d {
 
 
   public Vector4d cross (Vector4d A, Vector4d B) {
-    double [] C = v;
+    double [] C = vector;
     if (A == this || B == this) C = new double [4];
-    v = cross (A.v, B.v, C);
+    vector = cross (A.vector, B.vector, C);
     return this;
   }
 
 
   public double length () {
-    return length (v);
+    return length (vector);
   }
 
 
   public static double length (double [] A) {
-    return java.lang.Math.sqrt (length_square (A));
+    return java.lang.Math.sqrt (lengthSquare (A));
   }
 
 
-  public double length_square () {
-    return length_square (v);
+  public double lengthSquare () {
+    return lengthSquare (vector);
   }
 
 
   /** <code>|A| = x*x + y*y + z*z</code>. */
-  public static double length_square (double [] A) {
+  public static double lengthSquare (double [] A) {
     return A [0] * A [0] + A [1] * A [1] + A [2] * A [2];
   }
 
 
   public Vector4d minus (Vector4d A, Vector4d B) {
-    minus (A.v, B.v, v);
+    minus (A.vector, B.vector, vector);
     return this;
   }
 
 
   /** <code>C = A - B</code>. */
-  public static double [] minus (double [] A, double [] B, double [] C) {
+  private double [] minus (double [] A, double [] B, double [] C) {
     C [0] = A [0] - B [0];
     C [1] = A [1] - B [1];
     C [2] = A [2] - B [2];
@@ -79,50 +77,21 @@ public class Vector4d {
   }
   
 
-  public Vector4d multiply_left (Matrix4d A) {
-    return multiply_left (A, this);
+  public Vector4d multiplyRight (Matrix4d A) {
+    return multiplyRight (this, A);
   }
 
 
-  public Vector4d multiply_left (Matrix4d A, Vector4d V) {
-    double [] B = v;
+  public Vector4d multiplyRight (Vector4d V, Matrix4d A) {
+    double [] B = vector;
     if (V == this) B = new double [4];
-    v = multiply_left (A.m, V.v, B);
-    return this;
-  }
-
-
-  /** <code>B = A * V</code>. */
-  public static double [] multiply_left (double [] A, double [] V, 
-    double [] B) {
-
-    B [0] = A [0] * V [0] + A [1] * V [1]
-      + A [2] * V [2] + A [3] * V [3];
-    B [1] = A [4] * V [0] + A [5] * V [1]
-      + A [6] * V [2] + A [7] * V [3];
-    B [2] = A [8] * V [0] + A [9] * V [1]
-      + A [10] * V [2] + A [11] * V [3];
-    B [3] = A [12] * V [0] + A [13] * V [1]
-      + A [14] * V [2] + A [15] * V [3];
-    return B;
-  }    
-
-
-  public Vector4d multiply_right (Matrix4d A) {
-    return multiply_right (this, A);
-  }
-
-
-  public Vector4d multiply_right (Vector4d V, Matrix4d A) {
-    double [] B = v;
-    if (V == this) B = new double [4];
-    v = multiply_right (V.v, A.m, B);
+    vector = multiplyRight (V.vector, A.getMatrix(), B);
     return this;
   }
 
 
   /** <code>B = V * A</code>. */
-  public static double [] multiply_right (double [] V, double [] A, 
+  private double [] multiplyRight (double [] V, double [] A, 
     double [] B) {
 
     B [0] = V [0] * A [0] + V [1] * A [4]
@@ -143,14 +112,14 @@ public class Vector4d {
 
 
   public Vector4d negate (Vector4d A) {
-    negate (A.v, v);
+    negate (A.vector, vector);
     return this;
   }
 
 
   /** <code>B = -A</code>. */
-  public static double [] negate (double [] A, double [] B) {
-    return scalar_multiply (A, -1, B);
+  private double [] negate (double [] A, double [] B) {
+    return scalarMultiply (A, -1, B);
   }
 
 
@@ -160,19 +129,19 @@ public class Vector4d {
 
 
   public Vector4d normalize (Vector4d A) {
-    normalize (A.v, v);
+    normalize (A.vector, vector);
     return this;
   }
 
 
   /** <code>B = A / |A|</code>. */
-  public static double [] normalize (double [] A, double [] B) {
-    return scalar_divide (A, length (A), B);
+  private double [] normalize (double [] A, double [] B) {
+    return scalarDivide (A, length (A), B);
   }
 
 
   /** <code>B = A + (a * I)</code>. */
-  public static double [] scalar_addition (double [] A, double d, double [] B) {
+  private double [] scalarAddition (double [] A, double d, double [] B) {
     B [0] = A [0] + d;
     B [1] = A [1] + d;
     B [2] = A [2] + d;
@@ -180,56 +149,37 @@ public class Vector4d {
     return B;
   }
 
-    
-  public Vector4d scalar_divide (double d) {
-    scalar_divide (v, d, v);
-    return this;
-  }
-    
-
-  public Vector4d scalar_divide (Vector4d A, double d) {
-    scalar_divide (A.v, d, v);
-    return this;
-  }
-    
 
   /** <code>B = (1/d) * A</code>. */
-  public static double [] scalar_divide (double [] A, double d, double [] B) {
-    return scalar_multiply (A, 1/d, B);
+  private double [] scalarDivide (double [] A, double d, double [] B) {
+    return scalarMultiply (A, 1/d, B);
   }
     
 
-  public Vector4d scalar_minus (double d) {
-    scalar_minus (v, d, v);
+  public Vector4d scalarMinus (double d) {
+    scalarMinus (vector, d, vector);
     return this;
-  }
-    
-
-  public Vector4d scalar_minus (Vector4d A, double d) {
-    scalar_minus (A.v, d, v);
-    return this;
-  }
-    
+  } 
 
   /** <code>B = A - (a * I)</code>. */
-  public static double [] scalar_minus (double [] A, double d, double [] B) {
-    return scalar_addition (A, -d, B);
+  private double [] scalarMinus (double [] A, double d, double [] B) {
+    return scalarAddition (A, -d, B);
   }
 
 
-  public Vector4d scalar_multiply (double d) {
-    return scalar_multiply (this, d);
+  public Vector4d scalarMultiply (double d) {
+    return scalarMultiply (this, d);
   }
 
 
-  public Vector4d scalar_multiply (Vector4d A, double d) {
-    scalar_multiply (A.v, d, v);
+  private Vector4d scalarMultiply (Vector4d A, double d) {
+    scalarMultiply (A.vector, d, vector);
     return this;
   }
 
 
   /** <code>B = d * A</code>. */
-  public static double [] scalar_multiply (double [] A, double d, double [] B) {
+  private double [] scalarMultiply (double [] A, double d, double [] B) {
     B [0] = A [0] * d;
     B [1] = A [1] * d;
     B [2] = A [2] * d;
@@ -239,6 +189,16 @@ public class Vector4d {
     
 
   public String toString () {
-    return "#Vector4d: " + v [0] + " " + v [1] + " " + v [2] + " " + v [3];
+    return "#Vector4d: " + vector [0] + " " + vector [1] + " " + vector [2] + " " + vector [3];
+  }
+  
+  // Get and Set
+  
+  public double[] getVector() {
+    return vector;
+  }
+ 
+  public void setVector(double[] vector) {
+    this.vector = vector;
   }
 }

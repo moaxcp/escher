@@ -372,7 +372,7 @@ public class GLUT {             // TODO
     Vector3f n = new Vector3f ().cross (AC, AB).normalize ();
 
     gl.begin (type);
-    gl.normal3fv (n.v);
+    gl.normal3fv (n.getVector());
     gl.vertex3fv (x0);
     gl.vertex3fv (x1);
     gl.vertex3fv (x2);

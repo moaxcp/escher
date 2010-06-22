@@ -59,9 +59,9 @@ public class GLU {              // TODO
      * [side_z up_z -forward_z 0]
      * [  0     0       0      1]
      */
-    matrix.set_column (side, up, forward.negate (), Vector4d.ZERO);    
-    matrix.set_row (3, 0.0, 0.0, 0.0, 1.0);
-    gl.mult_matrixd (matrix.m);
+    matrix.setColumn (side, up, forward.negate (), Vector4d.ZERO);    
+    matrix.setRow (3, 0.0, 0.0, 0.0, 1.0);
+    gl.mult_matrixd (matrix.getMatrix());
 
     //-- translate eye to origin
     gl.translated (-eyex, -eyey, -eyez);
@@ -101,7 +101,7 @@ public class GLU {              // TODO
     int [] viewport) {
 
     Vector4d window = new Vector4d ();
-    return window.v;
+    return window.getVector();
   }
 
 
@@ -113,26 +113,26 @@ public class GLU {              // TODO
     int [] viewport) {
 
     Matrix4d product = new Matrix4d ();
-    Matrix4d.multiply (modelview, projection, product.m);
+    Matrix4d.multiply (modelview, projection, product.getMatrix());
     if (product.invert () == null) return null;
 
     Vector4d A = new Vector4d (window_x, window_y, window_z, 1.0);
 
     // map x and y from window coordinates
-    A.v [0] = (A.v [0] - viewport [0]) / viewport [2];
-    A.v [1] = (A.v [1] - viewport [1]) / viewport [3];
+    A.getVector() [0] = (A.getVector() [0] - viewport [0]) / viewport [2];
+    A.getVector() [1] = (A.getVector() [1] - viewport [1]) / viewport [3];
 
     // map to range -1 to 1, A = 2*A - I
-    A.scalar_multiply (2).scalar_minus (1);
+    A.scalarMultiply (2).scalarMinus (1);
 
-    A.multiply_right (product);
-    double d = A.v [3];
+    A.multiplyRight (product);
+    double d = A.getVector() [3];
     if (d == 0) return null;
     
     double [] result = new double [3]; // vs. 4
-    result [0] = A.v [0] / d;
-    result [1] = A.v [1] / d;
-    result [2] = A.v [2] / d;
+    result [0] = A.getVector() [0] / d;
+    result [1] = A.getVector() [1] / d;
+    result [2] = A.getVector() [2] / d;
     return result;
   }
 }

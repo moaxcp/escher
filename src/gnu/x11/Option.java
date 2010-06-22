@@ -18,11 +18,11 @@ public class Option extends gnu.util.Option {
       if (opt != null) retval = new Display.Name (opt);
 
     } catch (RuntimeException e) {
-      invalid_names.append (name + ", ");
+      invalidNames.append (name + ", ");
       // fall through
     }
 
-    add_spec (name, "display name", description, default_value.toString (),   
+    addSpec (name, "display name", description, default_value.toString (),   
       retval.toString ());
     return retval;
   }
@@ -36,11 +36,11 @@ public class Option extends gnu.util.Option {
       if (opt != null) retval = new RGB (opt);
 
     } catch (RuntimeException e) {
-      invalid_names.append (name + ", ");
+      invalidNames.append (name + ", ");
       // fall through
     }
 
-    add_spec (name, "RGB", description, 
+    addSpec (name, "RGB", description, 
       default_value.spec (), retval.spec ());
     return retval;
   }
@@ -56,11 +56,11 @@ public class Option extends gnu.util.Option {
       if (opt != null) retval = new Rectangle (option (name));
 
     } catch (RuntimeException e) {
-      invalid_names.append (name + ", ");
+      invalidNames.append (name + ", ");
       // fall through
     }
 
-    add_spec (name, "Rectangle", description, 
+    addSpec (name, "Rectangle", description, 
       default_value.spec (), retval.spec ());
     return retval;
   }

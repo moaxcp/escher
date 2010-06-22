@@ -12,20 +12,6 @@ public class Misc {
 
   //-- linearize array
 
-  // Can be removed
-  public static float [] linearize (float [] [] src) {
-    int s1 = src [0].length;
-    int s2 = src.length;   
-    float [] dst = new float [s1 * s2];
-    
-    for (int i=0; i<s2; i++) {
-      int offset = i * s1;
-      System.arraycopy (src [i], 0, dst, offset, s1);
-    }
-    return dst;
-  }
-
-
   public static float [] linearize (float [] [] [] src) {
     int s1 = src [0] [0].length;
     int s2 = src [0].length;
@@ -43,21 +29,6 @@ public class Misc {
 
   //-- string
 
-  // Can be removed
-  public static boolean empty (String s) {
-    return s == null || trim (s).length () == 0;
-  }
-  
-
-  /**
-   * @see #tokenize(String, String)
-   */
-  // Can be removed
-  public static String [] tokenize (String s) {
-    return tokenize (s, " \t\n\r\f");
-  }
-
-  
   /** Tokenize a string given a delimiter and from-index. */
   public static String [] tokenize (String s, String delim) {    
     StringTokenizer st = new StringTokenizer (s, delim);
@@ -68,52 +39,7 @@ public class Misc {
     
     return tokens;
   }
-
   
-  // Can be removed
-  public static String to_string (double [] d, String prefix) {
-    StringBuffer sb = new StringBuffer ();
-    for (int i=0; i<d.length; i++) {
-      sb.append (prefix);
-      sb.append (i + ": ");
-      sb.append (d [i]);
-    }
-    return sb.toString ();
-  }
-
-  
-  // Can be removed
-  public static String to_string (int [] j, String prefix) {
-    StringBuffer sb = new StringBuffer ();
-    for (int i=0; i<j.length; i++) {
-      sb.append (prefix);
-      sb.append (i + ": ");
-      sb.append (j [i]);
-    }
-    return sb.toString ();
-  }
-
-
-  /**
-   * @see #to_string(Object[], String)
-   */
-  // Can be removed
-  public static String to_string (Object [] objects) {
-    return to_string (objects, "\n");
-  }
-
-
-  public static String to_string (Object [] objects, String prefix) {
-    StringBuffer sb = new StringBuffer ();
-    for (int i=0; i<objects.length; i++) {
-      sb.append (prefix);
-      sb.append (i + ": ");
-      sb.append (objects [i]);
-    }
-    return sb.toString ();
-  }
-
-
   public static String trim (String s) {
     if (s == null || s.length () == 0) return s;
 
@@ -131,14 +57,5 @@ public class Misc {
     return s.substring (from, to+1);
   }
 
-
-  //-- system functions
-
-  // Can be removed
-  public static void sleep (long millis) {
-    try {
-      Thread.sleep (millis);
-    } catch (InterruptedException e) {} // ignore
-  }  
 }
  
