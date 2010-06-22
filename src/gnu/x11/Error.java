@@ -370,7 +370,7 @@ public class Error extends java.lang.Error {
         : "\n  bad-object: " + bad_object;
 
     } else if (code == ErrorCode.BAD_ATOM) {
-      Object bad_atom = display.atom_ids.get (new Integer (bad));
+      Object bad_atom = display.getAtom(bad);
       bad_string = bad_atom == null ?
         "\n  bad-atom-id: " + bad
         : "\n  bad-atom: " + bad_atom;

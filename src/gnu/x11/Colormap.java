@@ -59,7 +59,7 @@ public class Colormap extends Resource {
    *
    * @see <a href="XCreateColormap.html">XCreateColormap</a>
    */   
-  public Colormap (Window window, int visual_id, int alloc) {
+  public Colormap (Window window, int visualId, int alloc) {
     super (window.display);
 
     RequestOutputStream o = display.out;
@@ -67,7 +67,7 @@ public class Colormap extends Resource {
       o.begin_request (78, alloc, 4);
       o.write_int32 (id);
       o.write_int32 (window.id);
-      o.write_int32 (visual_id);
+      o.write_int32 (visualId);
       o.send ();
     }
   }
@@ -88,17 +88,17 @@ public class Colormap extends Resource {
   }
 
   // opcode 80 - copy colormap and free
-  public Colormap copy_and_free (int new_id) {
+  public Colormap copyAndFree (int newID) {
 
-    Colormap new_map = new Colormap (display, new_id);
+    Colormap newMap = new Colormap (display, newID);
     RequestOutputStream o = display.out;
     synchronized (o) {
       o.begin_request (80, 0, 3);
-      o.write_int32 (new_id);
+      o.write_int32 (newID);
       o.write_int32 (id);
       o.send ();
     }
-    return new_map;
+    return newMap;
   }
 
 
@@ -155,7 +155,7 @@ public class Colormap extends Resource {
    *
    * @see <a href="XAllocColor.html">XAllocColor</a>
    */
-  public Color alloc_color (int red, int green, int blue) {
+  public Color allocColor (int red, int green, int blue) {
     RequestOutputStream o = display.out;
     Color c;
     synchronized (o) {
@@ -197,7 +197,7 @@ public class Colormap extends Resource {
    *
    * @see <a href="XAllocNamedColor.html">XAllocNamedColor</a>
    */  
-  public Color alloc_named_color (String name) {
+  public Color allocNamedColor (String name) {
 
     RequestOutputStream o = display.out;
     int n = name.length ();
@@ -233,7 +233,7 @@ public class Colormap extends Resource {
 
 
   /**
-   * Reply of {@link #alloc_color_cells(boolean, int, int)}.
+   * Reply of {@link #allocColorCells(boolean, int, int)}.
    */
   // FIXME: Improve API somehow here.
   public static class ColorCellsReply {
@@ -249,7 +249,7 @@ public class Colormap extends Resource {
   /**
    * @see <a href="XAllocColorCells.html">XAllocColorCells</a>
    */
-  public ColorCellsReply alloc_color_cells (boolean contiguous, 
+  public ColorCellsReply allocColorCells (boolean contiguous, 
     int color_count, int plane_count) {
 
     RequestOutputStream o = display.out;
@@ -279,7 +279,7 @@ public class Colormap extends Resource {
   }
 
   /**
-   * Reply for {@link Colormap#alloc_planes(boolean, int, int, int, int)}.
+   * Reply for {@link Colormap#allocPlanes(boolean, int, int, int, int)}.
    */
   public class ColorPlaneReply {
     public int red_mask;
@@ -299,7 +299,7 @@ public class Colormap extends Resource {
   /**
    * @see <a href="XAllocColorPlanes.html">XAllocColorPlanes</a>
    */
-  public ColorPlaneReply alloc_planes (boolean contiguous, int color_count, 
+  public ColorPlaneReply allocPlanes (boolean contiguous, int color_count, 
                                        int red_count, int green_count,
                                        int blue_count) {
 
@@ -337,7 +337,7 @@ public class Colormap extends Resource {
   /**
    * @see <a href="XFreeColors.html">XFreeColors</a>
    */
-  public void free_colors (int [] pixels, int plane_mask) {
+  public void freeColors (int [] pixels, int plane_mask) {
 
     int n = pixels.length;
     RequestOutputStream o = display.out;
@@ -393,7 +393,7 @@ public class Colormap extends Resource {
   /**
    * @see <a href="XStoreColors.html">XStoreColors</a>
    */
-  public void store_colors (ColorItem[] items) {
+  public void storeColors (ColorItem[] items) {
 
     int n = items.length;
     RequestOutputStream o = display.out;
@@ -411,7 +411,7 @@ public class Colormap extends Resource {
   /**
    * @see <a href="XStoreNamedColor.html">XStoreNamedColor</a>
    */
-  public void store_named_color (int pixel, String name, boolean do_reds, 
+  public void storeNamedColor (int pixel, String name, boolean do_reds, 
                                  boolean do_greens, boolean do_blues) {
 
     int do_color = 0;
@@ -493,7 +493,7 @@ public class Colormap extends Resource {
    *
    * @see <a href="XLookupColor.html">XLookupColor</a>
    */
-  public Color lookup_color (String name) {
+  public Color lookupColor (String name) {
 
     int n = name.length ();
     int p = RequestOutputStream.pad (n);
@@ -528,36 +528,36 @@ public class Colormap extends Resource {
 
 
   /**
-   * @see #alloc_color(int, int, int)
+   * @see #allocColor(int, int, int)
    */
-  public Color alloc_color (RGB rgb) {
-    return alloc_color (rgb.red, rgb.green, rgb.blue);
+  public Color allocColor (RGB rgb) {
+    return allocColor (rgb.red, rgb.green, rgb.blue);
   }
 
   
   /**
-   * @see #alloc_color(RGB)
+   * @see #allocColor(RGB)
    */
-  public Color alloc_color8 (int red8, int green8, int blue8) {
-    return alloc_color (RGB.rgb8 (red8, green8, blue8));
+  public Color allocColor8 (int red8, int green8, int blue8) {
+    return allocColor (RGB.rgb8 (red8, green8, blue8));
   }
 
 
   /**
-   * @see #alloc_color(int, int, int)
+   * @see #allocColor(int, int, int)
    */
-  public Color alloc_random_color (java.util.Random random) {
-    return alloc_color (random.nextInt () & 0xffff,
+  public Color allocRandomColor (java.util.Random random) {
+    return allocColor (random.nextInt () & 0xffff,
       random.nextInt () & 0xffff,
       random.nextInt () & 0xffff);
   }
 
 
   /**
-   * @see #alloc_color(int, int, int)
+   * @see #allocColor(int, int, int)
    */
-  public Color alloc_random_rainbow_color (java.util.Random random) {
+  public Color allocRandomRainbowColor (java.util.Random random) {
     int hue = random.nextInt (360);
-    return alloc_color (RGB.hsv (hue, 1, 1));
+    return allocColor (RGB.hsv (hue, 1, 1));
   }
 }

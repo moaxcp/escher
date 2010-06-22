@@ -861,8 +861,8 @@ public class Window extends Drawable implements GLXDrawable {
         synchronized (o) {
             o.begin_request(18, mode, 6 + (n + p) / 4);
             o.write_int32(id);
-            o.write_int32(property.id);
-            o.write_int32(type.id);
+            o.write_int32(property.getId());
+            o.write_int32(type.getId());
             o.write_int8(format);
             o.skip(3);
             o.write_int32(len); // data length in format unit
@@ -882,7 +882,7 @@ public class Window extends Drawable implements GLXDrawable {
         synchronized (o) {
             o.begin_request(19, 0, 3);
             o.write_int32(id);
-            o.write_int32(property.id);
+            o.write_int32(property.getId());
             o.send();
         }
     }
@@ -993,8 +993,8 @@ public class Window extends Drawable implements GLXDrawable {
         synchronized (o) {
             o.begin_request(20, delete ? 1 : 0, 6);
             o.write_int32(id);
-            o.write_int32(property.id);
-            o.write_int32(type.id);
+            o.write_int32(property.getId());
+            o.write_int32(type.getId());
             o.write_int32(offset);
             o.write_int32(length);
             ResponseInputStream i = display.in;
@@ -1052,7 +1052,7 @@ public class Window extends Drawable implements GLXDrawable {
         synchronized (o) {
             o.begin_request(22, 0, 4);
             o.write_int32(id);
-            o.write_int32(selection.id);
+            o.write_int32(selection.getId());
             o.write_int32(time);
             o.send();
         }
@@ -1071,9 +1071,9 @@ public class Window extends Drawable implements GLXDrawable {
         synchronized (o) {
             o.begin_request(24, 0, 6);
             o.write_int32(id);
-            o.write_int32(selection.id);
-            o.write_int32(target.id);
-            o.write_int32(property.id);
+            o.write_int32(selection.getId());
+            o.write_int32(target.getId());
+            o.write_int32(property.getId());
             o.write_int32(time);
             o.send();
         }
@@ -1668,7 +1668,7 @@ public class Window extends Drawable implements GLXDrawable {
             o.write_int16(delta);
 
             for (int i = 0; i < properties.length; i++)
-                o.write_int32(properties[i].id);
+                o.write_int32(properties[i].getId());
 
             o.send();
         }
@@ -2253,7 +2253,7 @@ public class Window extends Drawable implements GLXDrawable {
         Atom wm_protocols = (Atom) Atom.intern(display, "WM_PROTOCOLS");
         Atom protocol = (Atom) Atom.intern(display, name);
 
-        change_property(wm_protocols, Atom.ATOM, protocol.id);
+        change_property(wm_protocols, Atom.ATOM, protocol.getId());
     }
 
     /** 
@@ -2379,7 +2379,7 @@ public class Window extends Drawable implements GLXDrawable {
         Property pi = get_property(false, Atom.WM_NAME, Atom.STRING, 0,
                                    MAX_WM_LENGTH); // support other types?
 
-        if (pi.format() != 8 || pi.type_id() != Atom.STRING.id)
+        if (pi.format() != 8 || pi.type_id() != Atom.STRING.getId())
             return null;
 
         return pi.string_value();
@@ -2413,7 +2413,7 @@ public class Window extends Drawable implements GLXDrawable {
         int[] list = wm_protocols();
 
         for (int i : list) {
-            if (i == protocol.id)
+            if (i == protocol.getId())
                 return true;
         }
 

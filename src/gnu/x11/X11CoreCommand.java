@@ -28,13 +28,11 @@ public enum X11CoreCommand implements X11Command
         this.length = length;
     }
     
-    @Override
     public int getLength()
     {
         return this.length;
     }
 
-    @Override
     public int getOpcode()
     {
         return this.opcode;

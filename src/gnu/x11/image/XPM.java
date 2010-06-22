@@ -47,7 +47,7 @@ public class XPM extends ZPixmap { // TODO
 	  mapping.put (symbol, new Color (pixel));
 
 	} else			// not starting with #
-	  mapping.put (symbol, cmap.alloc_named_color (color_value));
+	  mapping.put (symbol, cmap.allocNamedColor (color_value));
       }
     }
 

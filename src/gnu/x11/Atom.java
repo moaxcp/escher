@@ -3,7 +3,7 @@ package gnu.x11;
 
 /** X atom. */
 public class Atom {
-  // predefined atom ids
+  // Predefined atom ids
   public static final int ANY_PROPERTY_TYPE_ID = 0;
   public static final int PRIMARY_ID = 1;
   public static final int SECONDARY_ID = 2;
@@ -80,7 +80,7 @@ public class Atom {
    *
    * @see Window#NONE
    */
-  public static final Atom NONE
+  public static final Atom NONE 
     = new Atom (0, "NONE");
   public static final Atom ANY_PROPERTY_TYPE 
     = new Atom (ANY_PROPERTY_TYPE_ID, "ANY_PROPERTY_TYPE");
@@ -222,15 +222,15 @@ public class Atom {
     = new Atom (WM_TRANSIENT_FOR_ID, "WM_TRANSIENT_FOR");
 
 
-  public Display display;
-  public int id;
-  public String name;
+  private Display display;
+  private int id;
+  private String name;
 
 
   /** Predefined. */
   public Atom (int id, String name) {
-    this.id = id;
-    this.name = name;
+    setId(id);
+    setName(name);
   }
 
 
@@ -238,18 +238,17 @@ public class Atom {
   /**
    * @see <a href="XInternAtom.html">XInternAtom</a>
    */ 
-  private Atom (Display display, String name, boolean only_if_exists) {
+  private Atom (Display display, String name, boolean onlyIfExists) {
 
-    this.display = display;
-    this.name = name;
+    setDisplay(display);
+    setName(name);
 
     int n = name.length();
     int p = RequestOutputStream.pad (n);
     
     RequestOutputStream o = display.out;
     synchronized (o) {
-      o.begin_request (16, only_if_exists ? 1 : 0,
-                                          2 + (n + p) / 4);
+      o.begin_request (16, onlyIfExists ? 1 : 0, 2 + (n + p) / 4);
       o.write_int16 (n);
       o.skip (2); // Unused.
       o.write_string8 (name);
@@ -264,9 +263,8 @@ public class Atom {
       }
 
     }
-
-    display.atom_ids.put (new Integer (id), this);
-    display.atom_names.put (name, this);
+    display.addAtom(id, this);
+    display.addAtom(name, this);
   }
 
 
@@ -274,7 +272,7 @@ public class Atom {
   /**
    * @see <a href="XGetAtomName.html">XGetAtomName</a>
    */
-  public Atom (Display display, int id, boolean only_if_exists) {
+  public Atom (Display display, int id, boolean onlyIfExists) {
 
     this.display = display;
     this.id = id;
@@ -294,8 +292,8 @@ public class Atom {
         i.pad (len); // Pad.
       }
     }
-    display.atom_ids.put (new Integer (id), this);
-    display.atom_names.put (name, this);
+    display.addAtom(id, this);
+    display.addAtom(name, this);
   }
 
 
@@ -319,11 +317,11 @@ public class Atom {
    * @see #Atom(Display, int, boolean)
    */
   public static Object intern (Display display, int id, 
-    boolean only_if_exists) {    
+    boolean onlyIfExists) {    
 
-    Object value = display.atom_ids.get (new Integer (id));
+    Object value = display.getAtom(id);
     if (value != null && value instanceof Atom) return value;
-    return new Atom (display, id, only_if_exists);
+    return new Atom (display, id, onlyIfExists);
   }
 
 
@@ -331,11 +329,11 @@ public class Atom {
    * @see #Atom(Display, String, boolean)
    */
   public static Atom intern (Display display, String name,
-                             boolean only_if_exists) { 
+                             boolean onlyIfExists) { 
 
-    Object value = display.atom_names.get (name);
+    Object value = display.getAtom(name);
     if (value != null && value instanceof Atom) return (Atom) value;
-    Atom atom = new Atom (display, name, only_if_exists);
+    Atom atom = new Atom (display, name, onlyIfExists);
     if (atom.id == 0) {
       atom = null;
     }
@@ -346,4 +344,36 @@ public class Atom {
   public String toString () {    
     return "#Atom: " + name + " " + id;
   }
+
+ 
+  // Set and Getters
+
+  public Display getDisplay() {
+      return display;
+  }
+
+
+  public void setDisplay(Display display) {
+      this.display = display;
+  }
+
+
+  public int getId() {
+      return id;
+  }
+
+
+  public void setId(int id) {
+      this.id = id;
+  }
+
+
+  public String getName() {
+      return name;
+  }
+
+  public void setName(String name) {
+      this.name = name;
+  }  
+  
 }

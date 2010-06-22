@@ -54,7 +54,7 @@ public class PPM extends ZPixmap { // TODO
                 int b = bin.read();
 
                 // FIXME cache and index color
-                putPixel(x, y, cmap.alloc_color8(r, g, b));
+                putPixel(x, y, cmap.allocColor8(r, g, b));
             }
     }
 }

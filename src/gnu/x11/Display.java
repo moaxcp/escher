@@ -134,9 +134,9 @@ public class Display {
 
     public int resource_index;
 
-    public Hashtable atom_ids = new Hashtable(257);
+    private Hashtable<Integer, Atom> atomIDs = new Hashtable<Integer, Atom>(257);
 
-    public Hashtable atom_names = new Hashtable(257);
+    private Hashtable<String, Atom> atomNames = new Hashtable<String, Atom>(257);
 
     // xcmisc
     public XCMisc xcmisc;
@@ -518,7 +518,7 @@ public class Display {
         int owner_id = -1;
         synchronized (o) {
             o.begin_request(23, 0, 2);
-            o.write_int32(selection.id);
+            o.write_int32(selection.getId());
             ResponseInputStream i = in;
             synchronized (i) {
                 i.read_reply(o);
@@ -1497,4 +1497,21 @@ public class Display {
         
         this.visuals.put(xVisual.getID(), xVisual);
     }
+    
+    synchronized void addAtom(int id, Atom atom) {
+        this.atomIDs.put(id, atom);
+    }
+    
+    synchronized void addAtom(String name, Atom atom) {
+        this.atomNames.put(name, atom);
+    }
+    
+    synchronized Atom getAtom(int id) {
+        return atomIDs.get(id);
+    }
+    
+    synchronized Atom getAtom(String name) {
+        return atomIDs.get(name);
+    }
+    
 }
