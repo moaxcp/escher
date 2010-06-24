@@ -15,9 +15,9 @@ public final class SelectionClear extends Event {
 
   public SelectionClear (Display display, ResponseInputStream in) {
     super (display, in);
-    time = in.read_int32 ();
-    owner_id = in.read_int32 ();
-    selection_atom_id = in.read_int32 ();
+    time = in.readInt32 ();
+    owner_id = in.readInt32 ();
+    selection_atom_id = in.readInt32 ();
     in.skip (16);
   }
 }

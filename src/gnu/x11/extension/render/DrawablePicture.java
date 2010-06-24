@@ -114,11 +114,11 @@ public class DrawablePicture extends Picture {
 
     RequestOutputStream o = display.out;
     synchronized (o) {
-      o.begin_request (render.major_opcode, 4, 5 + attr.count ());
-      o.write_int32 (id);
-      o.write_int32 (drawable.id);
-      o.write_int32 (format.id ());
-      o.write_int32 (attr.bitmask);
+      o.beginRequest (render.major_opcode, 4, 5 + attr.count ());
+      o.writeInt32 (id);
+      o.writeInt32 (drawable.id);
+      o.writeInt32 (format.id ());
+      o.writeInt32 (attr.bitmask);
       attr.write (o);
       o.send ();
     }
@@ -132,9 +132,9 @@ public class DrawablePicture extends Picture {
   public void change (Attributes attr) {
     RequestOutputStream o = display.out;
     synchronized (o) {
-      o.begin_request (render.major_opcode, 5, 5+attr.count ());
-      o.write_int32 (id);
-      o.write_int32 (attr.bitmask);
+      o.beginRequest (render.major_opcode, 5, 5+attr.count ());
+      o.writeInt32 (id);
+      o.writeInt32 (attr.bitmask);
       attr.write (o);
       o.send ();    
     }
@@ -151,14 +151,14 @@ public class DrawablePicture extends Picture {
 
     RequestOutputStream o = display.out;
     synchronized (o) {
-      o.begin_request (render.major_opcode, 7, 3 + 2 * rectangles.length);
-      o.write_int32 (id);
+      o.beginRequest (render.major_opcode, 7, 3 + 2 * rectangles.length);
+      o.writeInt32 (id);
 
       for (int i = 0; i < rectangles.length; i++) {
-        o.write_int16 (rectangles [i].x);
-        o.write_int16 (rectangles [i].y);
-        o.write_int16 (rectangles [i].width);
-        o.write_int16 (rectangles [i].height);
+        o.writeInt16 (rectangles [i].x);
+        o.writeInt16 (rectangles [i].y);
+        o.writeInt16 (rectangles [i].width);
+        o.writeInt16 (rectangles [i].height);
       }
       o.send ();
     }
@@ -172,8 +172,8 @@ public class DrawablePicture extends Picture {
   public void free () {
     RequestOutputStream o = display.out;
     synchronized (o) {
-      o.begin_request (render.major_opcode, 7, 2);
-      o.write_int32 (id);
+      o.beginRequest (render.major_opcode, 7, 2);
+      o.writeInt32 (id);
       o.send ();
     }
   }
@@ -186,17 +186,17 @@ public class DrawablePicture extends Picture {
 
     RequestOutputStream o = display.out;
     synchronized (o) {
-      o.begin_request (render.major_opcode, 9, 8);
-      o.write_int32 (src.id);
-      o.write_int32 (id);
-      o.write_int32 (color_scale);
-      o.write_int32 (alpha_scale);
-      o.write_int16 (src_x);
-      o.write_int16 (src_y);
-      o.write_int16 (dst_x);
-      o.write_int16 (dst_y);
-      o.write_int16 (width);
-      o.write_int16 (height);
+      o.beginRequest (render.major_opcode, 9, 8);
+      o.writeInt32 (src.id);
+      o.writeInt32 (id);
+      o.writeInt32 (color_scale);
+      o.writeInt32 (alpha_scale);
+      o.writeInt16 (src_x);
+      o.writeInt16 (src_y);
+      o.writeInt16 (dst_x);
+      o.writeInt16 (dst_y);
+      o.writeInt16 (width);
+      o.writeInt16 (height);
       o.send ();
     }
   }
@@ -211,18 +211,18 @@ public class DrawablePicture extends Picture {
 
     RequestOutputStream o = display.out;
     synchronized (o) {
-      o.begin_request (render.major_opcode, 26, 7);
-      o.write_int8 (op);
+      o.beginRequest (render.major_opcode, 26, 7);
+      o.writeInt8 (op);
       o.skip (3);
-      o.write_int32 (id);
-      o.write_int16 (x);
-      o.write_int16 (y);
-      o.write_int16 (width);
-      o.write_int16 (height);
-      o.write_int16 (color.red);
-      o.write_int16 (color.green);
-      o.write_int16 (color.blue);
-      o.write_int16 (color.alpha);
+      o.writeInt32 (id);
+      o.writeInt16 (x);
+      o.writeInt16 (y);
+      o.writeInt16 (width);
+      o.writeInt16 (height);
+      o.writeInt16 (color.red);
+      o.writeInt16 (color.green);
+      o.writeInt16 (color.blue);
+      o.writeInt16 (color.alpha);
       o.send ();
     }
   }

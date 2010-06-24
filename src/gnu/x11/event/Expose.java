@@ -19,12 +19,12 @@ public final class Expose extends Event {
 
   public Expose (Display display, ResponseInputStream in) {
     super (display, in);
-    window_id = in.read_int32 ();
-    x = in.read_int16 ();
-    y = in.read_int16 ();
-    width = in.read_int16 ();
-    height = in.read_int16 ();
-    count = in.read_int16 ();
+    window_id = in.readInt32 ();
+    x = in.readInt16 ();
+    y = in.readInt16 ();
+    width = in.readInt16 ();
+    height = in.readInt16 ();
+    count = in.readInt16 ();
     in.skip (14); // Unused.
   }
 

@@ -55,23 +55,23 @@ public class Screen {
 
         this.display = display;
 
-        root_id = in.read_int32();
-        default_colormap_id = in.read_int32();
-        white_pixel = in.read_int32();
-        black_pixel = in.read_int32();
-        current_input_masks = in.read_int32();
-        width = in.read_int16();
-        height = in.read_int16();
-        width_in_mm = in.read_int16();
-        height_in_mm = in.read_int16();
-        min_installed_maps = in.read_int16();
-        max_installed_maps = in.read_int16();
-        root_visual_id = in.read_int32();
-        backing_stores = in.read_int8();
-        save_unders = in.read_bool();
-        root_depth = in.read_int8();
+        root_id = in.readInt32();
+        default_colormap_id = in.readInt32();
+        white_pixel = in.readInt32();
+        black_pixel = in.readInt32();
+        current_input_masks = in.readInt32();
+        width = in.readInt16();
+        height = in.readInt16();
+        width_in_mm = in.readInt16();
+        height_in_mm = in.readInt16();
+        min_installed_maps = in.readInt16();
+        max_installed_maps = in.readInt16();
+        root_visual_id = in.readInt32();
+        backing_stores = in.readInt8();
+        save_unders = in.readBool();
+        root_depth = in.readInt8();
         
-        int num_depths = in.read_int8();
+        int num_depths = in.readInt8();
         allowedDepths = new Depth[num_depths];
         for (int i = 0; i < num_depths; i++) {
             allowedDepths[i] = new Depth(in, this);

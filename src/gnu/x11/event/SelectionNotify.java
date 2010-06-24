@@ -17,11 +17,11 @@ public final class SelectionNotify extends Event {
 
   public SelectionNotify (Display display, ResponseInputStream in) {
     super (display, in);
-    time = in.read_int32 ();
-    requestor_window_id = in.read_int32 ();
-    selection_atom_id = in.read_int32 ();
-    target_atom_id = in.read_int32();
-    property_atom_id = in.read_int32 ();
+    time = in.readInt32 ();
+    requestor_window_id = in.readInt32 ();
+    selection_atom_id = in.readInt32 ();
+    target_atom_id = in.readInt32();
+    property_atom_id = in.readInt32 ();
     in.skip (8);
   }
 }

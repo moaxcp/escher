@@ -43,17 +43,17 @@ public abstract class Fontable extends Resource {
       i.skip (4);
       max_bounds = new CharInfo (i);
       i.skip (4);
-      min_char_or_byte2 = i.read_int16 ();
-      max_char_or_byte2 = i.read_int16 ();
-      default_char = i.read_int16 ();
-      int num_props = i.read_int16 ();
-      draw_direction = i.read_int8 ();
-      min_byte1 = i.read_int8 ();
-      max_byte1 = i.read_int8 ();
-      all_chars_exist = i.read_bool ();
-      font_ascent = i.read_int16 ();
-      font_descent = i.read_int16 ();
-      int num_charinfo = i.read_int32 ();
+      min_char_or_byte2 = i.readInt16 ();
+      max_char_or_byte2 = i.readInt16 ();
+      default_char = i.readInt16 ();
+      int num_props = i.readInt16 ();
+      draw_direction = i.readInt8 ();
+      min_byte1 = i.readInt8 ();
+      max_byte1 = i.readInt8 ();
+      all_chars_exist = i.readBool ();
+      font_ascent = i.readInt16 ();
+      font_descent = i.readInt16 ();
+      int num_charinfo = i.readInt32 ();
       properties = new FontProperty [num_props];
       for (int j = 0; j < num_props; j++)
         properties [j] = new FontProperty (i);
@@ -76,8 +76,8 @@ public abstract class Fontable extends Resource {
        * @param i the starting index of the font property
        */
       private FontProperty (ResponseInputStream i) {
-        name_id = i.read_int32 ();
-        value = i.read_int32 ();
+        name_id = i.readInt32 ();
+        value = i.readInt32 ();
       }
 
       public Atom name () {
@@ -104,12 +104,12 @@ public abstract class Fontable extends Resource {
        * @param i the starting index of the CharInfo field
        */
       private CharInfo (ResponseInputStream i) {
-        left_side_bearing = i.read_int16 ();
-        right_side_bearing = i.read_int16 ();
-        character_width = i.read_int16 ();
-        ascent = i.read_int16 ();
-        descent = i.read_int16 ();
-        attributes = i.read_int16 ();
+        left_side_bearing = i.readInt16 ();
+        right_side_bearing = i.readInt16 ();
+        character_width = i.readInt16 ();
+        ascent = i.readInt16 ();
+        descent = i.readInt16 ();
+        attributes = i.readInt16 ();
       }
 
       public int character_width () {
@@ -167,11 +167,11 @@ public abstract class Fontable extends Resource {
     FontInfo info;
     RequestOutputStream o = display.out;
     synchronized (o) {
-      o.begin_request (47, 0, 2);
-      o.write_int32 (id);
+      o.beginRequest (47, 0, 2);
+      o.writeInt32 (id);
       ResponseInputStream i = display.in;
       synchronized (i) {
-        i.read_reply (o);
+        i.readReply (o);
         i.skip (8);
         info = new FontInfo (i);
       }
@@ -194,15 +194,15 @@ public abstract class Fontable extends Resource {
     public int overall_right;
 
     TextExtentInfo (ResponseInputStream i) {
-      left_to_right = i.read_bool ();
+      left_to_right = i.readBool ();
       i.skip (6);
-      font_ascent = i.read_int16 ();
-      font_descent = i.read_int16 ();
-      overall_ascent = i.read_int16 ();
-      overall_descent = i.read_int16 ();
-      overall_width = i.read_int32 ();
-      overall_left = i.read_int32 ();
-      overall_right = i.read_int32 ();
+      font_ascent = i.readInt16 ();
+      font_descent = i.readInt16 ();
+      overall_ascent = i.readInt16 ();
+      overall_descent = i.readInt16 ();
+      overall_width = i.readInt32 ();
+      overall_left = i.readInt32 ();
+      overall_right = i.readInt32 ();
     }
 
     public int overall_width () {
@@ -223,12 +223,12 @@ public abstract class Fontable extends Resource {
 
     RequestOutputStream o = display.out;
     synchronized (o) {
-      o.begin_request (48, odd ? 1 : 0, len);
-      o.write_int32 (id);
-      o.write_string16 (s);
+      o.beginRequest (48, odd ? 1 : 0, len);
+      o.writeInt32 (id);
+      o.writeString16 (s);
       ResponseInputStream i = display.in;
       synchronized (i) {
-        i.read_reply (o);
+        i.readReply (o);
         i.skip (1);
         info = new TextExtentInfo (i);
         i.skip (4);

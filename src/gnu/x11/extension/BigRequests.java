@@ -24,12 +24,12 @@ public class BigRequests extends Extension {
         int st;
         RequestOutputStream o = display.out;
         synchronized (o) {
-            o.begin_request(major_opcode, 0, 1);
+            o.beginRequest(major_opcode, 0, 1);
             ResponseInputStream i = display.in;
             synchronized (i) {
-                i.read_reply(o);
+                i.readReply(o);
                 i.skip(8);
-                st = i.read_int32();
+                st = i.readInt32();
                 i.skip(20);
             }
         }

@@ -16,10 +16,10 @@ public final class ColormapNotify extends Event {
 
   public ColormapNotify (Display display, ResponseInputStream in) {
     super (display, in);
-    window_id = in.read_int32 ();
-    colormap_id = in.read_int32 ();
-    is_new = in.read_bool ();
-    state = in.read_int8 ();
+    window_id = in.readInt32 ();
+    colormap_id = in.readInt32 ();
+    is_new = in.readBool ();
+    state = in.readInt8 ();
     in.skip (18);
   }
 

@@ -98,13 +98,13 @@ public class RequestOutputStream extends FilterOutputStream {
   /**
    * The sequence number of the current request.
    */
-  private int seq_number;
+  private int seqNumber;
 
   /**
    * The send mode for this connection. Either {@link SendMode#ASYNCHRONOUS},
    * {@link SendMode#SYNCHRONOUS} or {@link SendMode#ROUND_TRIP}.
    */
-  private SendMode send_mode;
+  private SendMode sendMode;
 
   /**
    * The associated display.
@@ -131,9 +131,9 @@ public class RequestOutputStream extends FilterOutputStream {
   RequestOutputStream (OutputStream sink, int size, Display d) {
     super (sink);
     buffer = new byte [size];
-    seq_number = 0;
+    seqNumber = 0;
     display = d;
-    send_mode = get_default_send_mode ();
+    sendMode = get_default_send_mode ();
     
     this.timerTask = new RequestTimerTask();
     this.flushTimer = new Timer(FLUSH_THREAD_NAME, true);
@@ -168,7 +168,7 @@ public class RequestOutputStream extends FilterOutputStream {
    *
    * @return the actually used buffer size
    */
-  public synchronized int set_buffer_size (int size) {
+  public synchronized int setBufferSize (int size) {
     // First flush all possibly pending request data.
     if (index > 0) {
       System.err.println("WARNING: Unflushed request data.");
@@ -187,7 +187,7 @@ public class RequestOutputStream extends FilterOutputStream {
    */
   public void beginGLXRequest(GLXCommand command) {
       
-      begin_request(this.glxMajorOpcode, command.getOpcode(),
+      beginRequest(this.glxMajorOpcode, command.getOpcode(),
                     command.getLength());
   }
   
@@ -198,7 +198,7 @@ public class RequestOutputStream extends FilterOutputStream {
    */
   public void beginX11CoreRequest(X11CoreCommand command, int secondField) {
       
-      this.begin_request(command.getOpcode(), secondField, command.getLength());
+      this.beginRequest(command.getOpcode(), secondField, command.getLength());
   }
   
   /**
@@ -209,7 +209,7 @@ public class RequestOutputStream extends FilterOutputStream {
    * @param request_length the length of the request
    */
   @Deprecated
-  public void begin_request (int opcode, int second_field,
+  public void beginRequest (int opcode, int second_field,
                              int request_length) {
 
     assert Thread.holdsLock (this);
@@ -222,15 +222,15 @@ public class RequestOutputStream extends FilterOutputStream {
         this.timerTask = null;
     }
     
-    this.seq_number = (this.seq_number + 1) & 0xffff;
+    this.seqNumber = (this.seqNumber + 1) & 0xffff;
     
     if (buffer.length - index < request_length * 4) {
       flush();
     }
 
-    write_int8 (opcode);
-    write_int8 (second_field);
-    write_int16 (request_length);
+    writeInt8 (opcode);
+    writeInt8 (second_field);
+    writeInt16 (request_length);
   }
 
   boolean sendPendingRequest() {
@@ -249,9 +249,9 @@ public class RequestOutputStream extends FilterOutputStream {
    */
   public void send () {
 
-    send_impl ();
-    if (send_mode == SendMode.ROUND_TRIP) {
-      do_roundtrip ();
+    sendImpl ();
+    if (sendMode == SendMode.ROUND_TRIP) {
+      doRoundtrip ();
     }
   }
 
@@ -259,7 +259,7 @@ public class RequestOutputStream extends FilterOutputStream {
    * Performs the same operation as {@link #send()} but without possibly
    * doing a round-trip check.
    */
-  void send_impl () {
+  void sendImpl () {
 
     assert Thread.holdsLock (this);
 
@@ -274,8 +274,8 @@ public class RequestOutputStream extends FilterOutputStream {
         skip (pad);
       request_index = index;
       if (index > (buffer.length - FLUSH_THRESHOLD)
-          || send_mode == SendMode.SYNCHRONOUS
-          || send_mode == SendMode.ROUND_TRIP) {
+          || sendMode == SendMode.SYNCHRONOUS
+          || sendMode == SendMode.ROUND_TRIP) {
         flush ();
       }
 
@@ -293,7 +293,7 @@ public class RequestOutputStream extends FilterOutputStream {
    * very useful for debugging because the X errors can be traced to their
    * corresponding calls.
    */
-  private void do_roundtrip () {
+  private void doRoundtrip () {
     display.input.input_focus ();
   }
 
@@ -302,7 +302,7 @@ public class RequestOutputStream extends FilterOutputStream {
    *
    * @return the opcode of the current request
    */
-  public int current_opcode () {
+  public int currentOpcode () {
     return index > request_index ? buffer [request_index] : -1;
   }
 
@@ -311,7 +311,7 @@ public class RequestOutputStream extends FilterOutputStream {
    *
    * @param i the write index to set
    */
-  public void set_index (int i) {
+  public void setIndex (int i) {
     index = i + request_index;
   }
 
@@ -378,7 +378,7 @@ public class RequestOutputStream extends FilterOutputStream {
         try {
           out.write (buffer, 0, index);
         } catch (IOException ex) {
-          handle_exception (ex);
+          handleException (ex);
         }
         index = 0;
         request_index = 0;
@@ -387,7 +387,7 @@ public class RequestOutputStream extends FilterOutputStream {
       out.flush ();
 
     } catch (IOException ex) {
-      handle_exception (ex);
+      handleException (ex);
     }
   }
 
@@ -395,7 +395,7 @@ public class RequestOutputStream extends FilterOutputStream {
       this.flush();
   }
   
-  public void write_bool (boolean b) {
+  public void writeBool (boolean b) {
     assert Thread.holdsLock (this);
     int v = (b ? 1 : 0);
     buffer [index] = (byte) (v);
@@ -407,7 +407,7 @@ public class RequestOutputStream extends FilterOutputStream {
    *
    * @param v the value to write
    */
-  public void write_int8 (int v) {
+  public void writeInt8 (int v) {
     assert Thread.holdsLock (this);
     buffer [index] = (byte) (v);
     index++;
@@ -418,7 +418,7 @@ public class RequestOutputStream extends FilterOutputStream {
    *
    * @param v the value to write
    */
-  public void write_int16 (int v) {
+  public void writeInt16 (int v) {
     assert Thread.holdsLock (this);
     buffer [index] = (byte) (v >> 8);
     index++;
@@ -431,7 +431,7 @@ public class RequestOutputStream extends FilterOutputStream {
    *
    * @param v the value to write
    */
-  public void write_int32 (int v) {
+  public void writeInt32 (int v) {
     assert Thread.holdsLock (this);
     buffer [index] = (byte) (v >> 24);
     index++;
@@ -451,14 +451,14 @@ public class RequestOutputStream extends FilterOutputStream {
    *
    * @return the INT32 value at the specified index
    */
-  public int get_int32 (int index) {
+  public int getInt32 (int index) {
     int req_index = index + request_index;
     int int32 = (buffer[req_index] << 24) | (buffer[req_index + 1] << 16)
                 | (buffer[req_index + 2] << 8) | buffer[req_index + 3];
     return int32;
   }
 
-  public void write_float (float f) {
+  public void writeFloat (float f) {
     assert Thread.holdsLock (this);
 
     int v = Float.floatToIntBits (f);
@@ -473,7 +473,7 @@ public class RequestOutputStream extends FilterOutputStream {
     index++;
   }
 
-  public void write_double (double d) {
+  public void writeDouble (double d) {
     assert Thread.holdsLock (this);
 
     long v = Double.doubleToLongBits (d);
@@ -501,7 +501,7 @@ public class RequestOutputStream extends FilterOutputStream {
    *
    * @param s the string to write
    */
-  public void write_string8 (String s) {
+  public void writeString8 (String s) {
     assert Thread.holdsLock (this);
     write (s.getBytes ());
   }
@@ -511,16 +511,16 @@ public class RequestOutputStream extends FilterOutputStream {
    *
    * @param s the string to write
    */
-  public void write_string16 (String s) {
+  public void writeString16 (String s) {
     assert Thread.holdsLock (this);
     char [] chars = s.toCharArray();
     int len = chars.length;
     for (int i = 0; i < len; i++) {
-      write_int16 (chars [i]);
+      writeInt16 (chars [i]);
     }
   }
 
-  public void write_bytes (byte [] b) {
+  public void writeBytes (byte [] b) {
     assert Thread.holdsLock (this);
     write (b);
   }
@@ -537,7 +537,7 @@ public class RequestOutputStream extends FilterOutputStream {
    *
    * @param n the number to be padded
    */
-  public void write_pad (int n) {
+  public void writePad (int n) {
     assert Thread.holdsLock (this);
     skip (pad (n));
   }
@@ -583,7 +583,7 @@ public class RequestOutputStream extends FilterOutputStream {
   /**
    * Updates the length field of the request to reflect the current length.
    */
-  public void update_length () {
+  public void updateLength () {
     int len = (index + 3) / 4;
     buffer [2] = (byte) (len >> 8);
     buffer [3] = (byte) (len);
@@ -594,11 +594,11 @@ public class RequestOutputStream extends FilterOutputStream {
    *
    * @param ex the exception to handle
    */
-  private void handle_exception (Throwable ex) {
+  private void handleException (Throwable ex) {
     ex.printStackTrace();
   }
 
-  public void increase_length (int i) {
+  public void increaseLength (int i) {
     int l = (((int) (buffer[request_index + 2] & 0xff)) << 8)
             + (buffer[request_index + 3] & 0xff);
     l += i;
@@ -608,7 +608,7 @@ public class RequestOutputStream extends FilterOutputStream {
   }
 
   public int getSequenceNumber () {
-    return this.seq_number;
+    return this.seqNumber;
   }
 
   /**

@@ -34,11 +34,11 @@ public class Font extends Fontable {
 
     RequestOutputStream o = display.out;
     synchronized (o) {
-      o.begin_request (45, 0, 3 + (n + p) / 4);
-      o.write_int32 (id);
-      o.write_int16 (name.length ());
+      o.beginRequest (45, 0, 3 + (n + p) / 4);
+      o.writeInt32 (id);
+      o.writeInt16 (name.length ());
       o.skip (2);
-      o.write_string8 (name);
+      o.writeString8 (name);
       o.send ();
     }
   }
@@ -52,8 +52,8 @@ public class Font extends Fontable {
 
     RequestOutputStream o = display.out;
     synchronized (o) {
-      o.begin_request (46, 0, 2);
-      o.write_int32 (id);
+      o.beginRequest (46, 0, 2);
+      o.writeInt32 (id);
       o.send ();
     }
   }

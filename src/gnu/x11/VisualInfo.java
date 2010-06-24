@@ -79,13 +79,13 @@ public class VisualInfo {
         this.depth = depth.getDepth();
         this.screen = depth.getScreen();
 
-        id = in.read_int32();
-        visualClassID = in.read_int8();
-        bitsPerRGBValue = in.read_int8();
-        colormapEntries = in.read_int16();
-        redMask = in.read_int32();
-        greenMask = in.read_int32();
-        blueMask = in.read_int32();
+        id = in.readInt32();
+        visualClassID = in.readInt8();
+        bitsPerRGBValue = in.readInt8();
+        colormapEntries = in.readInt16();
+        redMask = in.readInt32();
+        greenMask = in.readInt32();
+        blueMask = in.readInt32();
 
         in.skip(4);
 

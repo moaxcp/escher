@@ -325,17 +325,17 @@ public class Display {
 
         RequestOutputStream o = out;
         synchronized (o) {
-            o.write_int8('B');
-            o.write_int8(0); // Unused.
-            o.write_int16(11);// major version
-            o.write_int16(0);// minor version
-            o.write_int16(auth_name.length);
-            o.write_int16(auth_data.length);
-            o.write_int16(0); // Unused.
-            o.write_bytes(auth_name);
-            o.write_pad(auth_name.length);
-            o.write_bytes(auth_data);
-            o.write_pad(auth_data.length);
+            o.writeInt8('B');
+            o.writeInt8(0); // Unused.
+            o.writeInt16(11);// major version
+            o.writeInt16(0);// minor version
+            o.writeInt16(auth_name.length);
+            o.writeInt16(auth_data.length);
+            o.writeInt16(0); // Unused.
+            o.writeBytes(auth_name);
+            o.writePad(auth_name.length);
+            o.writeBytes(auth_data);
+            o.writePad(auth_data.length);
             o.flush();
             ResponseInputStream i = in;
             synchronized (i) {
@@ -346,7 +346,7 @@ public class Display {
             }
         }
 
-        maximum_request_length = out.set_buffer_size(maximum_request_length);
+        maximum_request_length = out.setBufferSize(maximum_request_length);
         init_keyboard_mapping();
         init_defaults();
         init_big_request_extension();
@@ -517,13 +517,13 @@ public class Display {
         RequestOutputStream o = out;
         int owner_id = -1;
         synchronized (o) {
-            o.begin_request(23, 0, 2);
-            o.write_int32(selection.getId());
+            o.beginRequest(23, 0, 2);
+            o.writeInt32(selection.getId());
             ResponseInputStream i = in;
             synchronized (i) {
-                i.read_reply(o);
+                i.readReply(o);
                 i.skip(8);
-                owner_id = i.read_int32();
+                owner_id = i.readInt32();
                 i.skip(20);
             }
         }
@@ -535,7 +535,7 @@ public class Display {
 
         RequestOutputStream o = out;
         synchronized (o) {
-            o.begin_request(36, 0, 1);
+            o.beginRequest(36, 0, 1);
             o.send();
         }
     }
@@ -545,7 +545,7 @@ public class Display {
 
         RequestOutputStream o = out;
         synchronized (o) {
-            o.begin_request(37, 0, 1);
+            o.beginRequest(37, 0, 1);
             o.send();
         }
     }
@@ -564,23 +564,23 @@ public class Display {
         RequestOutputStream o = out;
         Font[] fonts = null;
         synchronized (o) {
-            o.begin_request(49, 0, 2 + (n + p) / 4);
-            o.write_int16(max_name_count);
-            o.write_int16(n);
-            o.write_string8(pattern);
+            o.beginRequest(49, 0, 2 + (n + p) / 4);
+            o.writeInt16(max_name_count);
+            o.writeInt16(n);
+            o.writeString8(pattern);
             o.skip(p);
 
             ResponseInputStream i = in;
             synchronized (i) {
-                i.read_reply(o);
+                i.readReply(o);
                 i.skip(4);
-                int len = i.read_int32() * 4; // Number of bytes for the reply.
-                int num_strings = i.read_int16();
+                int len = i.readInt32() * 4; // Number of bytes for the reply.
+                int num_strings = i.readInt16();
                 i.skip(22);
                 fonts = new Font[num_strings];
                 for (int j = 0; j < num_strings; j++) {
-                    int strlen = i.read_int8();
-                    String str = i.read_string8(strlen);
+                    int strlen = i.readInt8();
+                    String str = i.readString8(strlen);
                     len -= strlen + 1;
                     fonts[j] = new Font(this, str);
                 }
@@ -614,12 +614,12 @@ public class Display {
 
         RequestOutputStream o = out;
         synchronized (o) {
-            o.begin_request(51, 0, 2 + (n + p) / 4);
-            o.write_int16(path.length);
+            o.beginRequest(51, 0, 2 + (n + p) / 4);
+            o.writeInt16(path.length);
             o.skip(2);
             for (int i = 0; i < path.length; i++) {
-                o.write_int8(path[i].length());
-                o.write_string8(path[i]);
+                o.writeInt8(path[i].length());
+                o.writeString8(path[i]);
             }
             o.skip(p);
             o.send();
@@ -639,19 +639,19 @@ public class Display {
         RequestOutputStream o = out;
         String[] path;
         synchronized (o) {
-            o.begin_request(52, 0, 1);
+            o.beginRequest(52, 0, 1);
             ResponseInputStream i = in;
             synchronized (i) {
-                i.read_reply(o);
+                i.readReply(o);
                 i.skip(4);
-                int reply_length = i.read_int32() * 4;
-                int num_strings = i.read_int16();
+                int reply_length = i.readInt32() * 4;
+                int num_strings = i.readInt16();
                 i.skip(22);
                 path = new String[num_strings];
                 int bytes_read = 0;
                 for (int j = 0; j < num_strings; j++) {
-                    int num_chars = i.read_int8();
-                    path[j] = i.read_string8(num_chars);
+                    int num_chars = i.readInt8();
+                    path[j] = i.readString8(num_chars);
                     bytes_read += num_chars + 1;
                 }
                 i.skip(reply_length - bytes_read);
@@ -677,10 +677,10 @@ public class Display {
 
         ExtensionInfo(ResponseInputStream in) {
 
-            present = in.read_bool();
-            major_opcode = in.read_int8();
-            first_event = in.read_int8();
-            first_error = in.read_int8();
+            present = in.readBool();
+            major_opcode = in.readInt8();
+            first_event = in.readInt8();
+            first_error = in.readInt8();
             // System.err.println("first error: " + first_error);
             // Thread.dumpStack ();
         }
@@ -731,14 +731,14 @@ public class Display {
         ExtensionInfo info;
         RequestOutputStream o = out;
         synchronized (o) {
-            o.begin_request(98, 0, 2 + (n + p) / 4);
-            o.write_int16(n);
+            o.beginRequest(98, 0, 2 + (n + p) / 4);
+            o.writeInt16(n);
             o.skip(2);
-            o.write_string8(name);
+            o.writeString8(name);
             o.skip(p);
             ResponseInputStream i = in;
             synchronized (i) {
-                i.read_reply(o);
+                i.readReply(o);
                 i.skip(8);
                 info = new ExtensionInfo(i);
                 i.skip(20);
@@ -759,20 +759,20 @@ public class Display {
         String[] exts;
         RequestOutputStream o = out;
         synchronized (o) {
-            o.begin_request(99, 9, 1);
+            o.beginRequest(99, 9, 1);
             ResponseInputStream i = in;
             synchronized (i) {
-                i.read_reply(o);
+                i.readReply(o);
                 i.skip(1);
-                int num_strs = i.read_int8();
+                int num_strs = i.readInt8();
                 i.skip(2);
-                int reply_length = i.read_int32() * 4;
+                int reply_length = i.readInt32() * 4;
                 exts = new String[num_strs];
                 i.skip(24);
                 int bytes_read = 0;
                 for (int j = 0; j < num_strs; j++) {
-                    int len = i.read_int8();
-                    exts[j] = i.read_string8(len);
+                    int len = i.readInt8();
+                    exts[j] = i.readString8(len);
                     bytes_read += len + 1;
                 }
                 i.skip(reply_length - bytes_read);
@@ -797,7 +797,7 @@ public class Display {
 
         RequestOutputStream o = out;
         synchronized (o) {
-            o.begin_request(104, percent, 1);
+            o.beginRequest(104, percent, 1);
             o.send();
         }
     }
@@ -823,11 +823,11 @@ public class Display {
 
         RequestOutputStream o = out;
         synchronized (o) {
-            o.begin_request(107, 0, 3);
-            o.write_int16(timeout);
-            o.write_int16(interval);
-            o.write_int8(prefer_blanking);
-            o.write_int8(allow_exposures);
+            o.beginRequest(107, 0, 3);
+            o.writeInt16(timeout);
+            o.writeInt16(interval);
+            o.writeInt8(prefer_blanking);
+            o.writeInt8(allow_exposures);
             o.skip(2);
             o.send();
         }
@@ -850,10 +850,10 @@ public class Display {
 
         ScreenSaverInfo(ResponseInputStream in) {
 
-            timeout = in.read_int16();
-            interval = in.read_int16();
-            prefer_blanking = in.read_bool();
-            allow_exposures = in.read_bool();
+            timeout = in.readInt16();
+            interval = in.readInt16();
+            prefer_blanking = in.readBool();
+            allow_exposures = in.readBool();
         }
 
         public int timeout() {
@@ -897,10 +897,10 @@ public class Display {
         ScreenSaverInfo info;
         RequestOutputStream o = out;
         synchronized (o) {
-            o.begin_request(108, 0, 1);
+            o.beginRequest(108, 0, 1);
             ResponseInputStream i = in;
             synchronized (i) {
-                i.read_reply(o);
+                i.readReply(o);
                 i.skip(8);
                 info = new ScreenSaverInfo(i);
                 i.skip(18);
@@ -927,11 +927,11 @@ public class Display {
 
         RequestOutputStream o = out;
         synchronized (o) {
-            o.begin_request(109, mode, 2 + (n + p) / 4);
-            o.write_int8(family);
+            o.beginRequest(109, mode, 2 + (n + p) / 4);
+            o.writeInt8(family);
             o.skip(1);
-            o.write_int16(n);
-            o.write_bytes(host);
+            o.writeInt16(n);
+            o.writeBytes(host);
             o.skip(p);
             o.send();
         }
@@ -962,11 +962,11 @@ public class Display {
          */
         Host(ResponseInputStream in) {
 
-            family = in.read_int8();
+            family = in.readInt8();
             in.skip(1);
-            int add_len = in.read_int16();
+            int add_len = in.readInt16();
             address = new byte[add_len];
-            in.read_data(address);
+            in.readData(address);
             in.pad(add_len);
         }
     }
@@ -985,9 +985,9 @@ public class Display {
 
         HostsInfo(ResponseInputStream in) {
 
-            mode = in.read_bool();
+            mode = in.readBool();
             in.skip(6);
-            int num_hosts = in.read_int16();
+            int num_hosts = in.readInt16();
             in.skip(22);
             hosts = new Host[num_hosts];
             for (int i = 0; i < num_hosts; i++)
@@ -1008,10 +1008,10 @@ public class Display {
         HostsInfo info;
         RequestOutputStream o = out;
         synchronized (o) {
-            o.begin_request(110, 0, 1);
+            o.beginRequest(110, 0, 1);
             ResponseInputStream i = in;
             synchronized (i) {
-                i.read_reply(o);
+                i.readReply(o);
                 i.skip(1);
                 info = new HostsInfo(i);
             }
@@ -1033,7 +1033,7 @@ public class Display {
 
         RequestOutputStream o = out;
         synchronized (o) {
-            o.begin_request(111, mode, 1);
+            o.beginRequest(111, mode, 1);
             o.send();
         }
     }
@@ -1046,8 +1046,8 @@ public class Display {
 
         RequestOutputStream o = out;
         synchronized (o) {
-            o.begin_request(113, 0, 2);
-            o.write_int32(resource.id);
+            o.beginRequest(113, 0, 2);
+            o.writeInt32(resource.id);
             o.send();
         }
     }
@@ -1069,7 +1069,7 @@ public class Display {
 
         RequestOutputStream o = out;
         synchronized (o) {
-            o.begin_request(112, mode, 1);
+            o.beginRequest(112, mode, 1);
             o.send();
         }
     }
@@ -1088,7 +1088,7 @@ public class Display {
 
         RequestOutputStream o = out;
         synchronized (o) {
-            o.begin_request(115, mode, 1);
+            o.beginRequest(115, mode, 1);
             o.send();
         }
     }
@@ -1228,7 +1228,7 @@ public class Display {
      */
     private void init_server_info(ResponseInputStream i) throws EscherServerConnectionException {
 
-        int accepted = i.read_int8();
+        int accepted = i.readInt8();
         boolean connectionFailed = false;
         StringBuilder debugMessage = new StringBuilder();
         switch (accepted) {
@@ -1261,7 +1261,7 @@ public class Display {
         int failedLength = 0;
         if (connectionFailed) {
             // length of reason
-            failedLength = i.read_byte();
+            failedLength = i.readByte();
 
         } else {
             // Unused.
@@ -1286,7 +1286,7 @@ public class Display {
 
                 int reason = 0;
                 for (int n = 0; n < failedLength; n++) {
-                    reason = i.read_int32();
+                    reason = i.readInt32();
 
                     debugMessage.append("XServer returned error code: " +
                                         reason + "\n");
@@ -1306,29 +1306,29 @@ public class Display {
             		                              "XServer failed.");
         }
 
-        release_no = i.read_int32();
-        resource_base = i.read_int32();
-        resource_mask = i.read_int32();
+        release_no = i.readInt32();
+        resource_base = i.readInt32();
+        resource_mask = i.readInt32();
         i.skip(4); // motion-buffer-size.
 
-        int vendor_length = i.read_int16();
-        maximum_request_length = i.read_int16();
+        int vendor_length = i.readInt16();
+        maximum_request_length = i.readInt16();
         extended_maximum_request_length = maximum_request_length;
         
-        int screen_count = i.read_int8();
-        int pixmap_format_count = i.read_int8();
+        int screen_count = i.readInt8();
+        int pixmap_format_count = i.readInt8();
 
-        image_byte_order = i.read_int8();
+        image_byte_order = i.readInt8();
         
-        bitmap_format_bit_order = i.read_int8();
-        bitmap_format_scanline_unit = i.read_int8();
-        bitmap_format_scanline_pad = i.read_int8();
+        bitmap_format_bit_order = i.readInt8();
+        bitmap_format_scanline_unit = i.readInt8();
+        bitmap_format_scanline_pad = i.readInt8();
 
-        min_keycode = i.read_int8();
-        max_keycode = i.read_int8();
+        min_keycode = i.readInt8();
+        max_keycode = i.readInt8();
         i.skip(4); // Unused.
 
-        vendor = i.read_string8(vendor_length);
+        vendor = i.readString8(vendor_length);
         i.pad(vendor_length);
 
         /* ***** FORMAT ***** */
@@ -1360,7 +1360,7 @@ public class Display {
 
     public Event next_event() {
 
-        return in.read_event();
+        return in.readEvent();
     }
 
     public String toString() {

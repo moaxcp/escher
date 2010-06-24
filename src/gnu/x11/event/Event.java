@@ -70,9 +70,9 @@ public abstract class Event {
    */
   public Event (Display display, ResponseInputStream in) {
     this.display = display;
-    code = in.read_int8 ();
-    detail = in.read_int8 ();
-    sequence_number = in.read_int16();
+    code = in.readInt8 ();
+    detail = in.readInt8 ();
+    sequence_number = in.readInt16();
   }
 
 
@@ -101,9 +101,9 @@ public abstract class Event {
    * @param o the output stream to write to
    */
   public void write (RequestOutputStream o) {
-    o.write_int8 (code);
-    o.write_int8 (detail);
-    o.write_int16 (sequence_number); // Is this correct?
+    o.writeInt8 (code);
+    o.writeInt8 (detail);
+    o.writeInt16 (sequence_number); // Is this correct?
 
     // The remaining pieces must be written by the subclasses.
   }

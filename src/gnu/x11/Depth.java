@@ -13,9 +13,9 @@ public class Depth {
 
         this.screen = screen;
         
-        depth = in.read_int8();
+        depth = in.readInt8();
         in.skip(1);
-        int visualCount = in.read_int16();
+        int visualCount = in.readInt16();
         in.skip(4);
 
         visualTypes = new VisualInfo[visualCount];

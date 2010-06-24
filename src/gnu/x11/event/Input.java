@@ -37,16 +37,16 @@ public abstract class Input extends Event {
 
         super(display, in);
         
-        this.time = in.read_int32();
-        this.root_window_id = in.read_int32();
-        this.event_window_id = in.read_int32();
-        this.child_window_id = in.read_int32();
-        this.root_x = in.read_int16();
-        this.root_y = in.read_int16();
-        this.event_x = in.read_int16();
-        this.event_y = in.read_int16();
-        this.state = in.read_int16();
-        this.same_screen = in.read_bool();
+        this.time = in.readInt32();
+        this.root_window_id = in.readInt32();
+        this.event_window_id = in.readInt32();
+        this.child_window_id = in.readInt32();
+        this.root_x = in.readInt16();
+        this.root_y = in.readInt16();
+        this.event_x = in.readInt16();
+        this.event_y = in.readInt16();
+        this.state = in.readInt16();
+        this.same_screen = in.readBool();
         
         in.skip(1); // Unused.
     }
@@ -291,16 +291,16 @@ public abstract class Input extends Event {
     public void write(RequestOutputStream o) {
 
         super.write(o);
-        o.write_int32(time);
-        o.write_int32(root_window_id);
-        o.write_int32(event_window_id);
-        o.write_int32(child_window_id);
-        o.write_int16(root_x);
-        o.write_int16(root_y);
-        o.write_int16(event_x);
-        o.write_int16(event_y);
-        o.write_int16(state);
-        o.write_bool(same_screen);
+        o.writeInt32(time);
+        o.writeInt32(root_window_id);
+        o.writeInt32(event_window_id);
+        o.writeInt32(child_window_id);
+        o.writeInt16(root_x);
+        o.writeInt16(root_y);
+        o.writeInt16(event_x);
+        o.writeInt16(event_y);
+        o.writeInt16(state);
+        o.writeBool(same_screen);
         o.skip(1); // Unused.
 
     }

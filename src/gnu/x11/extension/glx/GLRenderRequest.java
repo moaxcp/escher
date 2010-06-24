@@ -43,9 +43,9 @@ class GLRenderRequest implements RequestObject {
    */
   public void write(RequestOutputStream s) {
     // Update the length field.
-    s.set_index (2);
+    s.setIndex (2);
     int length = index / 4 + 1;
-    s.write_int16 (length);
+    s.writeInt16 (length);
     // And write it out.
     s.write(buffer, 0, index);
     //s.send ();

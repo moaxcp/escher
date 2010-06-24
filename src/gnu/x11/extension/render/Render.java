@@ -71,15 +71,15 @@ public class Render extends gnu.x11.extension.Extension
     // check version before any other operations
     RequestOutputStream o = display.out;
     synchronized (o) {
-      o.begin_request (major_opcode, 0, 3);
-      o.write_int32 (CLIENT_MAJOR_VERSION);
-      o.write_int32 (CLIENT_MINOR_VERSION);
+      o.beginRequest (major_opcode, 0, 3);
+      o.writeInt32 (CLIENT_MAJOR_VERSION);
+      o.writeInt32 (CLIENT_MINOR_VERSION);
       ResponseInputStream i = display.in;
       synchronized (i) {
-        i.read_reply (o);
+        i.readReply (o);
         i.skip (8);
-        server_major_version = i.read_int32 ();
-        server_minor_version = i.read_int32 ();
+        server_major_version = i.readInt32 ();
+        server_minor_version = i.readInt32 ();
         i.skip (16);
       }
     }
@@ -92,12 +92,12 @@ public class Render extends gnu.x11.extension.Extension
     if (picture_formats_cache == null) {
       RequestOutputStream o = display.out;
       synchronized (o) {
-        o.begin_request (major_opcode, 1, 1);
+        o.beginRequest (major_opcode, 1, 1);
         ResponseInputStream i = display.in;
         synchronized (i) {
-          i.read_reply (o);
+          i.readReply (o);
           i.skip (8);
-          int count = i.read_int32 ();
+          int count = i.readInt32 ();
           i.skip (20);
           PictFormat [] pfs = new PictFormat [count];
           for (int idx = 0; idx < count; idx++) {
@@ -117,7 +117,7 @@ public class Render extends gnu.x11.extension.Extension
   public void picture_index_values () {
     RequestOutputStream o = display.out;
     synchronized (o) {
-      o.begin_request (major_opcode, 2, 2);
+      o.beginRequest (major_opcode, 2, 2);
       o.send ();
     }
   }
@@ -127,7 +127,7 @@ public class Render extends gnu.x11.extension.Extension
   public void dithers (Drawable drawable) {
     RequestOutputStream o = display.out;
     synchronized (o) {
-      o.begin_request (major_opcode, 3, 2);
+      o.beginRequest (major_opcode, 3, 2);
       o.send ();
     }
   }
@@ -178,20 +178,20 @@ public class Render extends gnu.x11.extension.Extension
 
     RequestOutputStream o = display.out;
     synchronized (o) {
-      o.begin_request (major_opcode, 8, 9);
-      o.write_int8 (op);
+      o.beginRequest (major_opcode, 8, 9);
+      o.writeInt8 (op);
       o.skip (3);
-      o.write_int32 (src.id);
-      o.write_int32 (mask.id);
-      o.write_int32 (dst.id);
-      o.write_int16 (src_x);
-      o.write_int16 (src_y);
-      o.write_int16 (mask_x);
-      o.write_int16 (mask_y);
-      o.write_int16 (dst_x);
-      o.write_int16 (dst_y);
-      o.write_int16 (width);
-      o.write_int16 (height);
+      o.writeInt32 (src.id);
+      o.writeInt32 (mask.id);
+      o.writeInt32 (dst.id);
+      o.writeInt16 (src_x);
+      o.writeInt16 (src_y);
+      o.writeInt16 (mask_x);
+      o.writeInt16 (mask_y);
+      o.writeInt16 (dst_x);
+      o.writeInt16 (dst_y);
+      o.writeInt16 (width);
+      o.writeInt16 (height);
       o.send ();
     }
   }
@@ -205,21 +205,21 @@ public class Render extends gnu.x11.extension.Extension
     RequestOutputStream o = display.out;
     synchronized (o) {
       int len = 9 + glyphs.length;
-      o.begin_request (major_opcode, 25, len);
-      o.write_int8 (op);
+      o.beginRequest (major_opcode, 25, len);
+      o.writeInt8 (op);
       o.skip (3);
-      o.write_int32 (src.id ());
-      o.write_int32 (dst.id ());
-      o.write_int32 (mask_format.id ());
-      o.write_int32 (glyphset.id ());
-      o.write_int16 (src_x);
-      o.write_int16 (src_y);
-      o.write_int8 (glyphs.length);
+      o.writeInt32 (src.id ());
+      o.writeInt32 (dst.id ());
+      o.writeInt32 (mask_format.id ());
+      o.writeInt32 (glyphset.id ());
+      o.writeInt16 (src_x);
+      o.writeInt16 (src_y);
+      o.writeInt8 (glyphs.length);
       o.skip(3);
-      o.write_int16 (dst_x);
-      o.write_int16 (dst_y);
+      o.writeInt16 (dst_x);
+      o.writeInt16 (dst_y);
       for (int i = 0; i < glyphs.length; i++) {
-        o.write_int32 (glyphs [i].get_id ());
+        o.writeInt32 (glyphs [i].get_id ());
       }
     }
   }
@@ -274,12 +274,12 @@ public class Render extends gnu.x11.extension.Extension
     RequestOutputStream o = display.out;
     Picture pic = new Picture (display);
     synchronized (o) {
-      o.begin_request (major_opcode, 33, 4);
-      o.write_int32 (pic.id ());
-      o.write_int16 (red);
-      o.write_int16 (green);
-      o.write_int16 (blue);
-      o.write_int16 (alpha);
+      o.beginRequest (major_opcode, 33, 4);
+      o.writeInt32 (pic.id ());
+      o.writeInt16 (red);
+      o.writeInt16 (green);
+      o.writeInt16 (blue);
+      o.writeInt16 (alpha);
       o.send ();
     }
     return pic;

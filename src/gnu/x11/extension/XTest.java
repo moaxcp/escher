@@ -38,17 +38,17 @@ public class XTest extends Extension {
 
     RequestOutputStream o = display.out;
     synchronized (o) {
-      o.begin_request (major_opcode, 0, 2);
-      o.write_int8 (CLIENT_MAJOR_VERSION);
+      o.beginRequest (major_opcode, 0, 2);
+      o.writeInt8 (CLIENT_MAJOR_VERSION);
       o.skip (1);
-      o.write_int16 (CLIENT_MINOR_VERSION);
+      o.writeInt16 (CLIENT_MINOR_VERSION);
       ResponseInputStream i = display.in;
       synchronized (i) {
-        i.read_reply (o);
+        i.readReply (o);
         i.skip (1);
-        server_major_version = i.read_int8 ();
+        server_major_version = i.readInt8 ();
         i.skip (6);
-        server_minor_version = i.read_int16 ();
+        server_minor_version = i.readInt16 ();
         i.skip (22);
       }
     }
@@ -69,14 +69,14 @@ public class XTest extends Extension {
     boolean same;
     RequestOutputStream o = display.out;
     synchronized (o) {
-      o.begin_request (major_opcode, 1, 3);
-      o.write_int32 (window.id);
-      o.write_int32 (cursor.id);
+      o.beginRequest (major_opcode, 1, 3);
+      o.writeInt32 (window.id);
+      o.writeInt32 (cursor.id);
       ResponseInputStream i = display.in;
       synchronized (i) {
-        i.read_reply (o);
+        i.readReply (o);
         i.skip (1);
-        same = i.read_bool ();
+        same = i.readBool ();
         i.skip (30);
       }
     }
@@ -107,15 +107,15 @@ public class XTest extends Extension {
 
     RequestOutputStream o = display.out;
     synchronized (o) {
-      o.begin_request (major_opcode, 2, 9);
-      o.write_int8 (type);
-      o.write_int8 (detail);
+      o.beginRequest (major_opcode, 2, 9);
+      o.writeInt8 (type);
+      o.writeInt8 (detail);
       o.skip (2);
-      o.write_int32 (delay);
-      o.write_int32 (root.id);
+      o.writeInt32 (delay);
+      o.writeInt32 (root.id);
       o.skip (8);
-      o.write_int16 (x);
-      o.write_int16 (y);
+      o.writeInt16 (x);
+      o.writeInt16 (y);
       o.send ();
     }
   }
@@ -129,8 +129,8 @@ public class XTest extends Extension {
 
     RequestOutputStream o = display.out;
     synchronized (o) {
-      o.begin_request (major_opcode, 3, 2);
-      o.write_bool (impervious);
+      o.beginRequest (major_opcode, 3, 2);
+      o.writeBool (impervious);
       o.send ();
     }
   }

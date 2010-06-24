@@ -14,9 +14,9 @@ public final class MappingNotify extends Event {
 
   public MappingNotify (Display display, ResponseInputStream in) {
     super (display, in);
-    request = in.read_int8 ();
-    first_keycode = in.read_int8 ();
-    count = in.read_int8 ();
+    request = in.readInt8 ();
+    first_keycode = in.readInt8 ();
+    count = in.readInt8 ();
     in.skip (25);
   }
 }

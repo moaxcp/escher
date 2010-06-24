@@ -19,10 +19,10 @@ public final class PropertyNotify extends Event {
 
   public PropertyNotify (Display display, ResponseInputStream in) {
     super (display, in);
-    window_id = in.read_int32 ();
-    atom_id = in.read_int32 ();
-    time = in.read_int32 ();
-    state = in.read_int8 ();
+    window_id = in.readInt32 ();
+    atom_id = in.readInt32 ();
+    time = in.readInt32 ();
+    state = in.readInt8 ();
     in.skip (15);
   }
 

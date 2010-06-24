@@ -43,16 +43,16 @@ public class DPMS extends Extension {
     // check version before any other operations
     RequestOutputStream o = display.out;
     synchronized (o) {
-      o.begin_request (major_opcode, 0, 2);
-      o.write_int16 (CLIENT_MAJOR_VERSION);
-      o.write_int16 (CLIENT_MINOR_VERSION);
+      o.beginRequest (major_opcode, 0, 2);
+      o.writeInt16 (CLIENT_MAJOR_VERSION);
+      o.writeInt16 (CLIENT_MINOR_VERSION);
 
       ResponseInputStream i = display.in;
       synchronized (i) {
-        i.read_reply (o);
+        i.readReply (o);
         i.skip (8);
-        server_major_version = i.read_int16 ();
-        server_minor_version = i.read_int16 ();
+        server_major_version = i.readInt16 ();
+        server_minor_version = i.readInt16 ();
         i.skip (20);
       }
     }
@@ -74,11 +74,11 @@ public class DPMS extends Extension {
     boolean capable;
     RequestOutputStream o = display.out;
     synchronized (o) {
-      o.begin_request (major_opcode, 1, 1);
+      o.beginRequest (major_opcode, 1, 1);
       ResponseInputStream i = display.in;
       synchronized (i) {
         i.skip (8);
-        capable = i.read_bool ();
+        capable = i.readBool ();
         i.skip (23);
       }
     }
@@ -93,9 +93,9 @@ public class DPMS extends Extension {
     public int suspend;
     public int off;
     TimeoutsInfo (ResponseInputStream i) {
-      standby = i.read_int16 ();
-      suspend = i.read_int16 ();
-      off = i.read_int16 ();
+      standby = i.readInt16 ();
+      suspend = i.readInt16 ();
+      off = i.readInt16 ();
     }
 
     public String toString () {
@@ -115,7 +115,7 @@ public class DPMS extends Extension {
     TimeoutsInfo info;
     RequestOutputStream o = display.out;
     synchronized (o) {
-      o.begin_request (major_opcode, 2, 1);
+      o.beginRequest (major_opcode, 2, 1);
       ResponseInputStream i = display.in;
       synchronized (i) {
         i.skip (8);
@@ -135,10 +135,10 @@ public class DPMS extends Extension {
 
     RequestOutputStream o = display.out;
     synchronized (o) {
-      o.begin_request (major_opcode, 3, 3);
-      o.write_int16 (standby);
-      o.write_int16 (suspend);
-      o.write_int16 (off);
+      o.beginRequest (major_opcode, 3, 3);
+      o.writeInt16 (standby);
+      o.writeInt16 (suspend);
+      o.writeInt16 (off);
       o.skip (2);
       o.send ();
     }
@@ -152,7 +152,7 @@ public class DPMS extends Extension {
   public void enable () {
     RequestOutputStream o = display.out;
     synchronized (o) {
-      o.begin_request (major_opcode, 4, 1);
+      o.beginRequest (major_opcode, 4, 1);
       o.send ();
     }
   }
@@ -165,7 +165,7 @@ public class DPMS extends Extension {
   public void disable () {
     RequestOutputStream o = display.out;
     synchronized (o) {
-      o.begin_request (major_opcode, 5, 1);
+      o.beginRequest (major_opcode, 5, 1);
       o.send ();
     }
   }
@@ -194,8 +194,8 @@ public class DPMS extends Extension {
   public void force_level (int level) {
     RequestOutputStream o = display.out;
     synchronized (o) {
-      o.begin_request (major_opcode, 6, 2);
-      o.write_int16 (level);
+      o.beginRequest (major_opcode, 6, 2);
+      o.writeInt16 (level);
       o.send ();
     }
   }
@@ -211,8 +211,8 @@ public class DPMS extends Extension {
     boolean state;
 
     Info (ResponseInputStream i) {
-      power_level = i.read_int16 ();
-      state = i.read_bool ();
+      power_level = i.readInt16 ();
+      state = i.readBool ();
     } 
 
     public String toString () {
@@ -231,10 +231,10 @@ public class DPMS extends Extension {
     Info info;
     RequestOutputStream o = display.out;
     synchronized (o) {
-      o.begin_request (major_opcode, 7, 1);
+      o.beginRequest (major_opcode, 7, 1);
       ResponseInputStream i = display.in;
       synchronized (i) {
-        i.read_reply (o);
+        i.readReply (o);
         i.skip (8);
         info = new Info (i);
         i.skip (21);

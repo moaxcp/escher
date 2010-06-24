@@ -17,10 +17,10 @@ public final class ClientMessage extends Event {
   /** Reading. */
   public ClientMessage (Display display, ResponseInputStream in) {
     super (display, in); 
-    window_id = in.read_int32 ();
-    type_atom_id = in.read_int32 ();
+    window_id = in.readInt32 ();
+    type_atom_id = in.readInt32 ();
     data = new byte[20];
-    in.read_data(data);
+    in.readData(data);
   }
 
 

@@ -16,9 +16,9 @@ public final class ResizeRequest extends Event {
   
   public ResizeRequest (Display display, ResponseInputStream in) {
     super (display, in);
-    window_id = in.read_int32 ();
-    width = in.read_int16 ();
-    height = in.read_int16 ();
+    window_id = in.readInt32 ();
+    width = in.readInt16 ();
+    height = in.readInt16 ();
     in.skip (20);
   }
 

@@ -58,8 +58,8 @@ public class Input {
   public void ungrab_pointer (int time) {
     RequestOutputStream o = display.out;
     synchronized (o) {
-      o.begin_request (27, 0, 2);
-      o.write_int32 (time);
+      o.beginRequest (27, 0, 2);
+      o.writeInt32 (time);
       o.send ();
     }
   }
@@ -77,10 +77,10 @@ public class Input {
 
     RequestOutputStream o = display.out;
     synchronized (o) {
-      o.begin_request (30, 0, 4);
-      o.write_int32 (cursor.id);
-      o.write_int32 (time);
-      o.write_int16 (event_mask);
+      o.beginRequest (30, 0, 4);
+      o.writeInt32 (cursor.id);
+      o.writeInt32 (time);
+      o.writeInt16 (event_mask);
       o.send ();
     }
   }
@@ -95,8 +95,8 @@ public class Input {
 
     RequestOutputStream o = display.out;
     synchronized (o) {
-      o.begin_request (32, 0, 2);
-      o.write_int32 (time);
+      o.beginRequest (32, 0, 2);
+      o.writeInt32 (time);
       o.send ();
     }
   }
@@ -131,8 +131,8 @@ public class Input {
 
     RequestOutputStream o = display.out;
     synchronized (o) {
-      o.begin_request (35, mode, 2);
-      o.write_int32 (time);
+      o.beginRequest (35, mode, 2);
+      o.writeInt32 (time);
       o.send ();
     }
   }
@@ -146,9 +146,9 @@ public class Input {
     public Window focus;
 
     InputFocusInfo (ResponseInputStream i) {
-      revert_to = i.read_int8 ();
+      revert_to = i.readInt8 ();
       i.skip (6);
-      focus_id = i.read_int32 ();
+      focus_id = i.readInt32 ();
       if (focus_id != 0 && focus_id != 1)
         focus = (Window) Window.intern (display, focus_id);
     }
@@ -164,10 +164,10 @@ public class Input {
     InputFocusInfo info;
     RequestOutputStream o = display.out;
     synchronized (o) {
-      o.begin_request (43, 0, 1);
+      o.beginRequest (43, 0, 1);
       ResponseInputStream i = display.in;
       synchronized (i) {
-        i.read_reply (o);
+        i.readReply (o);
         i.skip (1);
         info = new InputFocusInfo (i);
         i.skip (20);
@@ -186,12 +186,12 @@ public class Input {
     RequestOutputStream o = display.out;
     byte [] data = new byte [32];
     synchronized (o) {
-      o.begin_request (44, 0, 1);
+      o.beginRequest (44, 0, 1);
       ResponseInputStream i = display.in;
       synchronized (i) {
-        i.read_reply (o);
+        i.readReply (o);
         i.skip (8);
-        i.read_data (data);
+        i.readData (data);
       }
     }
     return data;
@@ -209,13 +209,13 @@ public class Input {
 
     RequestOutputStream o = display.out;
     synchronized (o) {
-      o.begin_request (100, keycode_count, 2 + keysyms.length);
-      o.write_int8 (first_keycode);
-      o.write_int8 (keysyms_per_keycode);
+      o.beginRequest (100, keycode_count, 2 + keysyms.length);
+      o.writeInt8 (first_keycode);
+      o.writeInt8 (keysyms_per_keycode);
       o.skip (2);
 
       for (int i = 0; i < keysyms.length; i++)
-        o.write_int8 (keysyms [i]);
+        o.writeInt8 (keysyms [i]);
 
       o.send ();
     }
@@ -232,24 +232,24 @@ public class Input {
 
     RequestOutputStream o = display.out;
     synchronized (o) {
-      o.begin_request (101, 0, 2);
-      o.write_int8 (min_keycode);
-      o.write_int8 (keysym_count);
-      o.write_int16 (0); // Unused.
+      o.beginRequest (101, 0, 2);
+      o.writeInt8 (min_keycode);
+      o.writeInt8 (keysym_count);
+      o.writeInt16 (0); // Unused.
 
       ResponseInputStream in = display.in;
       synchronized (in) {
-        in.read_reply (o);
+        in.readReply (o);
         in.skip (1);
-        keysyms_per_keycode = in.read_int8 ();
+        keysyms_per_keycode = in.readInt8 ();
         in.skip (2); // Unused.
-        int nm = in.read_int32 (); // length.
+        int nm = in.readInt32 (); // length.
         assert nm == keysyms_per_keycode * keysym_count;
         in.skip (24); // Unused.
         keysyms = new int [nm];
 
         for (int i = 0; i < nm; i++) {
-          keysyms [i] = in.read_int32 ();
+          keysyms [i] = in.readInt32 ();
         }
       }
     }
@@ -269,16 +269,16 @@ public class Input {
     public byte[] auto_repeats;
 
     KeyboardControlInfo (ResponseInputStream i) {
-      global_auto_repeat = i.read_bool ();
+      global_auto_repeat = i.readBool ();
       i.skip (6);
-      led_mask = i.read_int32 ();
-      key_click_percent = i.read_int8 ();
-      bell_percent = i.read_int8 ();
-      bell_pitch = i.read_int16 ();
-      bell_duration = i.read_int16 ();
+      led_mask = i.readInt32 ();
+      key_click_percent = i.readInt8 ();
+      bell_percent = i.readInt8 ();
+      bell_pitch = i.readInt16 ();
+      bell_duration = i.readInt16 ();
       i.skip (2);
       auto_repeats = new byte [32];
-      i.read_data (auto_repeats);
+      i.readData (auto_repeats);
     }
   }
   
@@ -304,8 +304,8 @@ public class Input {
   public void change_keyboard_control (KeyboardControl control) {
     RequestOutputStream o = display.out;
     synchronized (o) {
-      o.begin_request (102, 0, 2 + control.count ());
-      o.write_int32 (control.bitmask);
+      o.beginRequest (102, 0, 2 + control.count ());
+      o.writeInt32 (control.bitmask);
       control.write (o);
       o.send ();
     }
@@ -320,10 +320,10 @@ public class Input {
     KeyboardControlInfo info;
     RequestOutputStream o = display.out;
     synchronized (o) {
-      o.begin_request (103, 0, 1);
+      o.beginRequest (103, 0, 1);
       ResponseInputStream i = display.in;
       synchronized (i) {
-        i.read_reply (o);
+        i.readReply (o);
         i.skip (1);
         info = new KeyboardControlInfo (i);
       }
@@ -342,12 +342,12 @@ public class Input {
 
     RequestOutputStream o = display.out;
     synchronized (o) {
-      o.begin_request (105, 0, 3);
-      o.write_int16 (accel_numerator);
-      o.write_int16 (accel_denominator);
-      o.write_int16 (threshold);
-      o.write_bool (do_accel);
-      o.write_bool (do_threshold);
+      o.beginRequest (105, 0, 3);
+      o.writeInt16 (accel_numerator);
+      o.writeInt16 (accel_denominator);
+      o.writeInt16 (threshold);
+      o.writeBool (do_accel);
+      o.writeBool (do_threshold);
       o.send ();
     }
   }
@@ -361,9 +361,9 @@ public class Input {
     public int treshold;
 
     PointerControlInfo (ResponseInputStream i) {
-      acceleration_numerator = i.read_int16 ();
-      acceleration_denominator = i.read_int16 ();
-      treshold = i.read_int16 ();
+      acceleration_numerator = i.readInt16 ();
+      acceleration_denominator = i.readInt16 ();
+      treshold = i.readInt16 ();
     }
   }
   
@@ -376,10 +376,10 @@ public class Input {
     PointerControlInfo info;
     RequestOutputStream o = display.out;
     synchronized (o) {
-      o.begin_request (106, 0, 1);
+      o.beginRequest (106, 0, 1);
       ResponseInputStream i = display.in;
       synchronized (i) {
-        i.read_reply (o);
+        i.readReply (o);
         i.skip (8);
         info = new PointerControlInfo (i);
         i.skip(18);
@@ -410,14 +410,14 @@ public class Input {
 
     RequestOutputStream o = display.out;
     synchronized (o) {
-      o.begin_request (116, map.length, 1 + (n + p) / 4);
-      o.write_bytes (map);
+      o.beginRequest (116, map.length, 1 + (n + p) / 4);
+      o.writeBytes (map);
       o.skip (p);
       ResponseInputStream i = display.in;
       synchronized (i) {
-        i.read_reply (o);
+        i.readReply (o);
         i.skip (1);
-        status = i.read_int8 ();
+        status = i.readInt8 ();
         i.skip (30);
       }
     }
@@ -434,15 +434,15 @@ public class Input {
     byte [] map;
     RequestOutputStream o = display.out;
     synchronized (o) {
-      o.begin_request (117, 0, 1);
+      o.beginRequest (117, 0, 1);
       ResponseInputStream i = display.in;
       synchronized (i) {
-        i.read_reply (o);
+        i.readReply (o);
         i.skip (1);
-        int len = i.read_int8 ();
+        int len = i.readInt8 ();
         i.skip (30);
         map = new byte [len];
-        i.read_data (map);
+        i.readData (map);
       }
     }
     return map;
@@ -467,14 +467,14 @@ public class Input {
     int status;
     RequestOutputStream o = display.out;
     synchronized (o) {
-      o.begin_request (118, keycodes_per_modifier,
+      o.beginRequest (118, keycodes_per_modifier,
                        1 + 2 * keycodes_per_modifier);
       o.write (keycodes);
       ResponseInputStream i = display.in;
       synchronized (i) {
-        i.read_reply (o);
+        i.readReply (o);
         i.skip (1);
-        status = i.read_int8 ();
+        status = i.readInt8 ();
         i.skip (30);
       }
     }
@@ -487,10 +487,10 @@ public class Input {
     byte [] map;
 
     ModifierMapping (ResponseInputStream i) {
-      keycodes_per_modifier = i.read_int8 ();
+      keycodes_per_modifier = i.readInt8 ();
       i.skip (30);
       map = new byte [keycodes_per_modifier * 8];
-      i.read_data (map);
+      i.readData (map);
     }
   }
 
@@ -505,10 +505,10 @@ public class Input {
 
     RequestOutputStream o = display.out;
     synchronized (o) {
-      o.begin_request (119, 0, 1);
+      o.beginRequest (119, 0, 1);
       ResponseInputStream i = display.in;
       synchronized (i) {
-        i.read_reply (o);
+        i.readReply (o);
         i.skip (1);
         map = new ModifierMapping (i);        
       }

@@ -15,9 +15,9 @@ public final class UnmapNotify extends Event {
   /** Reading. */
   public UnmapNotify (Display display, ResponseInputStream in) {
     super (display, in);
-    event_window_id = in.read_int32 ();
-    window_id = in.read_int32 ();
-    from_configure = in.read_bool ();
+    event_window_id = in.readInt32 ();
+    window_id = in.readInt32 ();
+    from_configure = in.readBool ();
     in.skip (19);
   }
 

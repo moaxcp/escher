@@ -40,10 +40,10 @@ public class GC extends Fontable {
      */
     public void write (RequestOutputStream s) {
 
-      s.set_index (2);
-      s.write_int16 (3 + values.count());
-      s.write_int32 (GC.this.id);
-      s.write_int32 (values.bitmask);
+      s.setIndex (2);
+      s.writeInt16 (3 + values.count());
+      s.writeInt32 (GC.this.id);
+      s.writeInt32 (values.bitmask);
       values.write (s);
     }
     
@@ -379,10 +379,10 @@ public class GC extends Fontable {
 
     RequestOutputStream o = display.out;
     synchronized (o) {
-      o.begin_request(55, 0, 4 + values.count());
-      o.write_int32 (id);
-      o.write_int32 (drawable.id);
-      o.write_int32 (values.bitmask);
+      o.beginRequest(55, 0, 4 + values.count());
+      o.writeInt32 (id);
+      o.writeInt32 (drawable.id);
+      o.writeInt32 (values.bitmask);
       values.write (o);
       o.send ();
     }
@@ -401,7 +401,7 @@ public class GC extends Fontable {
 
     RequestOutputStream o = display.out;
     synchronized (o) {
-      o.begin_request (56, 0, 0);
+      o.beginRequest (56, 0, 0);
       ChangeGCRequestObject cr = new ChangeGCRequestObject (values);
       cr.write(o);
       o.send ();
@@ -423,10 +423,10 @@ public class GC extends Fontable {
 
     RequestOutputStream o = display.out;
     synchronized (o) {
-      o.begin_request (57, 0, 4);
-      o.write_int32 (id); // Src-ID.
-      o.write_int32 (dest.id); // Dst-ID.
-      o.write_int32 (mask);
+      o.beginRequest (57, 0, 4);
+      o.writeInt32 (id); // Src-ID.
+      o.writeInt32 (dest.id); // Dst-ID.
+      o.writeInt32 (mask);
       o.send ();
     }
 
@@ -449,15 +449,15 @@ public class GC extends Fontable {
 
     RequestOutputStream o = display.out;
     synchronized (o) {
-      o.begin_request (58, 0, 3 + (n + p) / 4);
+      o.beginRequest (58, 0, 3 + (n + p) / 4);
 
-      o.write_int32 (id); // The GC id.
-      o.write_int16 (dash_offset); // The dash offset.
-      o.write_int16 (n); // The number of dashes.
-      o.write_bytes (dashes); // The actual dashes.
+      o.writeInt32 (id); // The GC id.
+      o.writeInt16 (dash_offset); // The dash offset.
+      o.writeInt16 (n); // The number of dashes.
+      o.writeBytes (dashes); // The actual dashes.
 
       for (int i = 0; i < p; i++)
-        o.write_int8 (0); // Pad.
+        o.writeInt8 (0); // Pad.
 
       o.send ();
     }
@@ -485,16 +485,16 @@ public class GC extends Fontable {
 
     RequestOutputStream o = display.out;
     synchronized (o) {
-      o.begin_request (59, ordering, 3+2*rectangles.length);
-      o.write_int32 (id);
-      o.write_int16 (clip_x_origin);
-      o.write_int16 (clip_y_origin);
+      o.beginRequest (59, ordering, 3+2*rectangles.length);
+      o.writeInt32 (id);
+      o.writeInt16 (clip_x_origin);
+      o.writeInt16 (clip_y_origin);
 
       for (int i = 0; i < rectangles.length; i++) {
-        o.write_int16 (rectangles [i].x);
-        o.write_int16 (rectangles [i].y);
-        o.write_int16 (rectangles [i].width);
-        o.write_int16 (rectangles [i].height);
+        o.writeInt16 (rectangles [i].x);
+        o.writeInt16 (rectangles [i].y);
+        o.writeInt16 (rectangles [i].width);
+        o.writeInt16 (rectangles [i].height);
       }
       o.send ();
     }
@@ -508,8 +508,8 @@ public class GC extends Fontable {
   public void free () {
     RequestOutputStream o = display.out;
     synchronized (o) {
-      o.begin_request (60, 0, 2);
-      o.write_int32 (id);
+      o.beginRequest (60, 0, 2);
+      o.writeInt32 (id);
       o.send ();
     }
   }
@@ -570,7 +570,7 @@ public class GC extends Fontable {
         ChangeGCRequestObject r = (ChangeGCRequestObject) o.request_object;
         r.values.set_arc_mode (i);
       } else {
-        o.begin_request (56, 0, 0);
+        o.beginRequest (56, 0, 0);
         changeGCRequest.clear ();
         changeGCRequest.values.set_arc_mode (i);
         o.request_object = changeGCRequest;
@@ -600,7 +600,7 @@ public class GC extends Fontable {
         ChangeGCRequestObject r = (ChangeGCRequestObject) o.request_object;
         r.values.set_background (pixel);
       } else {
-        o.begin_request (56, 0, 0);
+        o.beginRequest (56, 0, 0);
         changeGCRequest.clear ();
         changeGCRequest.values.set_background (pixel);
         o.request_object = changeGCRequest;
@@ -622,7 +622,7 @@ public class GC extends Fontable {
         ChangeGCRequestObject r = (ChangeGCRequestObject) o.request_object;
         r.values.set_cap_style (i);
       } else {
-        o.begin_request (56, 0, 0);
+        o.beginRequest (56, 0, 0);
         changeGCRequest.clear ();
         changeGCRequest.values.set_cap_style (i);
         o.request_object = changeGCRequest;
@@ -644,7 +644,7 @@ public class GC extends Fontable {
         ChangeGCRequestObject r = (ChangeGCRequestObject) o.request_object;
         r.values.set_clip_mask (pixmap);
       } else {
-        o.begin_request (56, 0, 0);
+        o.beginRequest (56, 0, 0);
         changeGCRequest.clear ();
         changeGCRequest.values.set_clip_mask (pixmap);
         o.request_object = changeGCRequest;
@@ -666,7 +666,7 @@ public class GC extends Fontable {
         ChangeGCRequestObject r = (ChangeGCRequestObject) o.request_object;
         r.values.set_clip_x_origin (i);
       } else {
-        o.begin_request (56, 0, 0);
+        o.beginRequest (56, 0, 0);
         changeGCRequest.clear ();
         changeGCRequest.values.set_clip_x_origin (i);
         o.request_object = changeGCRequest;
@@ -688,7 +688,7 @@ public class GC extends Fontable {
         ChangeGCRequestObject r = (ChangeGCRequestObject) o.request_object;
         r.values.set_clip_y_origin (i);
       } else {
-        o.begin_request (56, 0, 0);
+        o.beginRequest (56, 0, 0);
         changeGCRequest.clear ();
         changeGCRequest.values.set_clip_y_origin (i);
         o.request_object = changeGCRequest;
@@ -710,7 +710,7 @@ public class GC extends Fontable {
         ChangeGCRequestObject r = (ChangeGCRequestObject) o.request_object;
         r.values.set_dashes (i);
       } else {
-        o.begin_request (56, 0, 0);
+        o.beginRequest (56, 0, 0);
         changeGCRequest.clear ();
         changeGCRequest.values.set_dashes (i);
         o.request_object = changeGCRequest;
@@ -732,7 +732,7 @@ public class GC extends Fontable {
         ChangeGCRequestObject r = (ChangeGCRequestObject) o.request_object;
         r.values.set_dash_offset (i);
       } else {
-        o.begin_request (56, 0, 0);
+        o.beginRequest (56, 0, 0);
         changeGCRequest.clear ();
         changeGCRequest.values.set_dash_offset (i);
         o.request_object = changeGCRequest;
@@ -754,7 +754,7 @@ public class GC extends Fontable {
         ChangeGCRequestObject r = (ChangeGCRequestObject) o.request_object;
         r.values.set_fill_rule (i);
       } else {
-        o.begin_request (56, 0, 0);
+        o.beginRequest (56, 0, 0);
         changeGCRequest.clear ();
         changeGCRequest.values.set_fill_rule (i);
         o.request_object = changeGCRequest;
@@ -776,7 +776,7 @@ public class GC extends Fontable {
         ChangeGCRequestObject r = (ChangeGCRequestObject) o.request_object;
         r.values.set_fill_style (i);
       } else {
-        o.begin_request (56, 0, 0);
+        o.beginRequest (56, 0, 0);
         changeGCRequest.clear ();
         changeGCRequest.values.set_fill_style (i);
         o.request_object = changeGCRequest;
@@ -798,7 +798,7 @@ public class GC extends Fontable {
         ChangeGCRequestObject r = (ChangeGCRequestObject) o.request_object;
         r.values.set_font (font);
       } else {
-        o.begin_request (56, 0, 0);
+        o.beginRequest (56, 0, 0);
         changeGCRequest.clear ();
         changeGCRequest.values.set_font (font);
         o.request_object = changeGCRequest;
@@ -828,7 +828,7 @@ public class GC extends Fontable {
         ChangeGCRequestObject r = (ChangeGCRequestObject) o.request_object;
         r.values.set_foreground (pixel);
       } else {
-        o.begin_request (56, 0, 0);
+        o.beginRequest (56, 0, 0);
         changeGCRequest.clear ();
         changeGCRequest.values.set_foreground (pixel);
         o.request_object = changeGCRequest;
@@ -850,7 +850,7 @@ public class GC extends Fontable {
         ChangeGCRequestObject r = (ChangeGCRequestObject) o.request_object;
         r.values.set_function (i);
       } else {
-        o.begin_request (56, 0, 0);
+        o.beginRequest (56, 0, 0);
         changeGCRequest.clear ();
         changeGCRequest.values.set_function (i);
         o.request_object = changeGCRequest;
@@ -872,7 +872,7 @@ public class GC extends Fontable {
         ChangeGCRequestObject r = (ChangeGCRequestObject) o.request_object;
         r.values.set_graphics_exposures (b);
       } else {
-        o.begin_request (56, 0, 0);
+        o.beginRequest (56, 0, 0);
         changeGCRequest.clear ();
         changeGCRequest.values.set_graphics_exposures (b);
         o.request_object = changeGCRequest;
@@ -894,7 +894,7 @@ public class GC extends Fontable {
         ChangeGCRequestObject r = (ChangeGCRequestObject) o.request_object;
         r.values.set_join_style (i);
       } else {
-        o.begin_request (56, 0, 0);
+        o.beginRequest (56, 0, 0);
         changeGCRequest.clear ();
         changeGCRequest.values.set_join_style (i);
         o.request_object = changeGCRequest;
@@ -916,7 +916,7 @@ public class GC extends Fontable {
         ChangeGCRequestObject r = (ChangeGCRequestObject) o.request_object;
         r.values.set_line_style (i);
       } else {
-        o.begin_request (56, 0, 0);
+        o.beginRequest (56, 0, 0);
         changeGCRequest.clear ();
         changeGCRequest.values.set_line_style (i);
         o.request_object = changeGCRequest;
@@ -938,7 +938,7 @@ public class GC extends Fontable {
         ChangeGCRequestObject r = (ChangeGCRequestObject) o.request_object;
         r.values.set_line_width (i);
       } else {
-        o.begin_request (56, 0, 0);
+        o.beginRequest (56, 0, 0);
         changeGCRequest.clear ();
         changeGCRequest.values.set_line_width (i);
         o.request_object = changeGCRequest;
@@ -960,7 +960,7 @@ public class GC extends Fontable {
         ChangeGCRequestObject r = (ChangeGCRequestObject) o.request_object;
         r.values.set_plane_mask (i);
       } else {
-        o.begin_request (56, 0, 0);
+        o.beginRequest (56, 0, 0);
         changeGCRequest.clear ();
         changeGCRequest.values.set_plane_mask (i);
         o.request_object = changeGCRequest;
@@ -982,7 +982,7 @@ public class GC extends Fontable {
         ChangeGCRequestObject r = (ChangeGCRequestObject) o.request_object;
         r.values.set_stipple (pixmap);
       } else {
-        o.begin_request (56, 0, 0);
+        o.beginRequest (56, 0, 0);
         changeGCRequest.clear ();
         changeGCRequest.values.set_stipple (pixmap);
         o.request_object = changeGCRequest;
@@ -1004,7 +1004,7 @@ public class GC extends Fontable {
         ChangeGCRequestObject r = (ChangeGCRequestObject) o.request_object;
         r.values.set_subwindow_mode (i);
       } else {
-        o.begin_request (56, 0, 0);
+        o.beginRequest (56, 0, 0);
         changeGCRequest.clear ();
         changeGCRequest.values.set_subwindow_mode (i);
         o.request_object = changeGCRequest;
@@ -1026,7 +1026,7 @@ public class GC extends Fontable {
         ChangeGCRequestObject r = (ChangeGCRequestObject) o.request_object;
         r.values.set_tile (pixmap);
       } else {
-        o.begin_request (56, 0, 0);
+        o.beginRequest (56, 0, 0);
         changeGCRequest.clear ();
         changeGCRequest.values.set_tile (pixmap);
         o.request_object = changeGCRequest;
@@ -1048,7 +1048,7 @@ public class GC extends Fontable {
         ChangeGCRequestObject r = (ChangeGCRequestObject) o.request_object;
         r.values.set_tile_stipple_x_origin (i);
       } else {
-        o.begin_request (56, 0, 0);
+        o.beginRequest (56, 0, 0);
         changeGCRequest.clear ();
         changeGCRequest.values.set_tile_stipple_x_origin (i);
         o.request_object = changeGCRequest;
@@ -1070,7 +1070,7 @@ public class GC extends Fontable {
         ChangeGCRequestObject r = (ChangeGCRequestObject) o.request_object;
         r.values.set_tile_stipple_x_origin (i);
       } else {
-        o.begin_request (56, 0, 0);
+        o.beginRequest (56, 0, 0);
         changeGCRequest.clear ();
         changeGCRequest.values.set_tile_stipple_x_origin (i);
         o.request_object = changeGCRequest;

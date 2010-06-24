@@ -162,18 +162,18 @@ public class Cursor extends Resource {
 
     RequestOutputStream o = display.out;
     synchronized (o) {
-      o.begin_request (93, 0, 8);
-      o.write_int32 (id);
-      o.write_int32 (src.id);
-      o.write_int32 (mask.id);
-      o.write_int16 (fg_r);
-      o.write_int16 (fg_g);
-      o.write_int16 (fg_b);
-      o.write_int16 (bg_r);
-      o.write_int16 (bg_g);
-      o.write_int16 (bg_b);
-      o.write_int16 (x);
-      o.write_int16 (y);
+      o.beginRequest (93, 0, 8);
+      o.writeInt32 (id);
+      o.writeInt32 (src.id);
+      o.writeInt32 (mask.id);
+      o.writeInt16 (fg_r);
+      o.writeInt16 (fg_g);
+      o.writeInt16 (fg_b);
+      o.writeInt16 (bg_r);
+      o.writeInt16 (bg_g);
+      o.writeInt16 (bg_b);
+      o.writeInt16 (x);
+      o.writeInt16 (y);
       o.send ();
     }
   }
@@ -186,18 +186,18 @@ public class Cursor extends Resource {
 
     RequestOutputStream o = display.out;
     synchronized (o) {
-      o.begin_request (94, 0, 8);
-      o.write_int32 (id);
-      o.write_int32 (src.id);
-      o.write_int32 (mask.id);
-      o.write_int16 (source_char);
-      o.write_int16 (mask_char);
-      o.write_int16 (fg_r);
-      o.write_int16 (fg_g);
-      o.write_int16 (fg_b);
-      o.write_int16 (bg_r);
-      o.write_int16 (bg_g);
-      o.write_int16 (bg_b);
+      o.beginRequest (94, 0, 8);
+      o.writeInt32 (id);
+      o.writeInt32 (src.id);
+      o.writeInt32 (mask.id);
+      o.writeInt16 (source_char);
+      o.writeInt16 (mask_char);
+      o.writeInt16 (fg_r);
+      o.writeInt16 (fg_g);
+      o.writeInt16 (fg_b);
+      o.writeInt16 (bg_r);
+      o.writeInt16 (bg_g);
+      o.writeInt16 (bg_b);
       o.send ();
       
     }
@@ -211,8 +211,8 @@ public class Cursor extends Resource {
   public void free () {
     RequestOutputStream o = display.out;
     synchronized (o) {
-      o.begin_request (95, 0, 2);
-      o.write_int32 (id);
+      o.beginRequest (95, 0, 2);
+      o.writeInt32 (id);
       o.send ();
     }
   }
@@ -226,14 +226,14 @@ public class Cursor extends Resource {
 
     RequestOutputStream o = display.out;
     synchronized (o) {
-      o.begin_request (96, 0, 5);
-      o.write_int32 (id);
-      o.write_int16 (foreground.red);
-      o.write_int16 (foreground.green);
-      o.write_int16 (foreground.blue);
-      o.write_int16 (background.red);
-      o.write_int16 (background.green);
-      o.write_int16 (background.blue);
+      o.beginRequest (96, 0, 5);
+      o.writeInt32 (id);
+      o.writeInt16 (foreground.red);
+      o.writeInt16 (foreground.green);
+      o.writeInt16 (foreground.blue);
+      o.writeInt16 (background.red);
+      o.writeInt16 (background.green);
+      o.writeInt16 (background.blue);
       o.send ();
     }
   }

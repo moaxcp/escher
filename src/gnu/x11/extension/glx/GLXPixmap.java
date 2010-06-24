@@ -20,12 +20,12 @@ public class GLXPixmap extends gnu.x11.Resource implements GLXDrawable {
     
     RequestOutputStream o = display.out;
     synchronized (o) {
-      o.begin_request (glx.major_opcode, 13, 5);
+      o.beginRequest (glx.major_opcode, 13, 5);
       
-      o.write_int32 (screen_no);
-      o.write_int32 (visual.getID());
-      o.write_int32 (pixmap.id);
-      o.write_int32 (id);
+      o.writeInt32 (screen_no);
+      o.writeInt32 (visual.getID());
+      o.writeInt32 (pixmap.id);
+      o.writeInt32 (id);
       o.send ();
     }
   } 
@@ -38,8 +38,8 @@ public class GLXPixmap extends gnu.x11.Resource implements GLXDrawable {
   public void destroy () {
     RequestOutputStream o = display.out;
     synchronized (o) {
-      o.begin_request (glx.major_opcode, 15, 2);
-      o.write_int32 (id);
+      o.beginRequest (glx.major_opcode, 15, 2);
+      o.writeInt32 (id);
       o.send ();
     }
   }    

@@ -16,8 +16,8 @@ public abstract class FocusEvent extends Event {
 
   public FocusEvent (Display display, ResponseInputStream in) {
     super (display, in);
-    eventWindowID = in.read_int32 ();
-    mode = in.read_int8 ();
+    eventWindowID = in.readInt32 ();
+    mode = in.readInt8 ();
     in.skip (23); // Unused.
   }
 

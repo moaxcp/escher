@@ -132,31 +132,31 @@ public class VisualConfig {
         this.count = count;
         
         // first 18 numbered properties
-        visual_id = i.read_int32();
-        clazz = i.read_int32();
-        rgba = i.read_int32() == 1;
-        red_size = i.read_int32();
-        green_size = i.read_int32();
-        blue_size = i.read_int32();
-        alpha_size = i.read_int32();
-        accum_red_size = i.read_int32();
-        accum_green_size = i.read_int32();
-        accum_blue_size = i.read_int32();
-        accum_alpha_size = i.read_int32();
-        double_buffer = i.read_int32() == 1;
-        stero = i.read_int32() == 1;
-        buffer_size = i.read_int32();
-        depth_size = i.read_int32();
-        stencil_size = i.read_int32();
-        aux_buffers = i.read_int32();
-        level = i.read_int32();
+        visual_id = i.readInt32();
+        clazz = i.readInt32();
+        rgba = i.readInt32() == 1;
+        red_size = i.readInt32();
+        green_size = i.readInt32();
+        blue_size = i.readInt32();
+        alpha_size = i.readInt32();
+        accum_red_size = i.readInt32();
+        accum_green_size = i.readInt32();
+        accum_blue_size = i.readInt32();
+        accum_alpha_size = i.readInt32();
+        double_buffer = i.readInt32() == 1;
+        stero = i.readInt32() == 1;
+        buffer_size = i.readInt32();
+        depth_size = i.readInt32();
+        stencil_size = i.readInt32();
+        aux_buffers = i.readInt32();
+        level = i.readInt32();
 
         // 
         more_prop_types = new int[count];
         more_prop_values = new int[count];
         for (int index = 0; index < count; index++) {
-            more_prop_types[index] = i.read_int32();
-            more_prop_values[index] = i.read_int32();
+            more_prop_types[index] = i.readInt32();
+            more_prop_values[index] = i.readInt32();
         }
     }
 

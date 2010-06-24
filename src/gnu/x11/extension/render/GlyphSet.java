@@ -20,9 +20,9 @@ public class GlyphSet extends gnu.x11.Resource {
 
     RequestOutputStream o = display.out;
     synchronized (o) {
-      o.begin_request (render.major_opcode, 17, 3);
-      o.write_int32 (id);
-      o.write_int32 (format.id ());
+      o.beginRequest (render.major_opcode, 17, 3);
+      o.writeInt32 (id);
+      o.writeInt32 (format.id ());
       o.send ();
     }
   }
@@ -39,9 +39,9 @@ public class GlyphSet extends gnu.x11.Resource {
 
     RequestOutputStream o = display.out;
     synchronized (o) {
-      o.begin_request (render.major_opcode, 18, 3);
-      o.write_int32 (id);
-      o.write_int32 (src.id);
+      o.beginRequest (render.major_opcode, 18, 3);
+      o.writeInt32 (id);
+      o.writeInt32 (src.id);
       o.send ();
     }
   }
@@ -66,8 +66,8 @@ public class GlyphSet extends gnu.x11.Resource {
     if (! disposed) {
       RequestOutputStream o = display.out;
       synchronized (o) {
-        o.begin_request (render.major_opcode, 19, 2);
-        o.write_int32 (id);
+        o.beginRequest (render.major_opcode, 19, 2);
+        o.writeInt32 (id);
         o.send ();
       }
     }
@@ -101,22 +101,22 @@ public class GlyphSet extends gnu.x11.Resource {
     RequestOutputStream o = display.out;
     Glyph [] glyphs = new Glyph [numGlyphs];
     synchronized (o) {
-      o.begin_request (render.major_opcode, 20, len);
-      o.write_int32 (id);
-      o.write_int32 (numGlyphs);
+      o.beginRequest (render.major_opcode, 20, len);
+      o.writeInt32 (id);
+      o.writeInt32 (numGlyphs);
       for (int i = 0; i < numGlyphs; i++) {
         int id = glyph_reqs [i].get_id ();
-        o.write_int32 (id);
+        o.writeInt32 (id);
         glyphs [i] = new Glyph (this, id);
       }
       for (int i = 0; i < numGlyphs; i++) {
         GlyphRequest gr = glyph_reqs [i];
-        o.write_int16 (gr.get_width ());
-        o.write_int16 (gr.get_height ());
-        o.write_int16 (gr.get_x ());
-        o.write_int16 (gr.get_y ());
-        o.write_int16 (gr.get_offs_x ());
-        o.write_int16 (gr.get_offs_y ());
+        o.writeInt16 (gr.get_width ());
+        o.writeInt16 (gr.get_height ());
+        o.writeInt16 (gr.get_x ());
+        o.writeInt16 (gr.get_y ());
+        o.writeInt16 (gr.get_offs_x ());
+        o.writeInt16 (gr.get_offs_y ());
       }
       for (int i = 0; i < numGlyphs; i++) {
         byte [] image = glyph_reqs [i].get_image ();
@@ -148,11 +148,11 @@ public class GlyphSet extends gnu.x11.Resource {
         }
       }
       if (numGlyphs > 0) {
-        o.begin_request (render.major_opcode, 22, 2 + numGlyphs);
-        o.write_int32 (id);
+        o.beginRequest (render.major_opcode, 22, 2 + numGlyphs);
+        o.writeInt32 (id);
         for (int i = 0; i < glyphs.length; i++) {
           if (! glyphs [i].disposed) {
-            o.write_int32 (glyphs [i].get_id ());
+            o.writeInt32 (glyphs [i].get_id ());
           }
         }
         o.send ();

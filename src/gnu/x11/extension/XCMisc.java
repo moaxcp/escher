@@ -30,15 +30,15 @@ public class XCMisc extends Extension {
     RequestOutputStream o = display.out;
     synchronized (o) {
 
-      o.begin_request (major_opcode, 0, 2);
-      o.write_int16 (CLIENT_MAJOR_VERSION);
-      o.write_int16 (CLIENT_MINOR_VERSION);
+      o.beginRequest (major_opcode, 0, 2);
+      o.writeInt16 (CLIENT_MAJOR_VERSION);
+      o.writeInt16 (CLIENT_MINOR_VERSION);
       ResponseInputStream i = display.in;
       synchronized (i) {
-        i.read_reply (o);
+        i.readReply (o);
         i.skip (8);
-        server_major_version = i.read_int16 ();
-        server_minor_version = i.read_int16 ();
+        server_major_version = i.readInt16 ();
+        server_minor_version = i.readInt16 ();
         i.skip (20);
       }
     }
@@ -50,8 +50,8 @@ public class XCMisc extends Extension {
     public int start_id;
     public int count;
     XIDRange (ResponseInputStream i) {
-      start_id = i.read_int32 ();
-      count = i.read_int32 ();
+      start_id = i.readInt32 ();
+      count = i.readInt32 ();
     }
   }
   
@@ -61,10 +61,10 @@ public class XCMisc extends Extension {
     XIDRange r;
     RequestOutputStream o = display.out;
     synchronized (o) {
-      o.begin_request (major_opcode, 1, 1);
+      o.beginRequest (major_opcode, 1, 1);
       ResponseInputStream i = display.in;
       synchronized (i) {
-        i.read_reply (o);
+        i.readReply (o);
         i.skip (8);
         r = new XIDRange (i);
         i.skip (16);
@@ -80,16 +80,16 @@ public class XCMisc extends Extension {
     int [] ids;
     RequestOutputStream o = display.out;
     synchronized (o) {
-      o.begin_request (major_opcode, 2, 2);
+      o.beginRequest (major_opcode, 2, 2);
       ResponseInputStream i = display.in;
       synchronized (i) {
-        i.read_reply (o);
+        i.readReply (o);
         i.skip (8);
-        int num = i.read_int32 ();
+        int num = i.readInt32 ();
         i.skip (20);
         ids = new int [num];
         for (int j = 0; j < num; j++)
-          ids [j] = i.read_int32 ();
+          ids [j] = i.readInt32 ();
       }
     }
     return ids;

@@ -110,22 +110,22 @@ public class GL extends gnu.x11.Resource implements GLConstant {
                         / largeRequestLength + 1;
                 pad = RequestOutputStream.pad(small_params_length);
                 int l = 4 + (small_params_length + pad) / 4;
-                out.begin_request(getGLX().major_opcode, 2, l);
-                out.write_int32(getTag());
+                out.beginRequest(getGLX().major_opcode, 2, l);
+                out.writeInt32(getTag());
                 // We start counting at 1!
                 request_number = 1;
-                out.write_int16(request_number);
-                out.write_int16(request_total);
-                out.write_int32(small_params_length);
-                out.write_int32(length_total);
-                out.write_int32(opcode);
+                out.writeInt16(request_number);
+                out.writeInt16(request_total);
+                out.writeInt32(small_params_length);
+                out.writeInt32(length_total);
+                out.writeInt32(opcode);
                 large_param = false;
             } else {
-                out.begin_request(getGLX().major_opcode, 1,
+                out.beginRequest(getGLX().major_opcode, 1,
                         2 + render_command_length / 4);
-                out.write_int32(getTag());
-                out.write_int16(render_command_length);
-                out.write_int16(opcode);
+                out.writeInt32(getTag());
+                out.writeInt16(render_command_length);
+                out.writeInt16(opcode);
             }
         }
 
@@ -143,11 +143,11 @@ public class GL extends gnu.x11.Resource implements GLConstant {
                 int len = Math.min(largeNumBytesLeft,
                         out.getBufferLength() - 16);
                 int p = RequestOutputStream.pad(len);
-                out.begin_request(getGLX().major_opcode, 2, 4 + (len + p) / 4);
-                out.write_int32(getTag());
-                out.write_int16(request_number);
-                out.write_int16(request_total);
-                out.write_int32(len); // ni
+                out.beginRequest(getGLX().major_opcode, 2, 4 + (len + p) / 4);
+                out.writeInt32(getTag());
+                out.writeInt16(request_number);
+                out.writeInt16(request_total);
+                out.writeInt32(len); // ni
                 largeNumBytesLeft -= len;
             }
         }
@@ -157,7 +157,7 @@ public class GL extends gnu.x11.Resource implements GLConstant {
             if (render_large && large_param && !out.fits(4)) {
                 begin_large_parameter();
             }
-            out.write_float(val);
+            out.writeFloat(val);
         }
 
         void write_float64(double val) {
@@ -165,7 +165,7 @@ public class GL extends gnu.x11.Resource implements GLConstant {
             if (render_large && large_param && !out.fits(8)) {
                 begin_large_parameter();
             }
-            out.write_double(val);
+            out.writeDouble(val);
         }
 
         void write_int32(int val) {
@@ -173,7 +173,7 @@ public class GL extends gnu.x11.Resource implements GLConstant {
             if (render_large && large_param && !out.fits(4)) {
                 begin_large_parameter();
             }
-            out.write_int32(val);
+            out.writeInt32(val);
         }
 
         void write_int16(int val) {
@@ -181,7 +181,7 @@ public class GL extends gnu.x11.Resource implements GLConstant {
             if (render_large && large_param && !out.fits(2)) {
                 begin_large_parameter();
             }
-            out.write_int16(val);
+            out.writeInt16(val);
         }
 
         void write_int8(byte val) {
@@ -189,7 +189,7 @@ public class GL extends gnu.x11.Resource implements GLConstant {
             if (render_large && large_param && !out.fits(1)) {
                 begin_large_parameter();
             }
-            out.write_int8(val);
+            out.writeInt8(val);
         }
 
         void skip(int n) {
@@ -205,7 +205,7 @@ public class GL extends gnu.x11.Resource implements GLConstant {
             if (render_large && large_param && !out.fits(1)) {
                 begin_large_parameter();
             }
-            out.write_bool(val);
+            out.writeBool(val);
         }
 
         /**
@@ -367,7 +367,7 @@ public class GL extends gnu.x11.Resource implements GLConstant {
         // The pending request is sent automatically. We set the request
         // length pessimistcally, so that we are sure we have enough room
         // in the buffer.
-        o.begin_request(glx.major_opcode, 1,
+        o.beginRequest(glx.major_opcode, 1,
                 GLRenderRequest.DEFAULT_BUFFER_SIZE);
         rr.reset(tag);
         o.setRequestObject(rr);
@@ -386,11 +386,11 @@ public class GL extends gnu.x11.Resource implements GLConstant {
         RequestOutputStream o = display.out;
         synchronized (o) {
             o.beginGLXRequest(GLXCommand.GLXCreateContext);
-            o.write_int32(id);
-            o.write_int32(visual_id);
-            o.write_int32(screen_no);
-            o.write_int32(share_list.id);
-            o.write_bool(direct);
+            o.writeInt32(id);
+            o.writeInt32(visual_id);
+            o.writeInt32(screen_no);
+            o.writeInt32(share_list.id);
+            o.writeBool(direct);
             o.skip(3);
             o.send();
         }
@@ -436,8 +436,8 @@ public class GL extends gnu.x11.Resource implements GLConstant {
 
         RequestOutputStream o = display.out;
         synchronized (o) {
-            o.begin_request(glx.major_opcode, 4, 2);
-            o.write_int32(id);
+            o.beginRequest(glx.major_opcode, 4, 2);
+            o.writeInt32(id);
             o.send();
         }
     }
@@ -463,14 +463,14 @@ public class GL extends gnu.x11.Resource implements GLConstant {
         RequestOutputStream o = display.out;
         synchronized (o) {
             o.beginGLXRequest(GLXCommand.GLXMakeCurrent);
-            o.write_int32(drawable.id());
-            o.write_int32(id);
-            o.write_int32(tag);
+            o.writeInt32(drawable.id());
+            o.writeInt32(id);
+            o.writeInt32(tag);
             ResponseInputStream i = display.in;
             synchronized (i) {
-                i.read_reply(o);
+                i.readReply(o);
                 i.skip(8);
-                tag = i.read_int32();
+                tag = i.readInt32();
                 i.skip(20);
             }
         }
@@ -485,13 +485,13 @@ public class GL extends gnu.x11.Resource implements GLConstant {
         boolean direct;
         RequestOutputStream o = display.out;
         synchronized (o) {
-            o.begin_request(glx.major_opcode, 6, 2);
-            o.write_int32(id);
+            o.beginRequest(glx.major_opcode, 6, 2);
+            o.writeInt32(id);
             ResponseInputStream i = display.in;
             synchronized (i) {
-                i.read_reply(o);
+                i.readReply(o);
                 i.skip(8);
-                direct = i.read_bool();
+                direct = i.readBool();
                 i.skip(23);
             }
         }
@@ -506,8 +506,8 @@ public class GL extends gnu.x11.Resource implements GLConstant {
 
         RequestOutputStream o = display.out;
         synchronized (o) {
-            o.begin_request(glx.major_opcode, 8, 2);
-            o.write_int32(tag);
+            o.beginRequest(glx.major_opcode, 8, 2);
+            o.writeInt32(tag);
             // Need to flush here.
             o.flush();
         }
@@ -521,8 +521,8 @@ public class GL extends gnu.x11.Resource implements GLConstant {
 
         RequestOutputStream o = display.out;
         synchronized (o) {
-            o.begin_request(glx.major_opcode, 9, 2);
-            o.write_int32(tag);
+            o.beginRequest(glx.major_opcode, 9, 2);
+            o.writeInt32(tag);
             // Need to flush here.
             o.flush();
         }
@@ -536,11 +536,11 @@ public class GL extends gnu.x11.Resource implements GLConstant {
 
         RequestOutputStream o = display.out;
         synchronized (o) {
-            o.begin_request(glx.major_opcode, 10, 5);
-            o.write_int32(id);
-            o.write_int32(dst.id);
-            o.write_int32(mask);
-            o.write_int32(tag);
+            o.beginRequest(glx.major_opcode, 10, 5);
+            o.writeInt32(id);
+            o.writeInt32(dst.id);
+            o.writeInt32(mask);
+            o.writeInt32(tag);
             o.send();
         }
     }
@@ -553,9 +553,9 @@ public class GL extends gnu.x11.Resource implements GLConstant {
 
         RequestOutputStream o = display.out;
         synchronized (o) {
-            o.begin_request(glx.major_opcode, 11, 3);
-            o.write_int32(tag);
-            o.write_int32(drawable.id());
+            o.beginRequest(glx.major_opcode, 11, 3);
+            o.writeInt32(tag);
+            o.writeInt32(drawable.id());
             o.send();
         }
     }
@@ -568,12 +568,12 @@ public class GL extends gnu.x11.Resource implements GLConstant {
 
         RequestOutputStream o = display.out;
         synchronized (o) {
-            o.begin_request(glx.major_opcode, 12, 6);
-            o.write_int32(tag);
-            o.write_int32(font.id);
-            o.write_int32(first);
-            o.write_int32(count);
-            o.write_int32(base);
+            o.beginRequest(glx.major_opcode, 12, 6);
+            o.writeInt32(tag);
+            o.writeInt32(font.id);
+            o.writeInt32(first);
+            o.writeInt32(count);
+            o.writeInt32(base);
             o.send();
         }
     }
@@ -596,9 +596,9 @@ public class GL extends gnu.x11.Resource implements GLConstant {
         RequestOutputStream o = display.out;
         synchronized (o) {
             o.beginGLXRequest(GLXCommand.NewList);
-            o.write_int32(tag);
-            o.write_int32(list);
-            o.write_int32(mode);
+            o.writeInt32(tag);
+            o.writeInt32(list);
+            o.writeInt32(mode);
             o.send();
         }
     }
@@ -634,7 +634,7 @@ public class GL extends gnu.x11.Resource implements GLConstant {
         RequestOutputStream o = display.out;
         synchronized (o) {
             o.beginGLXRequest(GLXCommand.EndList);
-            o.write_int32(tag);
+            o.writeInt32(tag);
             o.send();
         }
     }
@@ -661,10 +661,10 @@ public class GL extends gnu.x11.Resource implements GLConstant {
 
         RequestOutputStream o = display.out;
         synchronized (o) {
-            o.begin_request(glx.major_opcode, 103, 4);
-            o.write_int32(tag);
-            o.write_int32(list);
-            o.write_int32(range);
+            o.beginRequest(glx.major_opcode, 103, 4);
+            o.writeInt32(tag);
+            o.writeInt32(list);
+            o.writeInt32(range);
             o.send();
         }
     }
@@ -680,13 +680,13 @@ public class GL extends gnu.x11.Resource implements GLConstant {
         RequestOutputStream o = display.out;
         synchronized (o) {
             o.beginGLXRequest(GLXCommand.GenLists);
-            o.write_int32(tag);
-            o.write_int32(range);
+            o.writeInt32(tag);
+            o.writeInt32(range);
             ResponseInputStream i = display.in;
             synchronized (i) {
-                i.read_reply(o);
+                i.readReply(o);
                 i.skip(8);
-                ret = i.read_int32();
+                ret = i.readInt32();
                 i.skip(20);
             }
         }
@@ -718,10 +718,10 @@ public class GL extends gnu.x11.Resource implements GLConstant {
 
         RequestOutputStream o = display.out;
         synchronized (o) {
-            o.begin_request(glx.major_opcode, 105, 4);
-            o.write_int32(tag);
-            o.write_int32(size);
-            o.write_int32(type);
+            o.beginRequest(glx.major_opcode, 105, 4);
+            o.writeInt32(tag);
+            o.writeInt32(size);
+            o.writeInt32(type);
             o.send();
         }
     }
@@ -736,9 +736,9 @@ public class GL extends gnu.x11.Resource implements GLConstant {
 
         RequestOutputStream o = display.out;
         synchronized (o) {
-            o.begin_request(glx.major_opcode, 106, 3);
-            o.write_int32(tag);
-            o.write_int32(size);
+            o.beginRequest(glx.major_opcode, 106, 3);
+            o.writeInt32(tag);
+            o.writeInt32(size);
             o.send();
         }
     }
@@ -760,28 +760,28 @@ public class GL extends gnu.x11.Resource implements GLConstant {
         int new_mode = render_mode;
         RequestOutputStream o = display.out;
         synchronized (o) {
-            o.begin_request(glx.major_opcode, 107, 3);
-            o.write_int32(tag);
-            o.write_int32(mode);
+            o.beginRequest(glx.major_opcode, 107, 3);
+            o.writeInt32(tag);
+            o.writeInt32(mode);
             if (render_mode == RENDER)
                 o.send();
             else {
                 ResponseInputStream i = display.in;
                 synchronized (i) {
-                    i.read_reply(o);
+                    i.readReply(o);
                     i.skip(8);
-                    d.ret_val = i.read_int32();
-                    int num_data = i.read_int32();
-                    new_mode = i.read_int32();
+                    d.ret_val = i.readInt32();
+                    int num_data = i.readInt32();
+                    new_mode = i.readInt32();
                     i.skip(12);
                     if (render_mode == FEEDBACK) {
                         d.feedback_data = new float[num_data];
                         for (int j = 0; j < num_data; j++)
-                            d.feedback_data[j] = i.read_float32();
+                            d.feedback_data[j] = i.readFloat32();
                     } else if (render_mode == SELECT) {
                         d.selection_data = new int[num_data];
                         for (int j = 0; j < num_data; j++)
-                            d.selection_data[j] = i.read_int32();
+                            d.selection_data[j] = i.readInt32();
                     } else {
                         assert false : "Should not get here";
                     }
@@ -801,11 +801,11 @@ public class GL extends gnu.x11.Resource implements GLConstant {
 
         RequestOutputStream o = display.out;
         synchronized (o) {
-            o.begin_request(glx.major_opcode, 108, 2);
-            o.write_int32(tag);
+            o.beginRequest(glx.major_opcode, 108, 2);
+            o.writeInt32(tag);
             ResponseInputStream i = display.in;
             synchronized (i) {
-                i.read_reply(o);
+                i.readReply(o);
                 // We wait for the response to make sure it is really finished.
                 // There is no interesting data in there.
                 i.skip(32);
@@ -821,10 +821,10 @@ public class GL extends gnu.x11.Resource implements GLConstant {
 
         RequestOutputStream o = display.out;
         synchronized (o) {
-            o.begin_request(glx.major_opcode, 109, 4);
-            o.write_int32(tag);
-            o.write_int32(pname);
-            o.write_int32(param);
+            o.beginRequest(glx.major_opcode, 109, 4);
+            o.writeInt32(tag);
+            o.writeInt32(pname);
+            o.writeInt32(param);
             o.send();
         }
     }
@@ -848,9 +848,9 @@ public class GL extends gnu.x11.Resource implements GLConstant {
         RequestOutputStream o = display.out;
         synchronized (o) {
             o.beginGLXRequest(GLXCommand.PixelStorei);
-            o.write_int32(tag);
-            o.write_int32(pname);
-            o.write_int32(param);
+            o.writeInt32(tag);
+            o.writeInt32(pname);
+            o.writeInt32(param);
             o.send();
         }
     }
@@ -881,23 +881,23 @@ public class GL extends gnu.x11.Resource implements GLConstant {
         boolean[] v;
         RequestOutputStream o = display.out;
         synchronized (o) {
-            o.begin_request(glx.major_opcode, 112, 3);
-            o.write_int32(tag);
-            o.write_int32(pname);
+            o.beginRequest(glx.major_opcode, 112, 3);
+            o.writeInt32(tag);
+            o.writeInt32(pname);
             ResponseInputStream i = display.in;
             synchronized (i) {
-                i.read_reply(o);
+                i.readReply(o);
                 i.skip(12);
-                int n = i.read_int32();
+                int n = i.readInt32();
                 if (n == 1) {
                     v = new boolean[1];
-                    v[0] = i.read_bool();
+                    v[0] = i.readBool();
                     i.skip(15);
                 } else {
                     i.skip(16);
                     v = new boolean[n];
                     for (int j = 0; j < n; j++) {
-                        v[j] = i.read_bool();
+                        v[j] = i.readBool();
                     }
                     i.skip(RequestOutputStream.pad(n));
                 }
@@ -935,13 +935,13 @@ public class GL extends gnu.x11.Resource implements GLConstant {
         int err;
         RequestOutputStream o = display.out;
         synchronized (o) {
-            o.begin_request(glx.major_opcode, 115, 2);
-            o.write_int32(tag);
+            o.beginRequest(glx.major_opcode, 115, 2);
+            o.writeInt32(tag);
             ResponseInputStream i = display.in;
             synchronized (i) {
-                i.read_reply(o);
+                i.readReply(o);
                 i.skip(8);
-                err = i.read_int32();
+                err = i.readInt32();
                 i.skip(20);
             }
         }
@@ -1136,33 +1136,33 @@ public class GL extends gnu.x11.Resource implements GLConstant {
         RequestOutputStream o = display.out;
         synchronized (o) {
             o.beginGLXRequest(GLXCommand.ReadPixels);
-            o.write_int32(tag);           
-            o.write_int32(x);
-            o.write_int32(y);
-            o.write_int32(width);
-            o.write_int32(height);
-            o.write_int32(format);
-            o.write_int32(type);
-            o.write_bool(false);
-            o.write_bool(false);
+            o.writeInt32(tag);           
+            o.writeInt32(x);
+            o.writeInt32(y);
+            o.writeInt32(width);
+            o.writeInt32(height);
+            o.writeInt32(format);
+            o.writeInt32(type);
+            o.writeBool(false);
+            o.writeBool(false);
             o.skip(2);
             
             ResponseInputStream in = display.in;
             synchronized (in) {
-                in.read_reply(o);
+                in.readReply(o);
                 in.skip(4);
-                int len = in.read_int32() * 4;
+                int len = in.readInt32() * 4;
                 in.skip(24);
                 if (pixels instanceof ByteBuffer) {
                     ByteBuffer bb = (ByteBuffer) pixels;
                     for (int i = 0; i < len; i++) {
-                        bb.put((byte) in.read_byte());
+                        bb.put((byte) in.readByte());
                     }
                 } else if (pixels instanceof IntBuffer) {
                     IntBuffer ib = (IntBuffer) pixels;
                     ib.position(0);
                     for (int i = len / 4 - 1; i >= 0; i--) {
-                        ib.put(in.read_int32());
+                        ib.put(in.readInt32());
                     }
                 } else {
                     throw new UnsupportedOperationException("Not Yet "
@@ -1182,21 +1182,21 @@ public class GL extends gnu.x11.Resource implements GLConstant {
         RequestOutputStream o = display.out;
         int[] ret;
         synchronized (o) {
-            o.begin_request(glx.major_opcode, 127, 3);
-            o.write_int32(tag);
-            o.write_int32(map);
+            o.beginRequest(glx.major_opcode, 127, 3);
+            o.writeInt32(tag);
+            o.writeInt32(map);
             ResponseInputStream in = display.in;
             synchronized (in) {
                 in.skip(12);
-                int n = in.read_int32();
+                int n = in.readInt32();
                 ret = new int[n];
                 if (n == 1) {
-                    ret[0] = in.read_int16();
+                    ret[0] = in.readInt16();
                     in.skip(14);
                 } else {
                     in.skip(16);
                     for (int i = 0; i < n; i++)
-                        ret[i] = in.read_int16();
+                        ret[i] = in.readInt16();
                     in.pad(RequestOutputStream.pad(n));
                 }
             }
@@ -1223,16 +1223,16 @@ public class GL extends gnu.x11.Resource implements GLConstant {
 
         synchronized (o) {
             o.beginGLXRequest(GLXCommand.GetString);
-            o.write_int32(tag);
-            o.write_int32(name);
+            o.writeInt32(tag);
+            o.writeInt32(name);
 
             ResponseInputStream in = display.in;
             synchronized (in) {
-                in.read_reply(o);
+                in.readReply(o);
                 in.skip(12);
-                int n = in.read_int32();
+                int n = in.readInt32();
                 in.skip(16);
-                str = in.read_string8(n);
+                str = in.readString8(n);
                 in.skip(RequestOutputStream.pad(n));
             }
         }
@@ -1315,23 +1315,23 @@ public class GL extends gnu.x11.Resource implements GLConstant {
         RequestOutputStream o = display.out;
         float[] ret;
         synchronized (o) {
-            o.begin_request(glx.major_opcode, 138, 5);
-            o.write_int32(tag);
-            o.write_int32(target);
-            o.write_int32(level);
-            o.write_int32(pname);
+            o.beginRequest(glx.major_opcode, 138, 5);
+            o.writeInt32(tag);
+            o.writeInt32(target);
+            o.writeInt32(level);
+            o.writeInt32(pname);
             ResponseInputStream in = display.in;
             synchronized (in) {
                 in.skip(12);
-                int n = in.read_int32();
+                int n = in.readInt32();
                 ret = new float[n];
                 if (n == 1) {
-                    ret[0] = in.read_float32();
+                    ret[0] = in.readFloat32();
                     in.skip(12);
                 } else {
                     in.skip(16);
                     for (int i = 0; i < n; i++)
-                        ret[i] = in.read_float32();
+                        ret[i] = in.readFloat32();
                 }
             }
         }
@@ -1347,23 +1347,23 @@ public class GL extends gnu.x11.Resource implements GLConstant {
         RequestOutputStream o = display.out;
         int[] ret;
         synchronized (o) {
-            o.begin_request(glx.major_opcode, 139, 5);
-            o.write_int32(tag);
-            o.write_int32(target);
-            o.write_int32(level);
-            o.write_int32(pname);
+            o.beginRequest(glx.major_opcode, 139, 5);
+            o.writeInt32(tag);
+            o.writeInt32(target);
+            o.writeInt32(level);
+            o.writeInt32(pname);
             ResponseInputStream in = display.in;
             synchronized (in) {
                 in.skip(12);
-                int n = in.read_int32();
+                int n = in.readInt32();
                 ret = new int[n];
                 if (n == 1) {
-                    ret[0] = in.read_int32();
+                    ret[0] = in.readInt32();
                     in.skip(12);
                 } else {
                     in.skip(16);
                     for (int i = 0; i < n; i++)
-                        ret[i] = in.read_int32();
+                        ret[i] = in.readInt32();
                 }
             }
         }
@@ -1379,13 +1379,13 @@ public class GL extends gnu.x11.Resource implements GLConstant {
         RequestOutputStream o = display.out;
         boolean ret;
         synchronized (o) {
-            o.begin_request(glx.major_opcode, 141, 3);
-            o.write_int32(tag);
-            o.write_int32(list);
+            o.beginRequest(glx.major_opcode, 141, 3);
+            o.writeInt32(tag);
+            o.writeInt32(list);
             ResponseInputStream i = display.in;
             synchronized (i) {
                 i.skip(8);
-                ret = i.read_bool();
+                ret = i.readBool();
                 i.skip(20);
             }
         }
@@ -1402,7 +1402,7 @@ public class GL extends gnu.x11.Resource implements GLConstant {
         synchronized (o) {
             // o.begin_request (glx.major_opcode, 142, 2);
             o.beginGLXRequest(GLXCommand.Flush);
-            o.write_int32(tag);
+            o.writeInt32(tag);
             o.flush();
         }
     }
@@ -1416,11 +1416,11 @@ public class GL extends gnu.x11.Resource implements GLConstant {
 
         TexturesResidentReply(ResponseInputStream in, int count) {
 
-            all_resident = in.read_bool();
+            all_resident = in.readBool();
             in.skip(20);
             residences = new boolean[count];
             for (int i = 0; i < count; i++)
-                residences[i] = in.read_bool();
+                residences[i] = in.readBool();
         }
 
     }
@@ -1436,11 +1436,11 @@ public class GL extends gnu.x11.Resource implements GLConstant {
         TexturesResidentReply ret;
         synchronized (o) {
             // The spec says request length == 1, but this seems wrong.
-            o.begin_request(glx.major_opcode, 143, 3 + n);
-            o.write_int32(tag);
-            o.write_int32(n);
+            o.beginRequest(glx.major_opcode, 143, 3 + n);
+            o.writeInt32(tag);
+            o.writeInt32(n);
             for (int i = 0; i < n; i++)
-                o.write_int32(textures[i]);
+                o.writeInt32(textures[i]);
             ResponseInputStream in = display.in;
             synchronized (in) {
                 in.skip(8);
@@ -1461,11 +1461,11 @@ public class GL extends gnu.x11.Resource implements GLConstant {
         RequestOutputStream o = display.out;
         synchronized (o) {
             // The spec says request length == 1, but this seems wrong.
-            o.begin_request(glx.major_opcode, 144, 3 + n);
-            o.write_int32(tag);
-            o.write_int32(n);
+            o.beginRequest(glx.major_opcode, 144, 3 + n);
+            o.writeInt32(tag);
+            o.writeInt32(n);
             for (int i = 0; i < n; i++)
-                o.write_int32(textures[i]);
+                o.writeInt32(textures[i]);
         }
     }
 
@@ -1478,15 +1478,15 @@ public class GL extends gnu.x11.Resource implements GLConstant {
         RequestOutputStream o = display.out;
         int[] textures;
         synchronized (o) {
-            o.begin_request(glx.major_opcode, 145, 3);
-            o.write_int32(tag);
-            o.write_int32(n);
+            o.beginRequest(glx.major_opcode, 145, 3);
+            o.writeInt32(tag);
+            o.writeInt32(n);
             ResponseInputStream in = display.in;
             synchronized (in) {
                 in.skip(32);
                 textures = new int[n];
                 for (int i = 0; i < n; i++)
-                    textures[i] = in.read_int32();
+                    textures[i] = in.readInt32();
             }
         }
         return textures;
@@ -1508,12 +1508,12 @@ public class GL extends gnu.x11.Resource implements GLConstant {
         boolean ret;
         synchronized (o) {
             o.beginGLXRequest(GLXCommand.IsTexture);
-            o.write_int32(tag);
-            o.write_int32(texture);
+            o.writeInt32(tag);
+            o.writeInt32(texture);
             ResponseInputStream in = display.in;
             synchronized (in) {
                 in.skip(8);
-                ret = in.read_bool();
+                ret = in.readBool();
                 in.skip(20);
             }
         }
@@ -6441,7 +6441,7 @@ public class GL extends gnu.x11.Resource implements GLConstant {
 
         RequestOutputStream o = display.out;
         if (o.index > 0 && o.opcode() == 1) {
-            o.update_length();
+            o.updateLength();
             o.flush();
         }
     }
@@ -6495,22 +6495,22 @@ public class GL extends gnu.x11.Resource implements GLConstant {
         RequestOutputStream o = display.out;
         float[] ret;
         synchronized (o) {
-            o.begin_request(glx.major_opcode, opcode, 3);
-            o.write_int32(tag);
-            o.write_int32(par1);
+            o.beginRequest(glx.major_opcode, opcode, 3);
+            o.writeInt32(tag);
+            o.writeInt32(par1);
             ResponseInputStream in = display.in;
             synchronized (in) {
-                in.read_reply(o);
+                in.readReply(o);
                 in.skip(12);
-                int n = in.read_int32();
+                int n = in.readInt32();
                 ret = new float[n];
                 if (n == 1) {
-                    ret[0] = in.read_float32();
+                    ret[0] = in.readFloat32();
                     in.skip(12);
                 } else {
                     in.skip(16);
                     for (int i = 0; i < n; i++)
-                        ret[i] = in.read_float32();
+                        ret[i] = in.readFloat32();
                 }
             }
         }
@@ -6534,23 +6534,23 @@ public class GL extends gnu.x11.Resource implements GLConstant {
         RequestOutputStream o = display.out;
         float[] ret;
         synchronized (o) {
-            o.begin_request(glx.major_opcode, opcode, 4);
-            o.write_int32(tag);
-            o.write_int32(par1);
-            o.write_int32(par2);
+            o.beginRequest(glx.major_opcode, opcode, 4);
+            o.writeInt32(tag);
+            o.writeInt32(par1);
+            o.writeInt32(par2);
             ResponseInputStream in = display.in;
             synchronized (in) {
-                in.read_reply(o);
+                in.readReply(o);
                 in.skip(12);
-                int n = in.read_int32();
+                int n = in.readInt32();
                 ret = new float[n];
                 if (n == 1) {
-                    ret[0] = in.read_float32();
+                    ret[0] = in.readFloat32();
                     in.skip(12);
                 } else {
                     in.skip(16);
                     for (int i = 0; i < n; i++)
-                        ret[i] = in.read_float32();
+                        ret[i] = in.readFloat32();
                 }
             }
         }
@@ -6563,22 +6563,22 @@ public class GL extends gnu.x11.Resource implements GLConstant {
         RequestOutputStream o = display.out;
         synchronized (o) {
             o.beginGLXRequest(command);
-            o.write_int32(tag);
-            o.write_int32(param1);
-            o.write_int32(param2);
+            o.writeInt32(tag);
+            o.writeInt32(param1);
+            o.writeInt32(param2);
             ResponseInputStream in = display.in;
             synchronized (in) {
-                in.read_reply(o);
+                in.readReply(o);
                 in.skip(12);
-                int n = in.read_int32();
+                int n = in.readInt32();
                 if (n == 1) {
-                    ret[offset] = in.read_float32();
+                    ret[offset] = in.readFloat32();
                     in.skip(12);
 
                 } else {
                     in.skip(16);
                     for (int i = offset; i < n; i++) {
-                        ret[i] = in.read_float32();
+                        ret[i] = in.readFloat32();
                     }
                 }
             }
@@ -6600,22 +6600,22 @@ public class GL extends gnu.x11.Resource implements GLConstant {
         RequestOutputStream o = display.out;
         double[] ret;
         synchronized (o) {
-            o.begin_request(glx.major_opcode, opcode, 3);
-            o.write_int32(tag);
-            o.write_int32(par1);
+            o.beginRequest(glx.major_opcode, opcode, 3);
+            o.writeInt32(tag);
+            o.writeInt32(par1);
             ResponseInputStream in = display.in;
             synchronized (in) {
-                in.read_reply(o);
+                in.readReply(o);
                 in.skip(12);
-                int n = in.read_int32();
+                int n = in.readInt32();
                 ret = new double[n];
                 if (n == 1) {
-                    ret[0] = in.read_float64();
+                    ret[0] = in.readFloat64();
                     in.skip(8);
                 } else {
                     in.skip(16);
                     for (int i = 0; i < n; i++)
-                        ret[i] = in.read_float64();
+                        ret[i] = in.readFloat64();
                 }
             }
         }
@@ -6638,23 +6638,23 @@ public class GL extends gnu.x11.Resource implements GLConstant {
         RequestOutputStream o = display.out;
         double[] ret;
         synchronized (o) {
-            o.begin_request(glx.major_opcode, opcode, 4);
-            o.write_int32(tag);
-            o.write_int32(par1);
-            o.write_int32(par2);
+            o.beginRequest(glx.major_opcode, opcode, 4);
+            o.writeInt32(tag);
+            o.writeInt32(par1);
+            o.writeInt32(par2);
             ResponseInputStream in = display.in;
             synchronized (in) {
-                in.read_reply(o);
+                in.readReply(o);
                 in.skip(12);
-                int n = in.read_int32();
+                int n = in.readInt32();
                 ret = new double[n];
                 if (n == 1) {
-                    ret[0] = in.read_float64();
+                    ret[0] = in.readFloat64();
                     in.skip(8);
                 } else {
                     in.skip(16);
                     for (int i = 0; i < n; i++)
-                        ret[i] = in.read_float64();
+                        ret[i] = in.readFloat64();
                 }
             }
         }
@@ -6678,22 +6678,22 @@ public class GL extends gnu.x11.Resource implements GLConstant {
         RequestOutputStream o = display.out;
         int[] ret;
         synchronized (o) {
-            o.begin_request(glx.major_opcode, opcode, 3);
-            o.write_int32(tag);
-            o.write_int32(par1);
+            o.beginRequest(glx.major_opcode, opcode, 3);
+            o.writeInt32(tag);
+            o.writeInt32(par1);
             ResponseInputStream in = display.in;
             synchronized (in) {
-                in.read_reply(o);
+                in.readReply(o);
                 in.skip(12);
-                int n = in.read_int32();
+                int n = in.readInt32();
                 ret = new int[n];
                 if (n == 1) {
-                    ret[0] = in.read_int32();
+                    ret[0] = in.readInt32();
                     in.skip(12);
                 } else {
                     in.skip(16);
                     for (int i = 0; i < n; i++)
-                        ret[i] = in.read_int32();
+                        ret[i] = in.readInt32();
                 }
             }
         }
@@ -6706,21 +6706,21 @@ public class GL extends gnu.x11.Resource implements GLConstant {
         RequestOutputStream o = display.out;
         synchronized (o) {
             o.beginGLXRequest(command);
-            o.write_int32(tag);
-            o.write_int32(param1);
+            o.writeInt32(tag);
+            o.writeInt32(param1);
             ResponseInputStream in = display.in;
             synchronized (in) {
-                in.read_reply(o);
+                in.readReply(o);
                 in.skip(12);
-                int n = in.read_int32();
+                int n = in.readInt32();
                 if (n == 1) {
-                    ret[offset] = in.read_int32();
+                    ret[offset] = in.readInt32();
                     in.skip(12);
 
                 } else {
                     in.skip(16);
                     for (int i = offset; i < n; i++) {
-                        ret[i] = in.read_int32();
+                        ret[i] = in.readInt32();
                     }
                 }
             }
@@ -6743,23 +6743,23 @@ public class GL extends gnu.x11.Resource implements GLConstant {
         RequestOutputStream o = display.out;
         int[] ret;
         synchronized (o) {
-            o.begin_request(glx.major_opcode, opcode, 4);
-            o.write_int32(tag);
-            o.write_int32(par1);
-            o.write_int32(par2);
+            o.beginRequest(glx.major_opcode, opcode, 4);
+            o.writeInt32(tag);
+            o.writeInt32(par1);
+            o.writeInt32(par2);
             ResponseInputStream in = display.in;
             synchronized (in) {
-                in.read_reply(o);
+                in.readReply(o);
                 in.skip(12);
-                int n = in.read_int32();
+                int n = in.readInt32();
                 ret = new int[n];
                 if (n == 1) {
-                    ret[0] = in.read_int32();
+                    ret[0] = in.readInt32();
                     in.skip(12);
                 } else {
                     in.skip(16);
                     for (int i = 0; i < n; i++)
-                        ret[i] = in.read_int32();
+                        ret[i] = in.readInt32();
                 }
             }
         }

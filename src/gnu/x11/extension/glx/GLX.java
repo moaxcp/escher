@@ -273,15 +273,15 @@ public class GLX extends gnu.x11.extension.Extension implements
             o.setGLXMajorOpcode(major_opcode);
             
             o.beginGLXRequest(GLXCommand.GLXQueryVersion);
-            o.write_int32(SUPPORTED_GLX_VERSION.major);
-            o.write_int32(SUPPORTED_GLX_VERSION.minor);
+            o.writeInt32(SUPPORTED_GLX_VERSION.major);
+            o.writeInt32(SUPPORTED_GLX_VERSION.minor);
             
             ResponseInputStream i = display.in;
             synchronized (i) {
-                i.read_reply(o);
+                i.readReply(o);
                 i.skip(8);
-                major = i.read_int32();
-                minor = i.read_int32();
+                major = i.readInt32();
+                minor = i.readInt32();
                 this.glxVersion = new GLXVersion(major, minor);
                 
                 i.skip(16);
@@ -311,15 +311,15 @@ public class GLX extends gnu.x11.extension.Extension implements
         VisualConfig[] vcs;
         synchronized (o) {
             o.beginGLXRequest(GLXCommand.GLXGetVisualConfigs);
-            o.write_int32(screenNo);
+            o.writeInt32(screenNo);
             
             ResponseInputStream i = display.in;
             synchronized (i) {
-                i.read_reply(o);
+                i.readReply(o);
                 i.skip(4);
-                int n = i.read_int32();
-                int visual_count = i.read_int32();
-                int property_count = i.read_int32();
+                int n = i.readInt32();
+                int visual_count = i.readInt32();
+                int property_count = i.readInt32();
                 i.skip(16);
                 assert n == visual_count * property_count;
                 if (property_count > 18) {
@@ -370,15 +370,15 @@ public class GLX extends gnu.x11.extension.Extension implements
         RequestOutputStream o = display.out;
         synchronized (o) {
             o.beginGLXRequest(GLXCommand.GLXQueryServerString);
-            o.write_int32(screen_no);
-            o.write_int32(name);
+            o.writeInt32(screen_no);
+            o.writeInt32(name);
             ResponseInputStream i = display.in;
             synchronized (i) {
-                i.read_reply(o);
+                i.readReply(o);
                 i.skip(12);
-                int len = i.read_int32();
+                int len = i.readInt32();
                 i.skip(16);
-                server_string = i.read_string8(len);
+                server_string = i.readString8(len);
                 i.pad(len);
             }
         }
@@ -476,11 +476,11 @@ public class GLX extends gnu.x11.extension.Extension implements
         synchronized (o) {
             int n = CLIENT_EXTENSION_STRING.length();
             int p = RequestOutputStream.pad(n);
-            o.begin_request(major_opcode, 20, 4 + (n + p) / 4);
-            o.write_int32(this.SUPPORTED_GLX_VERSION.major);
-            o.write_int32(this.SUPPORTED_GLX_VERSION.minor);
-            o.write_int32(CLIENT_EXTENSION_STRING.length());
-            o.write_string8(CLIENT_EXTENSION_STRING);
+            o.beginRequest(major_opcode, 20, 4 + (n + p) / 4);
+            o.writeInt32(this.SUPPORTED_GLX_VERSION.major);
+            o.writeInt32(this.SUPPORTED_GLX_VERSION.minor);
+            o.writeInt32(CLIENT_EXTENSION_STRING.length());
+            o.writeString8(CLIENT_EXTENSION_STRING);
             o.skip(p);
             o.send();
         }
@@ -492,19 +492,19 @@ public class GLX extends gnu.x11.extension.Extension implements
         int[] props;
         RequestOutputStream o = display.out;
         synchronized (o) {
-            o.begin_request(major_opcode, 21, 2);
-            o.write_int32(screen_no);
+            o.beginRequest(major_opcode, 21, 2);
+            o.writeInt32(screen_no);
             ResponseInputStream i = display.in;
             synchronized (i) {
                 i.skip(4);
-                int n = i.read_int32();
+                int n = i.readInt32();
                 // TODO: Build more useful object from this data.
-                int num_fb_configs = i.read_int32();
-                int num_props = i.read_int32();
+                int num_fb_configs = i.readInt32();
+                int num_props = i.readInt32();
                 i.skip(16);
                 props = new int[n];
                 for (int idx = 0; idx < n; idx++) {
-                    props[idx] = i.read_int32();
+                    props[idx] = i.readInt32();
                 }
             }
         }

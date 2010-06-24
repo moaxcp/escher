@@ -76,12 +76,12 @@ public class Print extends gnu.x11.extension.Extension
       int len = 4 + Data.unit (name) + Data.unit (locale);
       RequestOutputStream o = display.out;
       synchronized (o) {
-        o.begin_request (major_opcode, 2, len);
-        o.write_int32 (id);
-        o.write_int32 (name.length ());
-        o.write_int32 (locale.length ());
-        o.write_string8 (name);
-        o.write_string8 (locale);
+        o.beginRequest (major_opcode, 2, len);
+        o.writeInt32 (id);
+        o.writeInt32 (name.length ());
+        o.writeInt32 (locale.length ());
+        o.writeString8 (name);
+        o.writeString8 (locale);
         o.send ();
       }
     }
@@ -94,8 +94,8 @@ public class Print extends gnu.x11.extension.Extension
     public void set () {
       RequestOutputStream o = display.out;
       synchronized (o) {
-        o.begin_request (major_opcode, 3, 2);
-        o.write_int32 (id);
+        o.beginRequest (major_opcode, 3, 2);
+        o.writeInt32 (id);
         o.send ();
       }
     }
@@ -108,8 +108,8 @@ public class Print extends gnu.x11.extension.Extension
     public void destroy () {
       RequestOutputStream o = display.out;
       synchronized (o) {
-        o.begin_request (major_opcode, 5, 2);
-        o.write_int32 (id);
+        o.beginRequest (major_opcode, 5, 2);
+        o.writeInt32 (id);
         o.send ();
       }
     }
@@ -123,14 +123,14 @@ public class Print extends gnu.x11.extension.Extension
       int root_id;
       RequestOutputStream o = display.out;
       synchronized (o) {
-        o.begin_request (major_opcode, 6, 2);
+        o.beginRequest (major_opcode, 6, 2);
         // error in spec: missing context field
-        o.write_int32 (id);
+        o.writeInt32 (id);
         ResponseInputStream i = display.in;
         synchronized (i) {
-          i.read_reply (o);
+          i.readReply (o);
           i.skip (8);
-          root_id = i.read_int32 ();
+          root_id = i.readInt32 ();
           i.skip (16);
         }
       }
@@ -145,9 +145,9 @@ public class Print extends gnu.x11.extension.Extension
     public void select_input (int event_mask) {
       RequestOutputStream o = display.out;
       synchronized (o) {
-        o.begin_request (major_opcode, 15, 3);
-        o.write_int32 (id);
-        o.write_int32 (event_mask);
+        o.beginRequest (major_opcode, 15, 3);
+        o.writeInt32 (id);
+        o.writeInt32 (event_mask);
         o.send ();
       }
     }
@@ -158,8 +158,8 @@ public class Print extends gnu.x11.extension.Extension
       public int event_mask;
       public int all_event_masks;
       InputSelectedInfo (ResponseInputStream i) {
-        event_mask = i.read_int32 ();
-        all_event_masks = i.read_int32 ();
+        event_mask = i.readInt32 ();
+        all_event_masks = i.readInt32 ();
       }
       public int event_mask () { return event_mask; }
       public int all_events_mask () { return all_event_masks; }
@@ -175,11 +175,11 @@ public class Print extends gnu.x11.extension.Extension
       InputSelectedInfo info;
       RequestOutputStream o = display.out;
       synchronized (o) {
-        o.begin_request (major_opcode, 16, 2);
-        o.write_int32 (id);
+        o.beginRequest (major_opcode, 16, 2);
+        o.writeInt32 (id);
         ResponseInputStream i = display.in;
         synchronized (i) {
-          i.read_reply (o);
+          i.readReply (o);
           i.skip (8);
           info = new InputSelectedInfo (i);
           i.skip (16);
@@ -216,16 +216,16 @@ public class Print extends gnu.x11.extension.Extension
       String atts;
       RequestOutputStream o = display.out;
       synchronized (o) {
-        o.begin_request (major_opcode, 17, 3);
-        o.write_int32 (id);
-        o.write_int8 (pool);
+        o.beginRequest (major_opcode, 17, 3);
+        o.writeInt32 (id);
+        o.writeInt8 (pool);
         ResponseInputStream i = display.in;
         synchronized (i) {
-          i.read_reply (o);
+          i.readReply (o);
           i.skip (8);
-          int strlen = i.read_int32 ();
+          int strlen = i.readInt32 ();
           i.skip (20);
-          atts = i.read_string8 (strlen);
+          atts = i.readString8 (strlen);
         }
       }
       return atts;
@@ -251,13 +251,13 @@ public class Print extends gnu.x11.extension.Extension
       int len = 4 + Data.unit (attributes);
       RequestOutputStream o = display.out;
       synchronized (o) {
-        o.begin_request (major_opcode, 18, len);
-        o.write_int32 (id);
-        o.write_int32 (attributes.length ());
-        o.write_int8 (pool);
-        o.write_int8 (rule);
+        o.beginRequest (major_opcode, 18, len);
+        o.writeInt32 (id);
+        o.writeInt32 (attributes.length ());
+        o.writeInt8 (pool);
+        o.writeInt8 (rule);
         o.skip (2);
-        o.write_string8 (attributes);
+        o.writeString8 (attributes);
         o.send ();
       }
     };   
@@ -283,19 +283,19 @@ public class Print extends gnu.x11.extension.Extension
       int len = 4 + Data.unit (name);
       RequestOutputStream o = display.out;
       synchronized (o) {
-        o.begin_request (major_opcode, 19, len);
-        o.write_int32 (id);
-        o.write_int32 (name.length ());
-        o.write_int8 (pool);
+        o.beginRequest (major_opcode, 19, len);
+        o.writeInt32 (id);
+        o.writeInt32 (name.length ());
+        o.writeInt8 (pool);
         o.skip (3);
-        o.write_string8 (name);
+        o.writeString8 (name);
         ResponseInputStream i = display.in;
         synchronized (i) {
-          i.read_reply (o);
+          i.readReply (o);
           i.skip (8);
-          int strlen = i.read_int32 ();
+          int strlen = i.readInt32 ();
           i.skip (20);
-          attr = i.read_string8 (strlen);
+          attr = i.readString8 (strlen);
           i.skip (RequestOutputStream.pad (strlen));
         }
       }
@@ -312,12 +312,12 @@ public class Print extends gnu.x11.extension.Extension
       public int reproducible_width;
       public int reproducible_height;
       PageDimensions (ResponseInputStream i) {
-        width = i.read_int16 ();
-        height = i.read_int16 ();
-        offset_x = i.read_int16 ();
-        offset_y = i.read_int16 ();
-        reproducible_width = i.read_int16 ();
-        reproducible_height = i.read_int16 ();
+        width = i.readInt16 ();
+        height = i.readInt16 ();
+        offset_x = i.readInt16 ();
+        offset_y = i.readInt16 ();
+        reproducible_width = i.readInt16 ();
+        reproducible_height = i.readInt16 ();
       }
 
       public int width () { return width; }
@@ -345,9 +345,9 @@ public class Print extends gnu.x11.extension.Extension
       public boolean status;
       public int previous_resolution;
       SetImageResolutionInfo (ResponseInputStream i) {
-        status = i.read_bool ();
+        status = i.readBool ();
         i.skip (6);
-        previous_resolution = i.read_int16 ();
+        previous_resolution = i.readInt16 ();
       }
       public boolean status () { return status; }
       public int previous_resolution () { return previous_resolution; }
@@ -362,11 +362,11 @@ public class Print extends gnu.x11.extension.Extension
       PageDimensions dim;
       RequestOutputStream o = display.out;
       synchronized (o) {
-        o.begin_request (major_opcode, 21, 2);
-        o.write_int32 (id);
+        o.beginRequest (major_opcode, 21, 2);
+        o.writeInt32 (id);
         ResponseInputStream i = display.in;
         synchronized (i) {
-          i.read_reply (o);
+          i.readReply (o);
           i.skip (8);
           dim = new PageDimensions (i);
           i.skip (12);
@@ -385,9 +385,9 @@ public class Print extends gnu.x11.extension.Extension
       SetImageResolutionInfo info;
       RequestOutputStream o = display.out;
       synchronized (o) {
-        o.begin_request (major_opcode, 23, 3);
-        o.write_int32 (id);
-        o.write_int16 (resolution);
+        o.beginRequest (major_opcode, 23, 3);
+        o.writeInt32 (id);
+        o.writeInt16 (resolution);
         ResponseInputStream i = display.in;
         synchronized (i) {
           i.skip (1);
@@ -408,12 +408,12 @@ public class Print extends gnu.x11.extension.Extension
       int res;
       RequestOutputStream o = display.out;
       synchronized (o) {
-        o.begin_request (major_opcode, 24, 2);
-        o.write_int32 (id);
+        o.beginRequest (major_opcode, 24, 2);
+        o.writeInt32 (id);
         ResponseInputStream i = display.in;
         synchronized (i) {
           i.skip (8);
-          res = i.read_int16 ();
+          res = i.readInt16 ();
           i.skip (22);
         }
       }
@@ -454,13 +454,13 @@ public class Print extends gnu.x11.extension.Extension
     // check version before any other operations
     RequestOutputStream o = display.out;
     synchronized (o) {
-      o.begin_request (major_opcode, 0, 1);
+      o.beginRequest (major_opcode, 0, 1);
       ResponseInputStream i = display.in;
       synchronized (i) {
-        i.read_reply (o);
+        i.readReply (o);
         i.skip (8);
-        server_major_version = i.read_int16 ();
-        server_minor_version = i.read_int16 ();
+        server_major_version = i.readInt16 ();
+        server_minor_version = i.readInt16 ();
         i.skip (20);
       }
     }
@@ -473,11 +473,11 @@ public class Print extends gnu.x11.extension.Extension
     public String name;
     public String desc;
     Printer (ResponseInputStream i) {
-      int name_len = i.read_int32 ();
-      name = i.read_string8 (name_len);
+      int name_len = i.readInt32 ();
+      name = i.readString8 (name_len);
       i.skip (RequestOutputStream.pad (name_len));
-      int desc_len = i.read_int32 ();
-      desc = i.read_string8 (desc_len);
+      int desc_len = i.readInt32 ();
+      desc = i.readString8 (desc_len);
       i.skip (RequestOutputStream.pad (desc_len));
     }
 
@@ -513,15 +513,15 @@ public class Print extends gnu.x11.extension.Extension
     int len = 3 + Data.unit (name) + Data.unit (locale);
     RequestOutputStream o = display.out;
     synchronized (o) {
-      o.begin_request(major_opcode, 1, len);
-      o.write_int32 (name.length ());
-      o.write_int32 (locale.length ());
-      o.write_string8 (name);
-      o.write_string8 (locale);
+      o.beginRequest(major_opcode, 1, len);
+      o.writeInt32 (name.length ());
+      o.writeInt32 (locale.length ());
+      o.writeString8 (name);
+      o.writeString8 (locale);
       ResponseInputStream i = display.in;
       synchronized (i) {
         i.skip (8);
-        int num = i.read_int32 ();
+        int num = i.readInt32 ();
         printers = new Printer [num];
         for (int j = 0; j < num; j++) {
           printers [j] = new Printer (i);
@@ -540,12 +540,12 @@ public class Print extends gnu.x11.extension.Extension
     int id;
     RequestOutputStream o = display.out;
     synchronized (o) {
-      o.begin_request (major_opcode, 4, 1);
+      o.beginRequest (major_opcode, 4, 1);
       ResponseInputStream i = display.in;
       synchronized (i) {
-        i.read_reply (o);
+        i.readReply (o);
         i.skip (8);
-        id = i.read_int32 ();
+        id = i.readInt32 ();
         i.skip (16);
       }
     }
@@ -568,8 +568,8 @@ public class Print extends gnu.x11.extension.Extension
   public void start_job (int output_mode) {
     RequestOutputStream o = display.out;
     synchronized (o) {
-      o.begin_request (major_opcode, 7, 2);
-      o.write_int8 (output_mode);
+      o.beginRequest (major_opcode, 7, 2);
+      o.writeInt8 (output_mode);
       o.send ();
     }
   }
@@ -582,8 +582,8 @@ public class Print extends gnu.x11.extension.Extension
   public void end_job (boolean cancel) {
     RequestOutputStream o = display.out;
     synchronized (o) {
-      o.begin_request (major_opcode, 8, 2);
-      o.write_bool (cancel);
+      o.beginRequest (major_opcode, 8, 2);
+      o.writeBool (cancel);
       o.send ();
     }
   }
@@ -596,8 +596,8 @@ public class Print extends gnu.x11.extension.Extension
   public void start_doc (int type) {
     RequestOutputStream o = display.out;
     synchronized (o) {
-      o.begin_request (major_opcode, 9, 2);
-      o.write_int8 (type);
+      o.beginRequest (major_opcode, 9, 2);
+      o.writeInt8 (type);
       o.send ();
     }
   }
@@ -610,8 +610,8 @@ public class Print extends gnu.x11.extension.Extension
   public void end_doc (boolean cancel) {
     RequestOutputStream o = display.out;
     synchronized (o) {
-      o.begin_request (major_opcode, 10, 2);
-      o.write_bool (cancel);
+      o.beginRequest (major_opcode, 10, 2);
+      o.writeBool (cancel);
       o.send ();
     }
   }
@@ -624,8 +624,8 @@ public class Print extends gnu.x11.extension.Extension
   public void start_page (Window window) {
     RequestOutputStream o = display.out;
     synchronized (o) {
-      o.begin_request (major_opcode, 13, 2);
-      o.write_int32 (window.id);
+      o.beginRequest (major_opcode, 13, 2);
+      o.writeInt32 (window.id);
       o.send ();
     }
   }
@@ -638,8 +638,8 @@ public class Print extends gnu.x11.extension.Extension
   public void end_page (boolean cancel) {
     RequestOutputStream o = display.out;
     synchronized (o) {
-      o.begin_request (major_opcode, 14, 2);
-      o.write_bool (cancel);
+      o.beginRequest (major_opcode, 14, 2);
+      o.writeBool (cancel);
       o.send ();
     }
   }
@@ -652,7 +652,7 @@ public class Print extends gnu.x11.extension.Extension
   public void rehash_printer_list () {
     RequestOutputStream o = display.out;
     synchronized (o) {
-      o.begin_request (major_opcode, 20, 1);
+      o.beginRequest (major_opcode, 20, 1);
       o.send ();
     }
   }
@@ -671,16 +671,16 @@ public class Print extends gnu.x11.extension.Extension
     RequestOutputStream o = display.out;
     synchronized (o) {
       // error in spec: request length = 1 vs. 2
-      o.begin_request (major_opcode, 22, 1);
+      o.beginRequest (major_opcode, 22, 1);
       ResponseInputStream i = display.in;
       synchronized (i) {
-        i.read_reply (o);
+        i.readReply (o);
         i.skip (8);
-        int count = i.read_int32 ();
+        int count = i.readInt32 ();
         ids = new int [count + 1];
         i.skip (20);
         for (int j = 0; j <= count; j++)
-          ids [j] = i.read_int32 ();
+          ids [j] = i.readInt32 ();
       }
     }
     Window [] windows = new Window [ids.length];
@@ -714,7 +714,7 @@ public class Print extends gnu.x11.extension.Extension
     public int context_id;
     AttributeNotifyEvent (Display display, ResponseInputStream in) {
       super (display, in);
-      context_id = in.read_int32 ();
+      context_id = in.readInt32 ();
       in.skip (24);
     }
   
@@ -743,8 +743,8 @@ public class Print extends gnu.x11.extension.Extension
     public boolean cancel;
     public PrintNotifyEvent (Display display, ResponseInputStream i) { 
       super (display, i);
-      context_id = i.read_int32 ();
-      cancel = i.read_bool ();
+      context_id = i.readInt32 ();
+      cancel = i.readBool ();
       i.skip (23);
     }
   

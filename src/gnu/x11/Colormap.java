@@ -64,10 +64,10 @@ public class Colormap extends Resource {
 
     RequestOutputStream o = display.out;
     synchronized (o) {
-      o.begin_request (78, alloc, 4);
-      o.write_int32 (id);
-      o.write_int32 (window.id);
-      o.write_int32 (visualId);
+      o.beginRequest (78, alloc, 4);
+      o.writeInt32 (id);
+      o.writeInt32 (window.id);
+      o.writeInt32 (visualId);
       o.send ();
     }
   }
@@ -81,8 +81,8 @@ public class Colormap extends Resource {
 
     RequestOutputStream o = display.out;
     synchronized (o) {
-      o.begin_request (78, 0, 2);
-      o.write_int32 (id);
+      o.beginRequest (78, 0, 2);
+      o.writeInt32 (id);
       o.send ();
     }
   }
@@ -93,9 +93,9 @@ public class Colormap extends Resource {
     Colormap newMap = new Colormap (display, newID);
     RequestOutputStream o = display.out;
     synchronized (o) {
-      o.begin_request (80, 0, 3);
-      o.write_int32 (newID);
-      o.write_int32 (id);
+      o.beginRequest (80, 0, 3);
+      o.writeInt32 (newID);
+      o.writeInt32 (id);
       o.send ();
     }
     return newMap;
@@ -109,8 +109,8 @@ public class Colormap extends Resource {
   public void install () {
     RequestOutputStream o = display.out;
     synchronized (o) {
-      o.begin_request (81, 0, 3);
-      o.write_int32 (id);
+      o.beginRequest (81, 0, 3);
+      o.writeInt32 (id);
       o.send ();
     }
   }
@@ -123,8 +123,8 @@ public class Colormap extends Resource {
   public void uninstall () {
     RequestOutputStream o = display.out;
     synchronized (o) {
-      o.begin_request (82, 0, 3);
-      o.write_int32 (id);
+      o.beginRequest (82, 0, 3);
+      o.writeInt32 (id);
       o.send ();
     }
   }
@@ -159,21 +159,21 @@ public class Colormap extends Resource {
     RequestOutputStream o = display.out;
     Color c;
     synchronized (o) {
-      o.begin_request (84, 0, 4);
-      o.write_int32 (id);
-      o.write_int16 (red);
-      o.write_int16 (green);
-      o.write_int16 (blue);
+      o.beginRequest (84, 0, 4);
+      o.writeInt32 (id);
+      o.writeInt16 (red);
+      o.writeInt16 (green);
+      o.writeInt16 (blue);
       o.skip (2);
       ResponseInputStream i = display.in;
       synchronized (i) {
-        i.read_reply (o);
+        i.readReply (o);
         i.skip (8);
-        int r = i.read_int16 ();
-        int g = i.read_int16 ();
-        int b = i.read_int16 ();
+        int r = i.readInt16 ();
+        int g = i.readInt16 ();
+        int b = i.readInt16 ();
         i.skip (2);
-        int p = i.read_int32 ();
+        int p = i.readInt32 ();
         i.skip (12);
         c = new Color(p);
         c.setExact(new RGB (r, g, b));
@@ -205,23 +205,23 @@ public class Colormap extends Resource {
 
     Color c;
     synchronized (o) {
-      o.begin_request (85, 0, 3 + (n + p) / 4);
-      o.write_int32 (id);
-      o.write_int16 (n);
+      o.beginRequest (85, 0, 3 + (n + p) / 4);
+      o.writeInt32 (id);
+      o.writeInt16 (n);
       o.skip (2);
-      o.write_string8 (name);
+      o.writeString8 (name);
       o.skip (p);
       ResponseInputStream i = display.in;
       synchronized (i) {
-        i.read_reply (o);
+        i.readReply (o);
         i.skip (8);
-        int pixel = i.read_int32 ();
-        int er = i.read_int16 ();
-        int eg = i.read_int16 ();
-        int eb = i.read_int16 ();
-        int vr = i.read_int16 ();
-        int vg = i.read_int16 ();
-        int vb = i.read_int16 ();
+        int pixel = i.readInt32 ();
+        int er = i.readInt16 ();
+        int eg = i.readInt16 ();
+        int eb = i.readInt16 ();
+        int vr = i.readInt16 ();
+        int vg = i.readInt16 ();
+        int vb = i.readInt16 ();
         i.skip (8);
         c = new Color (pixel);
         c.setExact(new RGB (er, eg, eb));
@@ -255,23 +255,23 @@ public class Colormap extends Resource {
     RequestOutputStream o = display.out;
     ColorCellsReply r;
     synchronized (o) {
-      o.begin_request (86, contiguous ? 1 : 0, 3);
-      o.write_int32 (id);
-      o.write_int16 (color_count);
-      o.write_int16 (plane_count);
+      o.beginRequest (86, contiguous ? 1 : 0, 3);
+      o.writeInt32 (id);
+      o.writeInt16 (color_count);
+      o.writeInt16 (plane_count);
       ResponseInputStream i = display.in;
       synchronized (i) {
-        i.read_reply (o);
+        i.readReply (o);
         i.skip (8);
-        int n = i.read_int16 ();
-        int m = i.read_int16 ();
+        int n = i.readInt16 ();
+        int m = i.readInt16 ();
         i.skip (20);
         int [] pixels = new int [n];
         for (int j = 0; j < n; j++)
-          pixels [j] = i.read_int32 ();
+          pixels [j] = i.readInt32 ();
         int [] masks = new int [m];
         for (int j = 0; j < m; j++)
-          masks [j] = i.read_int32 ();
+          masks [j] = i.readInt32 ();
         r = new ColorCellsReply (pixels, masks);
       }
     }
@@ -306,26 +306,26 @@ public class Colormap extends Resource {
     RequestOutputStream o = display.out;
     ColorPlaneReply r;
     synchronized (o) {
-      o.begin_request (87, contiguous ? 1 : 0, 4);
-      o.write_int32 (id);
-      o.write_int16 (color_count);
-      o.write_int16 (red_count);
-      o.write_int16 (green_count);
-      o.write_int16 (blue_count);
+      o.beginRequest (87, contiguous ? 1 : 0, 4);
+      o.writeInt32 (id);
+      o.writeInt16 (color_count);
+      o.writeInt16 (red_count);
+      o.writeInt16 (green_count);
+      o.writeInt16 (blue_count);
 
       ResponseInputStream i = display.in;
       synchronized (i) {
-        i.read_reply (o);
+        i.readReply (o);
         i.skip (8);
-        int n = i.read_int16 ();
+        int n = i.readInt16 ();
         i.skip (2);
-        int rm = i.read_int32 ();
-        int gm = i.read_int32 ();
-        int bm = i.read_int32 ();
+        int rm = i.readInt32 ();
+        int gm = i.readInt32 ();
+        int bm = i.readInt32 ();
         i.skip (8);
         int [] px = new int [n];
         for (int j = 0; j < n; j++)
-          px [j] = i.read_int32 ();
+          px [j] = i.readInt32 ();
         r = new ColorPlaneReply (rm, gm, bm, px);
       }
     }
@@ -342,11 +342,11 @@ public class Colormap extends Resource {
     int n = pixels.length;
     RequestOutputStream o = display.out;
     synchronized (o) {
-      o.begin_request (88, 0, 3 + n);
-      o.write_int32 (id);
-      o.write_int32 (plane_mask);
+      o.beginRequest (88, 0, 3 + n);
+      o.writeInt32 (id);
+      o.writeInt32 (plane_mask);
       for (int i = 0; i < pixels.length; i++)
-        o.write_int32 (pixels [i]);
+        o.writeInt32 (pixels [i]);
       o.send ();
     }
   }
@@ -377,14 +377,14 @@ public class Colormap extends Resource {
     }
 
     void write (RequestOutputStream o) {
-      o.write_int32 (pixel);
-      o.write_int16 (red);
-      o.write_int16 (green);
-      o.write_int16 (blue);
+      o.writeInt32 (pixel);
+      o.writeInt16 (red);
+      o.writeInt16 (green);
+      o.writeInt16 (blue);
       int do_colors = ( do_red ? 0x01 : 0 )
                       | ( do_green ? 0x02 : 0)
                       | (do_blue ? 0x04 : 0); 
-      o.write_int8 (do_colors);
+      o.writeInt8 (do_colors);
       o.skip (1);
     }
   }
@@ -398,8 +398,8 @@ public class Colormap extends Resource {
     int n = items.length;
     RequestOutputStream o = display.out;
     synchronized (o) {
-      o.begin_request (89, 0, 3 + 2 * n);
-      o.write_int32 (id);
+      o.beginRequest (89, 0, 3 + 2 * n);
+      o.writeInt32 (id);
       for (int i = 0; i < n; i++)
         items [i].write (o);
       o.send ();
@@ -424,12 +424,12 @@ public class Colormap extends Resource {
 
     RequestOutputStream o = display.out;
     synchronized (o) {
-      o.begin_request (90, do_color, 4 + (n + p) / 4);
-      o.write_int32 (id);
-      o.write_int32 (pixel);
-      o.write_int16 (n);
+      o.beginRequest (90, do_color, 4 + (n + p) / 4);
+      o.writeInt32 (id);
+      o.writeInt32 (pixel);
+      o.writeInt16 (n);
       o.skip (2);
-      o.write_string8 (name);
+      o.writeString8 (name);
       o.skip (p);
       o.send ();
     }
@@ -454,22 +454,22 @@ public class Colormap extends Resource {
     int n = pixels.length;
     RGB [] rgbs;
     synchronized (o) {
-      o.begin_request (91, 0, 2 + n);
-      o.write_int32 (id);
+      o.beginRequest (91, 0, 2 + n);
+      o.writeInt32 (id);
       for (int j = 0; j < n; j++)
-        o.write_int32 (pixels [j]);
+        o.writeInt32 (pixels [j]);
 
       ResponseInputStream i = display.in;
       synchronized (i) {
-        i.read_reply (o);
+        i.readReply (o);
         i.skip (8);
-        int len = i.read_int16 ();
+        int len = i.readInt16 ();
         rgbs = new RGB [len];
         i.skip (22);
         for (int j = 0; j < len; j++) {
-          int r = i.read_int16 ();
-          int g = i.read_int16 ();
-          int b = i.read_int16 ();
+          int r = i.readInt16 ();
+          int g = i.readInt16 ();
+          int b = i.readInt16 ();
           i.skip (2);
           rgbs [j] = new RGB (r, g, b);
         }
@@ -500,23 +500,23 @@ public class Colormap extends Resource {
     RequestOutputStream o = display.out;
     Color c;
     synchronized (o) {
-      o.begin_request (92, 0, 3 + (n + p) / 4);
-      o.write_int32 (id);
-      o.write_int16 (n);
+      o.beginRequest (92, 0, 3 + (n + p) / 4);
+      o.writeInt32 (id);
+      o.writeInt16 (n);
       o.skip (2);
-      o.write_string8 (name);
+      o.writeString8 (name);
       o.skip (p);
 
       ResponseInputStream i = display.in;
       synchronized (i) {
-        i.read_reply (o);
+        i.readReply (o);
         i.skip (8);
-        int er = i.read_int16 ();
-        int eg = i.read_int16 ();
-        int eb = i.read_int16 ();
-        int vr = i.read_int16 ();
-        int vg = i.read_int16 ();
-        int vb = i.read_int16 ();
+        int er = i.readInt16 ();
+        int eg = i.readInt16 ();
+        int eb = i.readInt16 ();
+        int vr = i.readInt16 ();
+        int vg = i.readInt16 ();
+        int vb = i.readInt16 ();
         i.skip (12);
         c = new Color (0);
         c.setExact(new RGB (er, eg, eb));

@@ -106,17 +106,17 @@ public class ResponseInputStream extends FilterInputStream {
      * 
      * @return all pending events
      */
-    public List pull_all_events() {
+    public List pullAllEvents() {
 
         LinkedList l = new LinkedList(this.events);
-        Event e = this.read_event_from_stream();
+        Event e = this.readEventFromStream();
         while (e != null) {
             l.add(e);
         }
         return l;
     }
 
-    public boolean read_bool() {
+    public boolean readBool() {
 
         assert Thread.holdsLock(this);
 
@@ -134,7 +134,7 @@ public class ResponseInputStream extends FilterInputStream {
      * 
      * @return the byte value
      */
-    public int read_byte() {
+    public int readByte() {
 
         assert Thread.holdsLock(this);
 
@@ -147,12 +147,12 @@ public class ResponseInputStream extends FilterInputStream {
         return v & 0xff;
     }
 
-    private Event read_core_event(int code) {
+    private Event readCoreEvent(int code) {
 
         Event ev = null;
         switch (code) {
         case 0:
-            this.read_error();
+            this.readError();
             break;
         case 1:
             ev = null;
@@ -262,16 +262,16 @@ public class ResponseInputStream extends FilterInputStream {
         return ev;
     }
 
-    public void read_data(byte[] buf) {
+    public void readData(byte[] buf) {
 
         assert Thread.holdsLock(this);
 
         int len = buf.length;
         int offset = 0;
-        this.read_data(buf, offset, len);
+        this.readData(buf, offset, len);
     }
 
-    public void read_data(byte[] buf, int offset, int len) {
+    public void readData(byte[] buf, int offset, int len) {
 
         assert Thread.holdsLock(this);
 
@@ -292,15 +292,15 @@ public class ResponseInputStream extends FilterInputStream {
     /**
      * Reads an X error from the stream.
      */
-    private void read_error() {
+    private void readError() {
 
-        int reply = this.read_int8();
+        int reply = this.readInt8();
         assert reply == 0;
-        int code = this.read_int8();
-        int seq_no = this.read_int16();
-        int bad_value = this.read_int32();
-        int minor_opcode = this.read_int16();
-        int major_opcode = this.read_int8();
+        int code = this.readInt8();
+        int seq_no = this.readInt16();
+        int bad_value = this.readInt32();
+        int minor_opcode = this.readInt16();
+        int major_opcode = this.readInt8();
         this.skip(21);
         if (code >= 128 && code <= 255) {
             throw this.build_extension_error(this.display, code, seq_no, bad_value,
@@ -314,7 +314,7 @@ public class ResponseInputStream extends FilterInputStream {
         throw err;
     }
 
-    public Event read_event() {
+    public Event readEvent() {
 
         // Otherwise we read and return the first event from the stream.
         Event ev = null;
@@ -324,7 +324,7 @@ public class ResponseInputStream extends FilterInputStream {
             if (this.events.size() > 0) {
                 ev = (Event) this.events.removeFirst();
             } else {
-                ev = this.read_event_from_stream();
+                ev = this.readEventFromStream();
             }
 
             // If this returned null, there's a reply in the response stream and
@@ -350,7 +350,7 @@ public class ResponseInputStream extends FilterInputStream {
      * 
      * @return the next event from the stream
      */
-    private synchronized Event read_event_from_stream() {
+    private synchronized Event readEventFromStream() {
 
         int available = 0;
         try {
@@ -369,7 +369,7 @@ public class ResponseInputStream extends FilterInputStream {
         int code = -1;
         try {
             this.in.mark(1);
-            code = this.read_int8();
+            code = this.readInt8();
             this.in.reset();
         } catch (IOException ex) {
             ex.printStackTrace();
@@ -379,14 +379,14 @@ public class ResponseInputStream extends FilterInputStream {
         code = code & 0x7f; // Remove synthetic mask.
         Event ev = null;
         if (code >= 64 && code <= 127) {
-            ev = this.read_extension_event(code);
+            ev = this.readExtensionEvent(code);
         } else {
-            ev = this.read_core_event(code);
+            ev = this.readCoreEvent(code);
         }
         return ev;
     }
 
-    private Event read_extension_event(int code) {
+    private Event readExtensionEvent(int code) {
 
         EventFactory fac = this.display.extension_event_factories[code - 64];
         if (fac == null) {
@@ -395,16 +395,16 @@ public class ResponseInputStream extends FilterInputStream {
         return fac.build(this.display, this, code);
     }
 
-    public float read_float32() {
+    public float readFloat32() {
 
-        int bits = this.read_int32();
+        int bits = this.readInt32();
         float v = Float.intBitsToFloat(bits);
         return v;
     }
 
-    public double read_float64() {
+    public double readFloat64() {
 
-        long bits = this.read_int64();
+        long bits = this.readInt64();
         double v = Double.longBitsToDouble(bits);
         return v;
     }
@@ -414,7 +414,7 @@ public class ResponseInputStream extends FilterInputStream {
      * 
      * @return the value
      */
-    public int read_int16() {
+    public int readInt16() {
 
         assert Thread.holdsLock(this);
 
@@ -432,7 +432,7 @@ public class ResponseInputStream extends FilterInputStream {
      * 
      * @return the value
      */
-    public int read_int32() {
+    public int readInt32() {
 
         assert Thread.holdsLock(this);
 
@@ -450,7 +450,7 @@ public class ResponseInputStream extends FilterInputStream {
      * 
      * @return the value
      */
-    public long read_int64() {
+    public long readInt64() {
 
         assert Thread.holdsLock(this);
 
@@ -465,7 +465,7 @@ public class ResponseInputStream extends FilterInputStream {
         return v;
     }
 
-    public int read_int8() {
+    public int readInt8() {
 
         assert Thread.holdsLock(this);
 
@@ -487,7 +487,7 @@ public class ResponseInputStream extends FilterInputStream {
      * 
      * @return the input stream for reading the reply
      */
-    public void read_reply(RequestOutputStream out) {
+    public void readReply(RequestOutputStream out) {
 
         // When reading a reply, the calling thread must hold a lock on both
         // the input and the output stream, otherwise we might end up doing
@@ -499,7 +499,7 @@ public class ResponseInputStream extends FilterInputStream {
         // Flush the current request.
         // DON'T use plain send() because this could trigger a round-trip check
         // which would mess up with the reply.
-        out.send_impl();
+        out.sendImpl();
         out.flush();
 
         int exp_seq_no = out.getSequenceNumber();
@@ -509,15 +509,15 @@ public class ResponseInputStream extends FilterInputStream {
         do {
             try {
                 this.mark(1);
-                code = this.read_int8();
+                code = this.readInt8();
                 this.reset();
             } catch (IOException ex) {
                 this.handle_exception(ex);
             }
             if (code == 0) {
-                this.read_error();
+                this.readError();
             } else if (code > 1) { // Event.
-                Event ev = this.read_event_from_stream();
+                Event ev = this.readEventFromStream();
                 if (ev != null) {
                     this.events.addLast(ev);
                 }
@@ -527,10 +527,10 @@ public class ResponseInputStream extends FilterInputStream {
         // match.
         try {
             this.mark(4);
-            int reply = this.read_int8();
+            int reply = this.readInt8();
             assert reply == 1 : "Reply code must be 1 but is: " + reply;
             this.skip(1);
-            int seq_no = this.read_int16();
+            int seq_no = this.readInt16();
             assert (exp_seq_no == seq_no) : "expected sequence number: "
                     + exp_seq_no + " got sequence number: " + seq_no;
             this.reset();
@@ -541,12 +541,12 @@ public class ResponseInputStream extends FilterInputStream {
         // Now the calling thread can safely read the reply.
     }
 
-    public String read_string8(int len) {
+    public String readString8(int len) {
 
         assert Thread.holdsLock(this);
 
         byte[] buf = new byte[len];
-        this.read_data(buf);
+        this.readData(buf);
         String s = new String(buf);
         return s;
     }

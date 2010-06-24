@@ -22,15 +22,15 @@ public class PbufferClobberEvent extends gnu.x11.event.Event {
 
   public PbufferClobberEvent (Display display, ResponseInputStream i) { 
     super (display, i); 
-    event_type = i.read_int16 ();
-    drawable_id = i.read_int32 ();
-    buffer_mask = i.read_int32 ();
-    aux_buffer = i.read_int16 ();
-    x = i.read_int16 ();
-    y = i.read_int16 ();
-    width = i.read_int16 ();
-    height = i.read_int16 ();
-    count = i.read_int16 ();
+    event_type = i.readInt16 ();
+    drawable_id = i.readInt32 ();
+    buffer_mask = i.readInt32 ();
+    aux_buffer = i.readInt16 ();
+    x = i.readInt16 ();
+    y = i.readInt16 ();
+    width = i.readInt16 ();
+    height = i.readInt16 ();
+    count = i.readInt16 ();
   }
 
 

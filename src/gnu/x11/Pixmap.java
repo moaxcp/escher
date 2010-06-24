@@ -38,9 +38,9 @@ public class Pixmap extends Drawable {
          */
         public Format(ResponseInputStream in) {
 
-            depth = in.read_int8();
-            bitsPerPixel = in.read_int8();
-            scanlinePad = in.read_int8();
+            depth = in.readInt8();
+            bitsPerPixel = in.readInt8();
+            scanlinePad = in.readInt8();
             in.skip(5); // Unused.
         }
 
@@ -85,11 +85,11 @@ public class Pixmap extends Drawable {
 
         RequestOutputStream o = display.out;
         synchronized (o) {
-            o.begin_request(53, depth, 4);
-            o.write_int32(id);
-            o.write_int32(drawable.id);
-            o.write_int16(width);
-            o.write_int16(height);
+            o.beginRequest(53, depth, 4);
+            o.writeInt32(id);
+            o.writeInt32(drawable.id);
+            o.writeInt16(width);
+            o.writeInt16(height);
             o.send();
         }
     }
@@ -126,8 +126,8 @@ public class Pixmap extends Drawable {
 
         RequestOutputStream o = display.out;
         synchronized (o) {
-            o.begin_request(54, 0, 2);
-            o.write_int32(id);
+            o.beginRequest(54, 0, 2);
+            o.writeInt32(id);
             o.send();
         }
     }

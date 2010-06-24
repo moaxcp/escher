@@ -46,13 +46,13 @@ public class Shape extends Extension implements EventFactory {
     // check version before any other operations
     RequestOutputStream o = display.out;
     synchronized (o) {
-      o.begin_request (major_opcode, 0, 1);
+      o.beginRequest (major_opcode, 0, 1);
       ResponseInputStream i = display.in;
       synchronized (i) {
-        i.read_reply (o);
+        i.readReply (o);
         i.skip (8);
-        server_major_version = i.read_int16 ();
-        server_minor_version = i.read_int16 ();
+        server_major_version = i.readInt16 ();
+        server_minor_version = i.readInt16 ();
         i.skip (20);
       }
     }
@@ -102,20 +102,20 @@ public class Shape extends Extension implements EventFactory {
 
     RequestOutputStream o = display.out;
     synchronized (o) {
-      o.begin_request (major_opcode, 1, 4 + 2 * rectangles.length);
-      o.write_int8 (operation);
-      o.write_int8 (dest_kind);
-      o.write_int8 (ordering);
+      o.beginRequest (major_opcode, 1, 4 + 2 * rectangles.length);
+      o.writeInt8 (operation);
+      o.writeInt8 (dest_kind);
+      o.writeInt8 (ordering);
       o.skip (1);
-      o.write_int32 (dest.id);
-      o.write_int16 (x_offset);
-      o.write_int16 (y_offset);
+      o.writeInt32 (dest.id);
+      o.writeInt16 (x_offset);
+      o.writeInt16 (y_offset);
 
       for (int i = 0; i < rectangles.length; i++) {
-        o.write_int16 (rectangles [i].x);
-        o.write_int16 (rectangles [i].y);
-        o.write_int16 (rectangles [i].width);
-        o.write_int16 (rectangles [i].height);
+        o.writeInt16 (rectangles [i].x);
+        o.writeInt16 (rectangles [i].y);
+        o.writeInt16 (rectangles [i].width);
+        o.writeInt16 (rectangles [i].height);
       }
 
       o.send ();
@@ -144,14 +144,14 @@ public class Shape extends Extension implements EventFactory {
 
     RequestOutputStream o = display.out;
     synchronized (o) {
-      o.begin_request (major_opcode, 2, 5);
-      o.write_int8 (operation);
-      o.write_int8 (dest_kind);
+      o.beginRequest (major_opcode, 2, 5);
+      o.writeInt8 (operation);
+      o.writeInt8 (dest_kind);
       o.skip (2);
-      o.write_int32 (dest.id);
-      o.write_int16 (x_offset);
-      o.write_int16 (y_offset);
-      o.write_int32 (src.id);
+      o.writeInt32 (dest.id);
+      o.writeInt16 (x_offset);
+      o.writeInt16 (y_offset);
+      o.writeInt32 (src.id);
       o.send ();
     }
   }
@@ -181,15 +181,15 @@ public class Shape extends Extension implements EventFactory {
 
     RequestOutputStream o = display.out;
     synchronized (o) {
-      o.begin_request (major_opcode, 3, 5);
-      o.write_int8 (operation);
-      o.write_int8 (dest_kind);
-      o.write_int8 (src_kind);
+      o.beginRequest (major_opcode, 3, 5);
+      o.writeInt8 (operation);
+      o.writeInt8 (dest_kind);
+      o.writeInt8 (src_kind);
       o.skip (1);
-      o.write_int32 (dest.id);
-      o.write_int16 (x_offset);
-      o.write_int16 (y_offset);
-      o.write_int32 (src.id);
+      o.writeInt32 (dest.id);
+      o.writeInt16 (x_offset);
+      o.writeInt16 (y_offset);
+      o.writeInt32 (src.id);
       o.send ();
     }
   }
@@ -204,12 +204,12 @@ public class Shape extends Extension implements EventFactory {
 
     RequestOutputStream o = display.out;
     synchronized (o) {
-      o.begin_request (major_opcode, 4, 4);
-      o.write_int8 (dest_kind);
+      o.beginRequest (major_opcode, 4, 4);
+      o.writeInt8 (dest_kind);
       o.skip (3);
-      o.write_int32 (dest.id);
-      o.write_int16 (x_offset);
-      o.write_int16 (y_offset);
+      o.writeInt32 (dest.id);
+      o.writeInt16 (x_offset);
+      o.writeInt16 (y_offset);
       o.send ();
     }
   }
@@ -230,17 +230,17 @@ public class Shape extends Extension implements EventFactory {
     public int clip_height;
     
     ExtentsInfo (ResponseInputStream i) {
-      bounding_shaped = i.read_bool ();
-      clip_shaped = i.read_bool ();
+      bounding_shaped = i.readBool ();
+      clip_shaped = i.readBool ();
       i.skip (2);
-      bounding_x = i.read_int16 ();
-      bounding_y = i.read_int16 ();
-      bounding_width = i.read_int16 ();
-      bounding_height = i.read_int16 ();
-      clip_x = i.read_int16 ();
-      clip_y = i.read_int16 ();
-      clip_width = i.read_int16 ();
-      clip_height = i.read_int16 ();
+      bounding_x = i.readInt16 ();
+      bounding_y = i.readInt16 ();
+      bounding_width = i.readInt16 ();
+      bounding_height = i.readInt16 ();
+      clip_x = i.readInt16 ();
+      clip_y = i.readInt16 ();
+      clip_width = i.readInt16 ();
+      clip_height = i.readInt16 ();
     }
   
     public Rectangle bounding () { 
@@ -277,11 +277,11 @@ public class Shape extends Extension implements EventFactory {
     ExtentsInfo info;
     RequestOutputStream o = display.out;
     synchronized (o) {
-      o.begin_request (major_opcode, 5, 2);
-      o.write_int32 (dest.id);
+      o.beginRequest (major_opcode, 5, 2);
+      o.writeInt32 (dest.id);
       ResponseInputStream i = display.in;
       synchronized (i) {
-        i.read_reply (o);
+        i.readReply (o);
         i.skip (8);
         info = new ExtentsInfo (i);
         i.skip (4);
@@ -299,9 +299,9 @@ public class Shape extends Extension implements EventFactory {
 
     RequestOutputStream o = display.out;
     synchronized (o) {
-      o.begin_request (major_opcode, 6, 3);
-      o.write_int32 (dest.id);
-      o.write_bool (enable);
+      o.beginRequest (major_opcode, 6, 3);
+      o.writeInt32 (dest.id);
+      o.writeBool (enable);
       o.send ();    
     }
   }
@@ -315,13 +315,13 @@ public class Shape extends Extension implements EventFactory {
     boolean enabled;
     RequestOutputStream o = display.out;
     synchronized (o) {
-      o.begin_request (major_opcode, 6, 2);
-      o.write_int32 (dest.id);
+      o.beginRequest (major_opcode, 6, 2);
+      o.writeInt32 (dest.id);
       ResponseInputStream i = display.in;
       synchronized (i) {
-        i.read_reply (o);
+        i.readReply (o);
         i.skip (1);
-        enabled = i.read_bool ();
+        enabled = i.readBool ();
         i.skip (24);
       }
     }
@@ -341,16 +341,16 @@ public class Shape extends Extension implements EventFactory {
     public Rectangle [] rectangles;
 
     RectanglesInfo (ResponseInputStream i) {
-      ordering = i.read_int8 ();
+      ordering = i.readInt8 ();
       i.skip (6);
-      int nrects = i.read_int32 ();
+      int nrects = i.readInt32 ();
       rectangles = new Rectangle [nrects];
       i.skip (20);
       for (int j = 0; j < nrects; j++) {
-        int x = i.read_int16 ();
-        int y = i.read_int16 ();
-        int w = i.read_int16 ();
-        int h = i.read_int16 ();
+        int x = i.readInt16 ();
+        int y = i.readInt16 ();
+        int w = i.readInt16 ();
+        int h = i.readInt16 ();
         rectangles [j] = new Rectangle (x, y, w, h);
       }
     }
@@ -367,12 +367,12 @@ public class Shape extends Extension implements EventFactory {
     RectanglesInfo info;
     RequestOutputStream o = display.out;
     synchronized (o) {
-      o.begin_request (major_opcode, 7, 3);
-      o.write_int32 (window.id);
-      o.write_int8 (kind);
+      o.beginRequest (major_opcode, 7, 3);
+      o.writeInt32 (window.id);
+      o.writeInt8 (kind);
       ResponseInputStream i = display.in;
       synchronized (i) {
-        i.read_reply (o);
+        i.readReply (o);
         i.skip (1);
         info = new RectanglesInfo (i);
       }
@@ -395,13 +395,13 @@ public class Shape extends Extension implements EventFactory {
 
     NotifyEvent (Display display, ResponseInputStream i) { 
       super (display, i);
-      window_id = i.read_int32 ();
-      x = i.read_int16 ();
-      y = i.read_int16 ();
-      width = i.read_int16 ();
-      height = i.read_int16 ();
-      time = i.read_int32 ();
-      shaped = i.read_bool ();
+      window_id = i.readInt32 ();
+      x = i.readInt16 ();
+      y = i.readInt16 ();
+      width = i.readInt16 ();
+      height = i.readInt16 ();
+      time = i.readInt32 ();
+      shaped = i.readBool ();
       i.skip (11);
     }
 

@@ -45,14 +45,14 @@ public abstract class Drawable extends Resource {
 
         GeometryInfo(ResponseInputStream i) {
 
-            depth = i.read_int8();
+            depth = i.readInt8();
             i.skip(6);
-            root_window_id = i.read_int32();
-            x = i.read_int16();
-            y = i.read_int16();
-            width = i.read_int16();
-            height = i.read_int16();
-            border_width = i.read_int16();
+            root_window_id = i.readInt32();
+            x = i.readInt16();
+            y = i.readInt16();
+            width = i.readInt16();
+            height = i.readInt16();
+            border_width = i.readInt16();
             i.skip(10); // Unused.
         }
     }
@@ -66,11 +66,11 @@ public abstract class Drawable extends Resource {
         GeometryInfo info;
         RequestOutputStream o = display.out;
         synchronized (o) {
-            o.begin_request(14, 0, 2);
-            o.write_int32(id);
+            o.beginRequest(14, 0, 2);
+            o.writeInt32(id);
             ResponseInputStream i = display.in;
             synchronized (i) {
-                i.read_reply(o);
+                i.readReply(o);
                 i.skip(1);
                 info = new GeometryInfo(i);
             }
@@ -109,16 +109,16 @@ public abstract class Drawable extends Resource {
 
         RequestOutputStream o = display.out;
         synchronized (o) {
-            o.begin_request(62, 0, 7);
-            o.write_int32(src.id); // Src-drawable.
-            o.write_int32(id); // Dst-drawable.
-            o.write_int32(gc.id); // GC.
-            o.write_int16(src_x);
-            o.write_int16(src_y);
-            o.write_int16(dst_x);
-            o.write_int16(dst_y);
-            o.write_int16(width);
-            o.write_int16(height);
+            o.beginRequest(62, 0, 7);
+            o.writeInt32(src.id); // Src-drawable.
+            o.writeInt32(id); // Dst-drawable.
+            o.writeInt32(gc.id); // GC.
+            o.writeInt16(src_x);
+            o.writeInt16(src_y);
+            o.writeInt16(dst_x);
+            o.writeInt16(dst_y);
+            o.writeInt16(width);
+            o.writeInt16(height);
             o.send();
         }
     }
@@ -133,17 +133,17 @@ public abstract class Drawable extends Resource {
 
         RequestOutputStream o = display.out;
         synchronized (o) {
-            o.begin_request(63, 0, 8);
-            o.write_int32(src.id);
-            o.write_int32(id);
-            o.write_int32(gc.id);
-            o.write_int16(src_x);
-            o.write_int16(src_y);
-            o.write_int16(dst_x);
-            o.write_int16(dst_y);
-            o.write_int16(width);
-            o.write_int16(height);
-            o.write_int16(bit_plane);
+            o.beginRequest(63, 0, 8);
+            o.writeInt32(src.id);
+            o.writeInt32(id);
+            o.writeInt32(gc.id);
+            o.writeInt16(src_x);
+            o.writeInt16(src_y);
+            o.writeInt16(dst_x);
+            o.writeInt16(dst_y);
+            o.writeInt16(width);
+            o.writeInt16(height);
+            o.writeInt16(bit_plane);
             o.send();
         }
     }
@@ -184,12 +184,12 @@ public abstract class Drawable extends Resource {
         // FIXME: Handle aggregation.
         RequestOutputStream o = display.out;
         synchronized (o) {
-            o.begin_request(64, coordinate_mode, 3 + npoints);
-            o.write_int32(id);
-            o.write_int32(gc.id);
+            o.beginRequest(64, coordinate_mode, 3 + npoints);
+            o.writeInt32(id);
+            o.writeInt32(gc.id);
             for (int i = 0; i < npoints; i++) {
-                o.write_int16(xpoints[i]);
-                o.write_int16(ypoints[i]);
+                o.writeInt16(xpoints[i]);
+                o.writeInt16(ypoints[i]);
             }
             o.send();
         }
@@ -217,12 +217,12 @@ public abstract class Drawable extends Resource {
         int npoints = points.length;
         RequestOutputStream o = display.out;
         synchronized (o) {
-            o.begin_request(64, coordinate_mode, 3 + points.length);
-            o.write_int32(id);
-            o.write_int32(gc.id);
+            o.beginRequest(64, coordinate_mode, 3 + points.length);
+            o.writeInt32(id);
+            o.writeInt32(gc.id);
             for (int i = 0; i < npoints; i++) {
-                o.write_int16(points[i].x);
-                o.write_int16(points[i].y);
+                o.writeInt16(points[i].x);
+                o.writeInt16(points[i].y);
             }
             o.send();
         }
@@ -251,12 +251,12 @@ public abstract class Drawable extends Resource {
         // FIXME: Handle aggregation.
         RequestOutputStream o = display.out;
         synchronized (o) {
-            o.begin_request(65, coordinate_mode, 3 + npoints);
-            o.write_int32(id);
-            o.write_int32(gc.id);
+            o.beginRequest(65, coordinate_mode, 3 + npoints);
+            o.writeInt32(id);
+            o.writeInt32(gc.id);
             for (int i = 0; i < npoints; i++) {
-                o.write_int16(xpoints[i]);
-                o.write_int16(ypoints[i]);
+                o.writeInt16(xpoints[i]);
+                o.writeInt16(ypoints[i]);
             }
             o.send();
         }
@@ -268,16 +268,16 @@ public abstract class Drawable extends Resource {
         // FIXME: Handle aggregation.
         RequestOutputStream o = display.out;
         synchronized (o) {
-            o.begin_request(65, coordinate_mode, 3 + npoints + (close ? 1 : 0));
-            o.write_int32(id);
-            o.write_int32(gc.id);
+            o.beginRequest(65, coordinate_mode, 3 + npoints + (close ? 1 : 0));
+            o.writeInt32(id);
+            o.writeInt32(gc.id);
             for (int i = 0; i < npoints; i++) {
-                o.write_int16(xpoints[i]);
-                o.write_int16(ypoints[i]);
+                o.writeInt16(xpoints[i]);
+                o.writeInt16(ypoints[i]);
             }
             if (close) {
-                o.write_int16(xpoints[0]);
-                o.write_int16(ypoints[0]);
+                o.writeInt16(xpoints[0]);
+                o.writeInt16(ypoints[0]);
             }
             o.send();
         }
@@ -301,12 +301,12 @@ public abstract class Drawable extends Resource {
         int npoints = points.length;
         RequestOutputStream o = display.out;
         synchronized (o) {
-            o.begin_request(65, coordinate_mode, 3 + points.length);
-            o.write_int32(id);
-            o.write_int32(gc.id);
+            o.beginRequest(65, coordinate_mode, 3 + points.length);
+            o.writeInt32(id);
+            o.writeInt32(gc.id);
             for (int i = 0; i < npoints; i++) {
-                o.write_int16(points[i].x);
-                o.write_int16(points[i].y);
+                o.writeInt16(points[i].x);
+                o.writeInt16(points[i].y);
             }
             o.send();
         }
@@ -330,15 +330,15 @@ public abstract class Drawable extends Resource {
         int nsegs = segments.length;
         RequestOutputStream o = display.out;
         synchronized (o) {
-            o.begin_request(66, 0, 3 + 2 * nsegs);
-            o.write_int32(id);
-            o.write_int32(gc.id);
+            o.beginRequest(66, 0, 3 + 2 * nsegs);
+            o.writeInt32(id);
+            o.writeInt32(gc.id);
             for (int i = 0; i < nsegs; i++) {
                 Segment seg = segments[i];
-                o.write_int16(seg.x1);
-                o.write_int16(seg.y1);
-                o.write_int16(seg.x2);
-                o.write_int16(seg.y2);
+                o.writeInt16(seg.x1);
+                o.writeInt16(seg.y1);
+                o.writeInt16(seg.x2);
+                o.writeInt16(seg.y2);
             }
             o.send();
         }
@@ -364,15 +364,15 @@ public abstract class Drawable extends Resource {
         int nrects = rectangles.length;
         RequestOutputStream o = display.out;
         synchronized (o) {
-            o.begin_request(67, 0, 3 + 2 * nrects);
-            o.write_int32(id);
-            o.write_int32(gc.id);
+            o.beginRequest(67, 0, 3 + 2 * nrects);
+            o.writeInt32(id);
+            o.writeInt32(gc.id);
             for (int i = 0; i < nrects; i++) {
                 Rectangle rect = rectangles[i];
-                o.write_int16(rect.x);
-                o.write_int16(rect.y);
-                o.write_int16(rect.width);
-                o.write_int16(rect.height);
+                o.writeInt16(rect.x);
+                o.writeInt16(rect.y);
+                o.writeInt16(rect.width);
+                o.writeInt16(rect.height);
             }
             o.send();
         }
@@ -383,17 +383,17 @@ public abstract class Drawable extends Resource {
 
         RequestOutputStream o = display.out;
         synchronized (o) {
-            o.begin_request(68, 0, 3 + 3 * arcs.length);
-            o.write_int32(id);
-            o.write_int32(gc.id);
+            o.beginRequest(68, 0, 3 + 3 * arcs.length);
+            o.writeInt32(id);
+            o.writeInt32(gc.id);
             for (int i = 0; i < arcs.length; i++) {
                 Arc arc = arcs[i];
-                o.write_int16(arc.getX());
-                o.write_int16(arc.getY());
-                o.write_int16(arc.getWidth());
-                o.write_int16(arc.getHeight());
-                o.write_int16(arc.getAngle1());
-                o.write_int16(arc.getAngle2());
+                o.writeInt16(arc.getX());
+                o.writeInt16(arc.getY());
+                o.writeInt16(arc.getWidth());
+                o.writeInt16(arc.getHeight());
+                o.writeInt16(arc.getAngle1());
+                o.writeInt16(arc.getAngle2());
             }
         }
     }
@@ -403,17 +403,17 @@ public abstract class Drawable extends Resource {
 
         RequestOutputStream o = display.out;
         synchronized (o) {
-            o.begin_request(71, 0, 3 + 3 * arcs.length);
-            o.write_int32(id);
-            o.write_int32(gc.id);
+            o.beginRequest(71, 0, 3 + 3 * arcs.length);
+            o.writeInt32(id);
+            o.writeInt32(gc.id);
             for (int i = 0; i < arcs.length; i++) {
                 Arc arc = arcs[i];
-                o.write_int16(arc.getX());
-                o.write_int16(arc.getY());
-                o.write_int16(arc.getWidth());
-                o.write_int16(arc.getHeight());
-                o.write_int16(arc.getAngle1());
-                o.write_int16(arc.getAngle2());
+                o.writeInt16(arc.getX());
+                o.writeInt16(arc.getY());
+                o.writeInt16(arc.getWidth());
+                o.writeInt16(arc.getHeight());
+                o.writeInt16(arc.getAngle1());
+                o.writeInt16(arc.getAngle2());
             }
         }
     }
@@ -442,16 +442,16 @@ public abstract class Drawable extends Resource {
 
         RequestOutputStream o = display.out;
         synchronized (o) {
-            o.begin_request(69, 0, 4 + points.length);
-            o.write_int32(id);
-            o.write_int32(gc.id);
-            o.write_int8(shape);
-            o.write_int8(coordinate_mode);
+            o.beginRequest(69, 0, 4 + points.length);
+            o.writeInt32(id);
+            o.writeInt32(gc.id);
+            o.writeInt8(shape);
+            o.writeInt8(coordinate_mode);
             o.skip(2);
             for (int i = 0; i < points.length; i++) {
                 Point p = points[i];
-                o.write_int16(p.x);
-                o.write_int16(p.y);
+                o.writeInt16(p.x);
+                o.writeInt16(p.y);
             }
             o.send();
         }
@@ -462,15 +462,15 @@ public abstract class Drawable extends Resource {
 
         RequestOutputStream o = display.out;
         synchronized (o) {
-            o.begin_request(69, 0, 4 + npoints);
-            o.write_int32(id);
-            o.write_int32(gc.id);
-            o.write_int8(shape);
-            o.write_int8(coordinate_mode);
+            o.beginRequest(69, 0, 4 + npoints);
+            o.writeInt32(id);
+            o.writeInt32(gc.id);
+            o.writeInt8(shape);
+            o.writeInt8(coordinate_mode);
             o.skip(2);
             for (int i = 0; i < npoints; i++) {
-                o.write_int16(xpoints[i]);
-                o.write_int16(ypoints[i]);
+                o.writeInt16(xpoints[i]);
+                o.writeInt16(ypoints[i]);
             }
         }
     }
@@ -485,15 +485,15 @@ public abstract class Drawable extends Resource {
             int p = RequestOutputStream.pad(length);
 
             Image.Format format = image.get_format();
-            o.begin_request(72, format.getID(), 6 + (length + p) / 4);
-            o.write_int32(id);
-            o.write_int32(gc.id);
-            o.write_int16(image.get_width());
-            o.write_int16(y2 - y1);
-            o.write_int16(x);
-            o.write_int16(y);
-            o.write_int8(image.getLeftPad());
-            o.write_int8(image.get_pixmap_format().getDepth());
+            o.beginRequest(72, format.getID(), 6 + (length + p) / 4);
+            o.writeInt32(id);
+            o.writeInt32(gc.id);
+            o.writeInt16(image.get_width());
+            o.writeInt16(y2 - y1);
+            o.writeInt16(x);
+            o.writeInt16(y);
+            o.writeInt8(image.getLeftPad());
+            o.writeInt8(image.get_pixmap_format().getDepth());
             o.skip(2);
             o.write(image.get_data(), offset, length);
             o.send();
@@ -518,24 +518,24 @@ public abstract class Drawable extends Resource {
         synchronized (o) {
 
             o.beginX11CoreRequest(X11CoreCommand.GetImage, format.getID());
-            o.write_int32(id);
-            o.write_int16(x);
-            o.write_int16(y);
-            o.write_int16(width);
-            o.write_int16(height);
-            o.write_int32(planeMask);
+            o.writeInt32(id);
+            o.writeInt16(x);
+            o.writeInt16(y);
+            o.writeInt16(width);
+            o.writeInt16(height);
+            o.writeInt32(planeMask);
 
             ResponseInputStream i = display.in;
             synchronized (i) {
-                i.read_reply(o);
+                i.readReply(o);
                 i.skip(1);
-                int depth = i.read_int8();
+                int depth = i.readInt8();
                 i.skip(2);
-                int len = i.read_int32() * 4;
-                int visualID = i.read_int32();
+                int len = i.readInt32() * 4;
+                int visualID = i.readInt32();
                 i.skip(20);
                 byte[] data = new byte[len];
-                i.read_data(data);
+                i.readData(data);
 
                 if (format == Image.Format.ZPIXMAP) {
                     // should never be null
@@ -575,26 +575,26 @@ public abstract class Drawable extends Resource {
         int p = RequestOutputStream.pad(n);
         RequestOutputStream o = display.out;
         synchronized (o) {
-            o.begin_request(74, 0, 4 + (n + p) / 4);
-            o.write_int32(id);
-            o.write_int32(gc.id);
-            o.write_int16(x);
-            o.write_int16(y);
+            o.beginRequest(74, 0, 4 + (n + p) / 4);
+            o.writeInt32(id);
+            o.writeInt32(gc.id);
+            o.writeInt16(x);
+            o.writeInt16(y);
 
             for (int i = 0; i < texts.length; i++) {
                 if (texts[i].font != null) {
-                    o.write_int8(255);// font-shift indicator
-                    o.write_int32(texts[i].font.id); // java = MSB
+                    o.writeInt8(255);// font-shift indicator
+                    o.writeInt32(texts[i].font.id); // java = MSB
                 }
-                o.write_int8(texts[i].s.length());
-                o.write_int8(texts[i].delta);
-                o.write_string8(texts[i].s);
+                o.writeInt8(texts[i].s.length());
+                o.writeInt8(texts[i].delta);
+                o.writeString8(texts[i].s);
             }
             // Can't simply skip the padding bytes, otherwise the X server
             // would think that there are more items if the next byte in the
             // buffer is != 0, this would produce random errors.
             for (int i = 0; i < p; i++) {
-                o.write_int8(0);
+                o.writeInt8(0);
             }
             o.send();
         }
@@ -611,29 +611,29 @@ public abstract class Drawable extends Resource {
 
         RequestOutputStream o = display.out;
         synchronized (o) {
-            o.begin_request(75, 0, 4 + (n + p) / 4);
+            o.beginRequest(75, 0, 4 + (n + p) / 4);
 
-            o.write_int32(id);
-            o.write_int32(gc.id);
-            o.write_int16(x);
-            o.write_int16(y);
+            o.writeInt32(id);
+            o.writeInt32(gc.id);
+            o.writeInt16(x);
+            o.writeInt16(y);
 
             for (int i = 0; i < texts.length; i++) {
                 if (texts[i].font != null) {
-                    o.write_int8(255);// font-shift indicator
-                    o.write_int32(texts[i].font.id); // java = MSB
+                    o.writeInt8(255);// font-shift indicator
+                    o.writeInt32(texts[i].font.id); // java = MSB
                 }
 
                 String s = texts[i].s;
 
                 if (s.charAt(0) > 128) { // non-ascii
-                    o.write_int8(s.length() / 2);
-                    o.write_int8(texts[i].delta);
-                    o.write_string8(s);
+                    o.writeInt8(s.length() / 2);
+                    o.writeInt8(texts[i].delta);
+                    o.writeString8(s);
                 } else {// ascii
-                    o.write_int8(s.length());
-                    o.write_int8(texts[i].delta);
-                    o.write_string16(s);
+                    o.writeInt8(s.length());
+                    o.writeInt8(texts[i].delta);
+                    o.writeString16(s);
                 }
             }
 
@@ -652,12 +652,12 @@ public abstract class Drawable extends Resource {
         int p = RequestOutputStream.pad(n);
         RequestOutputStream o = display.out;
         synchronized (o) {
-            o.begin_request(76, n, 4 + (n + p) / 4);
-            o.write_int32(id);
-            o.write_int32(gc.id);
-            o.write_int16(x);
-            o.write_int16(y);
-            o.write_string8(s);
+            o.beginRequest(76, n, 4 + (n + p) / 4);
+            o.writeInt32(id);
+            o.writeInt32(gc.id);
+            o.writeInt16(x);
+            o.writeInt16(y);
+            o.writeString8(s);
             o.send();
         }
     }
@@ -673,12 +673,12 @@ public abstract class Drawable extends Resource {
 
         RequestOutputStream o = display.out;
         synchronized (o) {
-            o.begin_request(77, n, 4 + (2 * n + p) / 4);
-            o.write_int32(id);
-            o.write_int32(gc.id);
-            o.write_int16(x);
-            o.write_int16(y);
-            o.write_string16(s);
+            o.beginRequest(77, n, 4 + (2 * n + p) / 4);
+            o.writeInt32(id);
+            o.writeInt32(gc.id);
+            o.writeInt16(x);
+            o.writeInt16(y);
+            o.writeString16(s);
             o.send();
         }
     }
@@ -701,18 +701,18 @@ public abstract class Drawable extends Resource {
         RequestOutputStream o = display.out;
         int w, h;
         synchronized (o) {
-            o.begin_request(97, klass, 3);
-            o.write_int32(id);
-            o.write_int16(width);
-            o.write_int16(height);
+            o.beginRequest(97, klass, 3);
+            o.writeInt32(id);
+            o.writeInt16(width);
+            o.writeInt16(height);
             o.send();
 
             ResponseInputStream i = display.in;
             synchronized (i) {
-                i.read_reply(o);
+                i.readReply(o);
                 i.skip(8);
-                w = i.read_int16();
-                h = i.read_int16();
+                w = i.readInt16();
+                h = i.readInt16();
                 i.skip(20);
             }
         }
@@ -746,16 +746,16 @@ public abstract class Drawable extends Resource {
 
         RequestOutputStream o = display.out;
         synchronized (o) {
-            o.begin_request(68, 0, 6);
-            o.write_int32(id);
-            o.write_int32(gc.id);
+            o.beginRequest(68, 0, 6);
+            o.writeInt32(id);
+            o.writeInt32(gc.id);
 
-            o.write_int16(x);
-            o.write_int16(y);
-            o.write_int16(width);
-            o.write_int16(height);
-            o.write_int16(angle1);
-            o.write_int16(angle2);
+            o.writeInt16(x);
+            o.writeInt16(y);
+            o.writeInt16(width);
+            o.writeInt16(height);
+            o.writeInt16(angle1);
+            o.writeInt16(angle2);
             o.send();
         }
     }
@@ -787,16 +787,16 @@ public abstract class Drawable extends Resource {
 
         RequestOutputStream o = display.out;
         synchronized (o) {
-            o.begin_request(71, 0, 6);
-            o.write_int32(id);
-            o.write_int32(gc.id);
+            o.beginRequest(71, 0, 6);
+            o.writeInt32(id);
+            o.writeInt32(gc.id);
 
-            o.write_int16(x);
-            o.write_int16(y);
-            o.write_int16(width);
-            o.write_int16(height);
-            o.write_int16(angle1);
-            o.write_int16(angle2);
+            o.writeInt16(x);
+            o.writeInt16(y);
+            o.writeInt16(width);
+            o.writeInt16(height);
+            o.writeInt16(angle1);
+            o.writeInt16(angle2);
             o.send();
         }
     }
@@ -820,13 +820,13 @@ public abstract class Drawable extends Resource {
         // FIXME: Handle aggregation.
         RequestOutputStream o = display.out;
         synchronized (o) {
-            o.begin_request(65, ORIGIN, 5);
-            o.write_int32(id);
-            o.write_int32(gc.id);
-            o.write_int16(x1);
-            o.write_int16(y1);
-            o.write_int16(x2);
-            o.write_int16(y2);
+            o.beginRequest(65, ORIGIN, 5);
+            o.writeInt32(id);
+            o.writeInt32(gc.id);
+            o.writeInt16(x1);
+            o.writeInt16(y1);
+            o.writeInt16(x2);
+            o.writeInt16(y2);
             o.send();
         }
     }
@@ -835,20 +835,20 @@ public abstract class Drawable extends Resource {
 
         RequestOutputStream o = display.out;
         synchronized (o) {
-            if (o.current_opcode() == 66 && o.fits(8)) {
-                o.increase_length(2);
-                o.write_int16(x1);
-                o.write_int16(y1);
-                o.write_int16(x2);
-                o.write_int16(y2);
+            if (o.currentOpcode() == 66 && o.fits(8)) {
+                o.increaseLength(2);
+                o.writeInt16(x1);
+                o.writeInt16(y1);
+                o.writeInt16(x2);
+                o.writeInt16(y2);
             } else {
-                o.begin_request(66, ORIGIN, 5);
-                o.write_int32(id);
-                o.write_int32(gc.id);
-                o.write_int16(x1);
-                o.write_int16(y1);
-                o.write_int16(x2);
-                o.write_int16(y2);
+                o.beginRequest(66, ORIGIN, 5);
+                o.writeInt32(id);
+                o.writeInt32(gc.id);
+                o.writeInt16(x1);
+                o.writeInt16(y1);
+                o.writeInt16(x2);
+                o.writeInt16(y2);
             }
         }
     }
@@ -866,11 +866,11 @@ public abstract class Drawable extends Resource {
         // FIXME: Handle aggregation.
         RequestOutputStream o = display.out;
         synchronized (o) {
-            o.begin_request(64, ORIGIN, 4);
-            o.write_int32(id);
-            o.write_int32(gc.id);
-            o.write_int16(x);
-            o.write_int16(y);
+            o.beginRequest(64, ORIGIN, 4);
+            o.writeInt32(id);
+            o.writeInt32(gc.id);
+            o.writeInt16(x);
+            o.writeInt16(y);
             o.send();
         }
     }
@@ -910,13 +910,13 @@ public abstract class Drawable extends Resource {
 
         RequestOutputStream o = display.out;
         synchronized (o) {
-            o.begin_request(67, 0, 5);
-            o.write_int32(id);
-            o.write_int32(gc.id);
-            o.write_int16(x);
-            o.write_int16(y);
-            o.write_int16(width);
-            o.write_int16(height);
+            o.beginRequest(67, 0, 5);
+            o.writeInt32(id);
+            o.writeInt32(gc.id);
+            o.writeInt16(x);
+            o.writeInt16(y);
+            o.writeInt16(width);
+            o.writeInt16(height);
             o.send();
         }
     }
@@ -936,21 +936,21 @@ public abstract class Drawable extends Resource {
 
         RequestOutputStream o = display.out;
         synchronized (o) {
-            if (o.current_opcode() == 70 && o.get_int32(4) == id
-                    && o.get_int32(8) == gc.id) {
-                o.increase_length(2);
-                o.write_int16(x);
-                o.write_int16(y);
-                o.write_int16(width);
-                o.write_int16(height);
+            if (o.currentOpcode() == 70 && o.getInt32(4) == id
+                    && o.getInt32(8) == gc.id) {
+                o.increaseLength(2);
+                o.writeInt16(x);
+                o.writeInt16(y);
+                o.writeInt16(width);
+                o.writeInt16(height);
             } else {
-                o.begin_request(70, 0, 5);
-                o.write_int32(id);
-                o.write_int32(gc.id);
-                o.write_int16(x);
-                o.write_int16(y);
-                o.write_int16(width);
-                o.write_int16(height);
+                o.beginRequest(70, 0, 5);
+                o.writeInt32(id);
+                o.writeInt32(gc.id);
+                o.writeInt16(x);
+                o.writeInt16(y);
+                o.writeInt16(width);
+                o.writeInt16(height);
                 o.send();
             }
         }

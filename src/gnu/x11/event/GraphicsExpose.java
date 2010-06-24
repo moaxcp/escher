@@ -24,14 +24,14 @@ public final class GraphicsExpose extends Event {
   public GraphicsExpose (Display display, ResponseInputStream in) {
 
     super (display, in);
-    drawable_id = in.read_int32 ();
-    x = in.read_int16 ();
-    y = in.read_int16 ();
-    width = in.read_int16 ();
-    height = in.read_int16 ();
-    minor_opcode = in.read_int16 ();
-    count = in.read_int16 ();
-    major_opcode = in.read_int8 ();
+    drawable_id = in.readInt32 ();
+    x = in.readInt16 ();
+    y = in.readInt16 ();
+    width = in.readInt16 ();
+    height = in.readInt16 ();
+    minor_opcode = in.readInt16 ();
+    count = in.readInt16 ();
+    major_opcode = in.readInt8 ();
     in.skip (11);
 
   }

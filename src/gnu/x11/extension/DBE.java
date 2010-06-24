@@ -49,16 +49,16 @@ public class DBE extends Extension implements ErrorFactory {
     // check version before any other operations
     RequestOutputStream o = display.out;
     synchronized (o) {
-      o.begin_request (major_opcode, 0, 2);
-      o.write_int8 (CLIENT_MAJOR_VERSION);
-      o.write_int8 (CLIENT_MINOR_VERSION);
+      o.beginRequest (major_opcode, 0, 2);
+      o.writeInt8 (CLIENT_MAJOR_VERSION);
+      o.writeInt8 (CLIENT_MINOR_VERSION);
       o.skip (2);
       ResponseInputStream i = display.in;
       synchronized (i) {
-        i.read_reply (o);
+        i.readReply (o);
         i.skip (8);
-        server_major_version = i.read_int8 ();
-        server_minor_version = i.read_int8 ();
+        server_major_version = i.readInt8 ();
+        server_minor_version = i.readInt8 ();
         i.skip (22);
       }
     }
@@ -80,11 +80,11 @@ public class DBE extends Extension implements ErrorFactory {
 
     RequestOutputStream o = display.out;
     synchronized (o) {
-      o.begin_request (major_opcode, 3, 2 + 2 * n);
-      o.write_int32 (n);
+      o.beginRequest (major_opcode, 3, 2 + 2 * n);
+      o.writeInt32 (n);
       for (int i = 0; i < n; i++) {
-        o.write_int32 (windows [i].id);
-        o.write_int8 (actions [i]);
+        o.writeInt32 (windows [i].id);
+        o.writeInt8 (actions [i]);
         o.skip (3);
       }
       o.send ();
@@ -99,7 +99,7 @@ public class DBE extends Extension implements ErrorFactory {
   public void begin_idiom () {
     RequestOutputStream o = display.out;
     synchronized (o) {
-      o.begin_request (major_opcode, 4, 1);
+      o.beginRequest (major_opcode, 4, 1);
       o.send ();
     }
   }
@@ -112,7 +112,7 @@ public class DBE extends Extension implements ErrorFactory {
   public void end_idiom () {
     RequestOutputStream o = display.out;
     synchronized (o) {
-      o.begin_request (major_opcode, 5, 1);
+      o.beginRequest (major_opcode, 5, 1);
       o.send ();
     }
   }
@@ -125,9 +125,9 @@ public class DBE extends Extension implements ErrorFactory {
     public int depth;
     public int perflevel;
     public XdbeScreenVisualInfo (ResponseInputStream i) {
-      visual_id = i.read_int32 ();
-      depth = i.read_int8 ();
-      perflevel = i.read_int8 ();
+      visual_id = i.readInt32 ();
+      depth = i.readInt8 ();
+      perflevel = i.readInt8 ();
       i.skip (2);
     }
 
@@ -146,7 +146,7 @@ public class DBE extends Extension implements ErrorFactory {
     public XdbeScreenVisualInfo [] infos;
 
     public ScreenVisualInfo (ResponseInputStream i) { 
-      int number = i.read_int32 ();
+      int number = i.readInt32 ();
       infos = new XdbeScreenVisualInfo [number];
       for (int j = 0; j < number; j++) {
         infos [j] = new XdbeScreenVisualInfo (i);
@@ -175,15 +175,15 @@ public class DBE extends Extension implements ErrorFactory {
     ScreenVisualInfo[] infos;
     RequestOutputStream o = display.out;
     synchronized (o) {
-      o.begin_request (major_opcode, 6, 2 + screen_specifiers.length);
-      o.write_int32 (screen_specifiers.length);
+      o.beginRequest (major_opcode, 6, 2 + screen_specifiers.length);
+      o.writeInt32 (screen_specifiers.length);
       for (int i = 0; i < screen_specifiers.length; i++)
-        o.write_int32 (screen_specifiers [i].id);
+        o.writeInt32 (screen_specifiers [i].id);
       ResponseInputStream i = display.in;
       synchronized (i) {
-        i.read_reply (o);
+        i.readReply (o);
         i.skip (8);
-        int num = i.read_int32 ();
+        int num = i.readInt32 ();
         i.skip (20);
         infos = new ScreenVisualInfo [num];
         for (int j = 0; j < num; j++) {
@@ -215,10 +215,10 @@ public class DBE extends Extension implements ErrorFactory {
 
       RequestOutputStream o = display.out;
       synchronized (o) {
-        o.begin_request (major_opcode, 1, 4);
-        o.write_int32 (window.id);
-        o.write_int32 (id);
-        o.write_int8 (swap_action_hint);
+        o.beginRequest (major_opcode, 1, 4);
+        o.writeInt32 (window.id);
+        o.writeInt32 (id);
+        o.writeInt8 (swap_action_hint);
         o.skip (3);
         o.send ();
       }
@@ -233,8 +233,8 @@ public class DBE extends Extension implements ErrorFactory {
     public void deallocate () {
       RequestOutputStream o = display.out;
       synchronized (o) {
-        o.begin_request (major_opcode, 2, 2);
-        o.write_int32 (id);
+        o.beginRequest (major_opcode, 2, 2);
+        o.writeInt32 (id);
         o.send ();
       }
     }
@@ -250,13 +250,13 @@ public class DBE extends Extension implements ErrorFactory {
       int atts;
       RequestOutputStream o = display.out;
       synchronized (o) {
-        o.begin_request (major_opcode, 7, 2);
-        o.write_int32 (id);
+        o.beginRequest (major_opcode, 7, 2);
+        o.writeInt32 (id);
         ResponseInputStream i = display.in;
         synchronized (i) {
-          i.read_reply (o);
+          i.readReply (o);
           i.skip (8);
-          atts = i.read_int32 ();
+          atts = i.readInt32 ();
           i.skip (20);
         }
       }

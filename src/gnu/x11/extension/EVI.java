@@ -38,13 +38,13 @@ public class EVI extends Extension {
      */
     RequestOutputStream o = display.out;
     synchronized (o) {
-      o.begin_request (major_opcode, 0, 1);
+      o.beginRequest (major_opcode, 0, 1);
       ResponseInputStream i = display.in;
       synchronized (i) {
-        i.read_reply (o);
+        i.readReply (o);
         i.skip (8);
-        server_major_version = i.read_int16 ();
-        server_minor_version = i.read_int16 ();
+        server_major_version = i.readInt16 ();
+        server_minor_version = i.readInt16 ();
         i.skip (20);
       }
     }
@@ -64,15 +64,15 @@ public class EVI extends Extension {
     public int num_colormap_conflicts;
 
     ExtendedVisualInfo (ResponseInputStream i) {
-      core_visual_id = i.read_int32 ();
-      screen = i.read_int8 ();
-      level = i.read_int8 ();
-      transparency_type = i.read_int8 ();
+      core_visual_id = i.readInt32 ();
+      screen = i.readInt8 ();
+      level = i.readInt8 ();
+      transparency_type = i.readInt8 ();
       i.skip (1);
-      transparency_value = i.read_int32 ();
-      min_hw_colormaps = i.read_int8 ();
-      max_hw_colormaps = i.read_int8 ();
-      num_colormap_conflicts = i.read_int8 ();
+      transparency_value = i.readInt32 ();
+      min_hw_colormaps = i.readInt8 ();
+      max_hw_colormaps = i.readInt8 ();
+      num_colormap_conflicts = i.readInt8 ();
     }
     
   }
@@ -85,8 +85,8 @@ public class EVI extends Extension {
     public ExtendedVisualInfo [] items;
 
     VisualInfoReply (ResponseInputStream i) {
-      int n_info = i.read_int32 ();
-      n_conflicts = i.read_int32 ();
+      int n_info = i.readInt32 ();
+      n_conflicts = i.readInt32 ();
       i.skip (16);
       items = new ExtendedVisualInfo [n_info];
       for (int j = 0; j < n_info; j++) {
@@ -104,13 +104,13 @@ public class EVI extends Extension {
     VisualInfoReply reply;
     RequestOutputStream o = display.out;
     synchronized (o) {
-      o.begin_request (major_opcode, 1, 2 + visuals.length);
-      o.write_int32 (visuals.length);
+      o.beginRequest (major_opcode, 1, 2 + visuals.length);
+      o.writeInt32 (visuals.length);
       for (int i = 0; i < visuals.length; i++)
-        o.write_int32 (visuals [i].getID());
+        o.writeInt32 (visuals [i].getID());
       ResponseInputStream in = display.in;
       synchronized (in) {
-        in.read_reply (o);
+        in.readReply (o);
         in.skip (8);
         reply = new VisualInfoReply (in);
         

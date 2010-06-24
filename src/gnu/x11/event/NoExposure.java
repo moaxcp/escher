@@ -14,9 +14,9 @@ public final class NoExposure extends Event {
   
   public NoExposure (Display display, ResponseInputStream in) {
     super (display, in);
-    drawable_id = in.read_int32 ();
-    minor_opcode = in.read_int16();
-    major_opcode = in.read_int8 ();
+    drawable_id = in.readInt32 ();
+    minor_opcode = in.readInt16();
+    major_opcode = in.readInt8 ();
     in.skip (21);
   }
 }

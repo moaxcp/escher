@@ -14,9 +14,9 @@ public final class MapNotify extends Event {
 
   public MapNotify (Display display, ResponseInputStream in) {
     super (display, in);
-    event_window_id = in.read_int32 ();
-    window_id = in.read_int32 ();
-    override_redirect = in.read_bool ();
+    event_window_id = in.readInt32 ();
+    window_id = in.readInt32 ();
+    override_redirect = in.readBool ();
     in.skip (19);
   }
 }

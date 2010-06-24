@@ -17,10 +17,10 @@ public final class CirculateRequest extends Event {
 
   public CirculateRequest (Display display, ResponseInputStream in) {
     super (display, in);
-    parent_window_id = in.read_int32 ();
-    window_id = in.read_int32 ();
+    parent_window_id = in.readInt32 ();
+    window_id = in.readInt32 ();
     in.skip (4); // Unused.
-    place = in.read_int8 ();
+    place = in.readInt8 ();
     in.skip (15);
   }
 

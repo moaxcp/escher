@@ -17,8 +17,8 @@ public final class VisibilityNotify extends Event {
   
   public VisibilityNotify (Display display, ResponseInputStream in) {
     super (display, in);
-    window_id = in.read_int32 ();
-    state = in.read_int8 ();
+    window_id = in.readInt32 ();
+    state = in.readInt8 ();
     in.skip (23);
   }
 }

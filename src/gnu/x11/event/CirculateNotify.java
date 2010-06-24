@@ -18,10 +18,10 @@ public final class CirculateNotify extends Event {
 
   public CirculateNotify (Display display, ResponseInputStream in) {
     super (display, in);
-    event_window_id = in.read_int32 ();
-    window_id = in.read_int32 ();
+    event_window_id = in.readInt32 ();
+    window_id = in.readInt32 ();
     in.skip (4); // Unused.
-    place = in.read_int8 ();
+    place = in.readInt8 ();
     in.skip (15);
   }
 

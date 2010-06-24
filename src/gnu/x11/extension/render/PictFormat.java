@@ -83,14 +83,14 @@ public class PictFormat {
      * @param i the stream to read from
      */
     Direct (ResponseInputStream i) {
-      red_shift = i.read_int16();
-      red_mask = i.read_int16();
-      green_shift = i.read_int16();
-      green_mask = i.read_int16();
-      blue_shift = i.read_int16();
-      blue_mask = i.read_int16();
-      alpha_shift = i.read_int16();
-      alpha_mask = i.read_int16();
+      red_shift = i.readInt16();
+      red_mask = i.readInt16();
+      green_shift = i.readInt16();
+      green_mask = i.readInt16();
+      blue_shift = i.readInt16();
+      blue_mask = i.readInt16();
+      alpha_shift = i.readInt16();
+      alpha_mask = i.readInt16();
     }
 
     /**
@@ -303,12 +303,12 @@ public class PictFormat {
    * @param i the PictFormat to read from
    */
   PictFormat (ResponseInputStream i) {
-    id = i.read_int32 ();
-    type = i.read_int8 () == 0 ? Type.INDEXED : Type.DIRECT;
-    depth = i.read_int8 ();
+    id = i.readInt32 ();
+    type = i.readInt8 () == 0 ? Type.INDEXED : Type.DIRECT;
+    depth = i.readInt8 ();
     i.skip (2);
     direct = new Direct(i);
-    colormap = new Colormap(i.read_int32 ());
+    colormap = new Colormap(i.readInt32 ());
   }
 
   /**
