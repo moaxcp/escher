@@ -387,7 +387,7 @@ public class Error extends java.lang.Error {
     String major_opcode_string = "\n  major-opcode: " + major_opcode + " "
       + (major_opcode < 128 ?
         OPCODE_STRINGS [major_opcode]
-        : display.extension_opcode_strings [major_opcode - 128]);
+        : display.extensionOpcodeStrings [major_opcode - 128]);
     
 
     //-- minor opcode    
@@ -395,7 +395,7 @@ public class Error extends java.lang.Error {
     String minor_opcode_string = major_opcode < 128 ? ""
       : "\n  minor-opcode: " + minor_opcode
       + " " +
-      display.extension_minor_opcode_strings[major_opcode - 128][minor_opcode];
+      display.extensionMinorOpcodeStrings[major_opcode - 128][minor_opcode];
 
 
     //-- output

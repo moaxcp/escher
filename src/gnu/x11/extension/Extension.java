@@ -33,18 +33,18 @@ abstract public class Extension {
     major_opcode = er.major_opcode ();
 
     // register opcode strings
-    display.extension_opcode_strings [major_opcode - 128] = name;
-    display.extension_minor_opcode_strings [major_opcode - 128] 
+    display.extensionOpcodeStrings [major_opcode - 128] = name;
+    display.extensionMinorOpcodeStrings [major_opcode - 128] 
       = minor_opcode_strings;
 
     // register error factory
     for (int i=0; i<error_count; i++)
-      display.extension_error_factories [first_error - 128 + i]
+      display.extensionErrorFactories [first_error - 128 + i]
         = (ErrorFactory) this;
 
     // register event factory
     for (int i=0; i<event_count; i++)
-      display.extension_event_factories [first_event - 64 + i]
+      display.extensionEventFactories [first_event - 64 + i]
         = (EventFactory) this;
   }
 

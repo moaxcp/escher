@@ -30,11 +30,11 @@ public class ZPixmap extends Image {
     ZPixmap(Display display, VisualInfo xVisual)
             throws EscherUnsupportedScreenBitDepthException {
 
-        super(Format.ZPIXMAP, display.default_pixmap_format);
+        super(Format.ZPIXMAP, display.defaultPixmapFormat);
 
-        imageByteOrder = display.image_byte_order;
+        imageByteOrder = display.imageByteOrder;
         this.xVisual = xVisual;
-        this.delegate = getDelegate(display.default_pixmap_format.getDepth());
+        this.delegate = getDelegate(display.defaultPixmapFormat.getDepth());
     }
 
     /**
@@ -74,7 +74,7 @@ public class ZPixmap extends Image {
     public ZPixmap(Display display, int width, int height, VisualInfo xVisual)
             throws EscherUnsupportedScreenBitDepthException {
         
-        this(display, width, height, display.default_pixmap_format, xVisual);
+        this(display, width, height, display.defaultPixmapFormat, xVisual);
     }
 
     public ZPixmap(Display display, int width, int height,
@@ -83,7 +83,7 @@ public class ZPixmap extends Image {
 
         super(width, height, Format.ZPIXMAP, format);
 
-        imageByteOrder = display.image_byte_order;
+        imageByteOrder = display.imageByteOrder;
         this.xVisual = xVisual;
         this.delegate = getDelegate(format.getDepth());
     }

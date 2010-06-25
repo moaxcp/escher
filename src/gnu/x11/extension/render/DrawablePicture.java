@@ -90,7 +90,7 @@ public class DrawablePicture extends Picture {
      * @param a possible:
      * {@link Atom#NONE} (default)
      */
-    public void set_dither (Atom a) { set (11, a.getId()); }
+    public void set_dither (Atom a) { set (11, a.getID()); }
 
 
     /** 

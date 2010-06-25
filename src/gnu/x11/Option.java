@@ -8,14 +8,14 @@ public class Option extends gnu.util.Option {
   }
 
   
-  public Display.Name display_name (String name, String description,
-    Display.Name default_value) {
+  public DisplayName display_name (String name, String description,
+    DisplayName default_value) {
 
-    Display.Name retval = default_value;
+    DisplayName retval = default_value;
     
     try {
       String opt = option (name);
-      if (opt != null) retval = new Display.Name (opt);
+      if (opt != null) retval = new DisplayName (opt);
 
     } catch (RuntimeException e) {
       invalidNames.append (name + ", ");

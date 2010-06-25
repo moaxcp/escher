@@ -19,8 +19,7 @@ class DebugRequestOutputStream extends RequestOutputStream {
 
     private static final Logger logger;
     static {
-        logger = java.util.logging.Logger
-                .getLogger("gnu.x11.DebugRequestOutputStream");
+        logger = java.util.logging.Logger.getLogger("gnu.x11.DebugRequestOutputStream");
 
         logger.setLevel(Level.ALL);
         Handler h = new ConsoleHandler();
@@ -30,8 +29,7 @@ class DebugRequestOutputStream extends RequestOutputStream {
         try {
             // unless explicitly asked to do otherwise, we set the send_mode to
             // SYNCHRONOUS for debugging.
-            String sendMode = System.getProperty("escher.send_mode",
-                    "ROUND_TRIP");
+            String sendMode = System.getProperty("escher.send_mode", "ROUND_TRIP");
             System.setProperty("escher.send_mode", sendMode);
 
         } catch (SecurityException e) {

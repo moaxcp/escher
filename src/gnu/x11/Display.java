@@ -32,7 +32,7 @@ public class Display {
     
     private static java.util.logging.Logger logger;
     static {
-        
+
         logger = java.util.logging.Logger.getLogger("gnu.x11.Display");
         logger.setLevel(Level.ALL);
     }
@@ -45,12 +45,12 @@ public class Display {
     /**
      * The output stream.
      */
-    public RequestOutputStream out;
+    private RequestOutputStream out;
 
     /**
      * The input stream.
      */
-    public ResponseInputStream in;
+    private ResponseInputStream in;
 
     /**
      * The socket.
@@ -60,26 +60,29 @@ public class Display {
     /**
      * The hostname to this display.
      */
-    public String hostname;
+    private String hostname;
 
     /**
      * The display number.
      */
-    public int display_no;
+    private int displayNumber;
 
-    public Input input;
+    /**
+     *  The display input (Keyboard/mouse) 
+     */
+    private Input input;
 
     /**
      * Indicates if this display is connected or not.
      */
-    public boolean connected;
+    private boolean connected;
 
-    // server information
-    public int release_no;
+    // Server information
+    private int releaseNumber;
 
-    public String vendor;
+    private String vendor;
 
-    public int maximum_request_length;
+    private int maximumRequestLength;
 
     /** Contains an array view of the Screens supported by this Display. */
     private Screen[] screens;
@@ -87,88 +90,85 @@ public class Display {
     /**
      * Contains all the visual info mapped by the ID.
      */
-    private HashMap<Integer, VisualInfo> visuals =
-        new HashMap<Integer, VisualInfo>();
-    
-    
-    public Pixmap.Format[] pixmap_formats;
+    private HashMap<Integer, VisualInfo> visuals = new HashMap<Integer, VisualInfo>();
+       
+    public Pixmap.Format[] pixmapFormats;
 
-    public int image_byte_order;
+    public int imageByteOrder;
 
-    public int bitmap_format_bit_order;
+    public int bitmapFormatBitOrder;
 
-    public int bitmap_format_scanline_unit;
+    public int bitmapFormatScanlineUnit;
 
-    public int bitmap_format_scanline_pad;
+    public int bitmapFormatScanlinePad;
 
-    public int resource_base;
+    public int resourceBase;
 
-    public int resource_mask;
+    public int resourceMask;
 
-    // defaults
-    public Color default_black, default_white;
+    // Defaults
+    public Color defaultBlack, defaultWhite;
 
-    public Colormap default_colormap;
+    public Colormap defaultColormap;
 
-    public int default_depth;
+    public int defaultDepth;
 
-    public Pixmap.Format default_pixmap_format;
+    public Pixmap.Format defaultPixmapFormat;
 
     private Window defaultRoot;
 
-    public Screen default_screen;
+    public Screen defaultScreen;
 
-    public int default_screen_no;
+    public int defaultScreenNumber;
 
-    int min_keycode;
+    int minKeycode;
 
-    int max_keycode;
+    int maxKeycode;
 
     /**
      * @see Screen#default_gc()
      */
-    public GC default_gc;
+    public GC defaultGC;
 
-    // resources
-    public Hashtable resources = new Hashtable(257);
+    // Resources
+    public Hashtable<Integer, Resource> resources = new Hashtable<Integer, Resource>(257);
 
-    public int resource_index;
+    public int resourceIndex;
 
     private Hashtable<Integer, Atom> atomIDs = new Hashtable<Integer, Atom>(257);
 
-    private Hashtable<String, Atom> atomNames = new Hashtable<String, Atom>(257);
+    private Hashtable<String, Atom> atoms = new Hashtable<String, Atom>(257);
 
-    // xcmisc
+    // XCMisc
     public XCMisc xcmisc;
 
-    public boolean use_xcmisc;
+    public boolean useXcmisc;
 
-    public int xcmisc_resource_base;
+    public int xcmiscResourceBase;
 
-    public int xcmisc_resource_count;
+    public int xcmiscResourceCount;
 
-    // extension
+    // Extension
+    public boolean bigRequestsPresent;
 
-    public boolean big_requests_present;
-
-    public int extended_maximum_request_length;
+    public int extendedMaximumRequestLength;
 
     /**
      * Major opcodes 128 through 255 are reserved for extensions, totally 128.
      */
-    public String[] extension_opcode_strings = new String[128];
+    public String[] extensionOpcodeStrings = new String[128];
 
-    public String[][] extension_minor_opcode_strings = new String[128][];
+    public String[][] extensionMinorOpcodeStrings = new String[128][];
 
     /**
      * Event codes 64 through 127 are reserved for extensiones, totally 64.
      */
-    public EventFactory[] extension_event_factories = new EventFactory[64];
+    public EventFactory[] extensionEventFactories = new EventFactory[64];
 
     /**
      * Error codes 128 through 255 are reserved for extensiones, totally 128.
      */
-    public ErrorFactory[] extension_error_factories = new ErrorFactory[128];
+    public ErrorFactory[] extensionErrorFactories = new ErrorFactory[128];
 
     /**
      * Open a connection to the display defined by the DISPLAY
@@ -181,56 +181,7 @@ public class Display {
      */
     public Display() throws EscherServerConnectionException {
 
-        this(new Display.Name(System.getenv("DISPLAY")));
-    }
-
-    /** X display name. */
-    public static class Name {
-
-        public String hostname = "";
-
-        public int display_no, screen_no;
-
-        public Name(String display_name) {
-
-            if (display_name == null)
-                return;
-            
-            int i = display_name.indexOf(':');
-
-            // case 1: display_name = hostname
-            if (i == -1) {
-                hostname = display_name;
-                return;
-            }
-
-            hostname = display_name.substring(0, i);
-            int j = display_name.indexOf('.', i);
-
-            if (j == -1) {
-                // case 2: display_name = hostname:display_no
-                display_no = Integer.parseInt(display_name
-                                .substring(i + 1, display_name.length()));
-                return;
-            }
-
-            // case 3: display_name = hostname:display_no.screen_no
-            display_no = Integer.parseInt(display_name.substring(i + 1, j));
-            screen_no = Integer.parseInt(display_name
-                            .substring(j + 1, display_name.length()));
-        }
-
-        public Name(String hostname, int display_no, int screen_no) {
-
-            this.hostname = hostname;
-            this.display_no = display_no;
-            this.screen_no = screen_no;
-        }
-
-        public String toString() {
-
-            return hostname + ":" + display_no + "." + screen_no;
-        }
+        this(new DisplayName(System.getenv("DISPLAY")));
     }
 
     /**
@@ -238,7 +189,7 @@ public class Display {
      * 
      * @throws EscherServerConnectionException
      */
-    public Display(Name name) throws EscherServerConnectionException {
+    public Display(DisplayName name) throws EscherServerConnectionException {
 
         this(name.hostname, name.display_no, name.screen_no);
     }
@@ -274,9 +225,9 @@ public class Display {
                    int display_no, int screen_no)
             throws EscherServerConnectionException {
 
-        default_screen_no = screen_no;
+        defaultScreenNumber = screen_no;
         this.hostname = hostname;
-        this.display_no = display_no;
+        this.displayNumber = display_no;
         this.socket = socket;
         init_streams();
         init();
@@ -289,8 +240,8 @@ public class Display {
     public Display(String hostname, int display_no, int screen_no)
             throws EscherServerConnectionException {
         
-        default_screen_no = screen_no;
-        this.display_no = display_no;
+        defaultScreenNumber = screen_no;
+        this.displayNumber = display_no;
         this.hostname = hostname;
         try {
             socket = new Socket(hostname, 6000 + display_no);
@@ -346,7 +297,7 @@ public class Display {
             }
         }
 
-        maximum_request_length = out.setBufferSize(maximum_request_length);
+        maximumRequestLength = out.setBufferSize(maximumRequestLength);
         init_keyboard_mapping();
         init_defaults();
         init_big_request_extension();
@@ -505,7 +456,7 @@ public class Display {
      */
     public VisualInfo getDefaultVisual() {
      
-        return this.getVisualInfo(this.default_screen.root_visual_id());
+        return this.getVisualInfo(this.defaultScreen.root_visual_id());
     }
     
     // opcode 23 - get selection owner
@@ -518,7 +469,7 @@ public class Display {
         int owner_id = -1;
         synchronized (o) {
             o.beginRequest(23, 0, 2);
-            o.writeInt32(selection.getId());
+            o.writeInt32(selection.getID());
             ResponseInputStream i = in;
             synchronized (i) {
                 i.readReply(o);
@@ -1127,12 +1078,12 @@ public class Display {
          * 00000000001111111111111111111111b
          */
 
-        if (!use_xcmisc)
+        if (!useXcmisc)
             // check if basic allocation fails
-            use_xcmisc = (resource_index + 1 & ~resource_mask) != 0;
+            useXcmisc = (resourceIndex + 1 & ~resourceMask) != 0;
 
-        if (!use_xcmisc) {
-            int id = resource_index++ | resource_base;
+        if (!useXcmisc) {
+            int id = resourceIndex++ | resourceBase;
             resources.put(new Integer(id), object);
             return id;
         }
@@ -1145,16 +1096,16 @@ public class Display {
             }
         }
 
-        if (xcmisc_resource_count == 0) {
+        if (xcmiscResourceCount == 0) {
             // first time, or used up
             gnu.x11.extension.XCMisc.XIDRange rr = xcmisc.xid_range();
-            xcmisc_resource_base = rr.start_id;
-            xcmisc_resource_count = rr.count;
+            xcmiscResourceBase = rr.start_id;
+            xcmiscResourceCount = rr.count;
         }
 
         // give out in descending order
-        xcmisc_resource_count--;
-        return xcmisc_resource_base + xcmisc_resource_count;
+        xcmiscResourceCount--;
+        return xcmiscResourceBase + xcmiscResourceCount;
     }
 
     /**
@@ -1194,27 +1145,27 @@ public class Display {
 
         try {
             BigRequests big = new BigRequests(this);
-            big_requests_present = true;
-            extended_maximum_request_length = big.enable();
+            bigRequestsPresent = true;
+            extendedMaximumRequestLength = big.enable();
 
         } catch (NotFoundException e) {
-            big_requests_present = false;
+            bigRequestsPresent = false;
         }
     }
 
     public void init_defaults() {
 
-        default_screen = screens[default_screen_no];
-        defaultRoot = default_screen.root(); // before init default_gc
-        default_depth = default_screen.root_depth;
-        default_colormap = default_screen.default_colormap();
-        default_gc = default_screen.default_gc();
-        default_black = new Color(default_screen.black_pixel);
-        default_white = new Color(default_screen.white_pixel);
+        defaultScreen = screens[defaultScreenNumber];
+        defaultRoot = defaultScreen.root(); // before init default_gc
+        defaultDepth = defaultScreen.root_depth;
+        defaultColormap = defaultScreen.default_colormap();
+        defaultGC = defaultScreen.default_gc();
+        defaultBlack = new Color(defaultScreen.black_pixel);
+        defaultWhite = new Color(defaultScreen.white_pixel);
 
-        for (int i = pixmap_formats.length - 1; i >= 0; i--) {
-            if (pixmap_formats[i].getDepth() == default_depth) {
-                default_pixmap_format = pixmap_formats[i];
+        for (int i = pixmapFormats.length - 1; i >= 0; i--) {
+            if (pixmapFormats[i].getDepth() == defaultDepth) {
+                defaultPixmapFormat = pixmapFormats[i];
                 break;
             }
         }
@@ -1236,13 +1187,13 @@ public class Display {
         case 0:
             debugMessage.append("Connection to the XServer failed.\n");
             debugMessage.append("Try to set DISPLAY variable or to give " +
-            		        "proper\n");
+                                "proper\n");
             debugMessage.append("permissions (eg. edit .Xauthority or " +
-            		        "run \"xhost +\")\n");
+                                "run \"xhost +\")\n");
             debugMessage.append("NOTE: leaving \"xhost +\" and allowing " +
-            		        "remote tcp\n");
+                                "remote tcp\n");
             debugMessage.append("connections to the XServer can be a " +
-            		        "potential\n");
+                                "potential\n");
             debugMessage.append("security risk.\n");
 
             connectionFailed = true;
@@ -1293,7 +1244,7 @@ public class Display {
                 }
 
                 debugMessage.append("XServer are allowed to use non " +
-                		     "standard errors codes\n");
+                                     "standard errors codes\n");
                 debugMessage.append("Please, consult the manual of your " +
                                     "XServer\n" +
                                     "to map the error codes to human " +
@@ -1303,44 +1254,44 @@ public class Display {
             logger.severe(debugMessage.toString());
 
             throw new EscherServerConnectionException("Connection to the " +
-            		                              "XServer failed.");
+                                                      "XServer failed.");
         }
 
-        release_no = i.readInt32();
-        resource_base = i.readInt32();
-        resource_mask = i.readInt32();
+        releaseNumber = i.readInt32();
+        resourceBase = i.readInt32();
+        resourceMask = i.readInt32();
         i.skip(4); // motion-buffer-size.
 
         int vendor_length = i.readInt16();
-        maximum_request_length = i.readInt16();
-        extended_maximum_request_length = maximum_request_length;
+        maximumRequestLength = i.readInt16();
+        extendedMaximumRequestLength = maximumRequestLength;
         
         int screen_count = i.readInt8();
         int pixmap_format_count = i.readInt8();
 
-        image_byte_order = i.readInt8();
+        imageByteOrder = i.readInt8();
         
-        bitmap_format_bit_order = i.readInt8();
-        bitmap_format_scanline_unit = i.readInt8();
-        bitmap_format_scanline_pad = i.readInt8();
+        bitmapFormatBitOrder = i.readInt8();
+        bitmapFormatScanlineUnit = i.readInt8();
+        bitmapFormatScanlinePad = i.readInt8();
 
-        min_keycode = i.readInt8();
-        max_keycode = i.readInt8();
+        minKeycode = i.readInt8();
+        maxKeycode = i.readInt8();
         i.skip(4); // Unused.
 
         vendor = i.readString8(vendor_length);
         i.pad(vendor_length);
 
         /* ***** FORMAT ***** */
-        pixmap_formats = new Pixmap.Format[pixmap_format_count];
+        pixmapFormats = new Pixmap.Format[pixmap_format_count];
         for (int j = 0; j < pixmap_format_count; j++) {
-            pixmap_formats[j] = new Pixmap.Format(i);
+            pixmapFormats[j] = new Pixmap.Format(i);
         }
 
         /* ***** SCREEN ***** */
-        if (default_screen_no < 0 || default_screen_no >= screen_count)
+        if (defaultScreenNumber < 0 || defaultScreenNumber >= screen_count)
             throw new RuntimeException("Invalid screen number (screen-count "
-                            + screen_count + "): " + default_screen_no);
+                            + screen_count + "): " + defaultScreenNumber);
 
         screens = new Screen[screen_count];
         for (int j = 0; j < screen_count; j++) {
@@ -1354,7 +1305,7 @@ public class Display {
      */
     private void init_keyboard_mapping() {
 
-        input = new Input(this, min_keycode, max_keycode);
+        input = new Input(this, minKeycode, maxKeycode);
         input.keyboard_mapping();
     }
 
@@ -1365,10 +1316,10 @@ public class Display {
 
     public String toString() {
 
-        return "#Display" + "\n  default-screen-number: " + default_screen_no
+        return "#Display" + "\n  default-screen-number: " + defaultScreenNumber
                         + "\n  vendor: " + vendor + "\n  release-number: "
-                        + release_no + "\n  maximum-request-length: "
-                        + maximum_request_length;
+                        + releaseNumber + "\n  maximum-request-length: "
+                        + maximumRequestLength;
     }
 
     /**
@@ -1393,7 +1344,7 @@ public class Display {
         }
 
         // Fetch display no.
-        String display_no_str = String.valueOf(display_no);
+        String display_no_str = String.valueOf(displayNumber);
 
         // Find the XAuthority that matches the hostname and display no.
         XAuthority found = null;
@@ -1503,7 +1454,7 @@ public class Display {
     }
     
     synchronized void addAtom(String name, Atom atom) {
-        this.atomNames.put(name, atom);
+        this.atoms.put(name, atom);
     }
     
     synchronized Atom getAtom(int id) {

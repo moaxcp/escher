@@ -545,7 +545,7 @@ public abstract class Drawable extends Resource {
                         xVisual = display.getDefaultVisual();
                     }
                     image = new ZPixmap(display, width, height,
-                                        display.default_pixmap_format, data,
+                                        display.defaultPixmapFormat, data,
                                         xVisual);
                 } else {                  
                     // "Now XYPixmaps are something that I never use, and
@@ -878,7 +878,7 @@ public abstract class Drawable extends Resource {
     public void put_image(GC gc, Image image, int x, int y) {
 
         // TODO: Make use of big requests when possible.
-        int max_data_byte = display.maximum_request_length - 24;
+        int max_data_byte = display.maximumRequestLength - 24;
         int lbc = image.getLineByteCount();
         int request_height = lbc > 0 ? max_data_byte
                 / image.getLineByteCount() : 1;

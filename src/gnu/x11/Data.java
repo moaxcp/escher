@@ -7,12 +7,13 @@ package gnu.x11;
  */
 public class Data {  
   /** Sequential writing. */
-  public int index;
+  private int index;
 
   /** Lower bound. */
-  public int offset;
+  private int offset;
 
-  public byte [] data;
+  /** Data itself */
+  private byte [] data;
 
 
   /** Writing. */
@@ -190,17 +191,17 @@ public class Data {
   }
 
 
-  public boolean read_boolean (int j) {
+  public boolean readBoolean (int j) {
     return read1 (j) == 1;
   }
 
 
-  public boolean read4_boolean (int j) {
+  public boolean readBoolean4 (int j) {
     return read4 (j) == 1;
   }
 
 
-  public double read_double (int j) {
+  public double readDouble (int j) {
     return Double.longBitsToDouble (read8 (j));
   }
 
@@ -614,5 +615,15 @@ public class Data {
       + "\n  index: " + index
       + "\n  offset: " + offset
       + to_string (data, offset, data.length, "");
+  }
+  
+  // Sets and Gets
+  
+  public byte[] getData() {
+    return data;
+  }
+
+  public void setData(byte[] data) {
+    this.data = data;
   }
 }

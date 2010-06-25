@@ -861,8 +861,8 @@ public class Window extends Drawable implements GLXDrawable {
         synchronized (o) {
             o.beginRequest(18, mode, 6 + (n + p) / 4);
             o.writeInt32(id);
-            o.writeInt32(property.getId());
-            o.writeInt32(type.getId());
+            o.writeInt32(property.getID());
+            o.writeInt32(type.getID());
             o.writeInt8(format);
             o.skip(3);
             o.writeInt32(len); // data length in format unit
@@ -882,7 +882,7 @@ public class Window extends Drawable implements GLXDrawable {
         synchronized (o) {
             o.beginRequest(19, 0, 3);
             o.writeInt32(id);
-            o.writeInt32(property.getId());
+            o.writeInt32(property.getID());
             o.send();
         }
     }
@@ -993,8 +993,8 @@ public class Window extends Drawable implements GLXDrawable {
         synchronized (o) {
             o.beginRequest(20, delete ? 1 : 0, 6);
             o.writeInt32(id);
-            o.writeInt32(property.getId());
-            o.writeInt32(type.getId());
+            o.writeInt32(property.getID());
+            o.writeInt32(type.getID());
             o.writeInt32(offset);
             o.writeInt32(length);
             ResponseInputStream i = display.in;
@@ -1052,7 +1052,7 @@ public class Window extends Drawable implements GLXDrawable {
         synchronized (o) {
             o.beginRequest(22, 0, 4);
             o.writeInt32(id);
-            o.writeInt32(selection.getId());
+            o.writeInt32(selection.getID());
             o.writeInt32(time);
             o.send();
         }
@@ -1071,9 +1071,9 @@ public class Window extends Drawable implements GLXDrawable {
         synchronized (o) {
             o.beginRequest(24, 0, 6);
             o.writeInt32(id);
-            o.writeInt32(selection.getId());
-            o.writeInt32(target.getId());
-            o.writeInt32(property.getId());
+            o.writeInt32(selection.getID());
+            o.writeInt32(target.getID());
+            o.writeInt32(property.getID());
             o.writeInt32(time);
             o.send();
         }
@@ -1667,8 +1667,8 @@ public class Window extends Drawable implements GLXDrawable {
             o.writeInt16(properties.length);
             o.writeInt16(delta);
 
-            for (int i = 0; i < properties.length; i++)
-                o.writeInt32(properties[i].getId());
+            for (Atom atom : properties)
+                o.writeInt32(atom.getID());
 
             o.send();
         }
@@ -2112,7 +2112,7 @@ public class Window extends Drawable implements GLXDrawable {
     public void set_wm_hints(WMHints wm_hints) {
 
         change_property(REPLACE, Atom.WM_HINTS, Atom.WM_HINTS, 8,
-                        wm_hints.data, 32, 8);
+                        wm_hints.getData(), 32, 8);
     }
 
     /** X window manager size hints. */
@@ -2224,7 +2224,7 @@ public class Window extends Drawable implements GLXDrawable {
     public void set_wm_normal_hints(WMSizeHints size_hints) {
 
         change_property(REPLACE, Atom.WM_NORMAL_HINTS, Atom.WM_SIZE_HINTS, 32,
-                        size_hints.data, 32, 8);
+                        size_hints.getData(), 32, 8);
     }
 
     /**
@@ -2253,7 +2253,7 @@ public class Window extends Drawable implements GLXDrawable {
         Atom wm_protocols = (Atom) Atom.intern(display, "WM_PROTOCOLS");
         Atom protocol = (Atom) Atom.intern(display, name);
 
-        change_property(wm_protocols, Atom.ATOM, protocol.getId());
+        change_property(wm_protocols, Atom.ATOM, protocol.getID());
     }
 
     /** 
@@ -2379,7 +2379,7 @@ public class Window extends Drawable implements GLXDrawable {
         Property pi = get_property(false, Atom.WM_NAME, Atom.STRING, 0,
                                    MAX_WM_LENGTH); // support other types?
 
-        if (pi.format() != 8 || pi.type_id() != Atom.STRING.getId())
+        if (pi.format() != 8 || pi.type_id() != Atom.STRING.getID())
             return null;
 
         return pi.string_value();
@@ -2413,7 +2413,7 @@ public class Window extends Drawable implements GLXDrawable {
         int[] list = wm_protocols();
 
         for (int i : list) {
-            if (i == protocol.getId())
+            if (i == protocol.getID())
                 return true;
         }
 

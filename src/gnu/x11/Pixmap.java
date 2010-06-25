@@ -99,7 +99,7 @@ public class Pixmap extends Drawable {
      */
     public Pixmap(Display display, int width, int height) {
 
-        this(display.getRootWindow(), width, height, display.default_depth);
+        this(display.getRootWindow(), width, height, display.defaultDepth);
     }
 
     /**
@@ -115,7 +115,7 @@ public class Pixmap extends Drawable {
      */
     public Pixmap(Drawable drawable) {
 
-        this(drawable, drawable.display.default_depth);
+        this(drawable, drawable.display.defaultDepth);
     }
 
     // opcode 54 - free pixmap

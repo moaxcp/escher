@@ -337,14 +337,14 @@ public class Colormap extends Resource {
   /**
    * @see <a href="XFreeColors.html">XFreeColors</a>
    */
-  public void freeColors (int [] pixels, int plane_mask) {
+  public void freeColors (int [] pixels, int planeMask) {
 
     int n = pixels.length;
     RequestOutputStream o = display.out;
     synchronized (o) {
       o.beginRequest (88, 0, 3 + n);
       o.writeInt32 (id);
-      o.writeInt32 (plane_mask);
+      o.writeInt32 (planeMask);
       for (int i = 0; i < pixels.length; i++)
         o.writeInt32 (pixels [i]);
       o.send ();

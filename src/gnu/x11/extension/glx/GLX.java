@@ -612,7 +612,7 @@ public class GLX extends gnu.x11.extension.Extension implements
      */
     public String more_string() {
 
-        int screen = display.default_screen_no;
+        int screen = display.defaultScreenNumber;
 
         // TODO output like `glxinfo'
 

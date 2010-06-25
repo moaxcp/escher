@@ -56,7 +56,7 @@ public final class ClientMessage extends Event {
 
     return format () == 32
       && type () == wm_protocols
-      && wm_data () == wm_delete_window.getId();
+      && wm_data () == wm_delete_window.getID();
   }
 
 

@@ -22,14 +22,14 @@ public class XPM extends ZPixmap { // TODO
 
     // TODO how to select best SUITABLE format?
     format = Format.ZPIXMAP;
-    pixmapFormat = display.default_pixmap_format;
-    imageByteOrder = display.image_byte_order;
+    pixmapFormat = display.defaultPixmapFormat;
+    imageByteOrder = display.imageByteOrder;
     // FIXME
     //pixelByteCount = pixmapFormat.bits_per_pixel () / 8;
     init ();
 
     java.util.Hashtable mapping = new java.util.Hashtable (2*num_colors);
-    Colormap cmap = display.default_colormap;
+    Colormap cmap = display.defaultColormap;
     
     for (int i=0; i<num_colors; i++) {
       StringTokenizer color = new StringTokenizer (xpm [i+1]);

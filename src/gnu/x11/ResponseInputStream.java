@@ -75,7 +75,7 @@ public class ResponseInputStream extends FilterInputStream {
     private Error build_extension_error(Display display, int code, int seq_no,
             int bad, int minor_opcode, int major_opcode) {
 
-        gnu.x11.extension.ErrorFactory factory = display.extension_error_factories[code - 128];
+        gnu.x11.extension.ErrorFactory factory = display.extensionErrorFactories[code - 128];
 
         if (factory == null) {
             throw new java.lang.Error("Unsupported extension error: " + code);
@@ -388,7 +388,7 @@ public class ResponseInputStream extends FilterInputStream {
 
     private Event readExtensionEvent(int code) {
 
-        EventFactory fac = this.display.extension_event_factories[code - 64];
+        EventFactory fac = this.display.extensionEventFactories[code - 64];
         if (fac == null) {
             throw new java.lang.Error("Unsuppored extension event: " + code);
         }

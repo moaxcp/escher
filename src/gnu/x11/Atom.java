@@ -229,7 +229,7 @@ public class Atom {
 
   /** Predefined. */
   public Atom (int id, String name) {
-    setId(id);
+    setID(id);
     setName(name);
   }
 
@@ -358,12 +358,12 @@ public class Atom {
   }
 
 
-  public int getId() {
+  public int getID() {
       return id;
   }
 
 
-  public void setId(int id) {
+  public void setID(int id) {
       this.id = id;
   }
 
