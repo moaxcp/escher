@@ -9,13 +9,13 @@ public class Bitmap extends Image {
 
 
   public Bitmap (Display display, int width, int height) {
-    super (width, height, Format.BITMAP, display.pixmapFormats [0]);
+    super (width, height, Format.BITMAP, display.getPixmapFormats()[0]);
 
-    if (display.imageByteOrder != LSB_FIRST
-      || display.bitmapFormatBitOrder != LEAST_SIGNIFICANT)
+    if (display.getImageByteOrder() != LSB_FIRST
+      || display.getBitmapFormatBitOrder() != LEAST_SIGNIFICANT)
       throw new Error ("Unsupported image format");
     
-    scanline_unit = display.bitmapFormatScanlineUnit;
+    scanline_unit = display.getBitmapFormatScanlineUnit();
     unit_byte_count = scanline_unit / 8;
   }
 

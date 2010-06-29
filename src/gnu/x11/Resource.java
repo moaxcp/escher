@@ -13,7 +13,7 @@ public abstract class Resource {
   /** Create. */
   public Resource (Display display) {
     this.display = display;
-    id = display.allocate_id (this);
+    id = display.allocateID (this);
   }
 
 
@@ -21,7 +21,7 @@ public abstract class Resource {
   public Resource (Display display, int id) {
     this.display = display;
     this.id = id;
-    display.resources.put (new Integer (id), this);
+    display.getResources().put (new Integer (id), this);
   }
 
 
@@ -33,7 +33,7 @@ public abstract class Resource {
 
 
   public void unintern () {
-    display.resources.remove (new Integer (id));
+    display.getResources().remove (new Integer (id));
   }
 
   /**

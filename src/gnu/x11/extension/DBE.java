@@ -47,13 +47,13 @@ public class DBE extends Extension implements ErrorFactory {
     super (display, "DOUBLE-BUFFER", MINOR_OPCODE_STRINGS, 1, 0);
 
     // check version before any other operations
-    RequestOutputStream o = display.out;
+    RequestOutputStream o = display.getResponseOutputStream();
     synchronized (o) {
       o.beginRequest (major_opcode, 0, 2);
       o.writeInt8 (CLIENT_MAJOR_VERSION);
       o.writeInt8 (CLIENT_MINOR_VERSION);
       o.skip (2);
-      ResponseInputStream i = display.in;
+      ResponseInputStream i = display.getResponseInputStream();
       synchronized (i) {
         i.readReply (o);
         i.skip (8);
@@ -78,7 +78,7 @@ public class DBE extends Extension implements ErrorFactory {
   public void swap (Window [] windows, int [] actions) {
     int n = windows.length;
 
-    RequestOutputStream o = display.out;
+    RequestOutputStream o = display.getResponseOutputStream();
     synchronized (o) {
       o.beginRequest (major_opcode, 3, 2 + 2 * n);
       o.writeInt32 (n);
@@ -97,7 +97,7 @@ public class DBE extends Extension implements ErrorFactory {
    * @see <a href="XdbeBeginIdiom.html">XdbeBeginIdiom</a>
    */
   public void begin_idiom () {
-    RequestOutputStream o = display.out;
+    RequestOutputStream o = display.getResponseOutputStream();
     synchronized (o) {
       o.beginRequest (major_opcode, 4, 1);
       o.send ();
@@ -110,7 +110,7 @@ public class DBE extends Extension implements ErrorFactory {
    * @see <a href="XdbeEndIdiom.html">XdbeEndIdiom</a>
    */
   public void end_idiom () {
-    RequestOutputStream o = display.out;
+    RequestOutputStream o = display.getResponseOutputStream();
     synchronized (o) {
       o.beginRequest (major_opcode, 5, 1);
       o.send ();
@@ -173,13 +173,13 @@ public class DBE extends Extension implements ErrorFactory {
   public ScreenVisualInfo [] visual_info (Drawable [] screen_specifiers) {
 
     ScreenVisualInfo[] infos;
-    RequestOutputStream o = display.out;
+    RequestOutputStream o = display.getResponseOutputStream();
     synchronized (o) {
       o.beginRequest (major_opcode, 6, 2 + screen_specifiers.length);
       o.writeInt32 (screen_specifiers.length);
       for (int i = 0; i < screen_specifiers.length; i++)
         o.writeInt32 (screen_specifiers [i].id);
-      ResponseInputStream i = display.in;
+      ResponseInputStream i = display.getResponseInputStream();
       synchronized (i) {
         i.readReply (o);
         i.skip (8);
@@ -213,7 +213,7 @@ public class DBE extends Extension implements ErrorFactory {
       width = window.width;
       height = window.height;
 
-      RequestOutputStream o = display.out;
+      RequestOutputStream o = display.getResponseOutputStream();
       synchronized (o) {
         o.beginRequest (major_opcode, 1, 4);
         o.writeInt32 (window.id);
@@ -231,7 +231,7 @@ public class DBE extends Extension implements ErrorFactory {
      * XdbeDeallocateBackBufferName</a>
      */
     public void deallocate () {
-      RequestOutputStream o = display.out;
+      RequestOutputStream o = display.getResponseOutputStream();
       synchronized (o) {
         o.beginRequest (major_opcode, 2, 2);
         o.writeInt32 (id);
@@ -248,11 +248,11 @@ public class DBE extends Extension implements ErrorFactory {
     public Window attributes () {
 
       int atts;
-      RequestOutputStream o = display.out;
+      RequestOutputStream o = display.getResponseOutputStream();
       synchronized (o) {
         o.beginRequest (major_opcode, 7, 2);
         o.writeInt32 (id);
-        ResponseInputStream i = display.in;
+        ResponseInputStream i = display.getResponseInputStream();
         synchronized (i) {
           i.readReply (o);
           i.skip (8);

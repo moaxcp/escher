@@ -294,7 +294,7 @@ public class RequestOutputStream extends FilterOutputStream {
    * corresponding calls.
    */
   private void doRoundtrip () {
-    display.input.input_focus ();
+    display.getInput().input_focus ();
   }
 
   /**

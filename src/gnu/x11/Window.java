@@ -332,7 +332,7 @@ public class Window extends Drawable implements GLXDrawable {
     public void create(int border_width, int depth, int klass, int visual_id,
                        Attributes attr) {
 
-        RequestOutputStream o = display.out;
+        RequestOutputStream o = display.getResponseOutputStream();
         synchronized (o) {
             o.beginRequest(1, depth, 8 + attr.count());
             o.writeInt32(id);
@@ -378,7 +378,7 @@ public class Window extends Drawable implements GLXDrawable {
     public void change_attributes(Attributes attr) {
 
         // FIXME: Implement aggregation.
-        RequestOutputStream o = display.out;
+        RequestOutputStream o = display.getResponseOutputStream();
         synchronized (o) {
             o.beginRequest(2, 0, 3 + attr.count());
             o.writeInt32(id);
@@ -479,12 +479,12 @@ public class Window extends Drawable implements GLXDrawable {
      */
     public AttributesReply attributes() {
 
-        RequestOutputStream o = display.out;
+        RequestOutputStream o = display.getResponseOutputStream();
         AttributesReply r;
         synchronized (o) {
             o.beginRequest(3, 0, 2);
             o.writeInt32(id);
-            ResponseInputStream i = display.in;
+            ResponseInputStream i = display.getResponseInputStream();
             synchronized (i) {
                 i.readReply(o);
                 r = new AttributesReply(i);
@@ -499,7 +499,7 @@ public class Window extends Drawable implements GLXDrawable {
      */
     public void destroy() {
 
-        RequestOutputStream o = display.out;
+        RequestOutputStream o = display.getResponseOutputStream();
         synchronized (o) {
             o.beginRequest(4, 0, 2);
             o.writeInt32(id);
@@ -513,7 +513,7 @@ public class Window extends Drawable implements GLXDrawable {
      */
     public void destroy_subwindows() {
 
-        RequestOutputStream o = display.out;
+        RequestOutputStream o = display.getResponseOutputStream();
         synchronized (o) {
             o.beginRequest(5, 0, 2);
             o.writeInt32(id);
@@ -534,7 +534,7 @@ public class Window extends Drawable implements GLXDrawable {
      */
     public void change_save_set(boolean mode) {
 
-        RequestOutputStream o = display.out;
+        RequestOutputStream o = display.getResponseOutputStream();
         synchronized (o) {
             o.beginRequest(6, mode ? 1 : 0, 2);
             o.writeInt32(id);
@@ -548,7 +548,7 @@ public class Window extends Drawable implements GLXDrawable {
      */
     public void reparent(Window parent, int x, int y) {
 
-        RequestOutputStream o = display.out;
+        RequestOutputStream o = display.getResponseOutputStream();
         synchronized (o) {
             o.beginRequest(7, 0, 4);
             o.writeInt32(id);
@@ -565,7 +565,7 @@ public class Window extends Drawable implements GLXDrawable {
      */
     public void map() {
 
-        RequestOutputStream o = display.out;
+        RequestOutputStream o = display.getResponseOutputStream();
         synchronized (o) {
             o.beginRequest(8, 0, 2);
             o.writeInt32(id);
@@ -580,7 +580,7 @@ public class Window extends Drawable implements GLXDrawable {
      */
     public void map_subwindows() {
 
-        RequestOutputStream o = display.out;
+        RequestOutputStream o = display.getResponseOutputStream();
         synchronized (o) {
             o.beginRequest(9, 0, 2);
             o.writeInt32(id);
@@ -594,7 +594,7 @@ public class Window extends Drawable implements GLXDrawable {
      */
     public void unmap() {
 
-        RequestOutputStream o = display.out;
+        RequestOutputStream o = display.getResponseOutputStream();
         synchronized (o) {
             o.beginRequest(10, 0, 2);
             o.writeInt32(id);
@@ -608,7 +608,7 @@ public class Window extends Drawable implements GLXDrawable {
      */
     public void unmap_subwindows() {
 
-        RequestOutputStream o = display.out;
+        RequestOutputStream o = display.getResponseOutputStream();
         synchronized (o) {
             o.beginRequest(11, 0, 2);
             o.writeInt32(id);
@@ -698,7 +698,7 @@ public class Window extends Drawable implements GLXDrawable {
     public void configure(Changes changes) {
 
         // FIXME: Implement aggregation.
-        RequestOutputStream o = display.out;
+        RequestOutputStream o = display.getResponseOutputStream();
         synchronized (o) {
             o.beginRequest(12, 0, 3 + changes.count());
             o.writeInt32(id);
@@ -722,7 +722,7 @@ public class Window extends Drawable implements GLXDrawable {
      */
     public void circulate_window(int direction) {
 
-        RequestOutputStream o = display.out;
+        RequestOutputStream o = display.getResponseOutputStream();
         synchronized (o) {
             o.beginRequest(13, direction, 2);
             o.writeInt32(id);
@@ -770,11 +770,11 @@ public class Window extends Drawable implements GLXDrawable {
     public TreeInfo tree() {
 
         TreeInfo info;
-        RequestOutputStream o = display.out;
+        RequestOutputStream o = display.getResponseOutputStream();
         synchronized (o) {
             o.beginRequest(15, 0, 2);
             o.writeInt32(id);
-            ResponseInputStream i = display.in;
+            ResponseInputStream i = display.getResponseInputStream();
             synchronized (i) {
                 i.readReply(o);
                 i.skip(8);
@@ -857,7 +857,7 @@ public class Window extends Drawable implements GLXDrawable {
 
         int p = RequestOutputStream.pad(n);
 
-        RequestOutputStream o = display.out;
+        RequestOutputStream o = display.getResponseOutputStream();
         synchronized (o) {
             o.beginRequest(18, mode, 6 + (n + p) / 4);
             o.writeInt32(id);
@@ -878,7 +878,7 @@ public class Window extends Drawable implements GLXDrawable {
      */
     public void delete_property(Atom property) {
 
-        RequestOutputStream o = display.out;
+        RequestOutputStream o = display.getResponseOutputStream();
         synchronized (o) {
             o.beginRequest(19, 0, 3);
             o.writeInt32(id);
@@ -989,7 +989,7 @@ public class Window extends Drawable implements GLXDrawable {
                                  int offset, int length) {
 
         Property prop;
-        RequestOutputStream o = display.out;
+        RequestOutputStream o = display.getResponseOutputStream();
         synchronized (o) {
             o.beginRequest(20, delete ? 1 : 0, 6);
             o.writeInt32(id);
@@ -997,7 +997,7 @@ public class Window extends Drawable implements GLXDrawable {
             o.writeInt32(type.getID());
             o.writeInt32(offset);
             o.writeInt32(length);
-            ResponseInputStream i = display.in;
+            ResponseInputStream i = display.getResponseInputStream();
             synchronized (i) {
                 i.readReply(o);
                 i.skip(1);
@@ -1017,12 +1017,12 @@ public class Window extends Drawable implements GLXDrawable {
     public Atom[] properties() {
 
         Atom[] atoms;
-        RequestOutputStream o = display.out;
+        RequestOutputStream o = display.getResponseOutputStream();
         int[] atomIds;
         synchronized (o) {
             o.beginRequest(21, 0, 2);
             o.writeInt32(id);
-            ResponseInputStream i = display.in;
+            ResponseInputStream i = display.getResponseInputStream();
             synchronized (i) {
                 i.readReply(o);
                 i.skip(8);
@@ -1048,7 +1048,7 @@ public class Window extends Drawable implements GLXDrawable {
      */
     public void set_selection_owner(Atom selection, int time) {
 
-        RequestOutputStream o = display.out;
+        RequestOutputStream o = display.getResponseOutputStream();
         synchronized (o) {
             o.beginRequest(22, 0, 4);
             o.writeInt32(id);
@@ -1067,7 +1067,7 @@ public class Window extends Drawable implements GLXDrawable {
     public void convert_selection(Atom selection, Atom target, Atom property,
                                   int time) {
 
-        RequestOutputStream o = display.out;
+        RequestOutputStream o = display.getResponseOutputStream();
         synchronized (o) {
             o.beginRequest(24, 0, 6);
             o.writeInt32(id);
@@ -1085,7 +1085,7 @@ public class Window extends Drawable implements GLXDrawable {
      */
     public void send_event(boolean propagate, int event_mask, Event event) {
 
-        RequestOutputStream o = display.out;
+        RequestOutputStream o = display.getResponseOutputStream();
         synchronized (o) {
             o.beginRequest(25, propagate ? 1 : 0, 11);
             o.writeInt32(id);
@@ -1134,7 +1134,7 @@ public class Window extends Drawable implements GLXDrawable {
                             Window confine_to, Cursor cursor, int time) {
 
         int status;
-        RequestOutputStream o = display.out;
+        RequestOutputStream o = display.getResponseOutputStream();
         synchronized (o) {
             o.beginRequest(26, owner_events ? 1 : 0, 6);
             o.writeInt32(id);
@@ -1144,7 +1144,7 @@ public class Window extends Drawable implements GLXDrawable {
             o.writeInt32(confine_to.id);
             o.writeInt32(cursor.id);
             o.writeInt32(time);
-            ResponseInputStream i = display.in;
+            ResponseInputStream i = display.getResponseInputStream();
             synchronized (i) {
                 i.readReply(o);
                 i.skip(1);
@@ -1181,7 +1181,7 @@ public class Window extends Drawable implements GLXDrawable {
                             int event_mask, int pointer_mode,
                             int keyboard_mode, Window confine_to, Cursor cursor) {
 
-        RequestOutputStream o = display.out;
+        RequestOutputStream o = display.getResponseOutputStream();
         synchronized (o) {
             o.beginRequest(28, owner_events ? 1 : 0, 6);
             o.writeInt32(id);
@@ -1207,7 +1207,7 @@ public class Window extends Drawable implements GLXDrawable {
      */
     public void ungrab_button(int button, int modifiers) {
 
-        RequestOutputStream o = display.out;
+        RequestOutputStream o = display.getResponseOutputStream();
         synchronized (o) {
             o.beginRequest(29, button, 3);
             o.writeInt32(id);
@@ -1237,7 +1237,7 @@ public class Window extends Drawable implements GLXDrawable {
                              int keyboard_mode, int time) {
 
         int status;
-        RequestOutputStream o = display.out;
+        RequestOutputStream o = display.getResponseOutputStream();
         synchronized (o) {
             o.beginRequest(31, owner_events ? 1 : 0, 4);
             o.writeInt32(id);
@@ -1245,7 +1245,7 @@ public class Window extends Drawable implements GLXDrawable {
             o.writeInt8(pointer_mode);
             o.writeInt8(keyboard_mode);
             o.skip(2);
-            ResponseInputStream i = display.in;
+            ResponseInputStream i = display.getResponseInputStream();
             synchronized (i) {
                 i.readReply(o);
                 i.skip(1);
@@ -1271,9 +1271,10 @@ public class Window extends Drawable implements GLXDrawable {
     public void grab_key(int keysym, int modifiers, boolean owner_events,
                          int pointer_mode, int keyboard_mode) {
 
-        int keycode = display.input.keysym_to_keycode(keysym);
+        int keycode = display.getInput().keysym_to_keycode(keysym);
 
-        RequestOutputStream o = display.out;
+
+        RequestOutputStream o = display.getResponseOutputStream();
         synchronized (o) {
             o.beginRequest(33, owner_events ? 1 : 0, 4);
             o.writeInt32(id);
@@ -1297,9 +1298,9 @@ public class Window extends Drawable implements GLXDrawable {
      */
     public void ungrab_key(int keysym, int modifiers) {
 
-        int keycode = keysym == 0 ? 0 : display.input.keysym_to_keycode(keysym);
+        int keycode = keysym == 0 ? 0 : display.getInput().keysym_to_keycode(keysym);
 
-        RequestOutputStream o = display.out;
+        RequestOutputStream o = display.getResponseOutputStream();
         synchronized (o) {
             o.beginRequest(34, keycode, 3);
             o.writeInt32(id);
@@ -1362,11 +1363,11 @@ public class Window extends Drawable implements GLXDrawable {
     public PointerInfo query_pointer() {
 
         PointerInfo info;
-        RequestOutputStream o = display.out;
+        RequestOutputStream o = display.getResponseOutputStream();
         synchronized (o) {
             o.beginRequest(38, 0, 2);
             o.writeInt32(id);
-            ResponseInputStream i = display.in;
+            ResponseInputStream i = display.getResponseInputStream();
             synchronized (i) {
                 i.readReply(o);
                 i.skip(1);
@@ -1405,13 +1406,13 @@ public class Window extends Drawable implements GLXDrawable {
 
         TimeCoord[] timecoords;
 
-        RequestOutputStream o = display.out;
+        RequestOutputStream o = display.getResponseOutputStream();
         synchronized (o) {
             o.beginRequest(39, 0, 4);
             o.writeInt32(id);
             o.writeInt32(start);
             o.writeInt32(stop);
-            ResponseInputStream i = display.in;
+            ResponseInputStream i = display.getResponseInputStream();
             synchronized (i) {
                 i.readReply(o);
                 i.skip(8);
@@ -1457,14 +1458,14 @@ public class Window extends Drawable implements GLXDrawable {
     public Coordinates translate_coordinates(Window src, int src_x, int src_y) {
 
         Coordinates coords;
-        RequestOutputStream o = display.out;
+        RequestOutputStream o = display.getResponseOutputStream();
         synchronized (o) {
             o.beginRequest(40, 0, 4);
             o.writeInt32(src.id);
             o.writeInt32(id);
             o.writeInt16(src_x);
             o.writeInt16(src_y);
-            ResponseInputStream i = display.in;
+            ResponseInputStream i = display.getResponseInputStream();
             synchronized (i) {
                 i.readReply(o);
                 i.skip(1);
@@ -1484,7 +1485,7 @@ public class Window extends Drawable implements GLXDrawable {
     public void warp_pointer(Window src, int src_x, int src_y, int src_width,
                              int src_height, int dest_x, int dest_y) {
 
-        RequestOutputStream o = display.out;
+        RequestOutputStream o = display.getResponseOutputStream();
         synchronized (o) {
             o.beginRequest(41, 0, 6);
             o.writeInt32(src.id);
@@ -1596,7 +1597,7 @@ public class Window extends Drawable implements GLXDrawable {
      */
     public void set_input_focus(int revert_to, int time) {
 
-        RequestOutputStream o = display.out;
+        RequestOutputStream o = display.getResponseOutputStream();
         synchronized (o) {
             o.beginX11CoreRequest(X11CoreCommand.SetInputFocus, revert_to);
             o.writeInt32(id);
@@ -1612,7 +1613,7 @@ public class Window extends Drawable implements GLXDrawable {
     public void clear_area(int x, int y, int width, int height,
                            boolean exposures) {
 
-        RequestOutputStream o = display.out;
+        RequestOutputStream o = display.getResponseOutputStream();
         synchronized (o) {
             o.beginRequest(61, exposures ? 1 : 0, 4);
             o.writeInt32(id);
@@ -1634,11 +1635,11 @@ public class Window extends Drawable implements GLXDrawable {
     public Colormap[] list_installed_colormaps() {
 
         Colormap[] maps;
-        RequestOutputStream o = display.out;
+        RequestOutputStream o = display.getResponseOutputStream();
         synchronized (o) {
             o.beginRequest(83, 0, 2);
             o.writeInt32(id);
-            ResponseInputStream i = display.in;
+            ResponseInputStream i = display.getResponseInputStream();
             synchronized (i) {
                 i.readReply(o);
                 i.skip(8);
@@ -1660,7 +1661,7 @@ public class Window extends Drawable implements GLXDrawable {
      */
     public void rotate_properties(Atom[] properties, int delta) {
 
-        RequestOutputStream o = display.out;
+        RequestOutputStream o = display.getResponseOutputStream();
         synchronized (o) {
             o.beginRequest(114, 0, 3 + properties.length);
             o.writeInt32(id);
@@ -1781,7 +1782,7 @@ public class Window extends Drawable implements GLXDrawable {
 
     public static Object intern(Display display, int id) {
 
-        Object value = display.resources.get(new Integer(id));
+        Object value = display.getResources().get(new Integer(id));
         if (value != null)
             return value;
         return new Window(display, id);
@@ -1854,11 +1855,11 @@ public class Window extends Drawable implements GLXDrawable {
     }
 
     /**
-     * @see Display#kill_client(Resource)
+     * @see Display#killClient(Resource)
      */
     public void kill() {
 
-        display.kill_client(this);
+        display.killClient(this);
     }
 
     /**

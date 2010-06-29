@@ -364,7 +364,7 @@ public class Error extends java.lang.Error {
       || code == ErrorCode.BAD_PIXMAP
       || code == ErrorCode.BAD_WINDOW) {
 
-      Object bad_object = display.resources.get (new Integer (bad));
+      Object bad_object = display.getResources().get (new Integer (bad));
       bad_string = bad_object == null ?
         "\n  bad-id: " + bad
         : "\n  bad-object: " + bad_object;

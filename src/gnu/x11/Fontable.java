@@ -165,11 +165,11 @@ public abstract class Fontable extends Resource {
   public FontInfo info () {
 
     FontInfo info;
-    RequestOutputStream o = display.out;
+    RequestOutputStream o = display.getResponseOutputStream();
     synchronized (o) {
       o.beginRequest (47, 0, 2);
       o.writeInt32 (id);
-      ResponseInputStream i = display.in;
+      ResponseInputStream i = display.getResponseInputStream();
       synchronized (i) {
         i.readReply (o);
         i.skip (8);
@@ -221,12 +221,12 @@ public abstract class Fontable extends Resource {
     int pad = odd ? 2 : 0;
     int len = 2 + (2 * s.length () + pad) / 4;
 
-    RequestOutputStream o = display.out;
+    RequestOutputStream o = display.getResponseOutputStream();
     synchronized (o) {
       o.beginRequest (48, odd ? 1 : 0, len);
       o.writeInt32 (id);
       o.writeString16 (s);
-      ResponseInputStream i = display.in;
+      ResponseInputStream i = display.getResponseInputStream();
       synchronized (i) {
         i.readReply (o);
         i.skip (1);

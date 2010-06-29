@@ -266,7 +266,7 @@ public class GLX extends gnu.x11.extension.Extension implements
         int major = 0;
         int minor = 0;
         
-        RequestOutputStream o = display.out;
+        RequestOutputStream o = display.getResponseOutputStream();
         synchronized (o) {
             
             // set only once
@@ -276,7 +276,7 @@ public class GLX extends gnu.x11.extension.Extension implements
             o.writeInt32(SUPPORTED_GLX_VERSION.major);
             o.writeInt32(SUPPORTED_GLX_VERSION.minor);
             
-            ResponseInputStream i = display.in;
+            ResponseInputStream i = display.getResponseInputStream();
             synchronized (i) {
                 i.readReply(o);
                 i.skip(8);
@@ -307,13 +307,13 @@ public class GLX extends gnu.x11.extension.Extension implements
         if (visualConfigs[screenNo] != null)
             return visualConfigs[screenNo];
 
-        RequestOutputStream o = display.out;
+        RequestOutputStream o = display.getResponseOutputStream();
         VisualConfig[] vcs;
         synchronized (o) {
             o.beginGLXRequest(GLXCommand.GLXGetVisualConfigs);
             o.writeInt32(screenNo);
             
-            ResponseInputStream i = display.in;
+            ResponseInputStream i = display.getResponseInputStream();
             synchronized (i) {
                 i.readReply(o);
                 i.skip(4);
@@ -367,12 +367,12 @@ public class GLX extends gnu.x11.extension.Extension implements
     public String server_string(int screen_no, int name) {
 
         String server_string;
-        RequestOutputStream o = display.out;
+        RequestOutputStream o = display.getResponseOutputStream();
         synchronized (o) {
             o.beginGLXRequest(GLXCommand.GLXQueryServerString);
             o.writeInt32(screen_no);
             o.writeInt32(name);
-            ResponseInputStream i = display.in;
+            ResponseInputStream i = display.getResponseInputStream();
             synchronized (i) {
                 i.readReply(o);
                 i.skip(12);
@@ -472,7 +472,7 @@ public class GLX extends gnu.x11.extension.Extension implements
     // glx opcode 20 - client info
     private void send_client_info() {
 
-        RequestOutputStream o = display.out;
+        RequestOutputStream o = display.getResponseOutputStream();
         synchronized (o) {
             int n = CLIENT_EXTENSION_STRING.length();
             int p = RequestOutputStream.pad(n);
@@ -490,11 +490,11 @@ public class GLX extends gnu.x11.extension.Extension implements
     public int[] fb_configs(int screen_no) { // TODO 1.3
 
         int[] props;
-        RequestOutputStream o = display.out;
+        RequestOutputStream o = display.getResponseOutputStream();
         synchronized (o) {
             o.beginRequest(major_opcode, 21, 2);
             o.writeInt32(screen_no);
-            ResponseInputStream i = display.in;
+            ResponseInputStream i = display.getResponseInputStream();
             synchronized (i) {
                 i.skip(4);
                 int n = i.readInt32();
@@ -612,7 +612,7 @@ public class GLX extends gnu.x11.extension.Extension implements
      */
     public String more_string() {
 
-        int screen = display.defaultScreenNumber;
+        int screen = display.getDefaultScreenNumber();
 
         // TODO output like `glxinfo'
 

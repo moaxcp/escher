@@ -31,95 +31,12 @@ public class Data {
     this.data = data;
   }
 
-
-  /** Reading. */
-  public Data (byte [] [] data) {
-    int s1 = data [0].length;
-    int s2 = data.length;
-
-    this.data = new byte [s1 * s2];
-    for (int i=0; i<s2; i++) 
-      write1 (data [i]);
-  }
-
-
-  /** Reading. */
-  public Data (byte [] [] [] data) {
-    int s1 = data [0] [0].length;
-    int s2 = data [0].length;
-    int s3 = data.length;
-
-    this.data = new byte [s1 * s2 * s3];
-    for (int i=0; i<s3; i++) 
-      for (int j=0; j<s2; j++) 
-        write1 (data [i] [j]);
-  }
-
-
-  /** Reading. */
-  public Data (float [] data) {
-    int n = 4 * data.length;
-    this.data = new byte [n];
-    write4 (data);
-  }
-
-
-  /** Reading. */
-  public Data (float [] [] [] data) {
-    int s1 = data [0] [0].length;
-    int s2 = data [0].length;
-    int s3 = data.length;
-
-    // 4 = number of bytes per float
-    this.data = new byte [4 * s1 * 4 * s2 * 4 * s3];
-    for (int i=0; i<s3; i++) 
-      for (int j=0; j<s2; j++)
-        write4 (data [i] [j]);
-  }
-
-
-  /** Reading. */
-  public Data (int [] [] [] data) {
-    int s1 = data [0] [0].length;
-    int s2 = data [0].length;
-    int s3 = data.length;
-
-    // 4 = number of bytes per integer
-    this.data = new byte [4 * s1 * 4 * s2 * 4 * s3];
-    for (int i=0; i<s3; i++) 
-      for (int j=0; j<s2; j++)
-        write4 (data [i] [j]);
-  }
-
-
+  
   /** Reading. */
   public Data (Data data) {
     this (data.data);
     this.offset = data.offset;
   }
-
-
-  /** Reading. */
-  public Data (int [] data, int unit_size) {
-    if (unit_size == 2) {
-      int n = len (2 * data.length);
-      this.data = new byte [n];
-      write2 (data);
-
-    } else if (unit_size == 4) {
-      int n = 4 * data.length;
-      this.data = new byte [n];
-      write4 (data);
-    }
-  }
-
-
-  /** Offset Reading. */
-  public Data (Data data, int offset) {
-    this (data);
-    this.offset += offset;
-  }
-
 
   //-- padded
 
@@ -135,13 +52,7 @@ public class Data {
     return len (s.length ());
   }
 
-
-  /** Padded unit. */
-  public static int unit (byte [] b) {
-    return unit (b.length);
-  }
-
-
+  
   /** Padded unit. */
   public static int unit (int n) {
     return len (n) / 4;

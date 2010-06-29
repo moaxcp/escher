@@ -383,7 +383,7 @@ public class GL extends gnu.x11.Resource implements GLConstant {
         super(glx.display);
         this.glx = glx;
 
-        RequestOutputStream o = display.out;
+        RequestOutputStream o = display.getResponseOutputStream();
         synchronized (o) {
             o.beginGLXRequest(GLXCommand.GLXCreateContext);
             o.writeInt32(id);
@@ -434,7 +434,7 @@ public class GL extends gnu.x11.Resource implements GLConstant {
      */
     public void destroy() {
 
-        RequestOutputStream o = display.out;
+        RequestOutputStream o = display.getResponseOutputStream();
         synchronized (o) {
             o.beginRequest(glx.major_opcode, 4, 2);
             o.writeInt32(id);
@@ -460,13 +460,13 @@ public class GL extends gnu.x11.Resource implements GLConstant {
      */
     public void make_current(GLXDrawable drawable) {
  
-        RequestOutputStream o = display.out;
+        RequestOutputStream o = display.getResponseOutputStream();
         synchronized (o) {
             o.beginGLXRequest(GLXCommand.GLXMakeCurrent);
             o.writeInt32(drawable.id());
             o.writeInt32(id);
             o.writeInt32(tag);
-            ResponseInputStream i = display.in;
+            ResponseInputStream i = display.getResponseInputStream();
             synchronized (i) {
                 i.readReply(o);
                 i.skip(8);
@@ -483,11 +483,11 @@ public class GL extends gnu.x11.Resource implements GLConstant {
     public boolean direct() {
 
         boolean direct;
-        RequestOutputStream o = display.out;
+        RequestOutputStream o = display.getResponseOutputStream();
         synchronized (o) {
             o.beginRequest(glx.major_opcode, 6, 2);
             o.writeInt32(id);
-            ResponseInputStream i = display.in;
+            ResponseInputStream i = display.getResponseInputStream();
             synchronized (i) {
                 i.readReply(o);
                 i.skip(8);
@@ -504,7 +504,7 @@ public class GL extends gnu.x11.Resource implements GLConstant {
      */
     public void wait_gl() {
 
-        RequestOutputStream o = display.out;
+        RequestOutputStream o = display.getResponseOutputStream();
         synchronized (o) {
             o.beginRequest(glx.major_opcode, 8, 2);
             o.writeInt32(tag);
@@ -519,7 +519,7 @@ public class GL extends gnu.x11.Resource implements GLConstant {
      */
     public void wait_x() {
 
-        RequestOutputStream o = display.out;
+        RequestOutputStream o = display.getResponseOutputStream();
         synchronized (o) {
             o.beginRequest(glx.major_opcode, 9, 2);
             o.writeInt32(tag);
@@ -534,7 +534,7 @@ public class GL extends gnu.x11.Resource implements GLConstant {
      */
     public void copy(GL dst, int mask) {
 
-        RequestOutputStream o = display.out;
+        RequestOutputStream o = display.getResponseOutputStream();
         synchronized (o) {
             o.beginRequest(glx.major_opcode, 10, 5);
             o.writeInt32(id);
@@ -551,7 +551,7 @@ public class GL extends gnu.x11.Resource implements GLConstant {
      */
     public void swap_buffers(GLXDrawable drawable) {
 
-        RequestOutputStream o = display.out;
+        RequestOutputStream o = display.getResponseOutputStream();
         synchronized (o) {
             o.beginRequest(glx.major_opcode, 11, 3);
             o.writeInt32(tag);
@@ -566,7 +566,7 @@ public class GL extends gnu.x11.Resource implements GLConstant {
      */
     public void use_x_font(gnu.x11.Font font, int first, int count, int base) {
 
-        RequestOutputStream o = display.out;
+        RequestOutputStream o = display.getResponseOutputStream();
         synchronized (o) {
             o.beginRequest(glx.major_opcode, 12, 6);
             o.writeInt32(tag);
@@ -593,7 +593,7 @@ public class GL extends gnu.x11.Resource implements GLConstant {
     @Deprecated
     public void new_list(int list, int mode) {
 
-        RequestOutputStream o = display.out;
+        RequestOutputStream o = display.getResponseOutputStream();
         synchronized (o) {
             o.beginGLXRequest(GLXCommand.NewList);
             o.writeInt32(tag);
@@ -631,7 +631,7 @@ public class GL extends gnu.x11.Resource implements GLConstant {
     @Deprecated
     public void end_list() {
 
-        RequestOutputStream o = display.out;
+        RequestOutputStream o = display.getResponseOutputStream();
         synchronized (o) {
             o.beginGLXRequest(GLXCommand.EndList);
             o.writeInt32(tag);
@@ -659,7 +659,7 @@ public class GL extends gnu.x11.Resource implements GLConstant {
      */
     public void delete_lists(int list, int range) {
 
-        RequestOutputStream o = display.out;
+        RequestOutputStream o = display.getResponseOutputStream();
         synchronized (o) {
             o.beginRequest(glx.major_opcode, 103, 4);
             o.writeInt32(tag);
@@ -677,12 +677,12 @@ public class GL extends gnu.x11.Resource implements GLConstant {
     public int gen_lists(int range) {
 
         int ret;
-        RequestOutputStream o = display.out;
+        RequestOutputStream o = display.getResponseOutputStream();
         synchronized (o) {
             o.beginGLXRequest(GLXCommand.GenLists);
             o.writeInt32(tag);
             o.writeInt32(range);
-            ResponseInputStream i = display.in;
+            ResponseInputStream i = display.getResponseInputStream();
             synchronized (i) {
                 i.readReply(o);
                 i.skip(8);
@@ -716,7 +716,7 @@ public class GL extends gnu.x11.Resource implements GLConstant {
 
         render_mode = FEEDBACK;
 
-        RequestOutputStream o = display.out;
+        RequestOutputStream o = display.getResponseOutputStream();
         synchronized (o) {
             o.beginRequest(glx.major_opcode, 105, 4);
             o.writeInt32(tag);
@@ -734,7 +734,7 @@ public class GL extends gnu.x11.Resource implements GLConstant {
 
         render_mode = SELECT;
 
-        RequestOutputStream o = display.out;
+        RequestOutputStream o = display.getResponseOutputStream();
         synchronized (o) {
             o.beginRequest(glx.major_opcode, 106, 3);
             o.writeInt32(tag);
@@ -758,7 +758,7 @@ public class GL extends gnu.x11.Resource implements GLConstant {
 
         RenderModeData d = new RenderModeData();
         int new_mode = render_mode;
-        RequestOutputStream o = display.out;
+        RequestOutputStream o = display.getResponseOutputStream();
         synchronized (o) {
             o.beginRequest(glx.major_opcode, 107, 3);
             o.writeInt32(tag);
@@ -766,7 +766,7 @@ public class GL extends gnu.x11.Resource implements GLConstant {
             if (render_mode == RENDER)
                 o.send();
             else {
-                ResponseInputStream i = display.in;
+                ResponseInputStream i = display.getResponseInputStream();
                 synchronized (i) {
                     i.readReply(o);
                     i.skip(8);
@@ -799,11 +799,11 @@ public class GL extends gnu.x11.Resource implements GLConstant {
      */
     public void finish() {
 
-        RequestOutputStream o = display.out;
+        RequestOutputStream o = display.getResponseOutputStream();
         synchronized (o) {
             o.beginRequest(glx.major_opcode, 108, 2);
             o.writeInt32(tag);
-            ResponseInputStream i = display.in;
+            ResponseInputStream i = display.getResponseInputStream();
             synchronized (i) {
                 i.readReply(o);
                 // We wait for the response to make sure it is really finished.
@@ -819,7 +819,7 @@ public class GL extends gnu.x11.Resource implements GLConstant {
      */
     public void pixel_storef(int pname, int param) {
 
-        RequestOutputStream o = display.out;
+        RequestOutputStream o = display.getResponseOutputStream();
         synchronized (o) {
             o.beginRequest(glx.major_opcode, 109, 4);
             o.writeInt32(tag);
@@ -845,7 +845,7 @@ public class GL extends gnu.x11.Resource implements GLConstant {
     @Deprecated
     public void pixel_storei(int pname, int param) {
 
-        RequestOutputStream o = display.out;
+        RequestOutputStream o = display.getResponseOutputStream();
         synchronized (o) {
             o.beginGLXRequest(GLXCommand.PixelStorei);
             o.writeInt32(tag);
@@ -879,12 +879,12 @@ public class GL extends gnu.x11.Resource implements GLConstant {
     public boolean[] booleanv(int pname) {
 
         boolean[] v;
-        RequestOutputStream o = display.out;
+        RequestOutputStream o = display.getResponseOutputStream();
         synchronized (o) {
             o.beginRequest(glx.major_opcode, 112, 3);
             o.writeInt32(tag);
             o.writeInt32(pname);
-            ResponseInputStream i = display.in;
+            ResponseInputStream i = display.getResponseInputStream();
             synchronized (i) {
                 i.readReply(o);
                 i.skip(12);
@@ -933,11 +933,11 @@ public class GL extends gnu.x11.Resource implements GLConstant {
     public int error() {
 
         int err;
-        RequestOutputStream o = display.out;
+        RequestOutputStream o = display.getResponseOutputStream();
         synchronized (o) {
             o.beginRequest(glx.major_opcode, 115, 2);
             o.writeInt32(tag);
-            ResponseInputStream i = display.in;
+            ResponseInputStream i = display.getResponseInputStream();
             synchronized (i) {
                 i.readReply(o);
                 i.skip(8);
@@ -1133,7 +1133,7 @@ public class GL extends gnu.x11.Resource implements GLConstant {
     public void readPixels(int x, int y, int width, int height, int format,
                            int type, Buffer pixels) {
 
-        RequestOutputStream o = display.out;
+        RequestOutputStream o = display.getResponseOutputStream();
         synchronized (o) {
             o.beginGLXRequest(GLXCommand.ReadPixels);
             o.writeInt32(tag);           
@@ -1147,7 +1147,7 @@ public class GL extends gnu.x11.Resource implements GLConstant {
             o.writeBool(false);
             o.skip(2);
             
-            ResponseInputStream in = display.in;
+            ResponseInputStream in = display.getResponseInputStream();
             synchronized (in) {
                 in.readReply(o);
                 in.skip(4);
@@ -1179,13 +1179,13 @@ public class GL extends gnu.x11.Resource implements GLConstant {
      */
     public int[] pixel_mapusv(int map) {
 
-        RequestOutputStream o = display.out;
+        RequestOutputStream o = display.getResponseOutputStream();
         int[] ret;
         synchronized (o) {
             o.beginRequest(glx.major_opcode, 127, 3);
             o.writeInt32(tag);
             o.writeInt32(map);
-            ResponseInputStream in = display.in;
+            ResponseInputStream in = display.getResponseInputStream();
             synchronized (in) {
                 in.skip(12);
                 int n = in.readInt32();
@@ -1218,7 +1218,7 @@ public class GL extends gnu.x11.Resource implements GLConstant {
         if (name == VERSION && version_string_cache != null)
             return version_string_cache;
 
-        RequestOutputStream o = display.out;
+        RequestOutputStream o = display.getResponseOutputStream();
         String str;
 
         synchronized (o) {
@@ -1226,7 +1226,7 @@ public class GL extends gnu.x11.Resource implements GLConstant {
             o.writeInt32(tag);
             o.writeInt32(name);
 
-            ResponseInputStream in = display.in;
+            ResponseInputStream in = display.getResponseInputStream();
             synchronized (in) {
                 in.readReply(o);
                 in.skip(12);
@@ -1312,7 +1312,7 @@ public class GL extends gnu.x11.Resource implements GLConstant {
      */
     public float[] tex_level_parameterfv(int target, int level, int pname) {
 
-        RequestOutputStream o = display.out;
+        RequestOutputStream o = display.getResponseOutputStream();
         float[] ret;
         synchronized (o) {
             o.beginRequest(glx.major_opcode, 138, 5);
@@ -1320,7 +1320,7 @@ public class GL extends gnu.x11.Resource implements GLConstant {
             o.writeInt32(target);
             o.writeInt32(level);
             o.writeInt32(pname);
-            ResponseInputStream in = display.in;
+            ResponseInputStream in = display.getResponseInputStream();
             synchronized (in) {
                 in.skip(12);
                 int n = in.readInt32();
@@ -1344,7 +1344,7 @@ public class GL extends gnu.x11.Resource implements GLConstant {
      */
     public int[] tex_level_parameteriv(int target, int level, int pname) {
 
-        RequestOutputStream o = display.out;
+        RequestOutputStream o = display.getResponseOutputStream();
         int[] ret;
         synchronized (o) {
             o.beginRequest(glx.major_opcode, 139, 5);
@@ -1352,7 +1352,7 @@ public class GL extends gnu.x11.Resource implements GLConstant {
             o.writeInt32(target);
             o.writeInt32(level);
             o.writeInt32(pname);
-            ResponseInputStream in = display.in;
+            ResponseInputStream in = display.getResponseInputStream();
             synchronized (in) {
                 in.skip(12);
                 int n = in.readInt32();
@@ -1376,13 +1376,13 @@ public class GL extends gnu.x11.Resource implements GLConstant {
      */
     public boolean list(int list) {
 
-        RequestOutputStream o = display.out;
+        RequestOutputStream o = display.getResponseOutputStream();
         boolean ret;
         synchronized (o) {
             o.beginRequest(glx.major_opcode, 141, 3);
             o.writeInt32(tag);
             o.writeInt32(list);
-            ResponseInputStream i = display.in;
+            ResponseInputStream i = display.getResponseInputStream();
             synchronized (i) {
                 i.skip(8);
                 ret = i.readBool();
@@ -1398,7 +1398,7 @@ public class GL extends gnu.x11.Resource implements GLConstant {
      */
     public void flush() {
 
-        RequestOutputStream o = display.out;
+        RequestOutputStream o = display.getResponseOutputStream();
         synchronized (o) {
             // o.begin_request (glx.major_opcode, 142, 2);
             o.beginGLXRequest(GLXCommand.Flush);
@@ -1432,7 +1432,7 @@ public class GL extends gnu.x11.Resource implements GLConstant {
     public TexturesResidentReply textures_resident(int[] textures) {
 
         int n = textures.length;
-        RequestOutputStream o = display.out;
+        RequestOutputStream o = display.getResponseOutputStream();
         TexturesResidentReply ret;
         synchronized (o) {
             // The spec says request length == 1, but this seems wrong.
@@ -1441,7 +1441,7 @@ public class GL extends gnu.x11.Resource implements GLConstant {
             o.writeInt32(n);
             for (int i = 0; i < n; i++)
                 o.writeInt32(textures[i]);
-            ResponseInputStream in = display.in;
+            ResponseInputStream in = display.getResponseInputStream();
             synchronized (in) {
                 in.skip(8);
                 ret = new TexturesResidentReply(in, n);
@@ -1458,7 +1458,7 @@ public class GL extends gnu.x11.Resource implements GLConstant {
     public void delete_textures(int[] textures) {
 
         int n = textures.length;
-        RequestOutputStream o = display.out;
+        RequestOutputStream o = display.getResponseOutputStream();
         synchronized (o) {
             // The spec says request length == 1, but this seems wrong.
             o.beginRequest(glx.major_opcode, 144, 3 + n);
@@ -1475,13 +1475,13 @@ public class GL extends gnu.x11.Resource implements GLConstant {
      */
     public int[] gen_textures(int n) {
 
-        RequestOutputStream o = display.out;
+        RequestOutputStream o = display.getResponseOutputStream();
         int[] textures;
         synchronized (o) {
             o.beginRequest(glx.major_opcode, 145, 3);
             o.writeInt32(tag);
             o.writeInt32(n);
-            ResponseInputStream in = display.in;
+            ResponseInputStream in = display.getResponseInputStream();
             synchronized (in) {
                 in.skip(32);
                 textures = new int[n];
@@ -1504,13 +1504,13 @@ public class GL extends gnu.x11.Resource implements GLConstant {
      */
     public boolean texture(int texture) {
 
-        RequestOutputStream o = display.out;
+        RequestOutputStream o = display.getResponseOutputStream();
         boolean ret;
         synchronized (o) {
             o.beginGLXRequest(GLXCommand.IsTexture);
             o.writeInt32(tag);
             o.writeInt32(texture);
-            ResponseInputStream in = display.in;
+            ResponseInputStream in = display.getResponseInputStream();
             synchronized (in) {
                 in.skip(8);
                 ret = in.readBool();
@@ -1603,7 +1603,7 @@ public class GL extends gnu.x11.Resource implements GLConstant {
     @Deprecated
     public void call_list(int list) {
 
-        RequestOutputStream o = display.out;
+        RequestOutputStream o = display.getResponseOutputStream();
 
         synchronized (o) {
             GLRenderRequest rr = beginRenderRequest(o,
@@ -1662,7 +1662,7 @@ public class GL extends gnu.x11.Resource implements GLConstant {
 
         int p = RequestOutputStream.pad(length);
         int req_length = 12 + length + p;
-        RequestOutputStream o = display.out;
+        RequestOutputStream o = display.getResponseOutputStream();
         synchronized (o) {
             large_render_request.begin(o, 2, 12, length + p);
 
@@ -1720,7 +1720,7 @@ public class GL extends gnu.x11.Resource implements GLConstant {
      */
     public void list_base(int base) {
 
-        RequestOutputStream o = display.out;
+        RequestOutputStream o = display.getResponseOutputStream();
         synchronized (o) {
             GLRenderRequest rr = begin_render_request(o, 3, 8);
             rr.writeInt32(base);
@@ -1739,7 +1739,7 @@ public class GL extends gnu.x11.Resource implements GLConstant {
      */
     public void begin(int mode) {
 
-        RequestOutputStream o = display.out;
+        RequestOutputStream o = display.getResponseOutputStream();
         synchronized (o) {
             GLRenderRequest rr = this.beginRenderRequest(o,
                     GLXRenderingCommand.Begin);
@@ -1754,7 +1754,7 @@ public class GL extends gnu.x11.Resource implements GLConstant {
     public void bitmap(int width, int height, float xorig, float yorig,
                        float xmove, float ymove, byte[] bitmap) {
 
-        RequestOutputStream o = display.out;
+        RequestOutputStream o = display.getResponseOutputStream();
         synchronized (o) {
             large_render_request.begin(o, 5, 48, bitmap.length);
             large_render_request.write_int8((byte) 0); // Unused.
@@ -1787,7 +1787,7 @@ public class GL extends gnu.x11.Resource implements GLConstant {
      */
     public void color3b(int red, int green, int blue) {
 
-        RequestOutputStream o = display.out;
+        RequestOutputStream o = display.getResponseOutputStream();
         synchronized (o) {
             GLRenderRequest rr = begin_render_request(o, 6, 8);
             rr.writeInt8(red);
@@ -1803,7 +1803,7 @@ public class GL extends gnu.x11.Resource implements GLConstant {
      */
     public void color3d(double red, double green, double blue) {
 
-        RequestOutputStream o = display.out;
+        RequestOutputStream o = display.getResponseOutputStream();
         synchronized (o) {
             GLRenderRequest rr = begin_render_request(o, 7, 28);
             rr.writeDouble(red);
@@ -1850,7 +1850,7 @@ public class GL extends gnu.x11.Resource implements GLConstant {
      */
     public void color3ub(byte red, byte green, byte blue) {
 
-        RequestOutputStream o = display.out;
+        RequestOutputStream o = display.getResponseOutputStream();
         synchronized (o) {
             GLRenderRequest rr = begin_render_request(o, 11, 8);
             rr.writeInt8(red);
@@ -1884,7 +1884,7 @@ public class GL extends gnu.x11.Resource implements GLConstant {
      */
     public void color4b(byte red, byte green, byte blue, byte alpha) {
 
-        RequestOutputStream o = display.out;
+        RequestOutputStream o = display.getResponseOutputStream();
         synchronized (o) {
             GLRenderRequest rr = begin_render_request(o, 14, 8);
             rr.writeInt8(red);
@@ -1937,7 +1937,7 @@ public class GL extends gnu.x11.Resource implements GLConstant {
     public void color4ub(boolean red, boolean green, boolean blue,
                          boolean alpha) {
 
-        RequestOutputStream o = display.out;
+        RequestOutputStream o = display.getResponseOutputStream();
         synchronized (o) {
             GLRenderRequest rr = begin_render_request(o, 19, 8);
             rr.writeBool(red);
@@ -1953,7 +1953,7 @@ public class GL extends gnu.x11.Resource implements GLConstant {
      */
     public void color4ui(int red, int green, int blue, int alpha) {
 
-        RequestOutputStream o = display.out;
+        RequestOutputStream o = display.getResponseOutputStream();
         synchronized (o) {
             GLRenderRequest rr = begin_render_request(o, 20, 20);
             rr.writeInt32(red);
@@ -1969,7 +1969,7 @@ public class GL extends gnu.x11.Resource implements GLConstant {
      */
     public void color4us(int red, int green, int blue, int alpha) {
 
-        RequestOutputStream o = display.out;
+        RequestOutputStream o = display.getResponseOutputStream();
         synchronized (o) {
             GLRenderRequest rr = begin_render_request(o, 12, 12);
             rr.writeInt16(red);
@@ -1985,7 +1985,7 @@ public class GL extends gnu.x11.Resource implements GLConstant {
      */
     public void edge_flag(boolean flag) {
 
-        RequestOutputStream o = display.out;
+        RequestOutputStream o = display.getResponseOutputStream();
         synchronized (o) {
             GLRenderRequest rr = begin_render_request(o, 22, 8);
             rr.writeBool(flag);
@@ -2003,7 +2003,7 @@ public class GL extends gnu.x11.Resource implements GLConstant {
      */
     public void end() {
 
-        RequestOutputStream o = display.out;
+        RequestOutputStream o = display.getResponseOutputStream();
         synchronized (o) {
             beginRenderRequest(o, GLXRenderingCommand.End);
         }
@@ -2015,7 +2015,7 @@ public class GL extends gnu.x11.Resource implements GLConstant {
      */
     public void indexd(double c) {
 
-        RequestOutputStream o = display.out;
+        RequestOutputStream o = display.getResponseOutputStream();
         synchronized (o) {
             GLRenderRequest rr = begin_render_request(o, 24, 12);
             rr.writeDouble(c);
@@ -2028,7 +2028,7 @@ public class GL extends gnu.x11.Resource implements GLConstant {
      */
     public void indexf(float c) {
 
-        RequestOutputStream o = display.out;
+        RequestOutputStream o = display.getResponseOutputStream();
         synchronized (o) {
             GLRenderRequest rr = begin_render_request(o, 25, 8);
             rr.writeFloat(c);
@@ -2041,7 +2041,7 @@ public class GL extends gnu.x11.Resource implements GLConstant {
      */
     public void indexi(int c) {
 
-        RequestOutputStream o = display.out;
+        RequestOutputStream o = display.getResponseOutputStream();
         synchronized (o) {
             GLRenderRequest rr = begin_render_request(o, 26, 8);
             rr.writeInt32(c);
@@ -2054,7 +2054,7 @@ public class GL extends gnu.x11.Resource implements GLConstant {
      */
     public void indexs(int c) {
 
-        RequestOutputStream o = display.out;
+        RequestOutputStream o = display.getResponseOutputStream();
         synchronized (o) {
             GLRenderRequest rr = begin_render_request(o, 27, 8);
             rr.writeInt16(c);
@@ -2068,7 +2068,7 @@ public class GL extends gnu.x11.Resource implements GLConstant {
      */
     public void normal3b(boolean x, boolean y, boolean z) {
 
-        RequestOutputStream o = display.out;
+        RequestOutputStream o = display.getResponseOutputStream();
         synchronized (o) {
             GLRenderRequest rr = begin_render_request(o, 28, 8);
             rr.writeBool(x);
@@ -2084,7 +2084,7 @@ public class GL extends gnu.x11.Resource implements GLConstant {
      */
     public void normal3d(double x, double y, double z) {
 
-        RequestOutputStream o = display.out;
+        RequestOutputStream o = display.getResponseOutputStream();
         synchronized (o) {
             GLRenderRequest rr = begin_render_request(o, 29, 28);
             rr.writeDouble(x);
@@ -2107,7 +2107,7 @@ public class GL extends gnu.x11.Resource implements GLConstant {
      */
     public void normal3f(float x, float y, float z) {
 
-        RequestOutputStream o = display.out;
+        RequestOutputStream o = display.getResponseOutputStream();
         synchronized (o) {
             GLRenderRequest rr = beginRenderRequest(o,
                     GLXRenderingCommand.Normal3fv);
@@ -2131,7 +2131,7 @@ public class GL extends gnu.x11.Resource implements GLConstant {
      */
     public void normal3i(int x, int y, int z) {
 
-        RequestOutputStream o = display.out;
+        RequestOutputStream o = display.getResponseOutputStream();
         synchronized (o) {
             GLRenderRequest rr = beginRenderRequest(o,
                     GLXRenderingCommand.Normal3iv);
@@ -2156,7 +2156,7 @@ public class GL extends gnu.x11.Resource implements GLConstant {
      */
     public void raster_pos2d(double x, double y) {
 
-        RequestOutputStream o = display.out;
+        RequestOutputStream o = display.getResponseOutputStream();
         synchronized (o) {
             GLRenderRequest rr = begin_render_request(o, 33, 20);
             rr.writeDouble(x);
@@ -2170,7 +2170,7 @@ public class GL extends gnu.x11.Resource implements GLConstant {
      */
     public void raster_pos2f(float x, float y) {
 
-        RequestOutputStream o = display.out;
+        RequestOutputStream o = display.getResponseOutputStream();
         synchronized (o) {
             GLRenderRequest rr = begin_render_request(o, 34, 12);
             rr.writeFloat(x);
@@ -2184,7 +2184,7 @@ public class GL extends gnu.x11.Resource implements GLConstant {
      */
     public void raster_pos2i(int x, int y) {
 
-        RequestOutputStream o = display.out;
+        RequestOutputStream o = display.getResponseOutputStream();
         synchronized (o) {
             GLRenderRequest rr = begin_render_request(o, 35, 12);
             rr.writeInt32(x);
@@ -2198,7 +2198,7 @@ public class GL extends gnu.x11.Resource implements GLConstant {
      */
     public void raster_pos2s(int x, int y) {
 
-        RequestOutputStream o = display.out;
+        RequestOutputStream o = display.getResponseOutputStream();
         synchronized (o) {
             GLRenderRequest rr = begin_render_request(o, 36, 8);
             rr.writeInt16(x);
@@ -2212,7 +2212,7 @@ public class GL extends gnu.x11.Resource implements GLConstant {
      */
     public void raster_pos3d(double x, double y, double z) {
 
-        RequestOutputStream o = display.out;
+        RequestOutputStream o = display.getResponseOutputStream();
         synchronized (o) {
             GLRenderRequest rr = begin_render_request(o, 37, 28);
             rr.writeDouble(x);
@@ -2227,7 +2227,7 @@ public class GL extends gnu.x11.Resource implements GLConstant {
      */
     public void raster_pos3f(float x, float y, float z) {
 
-        RequestOutputStream o = display.out;
+        RequestOutputStream o = display.getResponseOutputStream();
         synchronized (o) {
             GLRenderRequest rr = begin_render_request(o, 38, 16);
             rr.writeFloat(x);
@@ -2242,7 +2242,7 @@ public class GL extends gnu.x11.Resource implements GLConstant {
      */
     public void raster_pos3i(int x, int y, int z) {
 
-        RequestOutputStream o = display.out;
+        RequestOutputStream o = display.getResponseOutputStream();
         synchronized (o) {
             GLRenderRequest rr = begin_render_request(o, 39, 16);
             rr.writeInt32(x);
@@ -2302,7 +2302,7 @@ public class GL extends gnu.x11.Resource implements GLConstant {
      */
     public void rectd(double x1, double x2, double y1, double y2) {
 
-        RequestOutputStream o = display.out;
+        RequestOutputStream o = display.getResponseOutputStream();
         synchronized (o) {
             GLRenderRequest rr = begin_render_request(o, 45, 36);
             rr.writeDouble(x1);
@@ -2318,7 +2318,7 @@ public class GL extends gnu.x11.Resource implements GLConstant {
      */
     public void rectf(float x1, float x2, float y1, float y2) {
 
-        RequestOutputStream o = display.out;
+        RequestOutputStream o = display.getResponseOutputStream();
         synchronized (o) {
             GLRenderRequest rr = begin_render_request(o, 46, 20);
             rr.writeFloat(x1);
@@ -2334,7 +2334,7 @@ public class GL extends gnu.x11.Resource implements GLConstant {
      */
     public void recti(int x1, int x2, int y1, int y2) {
 
-        RequestOutputStream o = display.out;
+        RequestOutputStream o = display.getResponseOutputStream();
         synchronized (o) {
             GLRenderRequest rr = begin_render_request(o, 47, 20);
             rr.writeInt32(x1);
@@ -2350,7 +2350,7 @@ public class GL extends gnu.x11.Resource implements GLConstant {
      */
     public void rects(int x1, int x2, int y1, int y2) {
 
-        RequestOutputStream o = display.out;
+        RequestOutputStream o = display.getResponseOutputStream();
         synchronized (o) {
             GLRenderRequest rr = begin_render_request(o, 48, 12);
             rr.writeInt16(x1);
@@ -2366,7 +2366,7 @@ public class GL extends gnu.x11.Resource implements GLConstant {
      */
     public void tex_coord1d(double s) {
 
-        RequestOutputStream o = display.out;
+        RequestOutputStream o = display.getResponseOutputStream();
         synchronized (o) {
             GLRenderRequest rr = begin_render_request(o, 49, 12);
             rr.writeDouble(s);
@@ -2379,7 +2379,7 @@ public class GL extends gnu.x11.Resource implements GLConstant {
      */
     public void tex_coord1f(float s) {
 
-        RequestOutputStream o = display.out;
+        RequestOutputStream o = display.getResponseOutputStream();
         synchronized (o) {
             GLRenderRequest rr = begin_render_request(o, 50, 8);
             rr.writeFloat(s);
@@ -2392,7 +2392,7 @@ public class GL extends gnu.x11.Resource implements GLConstant {
      */
     public void tex_coord1i(int s) {
 
-        RequestOutputStream o = display.out;
+        RequestOutputStream o = display.getResponseOutputStream();
         synchronized (o) {
             GLRenderRequest rr = begin_render_request(o, 51, 8);
             rr.writeInt32(s);
@@ -2405,7 +2405,7 @@ public class GL extends gnu.x11.Resource implements GLConstant {
      */
     public void tex_coord1s(int s) {
 
-        RequestOutputStream o = display.out;
+        RequestOutputStream o = display.getResponseOutputStream();
         synchronized (o) {
             GLRenderRequest rr = begin_render_request(o, 52, 8);
             rr.writeInt16(s);
@@ -2419,7 +2419,7 @@ public class GL extends gnu.x11.Resource implements GLConstant {
      */
     public void tex_coord2d(double s, double t) {
 
-        RequestOutputStream o = display.out;
+        RequestOutputStream o = display.getResponseOutputStream();
         synchronized (o) {
             GLRenderRequest rr = begin_render_request(o, 53, 20);
             rr.writeDouble(s);
@@ -2433,7 +2433,7 @@ public class GL extends gnu.x11.Resource implements GLConstant {
      */
     public void tex_coord2f(float s, float t) {
 
-        RequestOutputStream o = display.out;
+        RequestOutputStream o = display.getResponseOutputStream();
         synchronized (o) {
             GLRenderRequest rr = begin_render_request(o, 54, 12);
             rr.writeFloat(s);
@@ -2447,7 +2447,7 @@ public class GL extends gnu.x11.Resource implements GLConstant {
      */
     public void tex_coord2i(int s, int t) {
 
-        RequestOutputStream o = display.out;
+        RequestOutputStream o = display.getResponseOutputStream();
         synchronized (o) {
             GLRenderRequest rr = begin_render_request(o, 55, 12);
             rr.writeInt32(s);
@@ -2461,7 +2461,7 @@ public class GL extends gnu.x11.Resource implements GLConstant {
      */
     public void tex_coord2s(int s, int t) {
 
-        RequestOutputStream o = display.out;
+        RequestOutputStream o = display.getResponseOutputStream();
         synchronized (o) {
             GLRenderRequest rr = begin_render_request(o, 56, 8);
             rr.writeInt16(s);
@@ -2475,7 +2475,7 @@ public class GL extends gnu.x11.Resource implements GLConstant {
      */
     public void tex_coord3d(double s, double t, double r) {
 
-        RequestOutputStream o = display.out;
+        RequestOutputStream o = display.getResponseOutputStream();
         synchronized (o) {
             GLRenderRequest rr = begin_render_request(o, 57, 28);
             rr.writeDouble(s);
@@ -2490,7 +2490,7 @@ public class GL extends gnu.x11.Resource implements GLConstant {
      */
     public void tex_coord3f(float s, float t, float r) {
 
-        RequestOutputStream o = display.out;
+        RequestOutputStream o = display.getResponseOutputStream();
         synchronized (o) {
             GLRenderRequest rr = begin_render_request(o, 58, 16);
             rr.writeFloat(s);
@@ -2505,7 +2505,7 @@ public class GL extends gnu.x11.Resource implements GLConstant {
      */
     public void tex_coord3i(int s, int t, int r) {
 
-        RequestOutputStream o = display.out;
+        RequestOutputStream o = display.getResponseOutputStream();
         synchronized (o) {
             GLRenderRequest rr = begin_render_request(o, 59, 16);
             rr.writeInt32(s);
@@ -2565,7 +2565,7 @@ public class GL extends gnu.x11.Resource implements GLConstant {
      */
     public void vertex2d(double x, double y) {
 
-        RequestOutputStream o = display.out;
+        RequestOutputStream o = display.getResponseOutputStream();
         synchronized (o) {
             GLRenderRequest rr = begin_render_request(o, 65, 20);
             rr.writeDouble(x);
@@ -2579,7 +2579,7 @@ public class GL extends gnu.x11.Resource implements GLConstant {
      */
     public void vertex2f(float x, float y) {
 
-        RequestOutputStream o = display.out;
+        RequestOutputStream o = display.getResponseOutputStream();
         synchronized (o) {
             GLRenderRequest rr = begin_render_request(o, 66, 12);
             rr.writeFloat(x);
@@ -2593,7 +2593,7 @@ public class GL extends gnu.x11.Resource implements GLConstant {
      */
     public void vertex2i(int x, int y) {
 
-        RequestOutputStream o = display.out;
+        RequestOutputStream o = display.getResponseOutputStream();
         synchronized (o) {
             GLRenderRequest rr = begin_render_request(o, 67, 12);
             rr.writeInt32(x);
@@ -2607,7 +2607,7 @@ public class GL extends gnu.x11.Resource implements GLConstant {
      */
     public void vertex2s(int x, int y) {
 
-        RequestOutputStream o = display.out;
+        RequestOutputStream o = display.getResponseOutputStream();
         synchronized (o) {
             GLRenderRequest rr = begin_render_request(o, 68, 8);
             rr.writeInt16(x);
@@ -2699,7 +2699,7 @@ public class GL extends gnu.x11.Resource implements GLConstant {
      */
     public void clip_plane(int plane, double[] equation) {
 
-        RequestOutputStream o = display.out;
+        RequestOutputStream o = display.getResponseOutputStream();
         synchronized (o) {
             GLRenderRequest rr = begin_render_request(o, 77, 40);
             rr.writeDouble(equation[0]);
@@ -2725,7 +2725,7 @@ public class GL extends gnu.x11.Resource implements GLConstant {
      */
     public void cull_face(int mode) {
 
-        RequestOutputStream o = display.out;
+        RequestOutputStream o = display.getResponseOutputStream();
         synchronized (o) {
             GLRenderRequest rr = begin_render_request(o, 79, 8);
             rr.writeInt32(mode);
@@ -2738,7 +2738,7 @@ public class GL extends gnu.x11.Resource implements GLConstant {
      */
     public void fogf(int pname, float param) {
 
-        RequestOutputStream o = display.out;
+        RequestOutputStream o = display.getResponseOutputStream();
         synchronized (o) {
             GLRenderRequest rr = begin_render_request(o, 80, 12);
             rr.writeInt32(pname);
@@ -2767,7 +2767,7 @@ public class GL extends gnu.x11.Resource implements GLConstant {
             break;
         }
 
-        RequestOutputStream o = display.out;
+        RequestOutputStream o = display.getResponseOutputStream();
         synchronized (o) {
             GLRenderRequest rr = begin_render_request(o, 81, 8 + 4 * n);
             rr.writeInt32(pname);
@@ -2782,7 +2782,7 @@ public class GL extends gnu.x11.Resource implements GLConstant {
      */
     public void fogi(int pname, int param) {
 
-        RequestOutputStream o = display.out;
+        RequestOutputStream o = display.getResponseOutputStream();
         synchronized (o) {
             GLRenderRequest rr = begin_render_request(o, 82, 12);
             rr.writeInt32(pname);
@@ -2811,7 +2811,7 @@ public class GL extends gnu.x11.Resource implements GLConstant {
             break;
         }
 
-        RequestOutputStream o = display.out;
+        RequestOutputStream o = display.getResponseOutputStream();
         synchronized (o) {
             GLRenderRequest rr = begin_render_request(o, 83, 8 + 4 * n);
             rr.writeInt32(pname);
@@ -2825,7 +2825,7 @@ public class GL extends gnu.x11.Resource implements GLConstant {
      */
     public void front_face(int mode) {
 
-        RequestOutputStream o = display.out;
+        RequestOutputStream o = display.getResponseOutputStream();
         synchronized (o) {
             GLRenderRequest rr = begin_render_request(o, 84, 8);
             rr.writeInt32(mode);
@@ -2838,7 +2838,7 @@ public class GL extends gnu.x11.Resource implements GLConstant {
      */
     public void hint(int target, int mode) {
 
-        RequestOutputStream o = display.out;
+        RequestOutputStream o = display.getResponseOutputStream();
         synchronized (o) {
             GLRenderRequest rr = begin_render_request(o, 85, 12);
             rr.writeInt32(target);
@@ -2852,7 +2852,7 @@ public class GL extends gnu.x11.Resource implements GLConstant {
      */
     public void lightf(int light, int pname, float param) {
 
-        RequestOutputStream o = display.out;
+        RequestOutputStream o = display.getResponseOutputStream();
         synchronized (o) {
             GLRenderRequest rr = begin_render_request(o, 86, 16);
             rr.writeInt32(light);
@@ -2890,7 +2890,7 @@ public class GL extends gnu.x11.Resource implements GLConstant {
             throw new IllegalArgumentException("Invalid pname");
         }
 
-        RequestOutputStream o = display.out;
+        RequestOutputStream o = display.getResponseOutputStream();
         synchronized (o) {
             GLRenderRequest rr = begin_render_request(o, 87, 12 + 4 * n);
             rr.writeInt32(light);
@@ -2906,7 +2906,7 @@ public class GL extends gnu.x11.Resource implements GLConstant {
      */
     public void lighti(int light, int pname, int param) {
 
-        RequestOutputStream o = display.out;
+        RequestOutputStream o = display.getResponseOutputStream();
         synchronized (o) {
             GLRenderRequest rr = begin_render_request(o, 88, 16);
             rr.writeInt32(light);
@@ -2942,7 +2942,7 @@ public class GL extends gnu.x11.Resource implements GLConstant {
             break;
         }
 
-        RequestOutputStream o = display.out;
+        RequestOutputStream o = display.getResponseOutputStream();
         synchronized (o) {
             GLRenderRequest rr = begin_render_request(o, 89, 12 + 4 * n);
             rr.writeInt32(light);
@@ -2958,7 +2958,7 @@ public class GL extends gnu.x11.Resource implements GLConstant {
      */
     public void light_modelf(int pname, float param) {
 
-        RequestOutputStream o = display.out;
+        RequestOutputStream o = display.getResponseOutputStream();
         synchronized (o) {
             GLRenderRequest rr = begin_render_request(o, 90, 12);
             rr.writeInt32(pname);
@@ -2985,7 +2985,7 @@ public class GL extends gnu.x11.Resource implements GLConstant {
             break;
         }
 
-        RequestOutputStream o = display.out;
+        RequestOutputStream o = display.getResponseOutputStream();
         synchronized (o) {
             GLRenderRequest rr = begin_render_request(o, 91, 8 + 4 * n);
             rr.writeInt32(pname);
@@ -3000,7 +3000,7 @@ public class GL extends gnu.x11.Resource implements GLConstant {
      */
     public void light_modeli(int pname, int param) {
 
-        RequestOutputStream o = display.out;
+        RequestOutputStream o = display.getResponseOutputStream();
         synchronized (o) {
             GLRenderRequest rr = begin_render_request(o, 92, 12);
             rr.writeInt32(pname);
@@ -3027,7 +3027,7 @@ public class GL extends gnu.x11.Resource implements GLConstant {
             break;
         }
 
-        RequestOutputStream o = display.out;
+        RequestOutputStream o = display.getResponseOutputStream();
         synchronized (o) {
             GLRenderRequest rr = begin_render_request(o, 93, 8 + 4 * n);
             rr.writeInt32(pname);
@@ -3042,7 +3042,7 @@ public class GL extends gnu.x11.Resource implements GLConstant {
      */
     public void line_stipple(int factor, int pattern) {
 
-        RequestOutputStream o = display.out;
+        RequestOutputStream o = display.getResponseOutputStream();
         synchronized (o) {
             GLRenderRequest rr = begin_render_request(o, 94, 12);
             rr.writeInt32(factor);
@@ -3057,7 +3057,7 @@ public class GL extends gnu.x11.Resource implements GLConstant {
      */
     public void line_width(float width) {
 
-        RequestOutputStream o = display.out;
+        RequestOutputStream o = display.getResponseOutputStream();
         synchronized (o) {
             GLRenderRequest rr = begin_render_request(o, 95, 8);
             rr.writeFloat(width);
@@ -3070,7 +3070,7 @@ public class GL extends gnu.x11.Resource implements GLConstant {
      */
     public void materialf(int face, int pname, float param) {
 
-        RequestOutputStream o = display.out;
+        RequestOutputStream o = display.getResponseOutputStream();
         synchronized (o) {
             GLRenderRequest rr = begin_render_request(o, 96, 16);
             rr.writeInt32(face);
@@ -3125,7 +3125,7 @@ public class GL extends gnu.x11.Resource implements GLConstant {
             throw new IllegalArgumentException("Invalid pname");
         }
 
-        RequestOutputStream o = display.out;
+        RequestOutputStream o = display.getResponseOutputStream();
         synchronized (o) {
             GLRenderRequest rr = beginRenderRequest(o,
                     GLXRenderingCommand.Materialfv, 4 * n);
@@ -3142,7 +3142,7 @@ public class GL extends gnu.x11.Resource implements GLConstant {
      */
     public void materiali(int face, int pname, int param) {
 
-        RequestOutputStream o = display.out;
+        RequestOutputStream o = display.getResponseOutputStream();
         synchronized (o) {
             GLRenderRequest rr = begin_render_request(o, 98, 16);
             rr.writeInt32(face);
@@ -3175,7 +3175,7 @@ public class GL extends gnu.x11.Resource implements GLConstant {
             break;
         }
 
-        RequestOutputStream o = display.out;
+        RequestOutputStream o = display.getResponseOutputStream();
         synchronized (o) {
             GLRenderRequest rr = begin_render_request(o, 96, 12 + 4 * n);
             rr.writeInt32(face);
@@ -3191,7 +3191,7 @@ public class GL extends gnu.x11.Resource implements GLConstant {
      */
     public void point_size(float size) {
 
-        RequestOutputStream o = display.out;
+        RequestOutputStream o = display.getResponseOutputStream();
         synchronized (o) {
             GLRenderRequest rr = begin_render_request(o, 100, 8);
             rr.writeFloat(size);
@@ -3213,7 +3213,7 @@ public class GL extends gnu.x11.Resource implements GLConstant {
      */
     public void polygon_stipple(byte[] mask) {
 
-        RequestOutputStream o = display.out;
+        RequestOutputStream o = display.getResponseOutputStream();
         synchronized (o) {
             large_render_request.begin(o, 102, 24, mask.length);
             large_render_request.write_int8((byte) 0); // swap bytes
@@ -3262,7 +3262,7 @@ public class GL extends gnu.x11.Resource implements GLConstant {
     @Deprecated
     public void shade_model(int mode) {
 
-        RequestOutputStream o = display.out;
+        RequestOutputStream o = display.getResponseOutputStream();
         synchronized (o) {
             GLRenderRequest rr = beginRenderRequest(o,
                     GLXRenderingCommand.ShadeModel);
@@ -3297,7 +3297,7 @@ public class GL extends gnu.x11.Resource implements GLConstant {
      */
     public void tex_parameterf(int target, int pname, float param) {
 
-        RequestOutputStream o = display.out;
+        RequestOutputStream o = display.getResponseOutputStream();
         synchronized (o) {
             GLRenderRequest rr = begin_render_request(o, 105, 16);
             rr.writeInt32(target);
@@ -3327,7 +3327,7 @@ public class GL extends gnu.x11.Resource implements GLConstant {
             break;
         }
 
-        RequestOutputStream o = display.out;
+        RequestOutputStream o = display.getResponseOutputStream();
         synchronized (o) {
             GLRenderRequest rr = begin_render_request(o, 106, 12 + 4 * n);
             rr.writeInt32(target);
@@ -3367,7 +3367,7 @@ public class GL extends gnu.x11.Resource implements GLConstant {
             break;
         }
 
-        RequestOutputStream o = display.out;
+        RequestOutputStream o = display.getResponseOutputStream();
         synchronized (o) {
             GLRenderRequest rr = begin_render_request(o, 108, 12 + 4 * n);
             rr.writeInt32(target);
@@ -3385,7 +3385,7 @@ public class GL extends gnu.x11.Resource implements GLConstant {
                              int width, int border, int format, int type,
                              byte[] pixels) {
 
-        RequestOutputStream o = display.out;
+        RequestOutputStream o = display.getResponseOutputStream();
         synchronized (o) {
             large_render_request.begin(o, 109, 56, pixels.length);
             large_render_request.write_int8((byte) 0); // swap bytes
@@ -3424,7 +3424,7 @@ public class GL extends gnu.x11.Resource implements GLConstant {
                              int width, int height, int border, int format,
                              int type, byte[] pixels) {
 
-        RequestOutputStream o = display.out;
+        RequestOutputStream o = display.getResponseOutputStream();
         synchronized (o) {
             large_render_request.begin(o, 110, 56, pixels.length);
             large_render_request.write_int8((byte) 0); // swap bytes
@@ -3464,7 +3464,7 @@ public class GL extends gnu.x11.Resource implements GLConstant {
      */
     public void tex_envf(int target, int pname, float param) {
 
-        RequestOutputStream o = display.out;
+        RequestOutputStream o = display.getResponseOutputStream();
         synchronized (o) {
             GLRenderRequest rr = begin_render_request(o, 111, 16);
             rr.writeInt32(target);
@@ -3490,7 +3490,7 @@ public class GL extends gnu.x11.Resource implements GLConstant {
             break;
         }
 
-        RequestOutputStream o = display.out;
+        RequestOutputStream o = display.getResponseOutputStream();
         synchronized (o) {
             GLRenderRequest rr = begin_render_request(o, 112, 12 + 4 * n);
             rr.writeInt32(target);
@@ -3526,7 +3526,7 @@ public class GL extends gnu.x11.Resource implements GLConstant {
             break;
         }
 
-        RequestOutputStream o = display.out;
+        RequestOutputStream o = display.getResponseOutputStream();
         synchronized (o) {
             GLRenderRequest rr = begin_render_request(o, 114, 12 + 4 * n);
             rr.writeInt32(target);
@@ -3542,7 +3542,7 @@ public class GL extends gnu.x11.Resource implements GLConstant {
      */
     public void tex_gend(int coord, int pname, double param) {
 
-        RequestOutputStream o = display.out;
+        RequestOutputStream o = display.getResponseOutputStream();
         synchronized (o) {
             GLRenderRequest rr = begin_render_request(o, 115, 20);
             rr.writeInt32(coord);
@@ -3569,7 +3569,7 @@ public class GL extends gnu.x11.Resource implements GLConstant {
             break;
         }
 
-        RequestOutputStream o = display.out;
+        RequestOutputStream o = display.getResponseOutputStream();
         synchronized (o) {
             GLRenderRequest rr = begin_render_request(o, 116, 12 + 8 * n);
             rr.writeInt32(coord);
@@ -3585,7 +3585,7 @@ public class GL extends gnu.x11.Resource implements GLConstant {
      */
     public void tex_genf(int coord, int pname, float param) {
 
-        RequestOutputStream o = display.out;
+        RequestOutputStream o = display.getResponseOutputStream();
         synchronized (o) {
             GLRenderRequest rr = begin_render_request(o, 117, 16);
             rr.writeInt32(coord);
@@ -3612,7 +3612,7 @@ public class GL extends gnu.x11.Resource implements GLConstant {
             break;
         }
 
-        RequestOutputStream o = display.out;
+        RequestOutputStream o = display.getResponseOutputStream();
         synchronized (o) {
             GLRenderRequest rr = begin_render_request(o, 118, 12 + 4 * n);
             rr.writeInt32(coord);
@@ -3649,7 +3649,7 @@ public class GL extends gnu.x11.Resource implements GLConstant {
             break;
         }
 
-        RequestOutputStream o = display.out;
+        RequestOutputStream o = display.getResponseOutputStream();
         synchronized (o) {
             GLRenderRequest rr = begin_render_request(o, 120, 12 + 4 * n);
             rr.writeInt32(coord);
@@ -3665,7 +3665,7 @@ public class GL extends gnu.x11.Resource implements GLConstant {
      */
     public void init_names() {
 
-        RequestOutputStream o = display.out;
+        RequestOutputStream o = display.getResponseOutputStream();
         synchronized (o) {
             begin_render_request(o, 121, 4);
         }
@@ -3677,7 +3677,7 @@ public class GL extends gnu.x11.Resource implements GLConstant {
      */
     public void load_name(int name) {
 
-        RequestOutputStream o = display.out;
+        RequestOutputStream o = display.getResponseOutputStream();
         synchronized (o) {
             GLRenderRequest rr = begin_render_request(o, 122, 8);
             rr.writeInt32(name);
@@ -3690,7 +3690,7 @@ public class GL extends gnu.x11.Resource implements GLConstant {
      */
     public void pass_through(float token) {
 
-        RequestOutputStream o = display.out;
+        RequestOutputStream o = display.getResponseOutputStream();
         synchronized (o) {
             GLRenderRequest rr = begin_render_request(o, 123, 8);
             rr.writeFloat(token);
@@ -3703,7 +3703,7 @@ public class GL extends gnu.x11.Resource implements GLConstant {
      */
     public void pop_name() {
 
-        RequestOutputStream o = display.out;
+        RequestOutputStream o = display.getResponseOutputStream();
         synchronized (o) {
             begin_render_request(o, 124, 4);
         }
@@ -3715,7 +3715,7 @@ public class GL extends gnu.x11.Resource implements GLConstant {
      */
     public void push_name(int name) {
 
-        RequestOutputStream o = display.out;
+        RequestOutputStream o = display.getResponseOutputStream();
         synchronized (o) {
             GLRenderRequest rr = begin_render_request(o, 125, 8);
             rr.writeInt32(name);
@@ -3728,7 +3728,7 @@ public class GL extends gnu.x11.Resource implements GLConstant {
      */
     public void draw_buffer(int mode) {
 
-        RequestOutputStream o = display.out;
+        RequestOutputStream o = display.getResponseOutputStream();
         synchronized (o) {
             GLRenderRequest rr = begin_render_request(o, 126, 8);
             rr.writeInt32(mode);
@@ -3748,7 +3748,7 @@ public class GL extends gnu.x11.Resource implements GLConstant {
      */
     public void clear(int mask) {
 
-        RequestOutputStream o = display.out;
+        RequestOutputStream o = display.getResponseOutputStream();
         synchronized (o) {
             GLRenderRequest rr = beginRenderRequest(o,
                     GLXRenderingCommand.Clear);
@@ -3771,7 +3771,7 @@ public class GL extends gnu.x11.Resource implements GLConstant {
      */
     public void clear_index(float c) {
 
-        RequestOutputStream o = display.out;
+        RequestOutputStream o = display.getResponseOutputStream();
         synchronized (o) {
             GLRenderRequest rr = begin_render_request(o, 129, 8);
             rr.writeFloat(c);
@@ -3809,7 +3809,7 @@ public class GL extends gnu.x11.Resource implements GLConstant {
      */
     public void clear_stencil(int s) {
 
-        RequestOutputStream o = display.out;
+        RequestOutputStream o = display.getResponseOutputStream();
         synchronized (o) {
             GLRenderRequest rr = begin_render_request(o, 131, 8);
             rr.writeInt32(s);
@@ -3828,7 +3828,7 @@ public class GL extends gnu.x11.Resource implements GLConstant {
      */
     public void clear_depth(double depth) {
         
-        RequestOutputStream o = display.out;
+        RequestOutputStream o = display.getResponseOutputStream();
         synchronized (o) {
             GLRenderRequest rr =
                 beginRenderRequest(o, GLXRenderingCommand.ClearDepth);
@@ -3856,7 +3856,7 @@ public class GL extends gnu.x11.Resource implements GLConstant {
      */
     public void stencil_mask(int mask) {
 
-        RequestOutputStream o = display.out;
+        RequestOutputStream o = display.getResponseOutputStream();
         synchronized (o) {
             GLRenderRequest rr = begin_render_request(o, 133, 8);
             rr.writeInt32(mask);
@@ -3870,7 +3870,7 @@ public class GL extends gnu.x11.Resource implements GLConstant {
     public void color_mask(boolean red, boolean green, boolean blue,
             boolean alpha) {
 
-        RequestOutputStream o = display.out;
+        RequestOutputStream o = display.getResponseOutputStream();
         synchronized (o) {
             GLRenderRequest rr = begin_render_request(o, 134, 8);
             rr.writeBool(red);
@@ -3893,7 +3893,7 @@ public class GL extends gnu.x11.Resource implements GLConstant {
      */
     public void depth_mask(boolean flag) {
        
-        RequestOutputStream o = display.out;
+        RequestOutputStream o = display.getResponseOutputStream();
         synchronized (o) {
             GLRenderRequest rr =
                 beginRenderRequest(o, GLXRenderingCommand.DepthMask);
@@ -3923,7 +3923,7 @@ public class GL extends gnu.x11.Resource implements GLConstant {
      */
     public void index_mask(int mask) {
 
-        RequestOutputStream o = display.out;
+        RequestOutputStream o = display.getResponseOutputStream();
         synchronized (o) {
             GLRenderRequest rr = begin_render_request(o, 136, 8);
             rr.writeInt32(mask);
@@ -3936,7 +3936,7 @@ public class GL extends gnu.x11.Resource implements GLConstant {
      */
     public void accum(int op, float value) {
 
-        RequestOutputStream o = display.out;
+        RequestOutputStream o = display.getResponseOutputStream();
         synchronized (o) {
             GLRenderRequest rr = begin_render_request(o, 137, 12);
             rr.writeInt32(op);
@@ -3950,7 +3950,7 @@ public class GL extends gnu.x11.Resource implements GLConstant {
      */
     public void disable(int capability) {
 
-        RequestOutputStream o = display.out;
+        RequestOutputStream o = display.getResponseOutputStream();
         synchronized (o) {
             GLRenderRequest rr = begin_render_request(o, 138, 8);
             rr.writeInt32(capability);
@@ -3967,7 +3967,7 @@ public class GL extends gnu.x11.Resource implements GLConstant {
      */
     public void enable(int capability) {
 
-        RequestOutputStream o = display.out;
+        RequestOutputStream o = display.getResponseOutputStream();
         synchronized (o) {
             GLRenderRequest rr = beginRenderRequest(o,
                     GLXRenderingCommand.Enable);
@@ -3981,7 +3981,7 @@ public class GL extends gnu.x11.Resource implements GLConstant {
      */
     public void pop_attrib() {
 
-        RequestOutputStream o = display.out;
+        RequestOutputStream o = display.getResponseOutputStream();
         synchronized (o) {
             begin_render_request(o, 141, 4);
         }
@@ -3993,7 +3993,7 @@ public class GL extends gnu.x11.Resource implements GLConstant {
      */
     public void push_attrib(int mask) {
 
-        RequestOutputStream o = display.out;
+        RequestOutputStream o = display.getResponseOutputStream();
         synchronized (o) {
             GLRenderRequest rr = begin_render_request(o, 142, 8);
             rr.writeInt32(mask);
@@ -4031,7 +4031,7 @@ public class GL extends gnu.x11.Resource implements GLConstant {
 
         int n = order * k * 8;
 
-        RequestOutputStream o = display.out;
+        RequestOutputStream o = display.getResponseOutputStream();
         synchronized (o) {
             large_render_request.begin(o, 143, 28, n);
             large_render_request.write_float64(u1);
@@ -4076,7 +4076,7 @@ public class GL extends gnu.x11.Resource implements GLConstant {
 
         int n = order * k * 4;
 
-        RequestOutputStream o = display.out;
+        RequestOutputStream o = display.getResponseOutputStream();
         synchronized (o) {
             large_render_request.begin(o, 144, 20, n);
             large_render_request.write_int32(target);
@@ -4122,7 +4122,7 @@ public class GL extends gnu.x11.Resource implements GLConstant {
 
         int n = vorder * uorder * k * 8;
 
-        RequestOutputStream o = display.out;
+        RequestOutputStream o = display.getResponseOutputStream();
         synchronized (o) {
             large_render_request.begin(o, 145, 48, n);
             large_render_request.write_float64(u1);
@@ -4172,7 +4172,7 @@ public class GL extends gnu.x11.Resource implements GLConstant {
 
         int n = vorder * uorder * k * 4;
 
-        RequestOutputStream o = display.out;
+        RequestOutputStream o = display.getResponseOutputStream();
         synchronized (o) {
             large_render_request.begin(o, 146, 32, n);
             large_render_request.write_int32(target);
@@ -4195,7 +4195,7 @@ public class GL extends gnu.x11.Resource implements GLConstant {
      */
     public void map_grid1d(int un, double u1, double u2) {
 
-        RequestOutputStream o = display.out;
+        RequestOutputStream o = display.getResponseOutputStream();
         synchronized (o) {
             GLRenderRequest rr = begin_render_request(o, 147, 24);
             rr.writeDouble(u1);
@@ -4210,7 +4210,7 @@ public class GL extends gnu.x11.Resource implements GLConstant {
      */
     public void map_grid1f(int un, float u1, float u2) {
 
-        RequestOutputStream o = display.out;
+        RequestOutputStream o = display.getResponseOutputStream();
         synchronized (o) {
             GLRenderRequest rr = begin_render_request(o, 148, 16);
             rr.writeFloat(u1);
@@ -4226,7 +4226,7 @@ public class GL extends gnu.x11.Resource implements GLConstant {
     public void map_grid2d(int un, double u1, double u2, int vn, double v1,
                            double v2) {
 
-        RequestOutputStream o = display.out;
+        RequestOutputStream o = display.getResponseOutputStream();
         synchronized (o) {
             GLRenderRequest rr = begin_render_request(o, 149, 44);
             rr.writeDouble(u1);
@@ -4245,7 +4245,7 @@ public class GL extends gnu.x11.Resource implements GLConstant {
     public void map_grid2f(int un, float u1, float u2, int vn, float v1,
                            float v2) {
 
-        RequestOutputStream o = display.out;
+        RequestOutputStream o = display.getResponseOutputStream();
         synchronized (o) {
             GLRenderRequest rr = begin_render_request(o, 150, 28);
             rr.writeInt32(un);
@@ -4263,7 +4263,7 @@ public class GL extends gnu.x11.Resource implements GLConstant {
      */
     public void eval_coord1d(double u) {
 
-        RequestOutputStream o = display.out;
+        RequestOutputStream o = display.getResponseOutputStream();
         synchronized (o) {
             GLRenderRequest rr = begin_render_request(o, 151, 12);
             rr.writeDouble(u);
@@ -4276,7 +4276,7 @@ public class GL extends gnu.x11.Resource implements GLConstant {
      */
     public void eval_coord1f(float u) {
 
-        RequestOutputStream o = display.out;
+        RequestOutputStream o = display.getResponseOutputStream();
         synchronized (o) {
             GLRenderRequest rr = begin_render_request(o, 152, 8);
             rr.writeFloat(u);
@@ -4289,7 +4289,7 @@ public class GL extends gnu.x11.Resource implements GLConstant {
      */
     public void eval_coord2d(double u, double v) {
 
-        RequestOutputStream o = display.out;
+        RequestOutputStream o = display.getResponseOutputStream();
         synchronized (o) {
             GLRenderRequest rr = begin_render_request(o, 153, 20);
             rr.writeDouble(u);
@@ -4303,7 +4303,7 @@ public class GL extends gnu.x11.Resource implements GLConstant {
      */
     public void eval_coord2f(float u, float v) {
 
-        RequestOutputStream o = display.out;
+        RequestOutputStream o = display.getResponseOutputStream();
         synchronized (o) {
             GLRenderRequest rr = begin_render_request(o, 154, 12);
             rr.writeFloat(u);
@@ -4326,7 +4326,7 @@ public class GL extends gnu.x11.Resource implements GLConstant {
      */
     public void eval_point1(int i) {
 
-        RequestOutputStream o = display.out;
+        RequestOutputStream o = display.getResponseOutputStream();
         synchronized (o) {
             GLRenderRequest rr = begin_render_request(o, 156, 8);
             rr.writeInt32(i);
@@ -4339,7 +4339,7 @@ public class GL extends gnu.x11.Resource implements GLConstant {
      */
     public void eval_mesh2(int mode, int i1, int i2, int j1, int j2) {
 
-        RequestOutputStream o = display.out;
+        RequestOutputStream o = display.getResponseOutputStream();
         synchronized (o) {
             GLRenderRequest rr = begin_render_request(o, 157, 24);
             rr.writeInt32(mode);
@@ -4383,7 +4383,7 @@ public class GL extends gnu.x11.Resource implements GLConstant {
      */
     public void logic_op(int opcode) {
 
-        RequestOutputStream o = display.out;
+        RequestOutputStream o = display.getResponseOutputStream();
         synchronized (o) {
             GLRenderRequest rr = begin_render_request(o, 161, 8);
             rr.writeInt32(opcode);
@@ -4414,7 +4414,7 @@ public class GL extends gnu.x11.Resource implements GLConstant {
      */
     public void depth_func(int func) {
 
-        RequestOutputStream o = display.out;
+        RequestOutputStream o = display.getResponseOutputStream();
         synchronized (o) {
             GLRenderRequest rr = begin_render_request(o, 164, 8);
             rr.writeInt32(func);
@@ -4436,7 +4436,7 @@ public class GL extends gnu.x11.Resource implements GLConstant {
      */
     public void pixel_transferf(int pname, float param) {
 
-        RequestOutputStream o = display.out;
+        RequestOutputStream o = display.getResponseOutputStream();
         synchronized (o) {
             GLRenderRequest rr = begin_render_request(o, 166, 12);
             rr.writeInt32(pname);
@@ -4467,7 +4467,7 @@ public class GL extends gnu.x11.Resource implements GLConstant {
     @Deprecated
     public void read_buffer(int mode) {
 
-        RequestOutputStream o = display.out;
+        RequestOutputStream o = display.getResponseOutputStream();
         synchronized (o) {
             GLRenderRequest rr = beginRenderRequest(o,
                     GLXRenderingCommand.ReadBuffer);
@@ -4496,7 +4496,7 @@ public class GL extends gnu.x11.Resource implements GLConstant {
      */
     public void copy_pixels(int x, int y, int width, int height, int type) {
 
-        RequestOutputStream o = display.out;
+        RequestOutputStream o = display.getResponseOutputStream();
         synchronized (o) {
             GLRenderRequest rr = begin_render_request(o, 172, 24);
             rr.writeInt32(x);
@@ -4514,7 +4514,7 @@ public class GL extends gnu.x11.Resource implements GLConstant {
     public void draw_pixels(int width, int height, int format, int type,
                             byte[] pixels) {
 
-        RequestOutputStream o = display.out;
+        RequestOutputStream o = display.getResponseOutputStream();
         synchronized (o) {
             large_render_request.begin(o, 173, 40, pixels.length);
             large_render_request.write_int8((byte) 0); // swap bytes
@@ -4546,7 +4546,7 @@ public class GL extends gnu.x11.Resource implements GLConstant {
      */
     public void depth_range(double near, double far) {
 
-        RequestOutputStream o = display.out;
+        RequestOutputStream o = display.getResponseOutputStream();
         synchronized (o) {
             GLRenderRequest rr = begin_render_request(o, 174, 20);
             rr.writeDouble(near);
@@ -4566,7 +4566,7 @@ public class GL extends gnu.x11.Resource implements GLConstant {
     public void frustum(double left, double right, double bottom, double top,
                         double near, double far) {
 
-        RequestOutputStream o = display.out;
+        RequestOutputStream o = display.getResponseOutputStream();
         synchronized (o) {
             GLRenderRequest rr = beginRenderRequest(o,
                     GLXRenderingCommand.Frustum);
@@ -4591,7 +4591,7 @@ public class GL extends gnu.x11.Resource implements GLConstant {
     @Deprecated
     public void load_identity() {
 
-        RequestOutputStream o = display.out;
+        RequestOutputStream o = display.getResponseOutputStream();
         synchronized (o) {
             beginRenderRequest(o, GLXRenderingCommand.LoadIdentity);
         }
@@ -4616,7 +4616,7 @@ public class GL extends gnu.x11.Resource implements GLConstant {
      */
     public void load_matrixf(float[] matrix) {
 
-        RequestOutputStream o = display.out;
+        RequestOutputStream o = display.getResponseOutputStream();
         synchronized (o) {
             GLRenderRequest rr = begin_render_request(o, 177, 68);
             for (int i = 0; i < 16; i++)
@@ -4630,7 +4630,7 @@ public class GL extends gnu.x11.Resource implements GLConstant {
      */
     public void load_matrixd(double[] matrix) {
 
-        RequestOutputStream o = display.out;
+        RequestOutputStream o = display.getResponseOutputStream();
         synchronized (o) {
             GLRenderRequest rr = begin_render_request(o, 178, 132);
             for (int i = 0; i < 16; i++)
@@ -4648,7 +4648,7 @@ public class GL extends gnu.x11.Resource implements GLConstant {
     @Deprecated
     public void matrix_mode(int mode) {
 
-        RequestOutputStream o = display.out;
+        RequestOutputStream o = display.getResponseOutputStream();
         synchronized (o) {
             GLRenderRequest rr = beginRenderRequest(o,
                     GLXRenderingCommand.MatrixMode);
@@ -4674,7 +4674,7 @@ public class GL extends gnu.x11.Resource implements GLConstant {
      */
     public void mult_matrixf(float[] matrix) {
 
-        RequestOutputStream o = display.out;
+        RequestOutputStream o = display.getResponseOutputStream();
         synchronized (o) {
             GLRenderRequest rr = begin_render_request(o, 180, 68);
             for (int i = 0; i < 16; i++)
@@ -4684,7 +4684,7 @@ public class GL extends gnu.x11.Resource implements GLConstant {
 
     public void multMatrixd(DoubleBuffer buffer) {
 
-        RequestOutputStream o = display.out;
+        RequestOutputStream o = display.getResponseOutputStream();
         synchronized (o) {
             GLRenderRequest rr =
                 beginRenderRequest(o, GLXRenderingCommand.MultMatrixd);
@@ -4702,7 +4702,7 @@ public class GL extends gnu.x11.Resource implements GLConstant {
      */
     public void mult_matrixd(double[] matrix) {
 
-        RequestOutputStream o = display.out;
+        RequestOutputStream o = display.getResponseOutputStream();
         synchronized (o) {
             GLRenderRequest rr = begin_render_request(o, 181, 132);
             for (int i = 0; i < 16; i++)
@@ -4721,7 +4721,7 @@ public class GL extends gnu.x11.Resource implements GLConstant {
     public void ortho(double left, double right, double bottom, double top,
                       double near, double far) {
 
-        RequestOutputStream o = display.out;
+        RequestOutputStream o = display.getResponseOutputStream();
         synchronized (o) {
             GLRenderRequest rr = beginRenderRequest(o,
                     GLXRenderingCommand.Ortho);
@@ -4758,7 +4758,7 @@ public class GL extends gnu.x11.Resource implements GLConstant {
     @Deprecated
     public void pop_matrix() {
 
-        RequestOutputStream o = display.out;
+        RequestOutputStream o = display.getResponseOutputStream();
         synchronized (o) {
             beginRenderRequest(o, GLXRenderingCommand.PopMatrix);
         }
@@ -4813,7 +4813,7 @@ public class GL extends gnu.x11.Resource implements GLConstant {
     @Deprecated
     public void push_matrix() {
 
-        RequestOutputStream o = display.out;
+        RequestOutputStream o = display.getResponseOutputStream();
         synchronized (o) {
             beginRenderRequest(o, GLXRenderingCommand.PushMatrix);
         }
@@ -4926,7 +4926,7 @@ public class GL extends gnu.x11.Resource implements GLConstant {
      */
     public void draw_arrays(int mode) {
 
-        RequestOutputStream o = display.out;
+        RequestOutputStream o = display.getResponseOutputStream();
         synchronized (o) {
             GLRenderRequest rr = begin_render_request(o, 193, 16);
             rr.writeInt32(mode);
@@ -4939,7 +4939,7 @@ public class GL extends gnu.x11.Resource implements GLConstant {
      */
     public void indexub(boolean c) {
 
-        RequestOutputStream o = display.out;
+        RequestOutputStream o = display.getResponseOutputStream();
         synchronized (o) {
             GLRenderRequest rr = begin_render_request(o, 194, 8);
             rr.writeBool(c);
@@ -4954,7 +4954,7 @@ public class GL extends gnu.x11.Resource implements GLConstant {
     public void copy_color_sub_table(int target, int start, int x, int y,
                                      int width) {
 
-        RequestOutputStream o = display.out;
+        RequestOutputStream o = display.getResponseOutputStream();
         synchronized (o) {
             GLRenderRequest rr = begin_render_request(o, 196, 24);
             rr.writeInt32(target);
@@ -4971,7 +4971,7 @@ public class GL extends gnu.x11.Resource implements GLConstant {
      */
     public void active_texture_arb(int texture) {
 
-        RequestOutputStream o = display.out;
+        RequestOutputStream o = display.getResponseOutputStream();
         synchronized (o) {
             GLRenderRequest rr = begin_render_request(o, 197, 8);
             rr.writeInt32(texture);
@@ -4984,7 +4984,7 @@ public class GL extends gnu.x11.Resource implements GLConstant {
      */
     public void multi_tex_coord1d_arb(int target, double s) {
 
-        RequestOutputStream o = display.out;
+        RequestOutputStream o = display.getResponseOutputStream();
         synchronized (o) {
             GLRenderRequest rr = begin_render_request(o, 198, 16);
             rr.writeInt32(target);
@@ -4998,7 +4998,7 @@ public class GL extends gnu.x11.Resource implements GLConstant {
      */
     public void multi_tex_coord1f_arb(int target, float s) {
 
-        RequestOutputStream o = display.out;
+        RequestOutputStream o = display.getResponseOutputStream();
         synchronized (o) {
             GLRenderRequest rr = begin_render_request(o, 199, 12);
             rr.writeInt32(target);
@@ -5021,7 +5021,7 @@ public class GL extends gnu.x11.Resource implements GLConstant {
      */
     public void multi_tex_coord1s_arb(int target, int s) {
 
-        RequestOutputStream o = display.out;
+        RequestOutputStream o = display.getResponseOutputStream();
         synchronized (o) {
             GLRenderRequest rr = begin_render_request(o, 201, 12);
             rr.writeInt32(target);
@@ -5036,7 +5036,7 @@ public class GL extends gnu.x11.Resource implements GLConstant {
      */
     public void multi_tex_coord2d_arb(int target, double s, double t) {
 
-        RequestOutputStream o = display.out;
+        RequestOutputStream o = display.getResponseOutputStream();
         synchronized (o) {
             GLRenderRequest rr = begin_render_request(o, 202, 24);
             rr.writeInt32(target);
@@ -5051,7 +5051,7 @@ public class GL extends gnu.x11.Resource implements GLConstant {
      */
     public void multi_tex_coord2f_arb(int target, float s, float t) {
 
-        RequestOutputStream o = display.out;
+        RequestOutputStream o = display.getResponseOutputStream();
         synchronized (o) {
             GLRenderRequest rr = begin_render_request(o, 203, 16);
             rr.writeInt32(target);
@@ -5075,7 +5075,7 @@ public class GL extends gnu.x11.Resource implements GLConstant {
      */
     public void multi_tex_coord2s_arb(int target, int s, int t) {
 
-        RequestOutputStream o = display.out;
+        RequestOutputStream o = display.getResponseOutputStream();
         synchronized (o) {
             GLRenderRequest rr = begin_render_request(o, 205, 12);
             rr.writeInt32(target);
@@ -5091,7 +5091,7 @@ public class GL extends gnu.x11.Resource implements GLConstant {
     public void multi_tex_coord3d_arb(int target, double s, double t,
                                       double r) {
 
-        RequestOutputStream o = display.out;
+        RequestOutputStream o = display.getResponseOutputStream();
         synchronized (o) {
             GLRenderRequest rr = begin_render_request(o, 206, 32);
             rr.writeInt32(target);
@@ -5107,7 +5107,7 @@ public class GL extends gnu.x11.Resource implements GLConstant {
      */
     public void multi_tex_coord3f_arb(int target, float s, float t, float r) {
 
-        RequestOutputStream o = display.out;
+        RequestOutputStream o = display.getResponseOutputStream();
         synchronized (o) {
             GLRenderRequest rr = begin_render_request(o, 207, 20);
             rr.writeInt32(target);
@@ -5132,7 +5132,7 @@ public class GL extends gnu.x11.Resource implements GLConstant {
      */
     public void multi_tex_coord3s_arb(int target, int s, int t, int r) {
 
-        RequestOutputStream o = display.out;
+        RequestOutputStream o = display.getResponseOutputStream();
         synchronized (o) {
             GLRenderRequest rr = begin_render_request(o, 209, 16);
             rr.writeInt32(target);
@@ -5150,7 +5150,7 @@ public class GL extends gnu.x11.Resource implements GLConstant {
     public void multi_tex_coord4d_arb(int target, double s, double t, double r,
                                       double q) {
 
-        RequestOutputStream o = display.out;
+        RequestOutputStream o = display.getResponseOutputStream();
         synchronized (o) {
             GLRenderRequest rr = begin_render_request(o, 210, 40);
             rr.writeInt32(target);
@@ -5168,7 +5168,7 @@ public class GL extends gnu.x11.Resource implements GLConstant {
     public void multi_tex_coord4f_arb(int target, float s, float t, float r,
                                       float q) {
 
-        RequestOutputStream o = display.out;
+        RequestOutputStream o = display.getResponseOutputStream();
         synchronized (o) {
             GLRenderRequest rr = begin_render_request(o, 211, 24);
             rr.writeInt32(target);
@@ -5185,7 +5185,7 @@ public class GL extends gnu.x11.Resource implements GLConstant {
      */
     public void multi_tex_coord4i_arb(int target, int s, int t, int r, int q) {
 
-        RequestOutputStream o = display.out;
+        RequestOutputStream o = display.getResponseOutputStream();
         synchronized (o) {
             GLRenderRequest rr = begin_render_request(o, 212, 24);
             rr.writeInt32(target);
@@ -5202,7 +5202,7 @@ public class GL extends gnu.x11.Resource implements GLConstant {
      */
     public void multi_tex_coord4s_arb(int target, int s, int t, int r, int q) {
 
-        RequestOutputStream o = display.out;
+        RequestOutputStream o = display.getResponseOutputStream();
         synchronized (o) {
             GLRenderRequest rr = begin_render_request(o, 213, 16);
             rr.writeInt32(target);
@@ -5228,7 +5228,7 @@ public class GL extends gnu.x11.Resource implements GLConstant {
             break;
         }
 
-        RequestOutputStream o = display.out;
+        RequestOutputStream o = display.getResponseOutputStream();
         synchronized (o) {
             GLRenderRequest rr = begin_render_request(o, 2054, 12 + 4 * n);
             rr.writeInt32(pname);
@@ -5253,7 +5253,7 @@ public class GL extends gnu.x11.Resource implements GLConstant {
             break;
         }
 
-        RequestOutputStream o = display.out;
+        RequestOutputStream o = display.getResponseOutputStream();
         synchronized (o) {
             GLRenderRequest rr = begin_render_request(o, 2055, 12 + 4 * n);
             rr.writeInt32(pname);
@@ -5270,7 +5270,7 @@ public class GL extends gnu.x11.Resource implements GLConstant {
     public void copy_color_table(int target, int internal_format, int x, int y,
                                  int width) {
 
-        RequestOutputStream o = display.out;
+        RequestOutputStream o = display.getResponseOutputStream();
         synchronized (o) {
             GLRenderRequest rr = begin_render_request(o, 2056, 24);
             rr.writeInt32(target);
@@ -5287,7 +5287,7 @@ public class GL extends gnu.x11.Resource implements GLConstant {
      */
     public void blend_color(float red, float green, float blue, float alpha) {
 
-        RequestOutputStream o = display.out;
+        RequestOutputStream o = display.getResponseOutputStream();
         synchronized (o) {
             GLRenderRequest rr = begin_render_request(o, 4096, 20);
             rr.writeFloat(red);
@@ -5303,7 +5303,7 @@ public class GL extends gnu.x11.Resource implements GLConstant {
      */
     public void blend_equation(int mode) {
 
-        RequestOutputStream o = display.out;
+        RequestOutputStream o = display.getResponseOutputStream();
         synchronized (o) {
             GLRenderRequest rr = begin_render_request(o, 4097, 8);
             rr.writeInt32(mode);
@@ -5317,7 +5317,7 @@ public class GL extends gnu.x11.Resource implements GLConstant {
     public void polygon_offset(float factor, float units) {
 
         // TODO 1.3: opcode = 192
-        RequestOutputStream o = display.out;
+        RequestOutputStream o = display.getResponseOutputStream();
         synchronized (o) {
             GLRenderRequest rr = begin_render_request(o, 4098, 12);
             rr.writeFloat(factor);
@@ -5333,7 +5333,7 @@ public class GL extends gnu.x11.Resource implements GLConstant {
                                 int yoffset, int width, int height,
                                 int format, int type, byte[] pixels) {
 
-        RequestOutputStream o = display.out;
+        RequestOutputStream o = display.getResponseOutputStream();
         synchronized (o) {
             large_render_request.begin(o, 4100, 60, pixels.length);
             large_render_request.write_int8((byte) 0); // swap bytes
@@ -5370,7 +5370,7 @@ public class GL extends gnu.x11.Resource implements GLConstant {
      */
     public void convolution_parameterf(int target, int pname, float param) {
 
-        RequestOutputStream o = display.out;
+        RequestOutputStream o = display.getResponseOutputStream();
         synchronized (o) {
             GLRenderRequest rr = begin_render_request(o, 4103, 16);
             rr.writeInt32(target);
@@ -5402,7 +5402,7 @@ public class GL extends gnu.x11.Resource implements GLConstant {
             break;
         }
 
-        RequestOutputStream o = display.out;
+        RequestOutputStream o = display.getResponseOutputStream();
         synchronized (o) {
             GLRenderRequest rr = begin_render_request(o, 4104, 12 + 4 * n);
             rr.writeInt32(target);
@@ -5418,7 +5418,7 @@ public class GL extends gnu.x11.Resource implements GLConstant {
      */
     public void convolution_parameteri(int target, int pname, int param) {
 
-        RequestOutputStream o = display.out;
+        RequestOutputStream o = display.getResponseOutputStream();
         synchronized (o) {
             GLRenderRequest rr = begin_render_request(o, 4105, 16);
             rr.writeInt32(target);
@@ -5450,7 +5450,7 @@ public class GL extends gnu.x11.Resource implements GLConstant {
             break;
         }
 
-        RequestOutputStream o = display.out;
+        RequestOutputStream o = display.getResponseOutputStream();
         synchronized (o) {
             GLRenderRequest rr = begin_render_request(o, 4106, 12 + 4 * n);
             rr.writeInt32(target);
@@ -5467,7 +5467,7 @@ public class GL extends gnu.x11.Resource implements GLConstant {
     public void copy_convolution_filter1d(int target, int internal_format,
                                           int x, int y, int width) {
 
-        RequestOutputStream o = display.out;
+        RequestOutputStream o = display.getResponseOutputStream();
         synchronized (o) {
             GLRenderRequest rr = begin_render_request(o, 4107, 24);
             rr.writeInt32(target);
@@ -5486,7 +5486,7 @@ public class GL extends gnu.x11.Resource implements GLConstant {
                                           int x, int y, int width,
                                           int height) {
 
-        RequestOutputStream o = display.out;
+        RequestOutputStream o = display.getResponseOutputStream();
         synchronized (o) {
             GLRenderRequest rr = begin_render_request(o, 4108, 28);
             rr.writeInt32(target);
@@ -5505,7 +5505,7 @@ public class GL extends gnu.x11.Resource implements GLConstant {
     public void histogram(int target, int width, int internal_format,
                           boolean sink) {
 
-        RequestOutputStream o = display.out;
+        RequestOutputStream o = display.getResponseOutputStream();
         synchronized (o) {
             GLRenderRequest rr = begin_render_request(o, 4110, 20);
             rr.writeInt32(target);
@@ -5522,7 +5522,7 @@ public class GL extends gnu.x11.Resource implements GLConstant {
      */
     public void minmax(int target, int internal_format, boolean sink) {
 
-        RequestOutputStream o = display.out;
+        RequestOutputStream o = display.getResponseOutputStream();
         synchronized (o) {
             GLRenderRequest rr = begin_render_request(o, 4111, 16);
             rr.writeInt32(target);
@@ -5538,7 +5538,7 @@ public class GL extends gnu.x11.Resource implements GLConstant {
      */
     public void reset_histogram(int target) {
 
-        RequestOutputStream o = display.out;
+        RequestOutputStream o = display.getResponseOutputStream();
         synchronized (o) {
             GLRenderRequest rr = begin_render_request(o, 4112, 8);
             rr.writeInt32(target);
@@ -5551,7 +5551,7 @@ public class GL extends gnu.x11.Resource implements GLConstant {
      */
     public void reset_minmax(int target) {
 
-        RequestOutputStream o = display.out;
+        RequestOutputStream o = display.getResponseOutputStream();
         synchronized (o) {
             GLRenderRequest rr = begin_render_request(o, 4113, 8);
             rr.writeInt32(target);
@@ -5564,7 +5564,7 @@ public class GL extends gnu.x11.Resource implements GLConstant {
      */
     public void bind_texture(int target, int texture) {
 
-        RequestOutputStream o = display.out;
+        RequestOutputStream o = display.getResponseOutputStream();
         synchronized (o) {
             GLRenderRequest rr = begin_render_request(o, 4117, 12);
             rr.writeInt32(target);
@@ -5578,7 +5578,7 @@ public class GL extends gnu.x11.Resource implements GLConstant {
      */
     public void prioritize_textures(int[] textures, float[] priorities) {
 
-        RequestOutputStream o = display.out;
+        RequestOutputStream o = display.getResponseOutputStream();
         synchronized (o) {
             GLRenderRequest rr = begin_render_request(o, 4118,
                     8 + textures.length * 2 * 8);
@@ -5597,7 +5597,7 @@ public class GL extends gnu.x11.Resource implements GLConstant {
                                       int internal_format, int x, int y,
                                       int width, int border) {
 
-        RequestOutputStream o = display.out;
+        RequestOutputStream o = display.getResponseOutputStream();
         synchronized (o) {
             GLRenderRequest rr = begin_render_request(o, 4119, 32);
             rr.writeInt32(target);
@@ -5618,7 +5618,7 @@ public class GL extends gnu.x11.Resource implements GLConstant {
                                       int internal_format, int x, int y,
                                       int width, int height, int border) {
 
-        RequestOutputStream o = display.out;
+        RequestOutputStream o = display.getResponseOutputStream();
         synchronized (o) {
             GLRenderRequest rr = begin_render_request(o, 4120, 26);
             rr.writeInt32(target);
@@ -5639,7 +5639,7 @@ public class GL extends gnu.x11.Resource implements GLConstant {
     public void copy_texture_sub_image_1d(int target, int level, int xoffset,
                                           int x, int y, int width) {
 
-        RequestOutputStream o = display.out;
+        RequestOutputStream o = display.getResponseOutputStream();
         synchronized (o) {
             GLRenderRequest rr = begin_render_request(o, 4121, 28);
             rr.writeInt32(target);
@@ -5659,7 +5659,7 @@ public class GL extends gnu.x11.Resource implements GLConstant {
                                           int yoffset, int x, int y, int width,
                                           int height) {
 
-        RequestOutputStream o = display.out;
+        RequestOutputStream o = display.getResponseOutputStream();
         synchronized (o) {
             GLRenderRequest rr = begin_render_request(o, 4122, 36);
             rr.writeInt32(target);
@@ -5681,7 +5681,7 @@ public class GL extends gnu.x11.Resource implements GLConstant {
                                          int yoffset, int zoffset, int x,
                                          int y, int width, int height) {
 
-        RequestOutputStream o = display.out;
+        RequestOutputStream o = display.getResponseOutputStream();
         synchronized (o) {
             GLRenderRequest rr = begin_render_request(o, 4123, 40);
             rr.writeInt32(target);
@@ -6439,7 +6439,7 @@ public class GL extends gnu.x11.Resource implements GLConstant {
 
     private void flush_render_request() {
 
-        RequestOutputStream o = display.out;
+        RequestOutputStream o = display.getResponseOutputStream();
         if (o.index > 0 && o.opcode() == 1) {
             o.updateLength();
             o.flush();
@@ -6492,13 +6492,13 @@ public class GL extends gnu.x11.Resource implements GLConstant {
      */
     private float[] get_fv1(int opcode, int par1) {
 
-        RequestOutputStream o = display.out;
+        RequestOutputStream o = display.getResponseOutputStream();
         float[] ret;
         synchronized (o) {
             o.beginRequest(glx.major_opcode, opcode, 3);
             o.writeInt32(tag);
             o.writeInt32(par1);
-            ResponseInputStream in = display.in;
+            ResponseInputStream in = display.getResponseInputStream();
             synchronized (in) {
                 in.readReply(o);
                 in.skip(12);
@@ -6531,14 +6531,14 @@ public class GL extends gnu.x11.Resource implements GLConstant {
     @Deprecated
     private float[] get_fv2(int opcode, int par1, int par2) {
 
-        RequestOutputStream o = display.out;
+        RequestOutputStream o = display.getResponseOutputStream();
         float[] ret;
         synchronized (o) {
             o.beginRequest(glx.major_opcode, opcode, 4);
             o.writeInt32(tag);
             o.writeInt32(par1);
             o.writeInt32(par2);
-            ResponseInputStream in = display.in;
+            ResponseInputStream in = display.getResponseInputStream();
             synchronized (in) {
                 in.readReply(o);
                 in.skip(12);
@@ -6560,13 +6560,13 @@ public class GL extends gnu.x11.Resource implements GLConstant {
     private void getFloatVector(GLXCommand command, int param1, int param2,
                                 float[] ret, int offset) {
 
-        RequestOutputStream o = display.out;
+        RequestOutputStream o = display.getResponseOutputStream();
         synchronized (o) {
             o.beginGLXRequest(command);
             o.writeInt32(tag);
             o.writeInt32(param1);
             o.writeInt32(param2);
-            ResponseInputStream in = display.in;
+            ResponseInputStream in = display.getResponseInputStream();
             synchronized (in) {
                 in.readReply(o);
                 in.skip(12);
@@ -6597,13 +6597,13 @@ public class GL extends gnu.x11.Resource implements GLConstant {
      */
     private double[] get_dv1(int opcode, int par1) {
 
-        RequestOutputStream o = display.out;
+        RequestOutputStream o = display.getResponseOutputStream();
         double[] ret;
         synchronized (o) {
             o.beginRequest(glx.major_opcode, opcode, 3);
             o.writeInt32(tag);
             o.writeInt32(par1);
-            ResponseInputStream in = display.in;
+            ResponseInputStream in = display.getResponseInputStream();
             synchronized (in) {
                 in.readReply(o);
                 in.skip(12);
@@ -6635,14 +6635,14 @@ public class GL extends gnu.x11.Resource implements GLConstant {
      */
     private double[] get_dv2(int opcode, int par1, int par2) {
 
-        RequestOutputStream o = display.out;
+        RequestOutputStream o = display.getResponseOutputStream();
         double[] ret;
         synchronized (o) {
             o.beginRequest(glx.major_opcode, opcode, 4);
             o.writeInt32(tag);
             o.writeInt32(par1);
             o.writeInt32(par2);
-            ResponseInputStream in = display.in;
+            ResponseInputStream in = display.getResponseInputStream();
             synchronized (in) {
                 in.readReply(o);
                 in.skip(12);
@@ -6675,13 +6675,13 @@ public class GL extends gnu.x11.Resource implements GLConstant {
     @Deprecated
     private int[] get_iv1(int opcode, int par1) {
 
-        RequestOutputStream o = display.out;
+        RequestOutputStream o = display.getResponseOutputStream();
         int[] ret;
         synchronized (o) {
             o.beginRequest(glx.major_opcode, opcode, 3);
             o.writeInt32(tag);
             o.writeInt32(par1);
-            ResponseInputStream in = display.in;
+            ResponseInputStream in = display.getResponseInputStream();
             synchronized (in) {
                 in.readReply(o);
                 in.skip(12);
@@ -6703,12 +6703,12 @@ public class GL extends gnu.x11.Resource implements GLConstant {
     private void getIntVector(GLXCommand command, int param1, int[] ret,
                               int offset) {
 
-        RequestOutputStream o = display.out;
+        RequestOutputStream o = display.getResponseOutputStream();
         synchronized (o) {
             o.beginGLXRequest(command);
             o.writeInt32(tag);
             o.writeInt32(param1);
-            ResponseInputStream in = display.in;
+            ResponseInputStream in = display.getResponseInputStream();
             synchronized (in) {
                 in.readReply(o);
                 in.skip(12);
@@ -6740,14 +6740,14 @@ public class GL extends gnu.x11.Resource implements GLConstant {
      */
     private int[] get_iv2(int opcode, int par1, int par2) {
 
-        RequestOutputStream o = display.out;
+        RequestOutputStream o = display.getResponseOutputStream();
         int[] ret;
         synchronized (o) {
             o.beginRequest(glx.major_opcode, opcode, 4);
             o.writeInt32(tag);
             o.writeInt32(par1);
             o.writeInt32(par2);
-            ResponseInputStream in = display.in;
+            ResponseInputStream in = display.getResponseInputStream();
             synchronized (in) {
                 in.readReply(o);
                 in.skip(12);
@@ -6768,7 +6768,7 @@ public class GL extends gnu.x11.Resource implements GLConstant {
 
     private void render_2f(int opcode, float p1, float p2) {
 
-        RequestOutputStream o = display.out;
+        RequestOutputStream o = display.getResponseOutputStream();
         synchronized (o) {
             GLRenderRequest rr = begin_render_request(o, opcode, 12);
             rr.writeFloat(p1);
@@ -6778,7 +6778,7 @@ public class GL extends gnu.x11.Resource implements GLConstant {
 
     private void render_2i(int opcode, int p1, int p2) {
 
-        RequestOutputStream o = display.out;
+        RequestOutputStream o = display.getResponseOutputStream();
         synchronized (o) {
             GLRenderRequest rr = begin_render_request(o, opcode, 12);
             rr.writeInt32(p1);
@@ -6788,7 +6788,7 @@ public class GL extends gnu.x11.Resource implements GLConstant {
 
     private void render_3d(int opcode, double p1, double p2, double p3) {
 
-        RequestOutputStream o = display.out;
+        RequestOutputStream o = display.getResponseOutputStream();
         synchronized (o) {
             GLRenderRequest rr = begin_render_request(o, opcode, 28);
             rr.writeDouble(p1);
@@ -6800,7 +6800,7 @@ public class GL extends gnu.x11.Resource implements GLConstant {
     private void render3f(GLXRenderingCommand command, float p1, float p2,
             float p3) {
 
-        RequestOutputStream o = display.out;
+        RequestOutputStream o = display.getResponseOutputStream();
         synchronized (o) {
             GLRenderRequest rr = beginRenderRequest(o, command);
             rr.writeFloat(p1);
@@ -6812,7 +6812,7 @@ public class GL extends gnu.x11.Resource implements GLConstant {
     @Deprecated
     private void render_3f(int opcode, float p1, float p2, float p3) {
 
-        RequestOutputStream o = display.out;
+        RequestOutputStream o = display.getResponseOutputStream();
         synchronized (o) {
             GLRenderRequest rr = begin_render_request(o, opcode, 16);
             rr.writeFloat(p1);
@@ -6823,7 +6823,7 @@ public class GL extends gnu.x11.Resource implements GLConstant {
 
     private void render_3i(int opcode, int p1, int p2, int p3) {
 
-        RequestOutputStream o = display.out;
+        RequestOutputStream o = display.getResponseOutputStream();
         synchronized (o) {
             GLRenderRequest rr = begin_render_request(o, opcode, 16);
             rr.writeInt32(p1);
@@ -6834,7 +6834,7 @@ public class GL extends gnu.x11.Resource implements GLConstant {
 
     private void render_3s(int opcode, int p1, int p2, int p3) {
 
-        RequestOutputStream o = display.out;
+        RequestOutputStream o = display.getResponseOutputStream();
         synchronized (o) {
             GLRenderRequest rr = begin_render_request(o, opcode, 12);
             rr.writeInt16(p1);
@@ -6847,7 +6847,7 @@ public class GL extends gnu.x11.Resource implements GLConstant {
     private void render_4d(int opcode, double p1, double p2, double p3,
                            double p4) {
 
-        RequestOutputStream o = display.out;
+        RequestOutputStream o = display.getResponseOutputStream();
         synchronized (o) {
             GLRenderRequest rr = begin_render_request(o, opcode, 36);
             rr.writeDouble(p1);
@@ -6860,7 +6860,7 @@ public class GL extends gnu.x11.Resource implements GLConstant {
     private void render4f(GLXRenderingCommand command, float p1, float p2,
                           float p3, float p4) {
 
-        RequestOutputStream o = display.out;
+        RequestOutputStream o = display.getResponseOutputStream();
         synchronized (o) {
             GLRenderRequest rr = beginRenderRequest(o, command);
             rr.writeFloat(p1);
@@ -6873,7 +6873,7 @@ public class GL extends gnu.x11.Resource implements GLConstant {
     @Deprecated
     private void render_4f(int opcode, float p1, float p2, float p3, float p4) {
 
-        RequestOutputStream o = display.out;
+        RequestOutputStream o = display.getResponseOutputStream();
         synchronized (o) {
             GLRenderRequest rr = begin_render_request(o, opcode, 20);
             rr.writeFloat(p1);
@@ -6886,7 +6886,7 @@ public class GL extends gnu.x11.Resource implements GLConstant {
     private void render4i(GLXRenderingCommand command, int p1, int p2, int p3,
                           int p4) {
 
-        RequestOutputStream o = display.out;
+        RequestOutputStream o = display.getResponseOutputStream();
         synchronized (o) {
             GLRenderRequest rr = beginRenderRequest(o, command);
             rr.writeInt32(p1);
@@ -6899,7 +6899,7 @@ public class GL extends gnu.x11.Resource implements GLConstant {
     @Deprecated
     private void render_4i(int opcode, int p1, int p2, int p3, int p4) {
 
-        RequestOutputStream o = display.out;
+        RequestOutputStream o = display.getResponseOutputStream();
         synchronized (o) {
             GLRenderRequest rr = begin_render_request(o, opcode, 20);
             rr.writeInt32(p1);
@@ -6911,7 +6911,7 @@ public class GL extends gnu.x11.Resource implements GLConstant {
 
     private void render_4s(int opcode, int p1, int p2, int p3, int p4) {
 
-        RequestOutputStream o = display.out;
+        RequestOutputStream o = display.getResponseOutputStream();
         synchronized (o) {
             GLRenderRequest rr = begin_render_request(o, opcode, 12);
             rr.writeInt16(p1);

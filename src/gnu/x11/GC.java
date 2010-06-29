@@ -377,7 +377,7 @@ public class GC extends Fontable {
    */
   public void create (Drawable drawable, Values values) {
 
-    RequestOutputStream o = display.out;
+    RequestOutputStream o = display.getResponseOutputStream();
     synchronized (o) {
       o.beginRequest(55, 0, 4 + values.count());
       o.writeInt32 (id);
@@ -399,7 +399,7 @@ public class GC extends Fontable {
    */
   public void change (Values values) {
 
-    RequestOutputStream o = display.out;
+    RequestOutputStream o = display.getResponseOutputStream();
     synchronized (o) {
       o.beginRequest (56, 0, 0);
       ChangeGCRequestObject cr = new ChangeGCRequestObject (values);
@@ -421,7 +421,7 @@ public class GC extends Fontable {
    */
   public void copy (GC dest, int mask) {
 
-    RequestOutputStream o = display.out;
+    RequestOutputStream o = display.getResponseOutputStream();
     synchronized (o) {
       o.beginRequest (57, 0, 4);
       o.writeInt32 (id); // Src-ID.
@@ -447,7 +447,7 @@ public class GC extends Fontable {
     int n = dashes.length;
     int p = 4 - (n % 4);
 
-    RequestOutputStream o = display.out;
+    RequestOutputStream o = display.getResponseOutputStream();
     synchronized (o) {
       o.beginRequest (58, 0, 3 + (n + p) / 4);
 
@@ -483,7 +483,7 @@ public class GC extends Fontable {
   public void set_clip_rectangles (int clip_x_origin, int clip_y_origin,
                                    Rectangle [] rectangles, int ordering) {
 
-    RequestOutputStream o = display.out;
+    RequestOutputStream o = display.getResponseOutputStream();
     synchronized (o) {
       o.beginRequest (59, ordering, 3+2*rectangles.length);
       o.writeInt32 (id);
@@ -506,7 +506,7 @@ public class GC extends Fontable {
    * @see <a href="XFreeGC.html">XFreeGC</a>
    */
   public void free () {
-    RequestOutputStream o = display.out;
+    RequestOutputStream o = display.getResponseOutputStream();
     synchronized (o) {
       o.beginRequest (60, 0, 2);
       o.writeInt32 (id);
@@ -562,7 +562,7 @@ public class GC extends Fontable {
    * @see Values#set_arc_mode(int)
    */
   public void set_arc_mode (int i) {
-    RequestOutputStream o = display.out;
+    RequestOutputStream o = display.getResponseOutputStream();
     synchronized (o) {
       if (o.opcode () == 56
           && o.request_object instanceof ChangeGCRequestObject) {
@@ -592,7 +592,7 @@ public class GC extends Fontable {
    * @see Values#set_background(int)
    */
   public void set_background (int pixel) {
-    RequestOutputStream o = display.out;
+    RequestOutputStream o = display.getResponseOutputStream();
     synchronized (o) {
       if (o.opcode () == 56
           && o.request_object instanceof ChangeGCRequestObject) {
@@ -614,7 +614,7 @@ public class GC extends Fontable {
    * @see Values#set_cap_style(int)
    */
   public void set_cap_style (int i) {
-    RequestOutputStream o = display.out;
+    RequestOutputStream o = display.getResponseOutputStream();
     synchronized (o) {
       if (o.opcode () == 56
           && o.request_object instanceof ChangeGCRequestObject) {
@@ -636,7 +636,7 @@ public class GC extends Fontable {
    * @see Values#set_clip_mask(Pixmap)
    */
   public void set_clip_mask (Pixmap pixmap) {
-    RequestOutputStream o = display.out;
+    RequestOutputStream o = display.getResponseOutputStream();
     synchronized (o) {
       if (o.opcode () == 56
           && o.request_object instanceof ChangeGCRequestObject) {
@@ -658,7 +658,7 @@ public class GC extends Fontable {
    * @see Values#set_clip_x_origin(int)
    */
   public void set_clip_x_origin (int i) {
-    RequestOutputStream o = display.out;
+    RequestOutputStream o = display.getResponseOutputStream();
     synchronized (o) {
       if (o.opcode () == 56
           && o.request_object instanceof ChangeGCRequestObject) {
@@ -680,7 +680,7 @@ public class GC extends Fontable {
    * @see Values#set_clip_y_origin(int)
    */
   public void set_clip_y_origin (int i) {
-    RequestOutputStream o = display.out;
+    RequestOutputStream o = display.getResponseOutputStream();
     synchronized (o) {
       if (o.opcode () == 56
           && o.request_object instanceof ChangeGCRequestObject) {
@@ -702,7 +702,7 @@ public class GC extends Fontable {
    * @see Values#set_dashes(int)
    */
   public void set_dashes (int i) {
-    RequestOutputStream o = display.out;
+    RequestOutputStream o = display.getResponseOutputStream();
     synchronized (o) {
       if (o.opcode () == 56
           && o.request_object instanceof ChangeGCRequestObject) {
@@ -724,7 +724,7 @@ public class GC extends Fontable {
    * @see Values#set_dash_offset(int)
    */
   public void set_dash_offset (int i) {
-    RequestOutputStream o = display.out;
+    RequestOutputStream o = display.getResponseOutputStream();
     synchronized (o) {
       if (o.opcode () == 56
           && o.request_object instanceof ChangeGCRequestObject) {
@@ -746,7 +746,7 @@ public class GC extends Fontable {
    * @see Values#set_fill_rule(int)
    */
   public void set_fill_rule (int i) {
-    RequestOutputStream o = display.out;
+    RequestOutputStream o = display.getResponseOutputStream();
     synchronized (o) {
       if (o.opcode () == 56
           && o.request_object instanceof ChangeGCRequestObject) {
@@ -768,7 +768,7 @@ public class GC extends Fontable {
    * @see Values#set_fill_style(int)
    */
   public void set_fill_style (int i) {
-    RequestOutputStream o = display.out;
+    RequestOutputStream o = display.getResponseOutputStream();
     synchronized (o) {
       if (o.opcode () == 56
           && o.request_object instanceof ChangeGCRequestObject) {
@@ -790,7 +790,7 @@ public class GC extends Fontable {
    * @see Values#set_font(Font)
    */
   public void set_font (Font font) {
-    RequestOutputStream o = display.out;
+    RequestOutputStream o = display.getResponseOutputStream();
     synchronized (o) {
       if (o.opcode () == 56
           && o.request_object instanceof ChangeGCRequestObject) {
@@ -820,7 +820,7 @@ public class GC extends Fontable {
    * @see Values#set_foreground(int)
    */
   public void set_foreground (int pixel) {
-    RequestOutputStream o = display.out;
+    RequestOutputStream o = display.getResponseOutputStream();
     synchronized (o) {
       if (o.opcode () == 56
           && o.request_object instanceof ChangeGCRequestObject) {
@@ -842,7 +842,7 @@ public class GC extends Fontable {
    * @see Values#set_function(int)
    */
   public void set_function (int i) {
-    RequestOutputStream o = display.out;
+    RequestOutputStream o = display.getResponseOutputStream();
     synchronized (o) {
       if (o.opcode () == 56
           && o.request_object instanceof ChangeGCRequestObject) {
@@ -864,7 +864,7 @@ public class GC extends Fontable {
    * @see Values#set_graphics_exposures(boolean)
    */
   public void set_graphics_exposures (boolean b) {
-    RequestOutputStream o = display.out;
+    RequestOutputStream o = display.getResponseOutputStream();
     synchronized (o) {
       if (o.opcode () == 56
           && o.request_object instanceof ChangeGCRequestObject) {
@@ -886,7 +886,7 @@ public class GC extends Fontable {
    * @see Values#set_join_style(int)
    */
   public void set_join_style (int i) {
-    RequestOutputStream o = display.out;
+    RequestOutputStream o = display.getResponseOutputStream();
     synchronized (o) {
       if (o.opcode () == 56
           && o.request_object instanceof ChangeGCRequestObject) {
@@ -908,7 +908,7 @@ public class GC extends Fontable {
    * @see Values#set_line_style(int)
    */
   public void set_line_style (int i) {
-    RequestOutputStream o = display.out;
+    RequestOutputStream o = display.getResponseOutputStream();
     synchronized (o) {
       if (o.opcode () == 56
           && o.request_object instanceof ChangeGCRequestObject) {
@@ -930,7 +930,7 @@ public class GC extends Fontable {
    * @see Values#set_line_width(int)
    */
   public void set_line_width (int i) {
-    RequestOutputStream o = display.out;
+    RequestOutputStream o = display.getResponseOutputStream();
     synchronized (o) {
       if (o.opcode () == 56
           && o.request_object instanceof ChangeGCRequestObject) {
@@ -952,7 +952,7 @@ public class GC extends Fontable {
    * @see Values#set_plane_mask(int)
    */
   public void set_plane_mask (int i) {
-    RequestOutputStream o = display.out;
+    RequestOutputStream o = display.getResponseOutputStream();
     synchronized (o) {
       if (o.opcode () == 56
           && o.request_object instanceof ChangeGCRequestObject) {
@@ -974,7 +974,7 @@ public class GC extends Fontable {
    * @see Values#set_stipple(Pixmap)
    */
   public void set_stipple (Pixmap pixmap) {
-    RequestOutputStream o = display.out;
+    RequestOutputStream o = display.getResponseOutputStream();
     synchronized (o) {
       if (o.opcode () == 56
           && o.request_object instanceof ChangeGCRequestObject) {
@@ -996,7 +996,7 @@ public class GC extends Fontable {
    * @see Values#set_subwindow_mode(int)
    */
   public void set_subwindow_mode (int i) {
-    RequestOutputStream o = display.out;
+    RequestOutputStream o = display.getResponseOutputStream();
     synchronized (o) {
       if (o.opcode () == 56
           && o.request_object instanceof ChangeGCRequestObject) {
@@ -1018,7 +1018,7 @@ public class GC extends Fontable {
    * @see Values#set_tile(Pixmap)
    */
   public void set_tile (Pixmap pixmap) {
-    RequestOutputStream o = display.out;
+    RequestOutputStream o = display.getResponseOutputStream();
     synchronized (o) {
       if (o.opcode () == 56
           && o.request_object instanceof ChangeGCRequestObject) {
@@ -1040,7 +1040,7 @@ public class GC extends Fontable {
    * @see Values#set_tile_stipple_x_origin(int)
    */
   public void set_tile_stipple_x_origin (int i) {
-    RequestOutputStream o = display.out;
+    RequestOutputStream o = display.getResponseOutputStream();
     synchronized (o) {
       if (o.opcode () == 56
           && o.request_object instanceof ChangeGCRequestObject) {
@@ -1062,7 +1062,7 @@ public class GC extends Fontable {
    * @see Values#set_tile_stipple_y_origin(int)
    */
   public void set_tile_stipple_y_origin (int i) {
-    RequestOutputStream o = display.out;
+    RequestOutputStream o = display.getResponseOutputStream();
     synchronized (o) {
       if (o.opcode () == 56
           && o.request_object instanceof ChangeGCRequestObject) {

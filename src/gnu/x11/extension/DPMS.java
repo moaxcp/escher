@@ -41,13 +41,13 @@ public class DPMS extends Extension {
     super (display, "DPMS", MINOR_OPCODE_STRINGS); 
 
     // check version before any other operations
-    RequestOutputStream o = display.out;
+    RequestOutputStream o = display.getResponseOutputStream();
     synchronized (o) {
       o.beginRequest (major_opcode, 0, 2);
       o.writeInt16 (CLIENT_MAJOR_VERSION);
       o.writeInt16 (CLIENT_MINOR_VERSION);
 
-      ResponseInputStream i = display.in;
+      ResponseInputStream i = display.getResponseInputStream();
       synchronized (i) {
         i.readReply (o);
         i.skip (8);
@@ -72,10 +72,10 @@ public class DPMS extends Extension {
    */
   public boolean capable () {
     boolean capable;
-    RequestOutputStream o = display.out;
+    RequestOutputStream o = display.getResponseOutputStream();
     synchronized (o) {
       o.beginRequest (major_opcode, 1, 1);
-      ResponseInputStream i = display.in;
+      ResponseInputStream i = display.getResponseInputStream();
       synchronized (i) {
         i.skip (8);
         capable = i.readBool ();
@@ -113,10 +113,10 @@ public class DPMS extends Extension {
    */
   public TimeoutsInfo timeouts () {
     TimeoutsInfo info;
-    RequestOutputStream o = display.out;
+    RequestOutputStream o = display.getResponseOutputStream();
     synchronized (o) {
       o.beginRequest (major_opcode, 2, 1);
-      ResponseInputStream i = display.in;
+      ResponseInputStream i = display.getResponseInputStream();
       synchronized (i) {
         i.skip (8);
         info = new TimeoutsInfo(i);
@@ -133,7 +133,7 @@ public class DPMS extends Extension {
    */
   public void set_timeouts (int standby, int suspend, int off) {
 
-    RequestOutputStream o = display.out;
+    RequestOutputStream o = display.getResponseOutputStream();
     synchronized (o) {
       o.beginRequest (major_opcode, 3, 3);
       o.writeInt16 (standby);
@@ -150,7 +150,7 @@ public class DPMS extends Extension {
    * @see <a href="DPMSEnable.html">DPMSEnable</a>
    */
   public void enable () {
-    RequestOutputStream o = display.out;
+    RequestOutputStream o = display.getResponseOutputStream();
     synchronized (o) {
       o.beginRequest (major_opcode, 4, 1);
       o.send ();
@@ -163,7 +163,7 @@ public class DPMS extends Extension {
    * @see <a href="DPMSDisable.html">DPMSDisable</a>
    */
   public void disable () {
-    RequestOutputStream o = display.out;
+    RequestOutputStream o = display.getResponseOutputStream();
     synchronized (o) {
       o.beginRequest (major_opcode, 5, 1);
       o.send ();
@@ -192,7 +192,7 @@ public class DPMS extends Extension {
    * @see <a href="DPMSForceLevel.html">DPMSForceLevel</a>
    */
   public void force_level (int level) {
-    RequestOutputStream o = display.out;
+    RequestOutputStream o = display.getResponseOutputStream();
     synchronized (o) {
       o.beginRequest (major_opcode, 6, 2);
       o.writeInt16 (level);
@@ -229,10 +229,10 @@ public class DPMS extends Extension {
    */
   public Info info () {
     Info info;
-    RequestOutputStream o = display.out;
+    RequestOutputStream o = display.getResponseOutputStream();
     synchronized (o) {
       o.beginRequest (major_opcode, 7, 1);
-      ResponseInputStream i = display.in;
+      ResponseInputStream i = display.getResponseInputStream();
       synchronized (i) {
         i.readReply (o);
         i.skip (8);

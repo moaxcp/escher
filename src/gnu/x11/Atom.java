@@ -246,7 +246,7 @@ public class Atom {
     int n = name.length();
     int p = RequestOutputStream.pad (n);
     
-    RequestOutputStream o = display.out;
+    RequestOutputStream o = display.getResponseOutputStream();
     synchronized (o) {
       o.beginRequest (16, onlyIfExists ? 1 : 0, 2 + (n + p) / 4);
       o.writeInt16 (n);
@@ -254,7 +254,7 @@ public class Atom {
       o.writeString8 (name);
       o.writePad (n);
 
-      ResponseInputStream i = display.in;
+      ResponseInputStream i = display.getResponseInputStream();
       synchronized (i) {
         i.readReply(o);
         i.skip (8); // Unused + sequence number + reply length.
@@ -277,12 +277,12 @@ public class Atom {
     this.display = display;
     this.id = id;
 
-    RequestOutputStream o = display.out;
+    RequestOutputStream o = display.getResponseOutputStream();
     synchronized (o) {
       o.beginRequest (17, 0, 2);
       o.writeInt32 (id);
 
-      ResponseInputStream i = display.in;
+      ResponseInputStream i = display.getResponseInputStream();
       synchronized (i) {
         i.readReply (o);
         i.skip (8); // Unused + sequence number + reply length.

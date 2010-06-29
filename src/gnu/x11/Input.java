@@ -56,7 +56,7 @@ public class Input {
    * @see <a href="XUngrabPointer.html">XUngrabPointer</a>
    */
   public void ungrab_pointer (int time) {
-    RequestOutputStream o = display.out;
+    RequestOutputStream o = display.getResponseOutputStream();
     synchronized (o) {
       o.beginRequest (27, 0, 2);
       o.writeInt32 (time);
@@ -75,7 +75,7 @@ public class Input {
   public void change_active_pointer_grab (int event_mask, 
                                           Cursor cursor, int time) {
 
-    RequestOutputStream o = display.out;
+    RequestOutputStream o = display.getResponseOutputStream();
     synchronized (o) {
       o.beginRequest (30, 0, 4);
       o.writeInt32 (cursor.id);
@@ -93,7 +93,7 @@ public class Input {
    */
   public void ungrab_keyboard (int time) {
 
-    RequestOutputStream o = display.out;
+    RequestOutputStream o = display.getResponseOutputStream();
     synchronized (o) {
       o.beginRequest (32, 0, 2);
       o.writeInt32 (time);
@@ -129,7 +129,7 @@ public class Input {
    */
   public void allow_events (int mode, int time) {
 
-    RequestOutputStream o = display.out;
+    RequestOutputStream o = display.getResponseOutputStream();
     synchronized (o) {
       o.beginRequest (35, mode, 2);
       o.writeInt32 (time);
@@ -162,10 +162,10 @@ public class Input {
   public InputFocusInfo input_focus () {
 
     InputFocusInfo info;
-    RequestOutputStream o = display.out;
+    RequestOutputStream o = display.getResponseOutputStream();
     synchronized (o) {
       o.beginRequest (43, 0, 1);
-      ResponseInputStream i = display.in;
+      ResponseInputStream i = display.getResponseInputStream();
       synchronized (i) {
         i.readReply (o);
         i.skip (1);
@@ -183,11 +183,11 @@ public class Input {
    * @see <a href="XQueryKeymap.html">XQueryKeymap</a>
    */
   public byte [] query_keymap () {
-    RequestOutputStream o = display.out;
+    RequestOutputStream o = display.getResponseOutputStream();
     byte [] data = new byte [32];
     synchronized (o) {
       o.beginRequest (44, 0, 1);
-      ResponseInputStream i = display.in;
+      ResponseInputStream i = display.getResponseInputStream();
       synchronized (i) {
         i.readReply (o);
         i.skip (8);
@@ -207,7 +207,7 @@ public class Input {
     
     int keycode_count = keysyms.length / keysyms_per_keycode;
 
-    RequestOutputStream o = display.out;
+    RequestOutputStream o = display.getResponseOutputStream();
     synchronized (o) {
       o.beginRequest (100, keycode_count, 2 + keysyms.length);
       o.writeInt8 (first_keycode);
@@ -230,14 +230,14 @@ public class Input {
 
     int keysym_count = max_keycode - min_keycode + 1;
 
-    RequestOutputStream o = display.out;
+    RequestOutputStream o = display.getResponseOutputStream();
     synchronized (o) {
       o.beginRequest (101, 0, 2);
       o.writeInt8 (min_keycode);
       o.writeInt8 (keysym_count);
       o.writeInt16 (0); // Unused.
 
-      ResponseInputStream in = display.in;
+      ResponseInputStream in = display.getResponseInputStream();
       synchronized (in) {
         in.readReply (o);
         in.skip (1);
@@ -302,7 +302,7 @@ public class Input {
    * @see <a href="XChangeKeyboardControl.html">XChangeKeyboardControl</a>
    */
   public void change_keyboard_control (KeyboardControl control) {
-    RequestOutputStream o = display.out;
+    RequestOutputStream o = display.getResponseOutputStream();
     synchronized (o) {
       o.beginRequest (102, 0, 2 + control.count ());
       o.writeInt32 (control.bitmask);
@@ -318,10 +318,10 @@ public class Input {
    */
   public KeyboardControlInfo keyboard_control () {
     KeyboardControlInfo info;
-    RequestOutputStream o = display.out;
+    RequestOutputStream o = display.getResponseOutputStream();
     synchronized (o) {
       o.beginRequest (103, 0, 1);
-      ResponseInputStream i = display.in;
+      ResponseInputStream i = display.getResponseInputStream();
       synchronized (i) {
         i.readReply (o);
         i.skip (1);
@@ -340,7 +340,7 @@ public class Input {
                                       int accel_numerator,
                                       int accel_denominator, int threshold) {
 
-    RequestOutputStream o = display.out;
+    RequestOutputStream o = display.getResponseOutputStream();
     synchronized (o) {
       o.beginRequest (105, 0, 3);
       o.writeInt16 (accel_numerator);
@@ -374,10 +374,10 @@ public class Input {
    */
   public PointerControlInfo pointer_control () {
     PointerControlInfo info;
-    RequestOutputStream o = display.out;
+    RequestOutputStream o = display.getResponseOutputStream();
     synchronized (o) {
       o.beginRequest (106, 0, 1);
-      ResponseInputStream i = display.in;
+      ResponseInputStream i = display.getResponseInputStream();
       synchronized (i) {
         i.readReply (o);
         i.skip (8);
@@ -408,12 +408,12 @@ public class Input {
 
     int status;
 
-    RequestOutputStream o = display.out;
+    RequestOutputStream o = display.getResponseOutputStream();
     synchronized (o) {
       o.beginRequest (116, map.length, 1 + (n + p) / 4);
       o.writeBytes (map);
       o.skip (p);
-      ResponseInputStream i = display.in;
+      ResponseInputStream i = display.getResponseInputStream();
       synchronized (i) {
         i.readReply (o);
         i.skip (1);
@@ -432,10 +432,10 @@ public class Input {
   public byte [] get_pointer_mapping () {
 
     byte [] map;
-    RequestOutputStream o = display.out;
+    RequestOutputStream o = display.getResponseOutputStream();
     synchronized (o) {
       o.beginRequest (117, 0, 1);
-      ResponseInputStream i = display.in;
+      ResponseInputStream i = display.getResponseInputStream();
       synchronized (i) {
         i.readReply (o);
         i.skip (1);
@@ -465,12 +465,12 @@ public class Input {
                                    byte [] keycodes) {
 
     int status;
-    RequestOutputStream o = display.out;
+    RequestOutputStream o = display.getResponseOutputStream();
     synchronized (o) {
       o.beginRequest (118, keycodes_per_modifier,
                        1 + 2 * keycodes_per_modifier);
       o.write (keycodes);
-      ResponseInputStream i = display.in;
+      ResponseInputStream i = display.getResponseInputStream();
       synchronized (i) {
         i.readReply (o);
         i.skip (1);
@@ -503,10 +503,10 @@ public class Input {
 
     ModifierMapping map;
 
-    RequestOutputStream o = display.out;
+    RequestOutputStream o = display.getResponseOutputStream();
     synchronized (o) {
       o.beginRequest (119, 0, 1);
-      ResponseInputStream i = display.in;
+      ResponseInputStream i = display.getResponseInputStream();
       synchronized (i) {
         i.readReply (o);
         i.skip (1);

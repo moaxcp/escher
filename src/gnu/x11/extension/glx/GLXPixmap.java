@@ -18,7 +18,7 @@ public class GLXPixmap extends gnu.x11.Resource implements GLXDrawable {
     super (glx.display);
     this.glx = glx;
     
-    RequestOutputStream o = display.out;
+    RequestOutputStream o = display.getResponseOutputStream();
     synchronized (o) {
       o.beginRequest (glx.major_opcode, 13, 5);
       
@@ -36,7 +36,7 @@ public class GLXPixmap extends gnu.x11.Resource implements GLXDrawable {
    * @see <a href="glXDestroyContext.html">glXDestroyContext</a>
    */
   public void destroy () {
-    RequestOutputStream o = display.out;
+    RequestOutputStream o = display.getResponseOutputStream();
     synchronized (o) {
       o.beginRequest (glx.major_opcode, 15, 2);
       o.writeInt32 (id);

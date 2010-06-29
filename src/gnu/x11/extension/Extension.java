@@ -25,12 +25,12 @@ abstract public class Extension {
     this.display = display;
     this.name = name;
     
-    Display.ExtensionInfo er = display.query_extension (name);
+    Display.ExtensionInfo er = display.queryExtension (name);
     if (!er.present ()) throw new NotFoundException (name);
 
-    first_event = er.first_event ();
-    first_error = er.first_error ();
-    major_opcode = er.major_opcode ();
+    first_event = er.firstEvent ();
+    first_error = er.firstError ();
+    major_opcode = er.majorOpcode ();
 
     // register opcode strings
     display.extensionOpcodeStrings [major_opcode - 128] = name;

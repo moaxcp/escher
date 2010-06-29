@@ -36,10 +36,10 @@ public class EVI extends Extension {
      * minor version, but most implementation (xfree86 3.3/4.0) does not. 
      * Which one is bugged?
      */
-    RequestOutputStream o = display.out;
+    RequestOutputStream o = display.getResponseOutputStream();
     synchronized (o) {
       o.beginRequest (major_opcode, 0, 1);
-      ResponseInputStream i = display.in;
+      ResponseInputStream i = display.getResponseInputStream();
       synchronized (i) {
         i.readReply (o);
         i.skip (8);
@@ -102,13 +102,13 @@ public class EVI extends Extension {
    */
   public VisualInfoReply visual_info (VisualInfo [] visuals) {
     VisualInfoReply reply;
-    RequestOutputStream o = display.out;
+    RequestOutputStream o = display.getResponseOutputStream();
     synchronized (o) {
       o.beginRequest (major_opcode, 1, 2 + visuals.length);
       o.writeInt32 (visuals.length);
       for (int i = 0; i < visuals.length; i++)
         o.writeInt32 (visuals [i].getID());
-      ResponseInputStream in = display.in;
+      ResponseInputStream in = display.getResponseInputStream();
       synchronized (in) {
         in.readReply (o);
         in.skip (8);

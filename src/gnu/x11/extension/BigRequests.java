@@ -22,10 +22,10 @@ public class BigRequests extends Extension {
     public int enable() {
 
         int st;
-        RequestOutputStream o = display.out;
+        RequestOutputStream o = display.getResponseOutputStream();
         synchronized (o) {
             o.beginRequest(major_opcode, 0, 1);
-            ResponseInputStream i = display.in;
+            ResponseInputStream i = display.getResponseInputStream();
             synchronized (i) {
                 i.readReply(o);
                 i.skip(8);

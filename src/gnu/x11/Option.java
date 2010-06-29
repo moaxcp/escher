@@ -7,25 +7,25 @@ public class Option extends gnu.util.Option {
     super (args);
   }
 
-  
-  public DisplayName display_name (String name, String description,
-    DisplayName default_value) {
-
-    DisplayName retval = default_value;
-    
-    try {
-      String opt = option (name);
-      if (opt != null) retval = new DisplayName (opt);
-
-    } catch (RuntimeException e) {
-      invalidNames.append (name + ", ");
-      // fall through
-    }
-
-    addSpec (name, "display name", description, default_value.toString (),   
-      retval.toString ());
-    return retval;
-  }
+//  Can be removed
+//  public DisplayName display_name (String name, String description,
+//    DisplayName default_value) {
+//
+//    DisplayName retval = default_value;
+//    
+//    try {
+//      String opt = option (name);
+//      if (opt != null) retval = new DisplayName (opt);
+//
+//    } catch (RuntimeException e) {
+//      invalidNames.append (name + ", ");
+//      // fall through
+//    }
+//
+//    addSpec (name, "display name", description, default_value.toString (),   
+//      retval.toString ());
+//    return retval;
+//  }
 
 
   public RGB rgb (String name, String description, RGB default_value) {

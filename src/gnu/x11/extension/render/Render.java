@@ -69,12 +69,12 @@ public class Render extends gnu.x11.extension.Extension
     super (display, "RENDER", MINOR_OPCODE_STRINGS, 5, 0);
 
     // check version before any other operations
-    RequestOutputStream o = display.out;
+    RequestOutputStream o = display.getResponseOutputStream();
     synchronized (o) {
       o.beginRequest (major_opcode, 0, 3);
       o.writeInt32 (CLIENT_MAJOR_VERSION);
       o.writeInt32 (CLIENT_MINOR_VERSION);
-      ResponseInputStream i = display.in;
+      ResponseInputStream i = display.getResponseInputStream();
       synchronized (i) {
         i.readReply (o);
         i.skip (8);
@@ -90,10 +90,10 @@ public class Render extends gnu.x11.extension.Extension
   // render opcode 1 - query picture formats
   public PictFormat [] picture_formats () {
     if (picture_formats_cache == null) {
-      RequestOutputStream o = display.out;
+      RequestOutputStream o = display.getResponseOutputStream();
       synchronized (o) {
         o.beginRequest (major_opcode, 1, 1);
-        ResponseInputStream i = display.in;
+        ResponseInputStream i = display.getResponseInputStream();
         synchronized (i) {
           i.readReply (o);
           i.skip (8);
@@ -115,7 +115,7 @@ public class Render extends gnu.x11.extension.Extension
 
   // render opcode 2 - query picture index values
   public void picture_index_values () {
-    RequestOutputStream o = display.out;
+    RequestOutputStream o = display.getResponseOutputStream();
     synchronized (o) {
       o.beginRequest (major_opcode, 2, 2);
       o.send ();
@@ -125,7 +125,7 @@ public class Render extends gnu.x11.extension.Extension
 
   // render opcode 3 - query dithers
   public void dithers (Drawable drawable) {
-    RequestOutputStream o = display.out;
+    RequestOutputStream o = display.getResponseOutputStream();
     synchronized (o) {
       o.beginRequest (major_opcode, 3, 2);
       o.send ();
@@ -176,7 +176,7 @@ public class Render extends gnu.x11.extension.Extension
     int src_x, int src_y, int mask_x, int mask_y, int dst_x, int dst_y, 
     int width, int height) {
 
-    RequestOutputStream o = display.out;
+    RequestOutputStream o = display.getResponseOutputStream();
     synchronized (o) {
       o.beginRequest (major_opcode, 8, 9);
       o.writeInt8 (op);
@@ -202,7 +202,7 @@ public class Render extends gnu.x11.extension.Extension
                                 Glyph[] glyphs) {
     // TODO: Replace int op with some enum type.
     // TODO: Implement 8 and 16 bit versions.
-    RequestOutputStream o = display.out;
+    RequestOutputStream o = display.getResponseOutputStream();
     synchronized (o) {
       int len = 9 + glyphs.length;
       o.beginRequest (major_opcode, 25, len);
@@ -271,7 +271,7 @@ public class Render extends gnu.x11.extension.Extension
    */
   public Picture create_solid_fill (int red, int green, int blue, int alpha) {
     // Opcode 33.
-    RequestOutputStream o = display.out;
+    RequestOutputStream o = display.getResponseOutputStream();
     Picture pic = new Picture (display);
     synchronized (o) {
       o.beginRequest (major_opcode, 33, 4);

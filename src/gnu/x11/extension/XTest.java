@@ -36,13 +36,13 @@ public class XTest extends Extension {
   public XTest (gnu.x11.Display display) throws NotFoundException { 
     super (display, "XTEST", MINOR_OPCODE_STRINGS); 
 
-    RequestOutputStream o = display.out;
+    RequestOutputStream o = display.getResponseOutputStream();
     synchronized (o) {
       o.beginRequest (major_opcode, 0, 2);
       o.writeInt8 (CLIENT_MAJOR_VERSION);
       o.skip (1);
       o.writeInt16 (CLIENT_MINOR_VERSION);
-      ResponseInputStream i = display.in;
+      ResponseInputStream i = display.getResponseInputStream();
       synchronized (i) {
         i.readReply (o);
         i.skip (1);
@@ -67,12 +67,12 @@ public class XTest extends Extension {
   public boolean compare_cursor (Window window, Cursor cursor) {
 
     boolean same;
-    RequestOutputStream o = display.out;
+    RequestOutputStream o = display.getResponseOutputStream();
     synchronized (o) {
       o.beginRequest (major_opcode, 1, 3);
       o.writeInt32 (window.id);
       o.writeInt32 (cursor.id);
-      ResponseInputStream i = display.in;
+      ResponseInputStream i = display.getResponseInputStream();
       synchronized (i) {
         i.readReply (o);
         i.skip (1);
@@ -105,7 +105,7 @@ public class XTest extends Extension {
   public void fake_input (int type, int detail, int delay, Window root, 
                           int x, int y) {
 
-    RequestOutputStream o = display.out;
+    RequestOutputStream o = display.getResponseOutputStream();
     synchronized (o) {
       o.beginRequest (major_opcode, 2, 9);
       o.writeInt8 (type);
@@ -127,7 +127,7 @@ public class XTest extends Extension {
    */
   public void grab_control (boolean impervious) {
 
-    RequestOutputStream o = display.out;
+    RequestOutputStream o = display.getResponseOutputStream();
     synchronized (o) {
       o.beginRequest (major_opcode, 3, 2);
       o.writeBool (impervious);

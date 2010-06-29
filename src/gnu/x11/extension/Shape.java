@@ -44,10 +44,10 @@ public class Shape extends Extension implements EventFactory {
     super (display, "SHAPE", MINOR_OPCODE_STRINGS, 0, 1);
 
     // check version before any other operations
-    RequestOutputStream o = display.out;
+    RequestOutputStream o = display.getResponseOutputStream();
     synchronized (o) {
       o.beginRequest (major_opcode, 0, 1);
-      ResponseInputStream i = display.in;
+      ResponseInputStream i = display.getResponseInputStream();
       synchronized (i) {
         i.readReply (o);
         i.skip (8);
@@ -100,7 +100,7 @@ public class Shape extends Extension implements EventFactory {
                                   int y_offset, Rectangle [] rectangles,
                                   int operation, int ordering) {
 
-    RequestOutputStream o = display.out;
+    RequestOutputStream o = display.getResponseOutputStream();
     synchronized (o) {
       o.beginRequest (major_opcode, 1, 4 + 2 * rectangles.length);
       o.writeInt8 (operation);
@@ -142,7 +142,7 @@ public class Shape extends Extension implements EventFactory {
   public void combine_mask (Window dest, int dest_kind, int x_offset, 
                             int y_offset, Pixmap src, int operation) { 
 
-    RequestOutputStream o = display.out;
+    RequestOutputStream o = display.getResponseOutputStream();
     synchronized (o) {
       o.beginRequest (major_opcode, 2, 5);
       o.writeInt8 (operation);
@@ -179,7 +179,7 @@ public class Shape extends Extension implements EventFactory {
   public void combine_shape (Window dest, int dest_kind, int x_offset,
                              int y_offset, Window src, int src_kind, int operation) { 
 
-    RequestOutputStream o = display.out;
+    RequestOutputStream o = display.getResponseOutputStream();
     synchronized (o) {
       o.beginRequest (major_opcode, 3, 5);
       o.writeInt8 (operation);
@@ -202,7 +202,7 @@ public class Shape extends Extension implements EventFactory {
   public void offset_shape (Window dest, int dest_kind,
                             int x_offset, int y_offset) {
 
-    RequestOutputStream o = display.out;
+    RequestOutputStream o = display.getResponseOutputStream();
     synchronized (o) {
       o.beginRequest (major_opcode, 4, 4);
       o.writeInt8 (dest_kind);
@@ -275,11 +275,11 @@ public class Shape extends Extension implements EventFactory {
   public ExtentsInfo extents (Window dest) {
     
     ExtentsInfo info;
-    RequestOutputStream o = display.out;
+    RequestOutputStream o = display.getResponseOutputStream();
     synchronized (o) {
       o.beginRequest (major_opcode, 5, 2);
       o.writeInt32 (dest.id);
-      ResponseInputStream i = display.in;
+      ResponseInputStream i = display.getResponseInputStream();
       synchronized (i) {
         i.readReply (o);
         i.skip (8);
@@ -297,7 +297,7 @@ public class Shape extends Extension implements EventFactory {
    */
   public void select_input (Window dest, boolean enable) {
 
-    RequestOutputStream o = display.out;
+    RequestOutputStream o = display.getResponseOutputStream();
     synchronized (o) {
       o.beginRequest (major_opcode, 6, 3);
       o.writeInt32 (dest.id);
@@ -313,11 +313,11 @@ public class Shape extends Extension implements EventFactory {
    */
   public boolean input_selected (Window dest) {
     boolean enabled;
-    RequestOutputStream o = display.out;
+    RequestOutputStream o = display.getResponseOutputStream();
     synchronized (o) {
       o.beginRequest (major_opcode, 6, 2);
       o.writeInt32 (dest.id);
-      ResponseInputStream i = display.in;
+      ResponseInputStream i = display.getResponseInputStream();
       synchronized (i) {
         i.readReply (o);
         i.skip (1);
@@ -365,12 +365,12 @@ public class Shape extends Extension implements EventFactory {
   public RectanglesInfo rectangles (Window window, int kind) {
 
     RectanglesInfo info;
-    RequestOutputStream o = display.out;
+    RequestOutputStream o = display.getResponseOutputStream();
     synchronized (o) {
       o.beginRequest (major_opcode, 7, 3);
       o.writeInt32 (window.id);
       o.writeInt8 (kind);
-      ResponseInputStream i = display.in;
+      ResponseInputStream i = display.getResponseInputStream();
       synchronized (i) {
         i.readReply (o);
         i.skip (1);

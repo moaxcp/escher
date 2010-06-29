@@ -23,13 +23,9 @@ import java.util.List;
 import java.util.logging.Level;
 
 /** X server connection. */
+// TODO Support Multiple Screens
 public class Display {
 
-    /* 
-     * TODO: fix all the public fields to be private and replace them with
-     * accessors
-     */
-    
     private static java.util.logging.Logger logger;
     static {
 
@@ -45,12 +41,12 @@ public class Display {
     /**
      * The output stream.
      */
-    private RequestOutputStream out;
+    private RequestOutputStream outputStream;
 
     /**
      * The input stream.
      */
-    private ResponseInputStream in;
+    private ResponseInputStream inputStream;
 
     /**
      * The socket.
@@ -66,7 +62,7 @@ public class Display {
      * The display number.
      */
     private int displayNumber;
-
+    
     /**
      *  The display input (Keyboard/mouse) 
      */
@@ -92,67 +88,109 @@ public class Display {
      */
     private HashMap<Integer, VisualInfo> visuals = new HashMap<Integer, VisualInfo>();
        
-    public Pixmap.Format[] pixmapFormats;
+    private Pixmap.Format[] pixmapFormats;
 
-    public int imageByteOrder;
+    private int imageByteOrder;
 
-    public int bitmapFormatBitOrder;
+    private int bitmapFormatBitOrder;
 
-    public int bitmapFormatScanlineUnit;
+    private int bitmapFormatScanlineUnit;
 
-    public int bitmapFormatScanlinePad;
+    private int bitmapFormatScanlinePad;
 
-    public int resourceBase;
+    private int resourceBase;
 
-    public int resourceMask;
+    private int resourceMask;
 
     // Defaults
-    public Color defaultBlack, defaultWhite;
+    private Color defaultBlack, defaultWhite;
 
-    public Colormap defaultColormap;
+    private Colormap defaultColormap;
 
-    public int defaultDepth;
+    private int defaultDepth;
 
-    public Pixmap.Format defaultPixmapFormat;
+    private Pixmap.Format defaultPixmapFormat;
 
     private Window defaultRoot;
 
-    public Screen defaultScreen;
+    private Screen defaultScreen;
 
-    public int defaultScreenNumber;
+    private int defaultScreenNumber;
 
-    int minKeycode;
+    private int minKeycode;
 
-    int maxKeycode;
+    private int maxKeycode;
 
     /**
      * @see Screen#default_gc()
      */
-    public GC defaultGC;
+    private GC defaultGC;
 
     // Resources
-    public Hashtable<Integer, Resource> resources = new Hashtable<Integer, Resource>(257);
+    private Hashtable<Integer, Resource> resources = new Hashtable<Integer, Resource>(257);
 
-    public int resourceIndex;
+    private int resourceIndex;
 
     private Hashtable<Integer, Atom> atomIDs = new Hashtable<Integer, Atom>(257);
 
     private Hashtable<String, Atom> atoms = new Hashtable<String, Atom>(257);
 
     // XCMisc
-    public XCMisc xcmisc;
+    private XCMisc xcmisc;
 
-    public boolean useXcmisc;
+    private boolean useXcmisc;
 
-    public int xcmiscResourceBase;
+    private int xcmiscResourceBase;
 
-    public int xcmiscResourceCount;
+    private int xcmiscResourceCount;
 
     // Extension
-    public boolean bigRequestsPresent;
+    private boolean bigRequestsPresent;
 
-    public int extendedMaximumRequestLength;
+    private int extendedMaximumRequestLength;
 
+    // ScreenSaver blanking
+    
+    public enum ScreenSaverBlanking {
+        NO(0),
+        YES(1),
+        DEFAULT(2);
+        
+        private int codeID;
+        
+        ScreenSaverBlanking(int opID) {
+            this.codeID = opID;
+        }
+        
+        public int getCodeID() {
+            return codeID;
+        }
+        
+        public static ScreenSaverBlanking getOption(boolean b) {
+            return (b) ? ScreenSaverBlanking.NO : ScreenSaverBlanking.YES;
+        }
+    }
+    
+    public enum ScreenSaverExposures {
+        NO(0),
+        YES(1),
+        DEFAULT(2);
+        
+        private int codeID;
+        
+        ScreenSaverExposures(int opID) {
+            this.codeID = opID;
+        }
+        
+        public int getCodeID() {
+            return codeID;
+        }
+        
+        public static ScreenSaverExposures getOption(boolean b) {
+            return (b) ? ScreenSaverExposures.NO : ScreenSaverExposures.YES;
+        }
+    }
+    
     /**
      * Major opcodes 128 through 255 are reserved for extensions, totally 128.
      */
@@ -170,41 +208,8 @@ public class Display {
      */
     public ErrorFactory[] extensionErrorFactories = new ErrorFactory[128];
 
-    /**
-     * Open a connection to the display defined by the DISPLAY
-     * environment variable. If this variable is not set, the
-     * connection is opened on {@code localhost:0.0}.
-     * 
-     * #Display(String, int, int)
-     * 
-     * @throws EscherServerConnectionException
-     */
-    public Display() throws EscherServerConnectionException {
-
-        this(new DisplayName(System.getenv("DISPLAY")));
-    }
-
-    /**
-     * #Display(String, int, int)
-     * 
-     * @throws EscherServerConnectionException
-     */
-    public Display(DisplayName name) throws EscherServerConnectionException {
-
-        this(name.hostname, name.display_no, name.screen_no);
-    }
-
-    /**
-     * #Display(String, int, int)
-     * 
-     * @throws EscherServerConnectionException
-     */
-    public Display(String hostname, int display_no)
-            throws EscherServerConnectionException {
-
-        this(hostname, display_no, 0);
-    }
-
+    // <-- Constructors -->
+    
     /**
      * Sets up a display using a connection over the specified <code>socket</code>.
      * This should be used when there is a need to use non-TCP sockets, like
@@ -215,20 +220,20 @@ public class Display {
      *            the socket to use for that connection
      * @param hostname
      *            the hostname to connect to
-     * @param display_no
+     * @param displayNumber
      *            the display number
-     * @param screen_no
+     * @param screenNumber
      *            the screen number
      * @throws EscherServerConnectionException
      */
-    public Display(Socket socket, String hostname,
-                   int display_no, int screen_no)
+    public Display(Socket socket, String hostname, int displayNumber, int screenNumber)
             throws EscherServerConnectionException {
 
-        defaultScreenNumber = screen_no;
-        this.hostname = hostname;
-        this.displayNumber = display_no;
-        this.socket = socket;
+        setDefaultScreenNumber(screenNumber);
+        setHostname(hostname);
+        setDisplayNumber(displayNumber);
+        setSocket(socket);
+        
         init_streams();
         init();
     }
@@ -237,21 +242,24 @@ public class Display {
      * @throws EscherServerConnectionException
      * @see <a href="XOpenDisplay.html">XOpenDisplay</a>
      */
-    public Display(String hostname, int display_no, int screen_no)
+    public Display(String hostname, int displayNumber, int screenNumber)
             throws EscherServerConnectionException {
         
-        defaultScreenNumber = screen_no;
-        this.displayNumber = display_no;
-        this.hostname = hostname;
+        setDefaultScreenNumber(screenNumber);
+        setHostname(hostname);
+        setDisplayNumber(displayNumber);
         try {
-            socket = new Socket(hostname, 6000 + display_no);
+            System.out.println("Debugging");
+            System.out.println(hostname + ":" + displayNumber + "." + screenNumber);
+            socket = new Socket(hostname, 6000 + displayNumber);
+            setSocket(socket);
         } catch (IOException ex) {
             handle_exception(ex);
         }
         init_streams();
         init();
     }
-
+    
     /**
      * Performs client connection to the XServer, initialising all
      * the internal datastructures.
@@ -274,7 +282,7 @@ public class Display {
             auth_data = new byte[0];
         }
 
-        RequestOutputStream o = out;
+        RequestOutputStream o = outputStream;
         synchronized (o) {
             o.writeInt8('B');
             o.writeInt8(0); // Unused.
@@ -288,21 +296,21 @@ public class Display {
             o.writeBytes(auth_data);
             o.writePad(auth_data.length);
             o.flush();
-            ResponseInputStream i = in;
+            ResponseInputStream i = inputStream;
             synchronized (i) {
                 // Don't do read_reply() here, this is not needed and
                 // doesn't work during connection setup.
                 connected = true;
-                init_server_info(i);
+                initServerInfo(i);
             }
         }
 
-        maximumRequestLength = out.setBufferSize(maximumRequestLength);
-        init_keyboard_mapping();
-        init_defaults();
-        init_big_request_extension();
+        maximumRequestLength = outputStream.setBufferSize(maximumRequestLength);
+        initKeyboarMapping();
+        initDefaults();
+        initBigRequestExtension();
     }
-
+    
     /**
      * This method returns a list of visual information that match the
      * specified attributes given in the visual information
@@ -406,6 +414,10 @@ public class Display {
         return visuals;
     }
 
+    /**
+     * Get all screens associated with this display
+     * @return a array of {@link Screen}s
+     */
     public Screen[] getScreens() {
 
         return this.screens;
@@ -463,14 +475,14 @@ public class Display {
     /**
      * @see <a href="XGetSelectionOwner.html">XGetSelectionOwner</a>
      */
-    public Window selection_owner(Atom selection) {
+    public Window selectionOwner(Atom selection) {
 
-        RequestOutputStream o = out;
+        RequestOutputStream o = outputStream;
         int owner_id = -1;
         synchronized (o) {
             o.beginRequest(23, 0, 2);
             o.writeInt32(selection.getID());
-            ResponseInputStream i = in;
+            ResponseInputStream i = inputStream;
             synchronized (i) {
                 i.readReply(o);
                 i.skip(8);
@@ -482,9 +494,9 @@ public class Display {
     }
 
     // opcode 36 - grab server
-    public synchronized void grab_server() {
+    public synchronized void grabServer() {
 
-        RequestOutputStream o = out;
+        RequestOutputStream o = outputStream;
         synchronized (o) {
             o.beginRequest(36, 0, 1);
             o.send();
@@ -492,9 +504,9 @@ public class Display {
     }
 
     // opcode 37 - ungrab server
-    public void ungrab_server() {
+    public void ungrabServer() {
 
-        RequestOutputStream o = out;
+        RequestOutputStream o = outputStream;
         synchronized (o) {
             o.beginRequest(37, 0, 1);
             o.send();
@@ -507,21 +519,21 @@ public class Display {
      *         {@link Enum#next_string()}
      * @see <a href="XListFonts.html">XListFonts</a>
      */
-    public Font[] fonts(String pattern, int max_name_count) {
+    public Font[] fonts(String pattern, int maxNameCount) {
 
         int n = pattern.length();
         int p = RequestOutputStream.pad(n);
 
-        RequestOutputStream o = out;
+        RequestOutputStream o = outputStream;
         Font[] fonts = null;
         synchronized (o) {
             o.beginRequest(49, 0, 2 + (n + p) / 4);
-            o.writeInt16(max_name_count);
+            o.writeInt16(maxNameCount);
             o.writeInt16(n);
             o.writeString8(pattern);
             o.skip(p);
 
-            ResponseInputStream i = in;
+            ResponseInputStream i = inputStream;
             synchronized (i) {
                 i.readReply(o);
                 i.skip(4);
@@ -545,7 +557,7 @@ public class Display {
     /**
      * @see <a href="XListFontsWithInfo.html">XListFontsWithInfo</a>
      */
-    public Data fonts_with_info(String pattern, int max_name_count) {
+    public Data fontsWithInfo(String pattern, int maxNameCount) {
 
         // FIXME: Implement.
         return null;
@@ -555,7 +567,7 @@ public class Display {
     /**
      * @see <a href="XSetFontPath.html">XSetFontPath</a>
      */
-    public void set_font_path(int count, String[] path) {
+    public void setFontPath(int count, String[] path) {
 
         int n = 0;
         for (int i = 0; i < path.length; i++) {
@@ -563,7 +575,7 @@ public class Display {
         }
         int p = RequestOutputStream.pad(n);
 
-        RequestOutputStream o = out;
+        RequestOutputStream o = outputStream;
         synchronized (o) {
             o.beginRequest(51, 0, 2 + (n + p) / 4);
             o.writeInt16(path.length);
@@ -582,16 +594,16 @@ public class Display {
      * Returns the current search path for fonts.
      * 
      * @return the current search path for fonts
-     * @see #set_font_path(int, String[])
+     * @see #setFontPath(int, String[])
      * @see <a href="XGetFontPath.html">XGetFontPath</a>
      */
-    public String[] font_path() {
+    public String[] fontPath() {
 
-        RequestOutputStream o = out;
+        RequestOutputStream o = outputStream;
         String[] path;
         synchronized (o) {
             o.beginRequest(52, 0, 1);
-            ResponseInputStream i = in;
+            ResponseInputStream i = inputStream;
             synchronized (i) {
                 i.readReply(o);
                 i.skip(4);
@@ -620,18 +632,18 @@ public class Display {
 
         private boolean present;
 
-        private int major_opcode;
+        private int majorOpcode;
 
-        private int first_event;
+        private int firstEvent;
 
-        private int first_error;
+        private int firstError;
 
         ExtensionInfo(ResponseInputStream in) {
 
             present = in.readBool();
-            major_opcode = in.readInt8();
-            first_event = in.readInt8();
-            first_error = in.readInt8();
+            majorOpcode = in.readInt8();
+            firstEvent = in.readInt8();
+            firstError = in.readInt8();
             // System.err.println("first error: " + first_error);
             // Thread.dumpStack ();
         }
@@ -641,19 +653,19 @@ public class Display {
             return present;
         }
 
-        public int major_opcode() {
+        public int majorOpcode() {
 
-            return major_opcode;
+            return majorOpcode;
         }
 
-        public int first_event() {
+        public int firstEvent() {
 
-            return first_event;
+            return firstEvent;
         }
 
-        public int first_error() {
+        public int firstError() {
 
-            return first_error;
+            return firstError;
         }
     }
 
@@ -674,20 +686,20 @@ public class Display {
      * @return
      * @see <a href="XQueryExtension.html">XQueryExtension</a>
      */
-    public ExtensionInfo query_extension(String name) {
+    public ExtensionInfo queryExtension(String name) {
 
         int n = name.length();
         int p = RequestOutputStream.pad(n);
 
         ExtensionInfo info;
-        RequestOutputStream o = out;
+        RequestOutputStream o = outputStream;
         synchronized (o) {
             o.beginRequest(98, 0, 2 + (n + p) / 4);
             o.writeInt16(n);
             o.skip(2);
             o.writeString8(name);
             o.skip(p);
-            ResponseInputStream i = in;
+            ResponseInputStream i = inputStream;
             synchronized (i) {
                 i.readReply(o);
                 i.skip(8);
@@ -708,10 +720,10 @@ public class Display {
     public String[] extensions() {
 
         String[] exts;
-        RequestOutputStream o = out;
+        RequestOutputStream o = outputStream;
         synchronized (o) {
             o.beginRequest(99, 9, 1);
-            ResponseInputStream i = in;
+            ResponseInputStream i = inputStream;
             synchronized (i) {
                 i.readReply(o);
                 i.skip(1);
@@ -746,39 +758,34 @@ public class Display {
      */
     public void bell(int percent) {
 
-        RequestOutputStream o = out;
+        RequestOutputStream o = outputStream;
         synchronized (o) {
             o.beginRequest(104, percent, 1);
             o.send();
         }
     }
 
-    /* FIXME: use enums */
-    public static final int NO = 0;
-    public static final int YES = 1;
-    public static final int DEFAULT = 2;
-    public static final String[] SCREEN_SAVER_STRINGS = {
-                    "no", "yes", "default"
-    };
+    
 
     // opcode 107 - set screen saver
     /**
-     * @param prefer_blanking
+     * @param preferBlanking
      *            valid: {@link #NO}, {@link #YES}, {@link #DEFAULT}
-     * @param allow_exposures
+     * @param allowExposures
      *            valid: {@link #NO}, {@link #YES}, {@link #DEFAULT}
      * @see <a href="XSetScreenSaver.html">XSetScreenSaver</a>
      */
-    public void set_screen_saver(int timeout, int interval,
-                                 int prefer_blanking, int allow_exposures) {
+    public void setScreenSaver(int timeout, int interval,
+                                 ScreenSaverBlanking preferBlanking,
+                                 ScreenSaverExposures allowExposures) {
 
-        RequestOutputStream o = out;
+        RequestOutputStream o = outputStream;
         synchronized (o) {
             o.beginRequest(107, 0, 3);
             o.writeInt16(timeout);
             o.writeInt16(interval);
-            o.writeInt8(prefer_blanking);
-            o.writeInt8(allow_exposures);
+            o.writeInt8(preferBlanking.getCodeID());
+            o.writeInt8(allowExposures.getCodeID());
             o.skip(2);
             o.send();
         }
@@ -795,16 +802,16 @@ public class Display {
 
         private int interval;
 
-        private boolean prefer_blanking;
+        private ScreenSaverBlanking preferBlanking;
 
-        private boolean allow_exposures;
+        private ScreenSaverExposures allowExposures;
 
         ScreenSaverInfo(ResponseInputStream in) {
 
             timeout = in.readInt16();
             interval = in.readInt16();
-            prefer_blanking = in.readBool();
-            allow_exposures = in.readBool();
+            preferBlanking = ScreenSaverBlanking.getOption(in.readBool()); 
+            allowExposures = ScreenSaverExposures.getOption(in.readBool()); 
         }
 
         public int timeout() {
@@ -817,22 +824,22 @@ public class Display {
             return interval;
         }
 
-        public boolean prefer_blanking() {
+        public ScreenSaverBlanking preferBlanking() {
 
-            return prefer_blanking;
+            return preferBlanking;
         }
 
-        public boolean allow_exposures() {
+        public ScreenSaverExposures allowExposures() {
 
-            return allow_exposures;
+            return allowExposures;
         }
 
         public String toString() {
 
             return "#ScreenSaverReply" + "\n  timeout: " + timeout()
                             + "\n  interval: " + interval()
-                            + "\n  prefer-blanking: " + prefer_blanking()
-                            + "\n  allow-exposures: " + allow_exposures();
+                            + "\n  prefer-blanking: " + preferBlanking()
+                            + "\n  allow-exposures: " + allowExposures();
         }
     }
 
@@ -843,13 +850,13 @@ public class Display {
      * @return the screensaver control values
      * @see <a href="XGetScreenSaver.html">XGetScreenSaver</a>
      */
-    public ScreenSaverInfo screen_saver() {
+    public ScreenSaverInfo screenSaver() {
 
         ScreenSaverInfo info;
-        RequestOutputStream o = out;
+        RequestOutputStream o = outputStream;
         synchronized (o) {
             o.beginRequest(108, 0, 1);
-            ResponseInputStream i = in;
+            ResponseInputStream i = inputStream;
             synchronized (i) {
                 i.readReply(o);
                 i.skip(8);
@@ -871,15 +878,15 @@ public class Display {
      * @see <a href="XAddHost.html">XAddHost</a>
      * @see <a href="XRemoveHost.html">XRemoveHost</a>
      */
-    public void change_hosts(int mode, int family, byte[] host) {
+    public void changeHosts(Host.ChangeOperation mode, Host.InternetFamily family, byte[] host) {
 
         int n = host.length;
         int p = RequestOutputStream.pad(n);
 
-        RequestOutputStream o = out;
+        RequestOutputStream o = outputStream;
         synchronized (o) {
-            o.beginRequest(109, mode, 2 + (n + p) / 4);
-            o.writeInt8(family);
+            o.beginRequest(109, mode.getCode(), 2 + (n + p) / 4);
+            o.writeInt8(family.getCode());
             o.skip(1);
             o.writeInt16(n);
             o.writeBytes(host);
@@ -888,64 +895,6 @@ public class Display {
         }
     }
 
-    /**
-     * Information about a host.
-     * 
-     * @see Display#list_hosts()
-     */
-    public static class Host {
-
-        public static final int INTERNET = 0;
-
-        public static final int DECNET = 1;
-
-        public static final int CHAOS = 2;
-
-        public int family;
-
-        public byte[] address;
-
-        /**
-         * Reads one Host instance from a ResponseInputStream.
-         * 
-         * @param in
-         *            the input stream to read from
-         */
-        Host(ResponseInputStream in) {
-
-            family = in.readInt8();
-            in.skip(1);
-            int add_len = in.readInt16();
-            address = new byte[add_len];
-            in.readData(address);
-            in.pad(add_len);
-        }
-    }
-
-    /**
-     * Hosts currently on the access control list and whether use of the list at
-     * connection setup is currently enabled or disabled.
-     * 
-     * @see Display#list_hosts
-     */
-    public static class HostsInfo {
-
-        public boolean mode;
-
-        Host[] hosts;
-
-        HostsInfo(ResponseInputStream in) {
-
-            mode = in.readBool();
-            in.skip(6);
-            int num_hosts = in.readInt16();
-            in.skip(22);
-            hosts = new Host[num_hosts];
-            for (int i = 0; i < num_hosts; i++)
-                hosts[i] = new Host(in);
-        }
-
-    }
 
     // opcode 110 - list hosts
     /**
@@ -954,13 +903,13 @@ public class Display {
      * 
      * @see <a href="XListHosts.html">XListHosts</a>
      */
-    public HostsInfo list_hosts() {
+    public HostsInfo listHosts() {
 
         HostsInfo info;
-        RequestOutputStream o = out;
+        RequestOutputStream o = outputStream;
         synchronized (o) {
             o.beginRequest(110, 0, 1);
-            ResponseInputStream i = in;
+            ResponseInputStream i = inputStream;
             synchronized (i) {
                 i.readReply(o);
                 i.skip(1);
@@ -970,21 +919,17 @@ public class Display {
         return info;
     }
 
-    public static final int ENABLE = 0;
-
-    public static final int DISABLE = 1;
-
     // opcode 111 - set access control
     /**
      * @param mode
      *            valid: {@link #ENABLE}, {@link #DISABLE}
      * @see <a href="XSetAccessControl.html">XSetAccessControl</a>
      */
-    public void set_access_control(int mode) {
+    public void setAccessControl(Host.AccessControl mode) {
 
-        RequestOutputStream o = out;
+        RequestOutputStream o = outputStream;
         synchronized (o) {
-            o.beginRequest(111, mode, 1);
+            o.beginRequest(111, mode.getCode(), 1);
             o.send();
         }
     }
@@ -993,21 +938,15 @@ public class Display {
     /**
      * @see <a href="XKillClient.html">XKillClient</a>
      */
-    public void kill_client(Resource resource) {
+    public void killClient(Resource resource) {
 
-        RequestOutputStream o = out;
+        RequestOutputStream o = outputStream;
         synchronized (o) {
             o.beginRequest(113, 0, 2);
             o.writeInt32(resource.id);
             o.send();
         }
     }
-
-    public static final int DESTROY = 0;
-
-    public static final int RETAIN_PERMANENT = 1;
-
-    public static final int RETAIN_TEMPORARY = 2;
 
     // opcode 112 - set close down mode
     /**
@@ -1016,18 +955,14 @@ public class Display {
      *            {@link #RETAIN_TEMPORARY}
      * @see <a href="XSetCloseDownMode.html">XSetCloseDownMode</a>
      */
-    public void set_close_down_mode(int mode) {
+    public void setCloseDownMode(Host.CloseDownMethod mode) {
 
-        RequestOutputStream o = out;
+        RequestOutputStream o = outputStream;
         synchronized (o) {
-            o.beginRequest(112, mode, 1);
+            o.beginRequest(112, mode.getCode(), 1);
             o.send();
         }
     }
-
-    public static final int ACTIVATE = 0;
-
-    public static final int RESET = 1;
 
     // opcode 115 - force screen saver
     /**
@@ -1035,11 +970,11 @@ public class Display {
      *            valid: {@link #ACTIVATE}, {@link #RESET}
      * @see <a href="XForceScreenSaver.html">XForceScreenSaver</a>
      */
-    public void force_screen_saver(int mode) {
+    public void forceScreenSaver(Host.ForceScreenSaver mode) {
 
-        RequestOutputStream o = out;
+        RequestOutputStream o = outputStream;
         synchronized (o) {
-            o.beginRequest(115, mode, 1);
+            o.beginRequest(115, mode.getCode(), 1);
             o.send();
         }
     }
@@ -1068,7 +1003,7 @@ public class Display {
      * use these extension requests behind the scenes when it has exhausted its
      * current pool of resource IDs.
      */
-    public int allocate_id(Object object) {
+    public int allocateID(Object object) {
 
         /*
          * If XC-MISC is present, we use it. Otherwise, we fall back to allocate X
@@ -1084,7 +1019,7 @@ public class Display {
 
         if (!useXcmisc) {
             int id = resourceIndex++ | resourceBase;
-            resources.put(new Integer(id), object);
+            resources.put(id, (Resource) object);
             return id;
         }
 
@@ -1115,8 +1050,8 @@ public class Display {
 
         // FIXME: Implement more sensible shutdown.
         try {
-            in.close();
-            out.close();
+            inputStream.close();
+            outputStream.close();
             socket.close();
         } catch (IOException ex) {
             handle_exception(ex);
@@ -1141,7 +1076,7 @@ public class Display {
      * XPutImage) is permitted but not required; an Xlib implementation may choose
      * to split the data across multiple smaller requests instead.
      */
-    public void init_big_request_extension() {
+    public void initBigRequestExtension() {
 
         try {
             BigRequests big = new BigRequests(this);
@@ -1153,7 +1088,7 @@ public class Display {
         }
     }
 
-    public void init_defaults() {
+    public void initDefaults() {
 
         defaultScreen = screens[defaultScreenNumber];
         defaultRoot = defaultScreen.root(); // before init default_gc
@@ -1163,9 +1098,9 @@ public class Display {
         defaultBlack = new Color(defaultScreen.black_pixel);
         defaultWhite = new Color(defaultScreen.white_pixel);
 
-        for (int i = pixmapFormats.length - 1; i >= 0; i--) {
-            if (pixmapFormats[i].getDepth() == defaultDepth) {
-                defaultPixmapFormat = pixmapFormats[i];
+        for (Pixmap.Format px : pixmapFormats) {
+            if (px.getDepth() == defaultDepth) {
+                defaultPixmapFormat = px;
                 break;
             }
         }
@@ -1177,7 +1112,7 @@ public class Display {
      * 
      * @throws EscherServerConnectionException
      */
-    private void init_server_info(ResponseInputStream i) throws EscherServerConnectionException {
+    private void initServerInfo(ResponseInputStream i) throws EscherServerConnectionException {
 
         int accepted = i.readInt8();
         boolean connectionFailed = false;
@@ -1303,7 +1238,7 @@ public class Display {
     /**
      * Initializes the keyboard mapping.
      */
-    private void init_keyboard_mapping() {
+    private void initKeyboarMapping() {
 
         input = new Input(this, minKeycode, maxKeycode);
         input.keyboard_mapping();
@@ -1311,7 +1246,7 @@ public class Display {
 
     public Event next_event() {
 
-        return in.readEvent();
+        return inputStream.readEvent();
     }
 
     public String toString() {
@@ -1385,7 +1320,7 @@ public class Display {
              * the reply of input focus? Some event may come after that?
              */
             try {
-                in.skip(in.available());
+                inputStream.skip(inputStream.available());
             } catch (IOException ie) {
                 throw new java.lang.Error(
                                           "Failed to clear socket input stream: "
@@ -1409,16 +1344,16 @@ public class Display {
             OutputStream o = socket.getOutputStream();
             //BufferedOutputStream buf_out = new BufferedOutputStream (o, 512);
             if (_debug != null)
-                out = new DebugRequestOutputStream(o, this);
+                outputStream = new DebugRequestOutputStream(o, this);
             else
-                out = new RequestOutputStream(o, this);
+                outputStream = new RequestOutputStream(o, this);
 
             // Create buffered response input stream.
             InputStream sock_in = socket.getInputStream();
             // Buffer space for 4 response messages. More are hardly needed I'd
             // think.
             BufferedInputStream buf_in = new BufferedInputStream(sock_in, 128);
-            in = new ResponseInputStream(buf_in, this);
+            inputStream = new ResponseInputStream(buf_in, this);
             
         } catch (IOException ex) {
             handle_exception(ex);
@@ -1427,9 +1362,9 @@ public class Display {
 
     public void flush() {
 
-        synchronized (out) {
-            out.send();
-            out.flush();
+        synchronized (outputStream) {
+            outputStream.send();
+            outputStream.flush();
         }
     }
 
@@ -1443,6 +1378,8 @@ public class Display {
 
         ex.printStackTrace();
     }
+    
+    // Accessors
     
     synchronized void addVisual(VisualInfo xVisual) {
         
@@ -1463,6 +1400,492 @@ public class Display {
     
     synchronized Atom getAtom(String name) {
         return atomIDs.get(name);
+    }    
+    
+    public ResponseInputStream getResponseInputStream() {
+
+        return inputStream;
     }
+
+    public RequestOutputStream getResponseOutputStream() {
+
+        return outputStream;
+    }
+
+    // Gets and Set's    
+
+    public Socket getSocket() {
+    
+        return socket;
+    }
+
+    
+    public String getHostname() {
+    
+        return hostname;
+    }
+
+    
+    public int getDisplayNumber() {
+    
+        return displayNumber;
+    }
+
+    
+    public Input getInput() {
+    
+        return input;
+    }
+
+    
+    public boolean isConnected() {
+    
+        return connected;
+    }
+
+    
+    public int getReleaseNumber() {
+    
+        return releaseNumber;
+    }
+
+    
+    public String getVendor() {
+    
+        return vendor;
+    }
+
+    
+    public int getMaximumRequestLength() {
+    
+        return maximumRequestLength;
+    }
+
+    
+    public HashMap<Integer, VisualInfo> getVisuals() {
+    
+        return visuals;
+    }
+
+    
+    public Pixmap.Format[] getPixmapFormats() {
+    
+        return pixmapFormats;
+    }
+
+    
+    public int getImageByteOrder() {
+    
+        return imageByteOrder;
+    }
+
+    
+    public int getBitmapFormatBitOrder() {
+    
+        return bitmapFormatBitOrder;
+    }
+
+    
+    public int getBitmapFormatScanlineUnit() {
+    
+        return bitmapFormatScanlineUnit;
+    }
+
+    
+    public int getBitmapFormatScanlinePad() {
+    
+        return bitmapFormatScanlinePad;
+    }
+
+    
+    public int getResourceBase() {
+    
+        return resourceBase;
+    }
+
+    
+    public int getResourceMask() {
+    
+        return resourceMask;
+    }
+
+    
+    public Color getDefaultBlack() {
+    
+        return defaultBlack;
+    }
+
+    
+    public Color getDefaultWhite() {
+    
+        return defaultWhite;
+    }
+
+    
+    public Colormap getDefaultColormap() {
+    
+        return defaultColormap;
+    }
+
+    
+    public int getDefaultDepth() {
+    
+        return defaultDepth;
+    }
+
+    
+    public Pixmap.Format getDefaultPixmapFormat() {
+    
+        return defaultPixmapFormat;
+    }
+
+    
+    public Window getDefaultRoot() {
+    
+        return defaultRoot;
+    }
+
+    
+    public Screen getDefaultScreen() {
+    
+        return defaultScreen;
+    }
+
+    
+    public int getDefaultScreenNumber() {
+    
+        return defaultScreenNumber;
+    }
+
+    
+    public int getMinKeycode() {
+    
+        return minKeycode;
+    }
+
+    
+    public int getMaxKeycode() {
+    
+        return maxKeycode;
+    }
+
+    
+    public GC getDefaultGC() {
+    
+        return defaultGC;
+    }
+
+    
+    public Hashtable<Integer, Resource> getResources() {
+    
+        return resources;
+    }
+
+    
+    public int getResourceIndex() {
+    
+        return resourceIndex;
+    }
+
+    
+    public XCMisc getXcmisc() {
+    
+        return xcmisc;
+    }
+
+    
+    public boolean isUseXcmisc() {
+    
+        return useXcmisc;
+    }
+
+    
+    public int getXcmiscResourceBase() {
+    
+        return xcmiscResourceBase;
+    }
+
+    
+    public int getXcmiscResourceCount() {
+    
+        return xcmiscResourceCount;
+    }
+
+    
+    public boolean isBigRequestsPresent() {
+    
+        return bigRequestsPresent;
+    }
+
+    
+    public int getExtendedMaximumRequestLength() {
+    
+        return extendedMaximumRequestLength;
+    }
+
+    
+    public String[] getExtensionOpcodeStrings() {
+    
+        return extensionOpcodeStrings;
+    }
+
+    
+    public String[][] getExtensionMinorOpcodeStrings() {
+    
+        return extensionMinorOpcodeStrings;
+    }
+
+    
+    public EventFactory[] getExtensionEventFactories() {
+    
+        return extensionEventFactories;
+    }
+
+    
+    public ErrorFactory[] getExtensionErrorFactories() {
+    
+        return extensionErrorFactories;
+    }
+
+    
+    public void setSocket(Socket socket) {
+    
+        this.socket = socket;
+    }
+
+    
+    public void setHostname(String hostname) {
+    
+        this.hostname = hostname;
+    }
+
+    
+    public void setDisplayNumber(int displayNumber) {
+    
+        this.displayNumber = displayNumber;
+    }
+
+    
+    public void setInput(Input input) {
+    
+        this.input = input;
+    }
+
+    
+    public void setConnected(boolean connected) {
+    
+        this.connected = connected;
+    }
+
+    
+    public void setReleaseNumber(int releaseNumber) {
+    
+        this.releaseNumber = releaseNumber;
+    }
+
+    
+    public void setVendor(String vendor) {
+    
+        this.vendor = vendor;
+    }
+
+    
+    public void setMaximumRequestLength(int maximumRequestLength) {
+    
+        this.maximumRequestLength = maximumRequestLength;
+    }
+
+    
+    public void setScreens(Screen[] screens) {
+    
+        this.screens = screens;
+    }
+
+    
+    public void setVisuals(HashMap<Integer, VisualInfo> visuals) {
+    
+        this.visuals = visuals;
+    }
+
+    
+    public void setPixmapFormats(Pixmap.Format[] pixmapFormats) {
+    
+        this.pixmapFormats = pixmapFormats;
+    }
+
+    
+    public void setImageByteOrder(int imageByteOrder) {
+    
+        this.imageByteOrder = imageByteOrder;
+    }
+
+    
+    public void setBitmapFormatBitOrder(int bitmapFormatBitOrder) {
+    
+        this.bitmapFormatBitOrder = bitmapFormatBitOrder;
+    }
+
+    
+    public void setBitmapFormatScanlineUnit(int bitmapFormatScanlineUnit) {
+    
+        this.bitmapFormatScanlineUnit = bitmapFormatScanlineUnit;
+    }
+
+    
+    public void setBitmapFormatScanlinePad(int bitmapFormatScanlinePad) {
+    
+        this.bitmapFormatScanlinePad = bitmapFormatScanlinePad;
+    }
+
+    
+    public void setResourceBase(int resourceBase) {
+    
+        this.resourceBase = resourceBase;
+    }
+
+    
+    public void setResourceMask(int resourceMask) {
+    
+        this.resourceMask = resourceMask;
+    }
+
+    
+    public void setDefaultBlack(Color defaultBlack) {
+    
+        this.defaultBlack = defaultBlack;
+    }
+
+    
+    public void setDefaultWhite(Color defaultWhite) {
+    
+        this.defaultWhite = defaultWhite;
+    }
+
+    
+    public void setDefaultColormap(Colormap defaultColormap) {
+    
+        this.defaultColormap = defaultColormap;
+    }
+
+    
+    public void setDefaultDepth(int defaultDepth) {
+    
+        this.defaultDepth = defaultDepth;
+    }
+
+    
+    public void setDefaultPixmapFormat(Pixmap.Format defaultPixmapFormat) {
+    
+        this.defaultPixmapFormat = defaultPixmapFormat;
+    }
+
+    
+    public void setDefaultRoot(Window defaultRoot) {
+    
+        this.defaultRoot = defaultRoot;
+    }
+
+    
+    public void setDefaultScreen(Screen defaultScreen) {
+    
+        this.defaultScreen = defaultScreen;
+    }
+
+    
+    public void setDefaultScreenNumber(int defaultScreenNumber) {
+    
+        this.defaultScreenNumber = defaultScreenNumber;
+    }
+
+    
+    public void setMinKeycode(int minKeycode) {
+    
+        this.minKeycode = minKeycode;
+    }
+
+    
+    public void setMaxKeycode(int maxKeycode) {
+    
+        this.maxKeycode = maxKeycode;
+    }
+
+    
+    public void setDefaultGC(GC defaultGC) {
+    
+        this.defaultGC = defaultGC;
+    }
+
+    
+    public void setResources(Hashtable<Integer, Resource> resources) {
+    
+        this.resources = resources;
+    }
+
+    
+    public void setResourceIndex(int resourceIndex) {
+    
+        this.resourceIndex = resourceIndex;
+    }
+
+    
+    public void setXcmisc(XCMisc xcmisc) {
+    
+        this.xcmisc = xcmisc;
+    }
+
+    
+    public void setUseXcmisc(boolean useXcmisc) {
+    
+        this.useXcmisc = useXcmisc;
+    }
+
+    
+    public void setXcmiscResourceBase(int xcmiscResourceBase) {
+    
+        this.xcmiscResourceBase = xcmiscResourceBase;
+    }
+
+    
+    public void setXcmiscResourceCount(int xcmiscResourceCount) {
+    
+        this.xcmiscResourceCount = xcmiscResourceCount;
+    }
+
+    
+    public void setBigRequestsPresent(boolean bigRequestsPresent) {
+    
+        this.bigRequestsPresent = bigRequestsPresent;
+    }
+
+    
+    public void setExtendedMaximumRequestLength(int extendedMaximumRequestLength) {
+    
+        this.extendedMaximumRequestLength = extendedMaximumRequestLength;
+    }
+
+    
+    public void setExtensionOpcodeStrings(String[] extensionOpcodeStrings) {
+    
+        this.extensionOpcodeStrings = extensionOpcodeStrings;
+    }
+
+    
+    public void setExtensionMinorOpcodeStrings(String[][] extensionMinorOpcodeStrings) {
+    
+        this.extensionMinorOpcodeStrings = extensionMinorOpcodeStrings;
+    }
+
+    
+    public void setExtensionEventFactories(EventFactory[] extensionEventFactories) {
+    
+        this.extensionEventFactories = extensionEventFactories;
+    }
+
+    
+    public void setExtensionErrorFactories(ErrorFactory[] extensionErrorFactories) {
+    
+        this.extensionErrorFactories = extensionErrorFactories;
+    }
+    
     
 }

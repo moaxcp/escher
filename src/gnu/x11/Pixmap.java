@@ -83,7 +83,7 @@ public class Pixmap extends Drawable {
         this.width = width;
         this.height = height;
 
-        RequestOutputStream o = display.out;
+        RequestOutputStream o = display.getResponseOutputStream();
         synchronized (o) {
             o.beginRequest(53, depth, 4);
             o.writeInt32(id);
@@ -99,7 +99,7 @@ public class Pixmap extends Drawable {
      */
     public Pixmap(Display display, int width, int height) {
 
-        this(display.getRootWindow(), width, height, display.defaultDepth);
+        this(display.getRootWindow(), width, height, display.getDefaultDepth());
     }
 
     /**
@@ -115,7 +115,7 @@ public class Pixmap extends Drawable {
      */
     public Pixmap(Drawable drawable) {
 
-        this(drawable, drawable.display.defaultDepth);
+        this(drawable, drawable.display.getDefaultDepth());
     }
 
     // opcode 54 - free pixmap
@@ -124,7 +124,7 @@ public class Pixmap extends Drawable {
      */
     public void free() {
 
-        RequestOutputStream o = display.out;
+        RequestOutputStream o = display.getResponseOutputStream();
         synchronized (o) {
             o.beginRequest(54, 0, 2);
             o.writeInt32(id);

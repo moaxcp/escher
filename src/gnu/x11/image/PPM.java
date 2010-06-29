@@ -45,7 +45,7 @@ public class PPM extends ZPixmap { // TODO
         // fill up data
 
         init();
-        Colormap cmap = display.defaultColormap;
+        Colormap cmap = display.getDefaultColormap();
 
         for (int y = 0; y < height; y++)
             for (int x = 0; x < width; x++) {

@@ -160,7 +160,7 @@ public class Cursor extends Resource {
                  int bg_r, int bg_g, int bg_b, int x, int y) { 
     super (src.display);
 
-    RequestOutputStream o = display.out;
+    RequestOutputStream o = display.getResponseOutputStream();
     synchronized (o) {
       o.beginRequest (93, 0, 8);
       o.writeInt32 (id);
@@ -184,7 +184,7 @@ public class Cursor extends Resource {
                       int mask_char, int fg_r, int fg_g, int fg_b, 
                       int bg_r, int bg_g, int bg_b) {
 
-    RequestOutputStream o = display.out;
+    RequestOutputStream o = display.getResponseOutputStream();
     synchronized (o) {
       o.beginRequest (94, 0, 8);
       o.writeInt32 (id);
@@ -209,7 +209,7 @@ public class Cursor extends Resource {
    * @see <a href="XFreeCursor.html">XFreeCursor</a>
    */
   public void free () {
-    RequestOutputStream o = display.out;
+    RequestOutputStream o = display.getResponseOutputStream();
     synchronized (o) {
       o.beginRequest (95, 0, 2);
       o.writeInt32 (id);
@@ -224,7 +224,7 @@ public class Cursor extends Resource {
    */
   public void recolor (RGB foreground, RGB background) {
 
-    RequestOutputStream o = display.out;
+    RequestOutputStream o = display.getResponseOutputStream();
     synchronized (o) {
       o.beginRequest (96, 0, 5);
       o.writeInt32 (id);

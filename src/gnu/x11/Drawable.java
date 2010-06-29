@@ -64,11 +64,11 @@ public abstract class Drawable extends Resource {
     public GeometryInfo get_geometry() {
 
         GeometryInfo info;
-        RequestOutputStream o = display.out;
+        RequestOutputStream o = display.getResponseOutputStream();
         synchronized (o) {
             o.beginRequest(14, 0, 2);
             o.writeInt32(id);
-            ResponseInputStream i = display.in;
+            ResponseInputStream i = display.getResponseInputStream();
             synchronized (i) {
                 i.readReply(o);
                 i.skip(1);
@@ -107,7 +107,7 @@ public abstract class Drawable extends Resource {
     public void copy_area(Drawable src, GC gc, int src_x, int src_y, int width,
                           int height, int dst_x, int dst_y) {
 
-        RequestOutputStream o = display.out;
+        RequestOutputStream o = display.getResponseOutputStream();
         synchronized (o) {
             o.beginRequest(62, 0, 7);
             o.writeInt32(src.id); // Src-drawable.
@@ -131,7 +131,7 @@ public abstract class Drawable extends Resource {
                            int dst_x, int dst_y, int width, int height,
                            int bit_plane) {
 
-        RequestOutputStream o = display.out;
+        RequestOutputStream o = display.getResponseOutputStream();
         synchronized (o) {
             o.beginRequest(63, 0, 8);
             o.writeInt32(src.id);
@@ -182,7 +182,7 @@ public abstract class Drawable extends Resource {
                            int coordinate_mode) {
 
         // FIXME: Handle aggregation.
-        RequestOutputStream o = display.out;
+        RequestOutputStream o = display.getResponseOutputStream();
         synchronized (o) {
             o.beginRequest(64, coordinate_mode, 3 + npoints);
             o.writeInt32(id);
@@ -215,7 +215,7 @@ public abstract class Drawable extends Resource {
 
         // FIXME: Handle aggregation.
         int npoints = points.length;
-        RequestOutputStream o = display.out;
+        RequestOutputStream o = display.getResponseOutputStream();
         synchronized (o) {
             o.beginRequest(64, coordinate_mode, 3 + points.length);
             o.writeInt32(id);
@@ -249,7 +249,7 @@ public abstract class Drawable extends Resource {
                           int coordinate_mode) {
 
         // FIXME: Handle aggregation.
-        RequestOutputStream o = display.out;
+        RequestOutputStream o = display.getResponseOutputStream();
         synchronized (o) {
             o.beginRequest(65, coordinate_mode, 3 + npoints);
             o.writeInt32(id);
@@ -266,7 +266,7 @@ public abstract class Drawable extends Resource {
                           int coordinate_mode, boolean close) {
 
         // FIXME: Handle aggregation.
-        RequestOutputStream o = display.out;
+        RequestOutputStream o = display.getResponseOutputStream();
         synchronized (o) {
             o.beginRequest(65, coordinate_mode, 3 + npoints + (close ? 1 : 0));
             o.writeInt32(id);
@@ -299,7 +299,7 @@ public abstract class Drawable extends Resource {
 
         // FIXME: Handle aggregation.
         int npoints = points.length;
-        RequestOutputStream o = display.out;
+        RequestOutputStream o = display.getResponseOutputStream();
         synchronized (o) {
             o.beginRequest(65, coordinate_mode, 3 + points.length);
             o.writeInt32(id);
@@ -328,7 +328,7 @@ public abstract class Drawable extends Resource {
         // FIXME: Handle aggregation.
 
         int nsegs = segments.length;
-        RequestOutputStream o = display.out;
+        RequestOutputStream o = display.getResponseOutputStream();
         synchronized (o) {
             o.beginRequest(66, 0, 3 + 2 * nsegs);
             o.writeInt32(id);
@@ -362,7 +362,7 @@ public abstract class Drawable extends Resource {
         // FIXME: Handle aggregation.
 
         int nrects = rectangles.length;
-        RequestOutputStream o = display.out;
+        RequestOutputStream o = display.getResponseOutputStream();
         synchronized (o) {
             o.beginRequest(67, 0, 3 + 2 * nrects);
             o.writeInt32(id);
@@ -381,7 +381,7 @@ public abstract class Drawable extends Resource {
     // opcode 68 - poly arc
     public void poly_arc(GC gc, Arc[] arcs) {
 
-        RequestOutputStream o = display.out;
+        RequestOutputStream o = display.getResponseOutputStream();
         synchronized (o) {
             o.beginRequest(68, 0, 3 + 3 * arcs.length);
             o.writeInt32(id);
@@ -401,7 +401,7 @@ public abstract class Drawable extends Resource {
     // opcode 71 - poly fill arc
     public void poly_fill_arc(GC gc, Arc[] arcs) {
 
-        RequestOutputStream o = display.out;
+        RequestOutputStream o = display.getResponseOutputStream();
         synchronized (o) {
             o.beginRequest(71, 0, 3 + 3 * arcs.length);
             o.writeInt32(id);
@@ -440,7 +440,7 @@ public abstract class Drawable extends Resource {
      */
     public void fill_poly(GC gc, Point[] points, int shape, int coordinate_mode) {
 
-        RequestOutputStream o = display.out;
+        RequestOutputStream o = display.getResponseOutputStream();
         synchronized (o) {
             o.beginRequest(69, 0, 4 + points.length);
             o.writeInt32(id);
@@ -460,7 +460,7 @@ public abstract class Drawable extends Resource {
     public void fill_poly(GC gc, int[] xpoints, int[] ypoints, int npoints,
                           int shape, int coordinate_mode) {
 
-        RequestOutputStream o = display.out;
+        RequestOutputStream o = display.getResponseOutputStream();
         synchronized (o) {
             o.beginRequest(69, 0, 4 + npoints);
             o.writeInt32(id);
@@ -478,7 +478,7 @@ public abstract class Drawable extends Resource {
     // opcode 72 - put image
     public void put_small_image(GC gc, Image image, int y1, int y2, int x, int y) {
 
-        RequestOutputStream o = display.out;
+        RequestOutputStream o = display.getResponseOutputStream();
         synchronized (o) {
             int offset = image.getLineByteCount() * y1;
             int length = image.getLineByteCount() * (y2 - y1);
@@ -512,7 +512,7 @@ public abstract class Drawable extends Resource {
                        Image.Format format)
             throws EscherUnsupportedScreenBitDepthException {
 
-        RequestOutputStream o = display.out;
+        RequestOutputStream o = display.getResponseOutputStream();
         Image image;
 
         synchronized (o) {
@@ -525,7 +525,7 @@ public abstract class Drawable extends Resource {
             o.writeInt16(height);
             o.writeInt32(planeMask);
 
-            ResponseInputStream i = display.in;
+            ResponseInputStream i = display.getResponseInputStream();
             synchronized (i) {
                 i.readReply(o);
                 i.skip(1);
@@ -545,7 +545,7 @@ public abstract class Drawable extends Resource {
                         xVisual = display.getDefaultVisual();
                     }
                     image = new ZPixmap(display, width, height,
-                                        display.defaultPixmapFormat, data,
+                                        display.getDefaultPixmapFormat(), data,
                                         xVisual);
                 } else {                  
                     // "Now XYPixmaps are something that I never use, and
@@ -573,7 +573,7 @@ public abstract class Drawable extends Resource {
 
         int n = length(texts, 8);
         int p = RequestOutputStream.pad(n);
-        RequestOutputStream o = display.out;
+        RequestOutputStream o = display.getResponseOutputStream();
         synchronized (o) {
             o.beginRequest(74, 0, 4 + (n + p) / 4);
             o.writeInt32(id);
@@ -609,7 +609,7 @@ public abstract class Drawable extends Resource {
         int n = length(texts, 16);
         int p = RequestOutputStream.pad(n);
 
-        RequestOutputStream o = display.out;
+        RequestOutputStream o = display.getResponseOutputStream();
         synchronized (o) {
             o.beginRequest(75, 0, 4 + (n + p) / 4);
 
@@ -650,7 +650,7 @@ public abstract class Drawable extends Resource {
 
         int n = s.length();
         int p = RequestOutputStream.pad(n);
-        RequestOutputStream o = display.out;
+        RequestOutputStream o = display.getResponseOutputStream();
         synchronized (o) {
             o.beginRequest(76, n, 4 + (n + p) / 4);
             o.writeInt32(id);
@@ -671,7 +671,7 @@ public abstract class Drawable extends Resource {
         int n = s.length();
         int p = RequestOutputStream.pad(2 * n);
 
-        RequestOutputStream o = display.out;
+        RequestOutputStream o = display.getResponseOutputStream();
         synchronized (o) {
             o.beginRequest(77, n, 4 + (2 * n + p) / 4);
             o.writeInt32(id);
@@ -698,7 +698,7 @@ public abstract class Drawable extends Resource {
      */
     public Size best_size(int klass, int width, int height) {
 
-        RequestOutputStream o = display.out;
+        RequestOutputStream o = display.getResponseOutputStream();
         int w, h;
         synchronized (o) {
             o.beginRequest(97, klass, 3);
@@ -707,7 +707,7 @@ public abstract class Drawable extends Resource {
             o.writeInt16(height);
             o.send();
 
-            ResponseInputStream i = display.in;
+            ResponseInputStream i = display.getResponseInputStream();
             synchronized (i) {
                 i.readReply(o);
                 i.skip(8);
@@ -744,7 +744,7 @@ public abstract class Drawable extends Resource {
 
         // FIXME: Handle aggregation.
 
-        RequestOutputStream o = display.out;
+        RequestOutputStream o = display.getResponseOutputStream();
         synchronized (o) {
             o.beginRequest(68, 0, 6);
             o.writeInt32(id);
@@ -785,7 +785,7 @@ public abstract class Drawable extends Resource {
 
         // FIXME: Handle aggregation.
 
-        RequestOutputStream o = display.out;
+        RequestOutputStream o = display.getResponseOutputStream();
         synchronized (o) {
             o.beginRequest(71, 0, 6);
             o.writeInt32(id);
@@ -818,7 +818,7 @@ public abstract class Drawable extends Resource {
     public void line(GC gc, int x1, int y1, int x2, int y2) {
 
         // FIXME: Handle aggregation.
-        RequestOutputStream o = display.out;
+        RequestOutputStream o = display.getResponseOutputStream();
         synchronized (o) {
             o.beginRequest(65, ORIGIN, 5);
             o.writeInt32(id);
@@ -833,7 +833,7 @@ public abstract class Drawable extends Resource {
 
     public void segment(GC gc, int x1, int y1, int x2, int y2) {
 
-        RequestOutputStream o = display.out;
+        RequestOutputStream o = display.getResponseOutputStream();
         synchronized (o) {
             if (o.currentOpcode() == 66 && o.fits(8)) {
                 o.increaseLength(2);
@@ -864,7 +864,7 @@ public abstract class Drawable extends Resource {
     public void point(GC gc, int x, int y) {
 
         // FIXME: Handle aggregation.
-        RequestOutputStream o = display.out;
+        RequestOutputStream o = display.getResponseOutputStream();
         synchronized (o) {
             o.beginRequest(64, ORIGIN, 4);
             o.writeInt32(id);
@@ -878,7 +878,7 @@ public abstract class Drawable extends Resource {
     public void put_image(GC gc, Image image, int x, int y) {
 
         // TODO: Make use of big requests when possible.
-        int max_data_byte = display.maximumRequestLength - 24;
+        int max_data_byte = display.getMaximumRequestLength() - 24;
         int lbc = image.getLineByteCount();
         int request_height = lbc > 0 ? max_data_byte
                 / image.getLineByteCount() : 1;
@@ -908,7 +908,7 @@ public abstract class Drawable extends Resource {
 
         // FIXME: Handle aggregation.
 
-        RequestOutputStream o = display.out;
+        RequestOutputStream o = display.getResponseOutputStream();
         synchronized (o) {
             o.beginRequest(67, 0, 5);
             o.writeInt32(id);
@@ -934,7 +934,7 @@ public abstract class Drawable extends Resource {
      */
     public void fill_rectangle(GC gc, int x, int y, int width, int height) {
 
-        RequestOutputStream o = display.out;
+        RequestOutputStream o = display.getResponseOutputStream();
         synchronized (o) {
             if (o.currentOpcode() == 70 && o.getInt32(4) == id
                     && o.getInt32(8) == gc.id) {

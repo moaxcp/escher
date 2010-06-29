@@ -62,7 +62,7 @@ public class Colormap extends Resource {
   public Colormap (Window window, int visualId, int alloc) {
     super (window.display);
 
-    RequestOutputStream o = display.out;
+    RequestOutputStream o = display.getResponseOutputStream();
     synchronized (o) {
       o.beginRequest (78, alloc, 4);
       o.writeInt32 (id);
@@ -79,7 +79,7 @@ public class Colormap extends Resource {
    */
   public void free () {
 
-    RequestOutputStream o = display.out;
+    RequestOutputStream o = display.getResponseOutputStream();
     synchronized (o) {
       o.beginRequest (78, 0, 2);
       o.writeInt32 (id);
@@ -91,7 +91,7 @@ public class Colormap extends Resource {
   public Colormap copyAndFree (int newID) {
 
     Colormap newMap = new Colormap (display, newID);
-    RequestOutputStream o = display.out;
+    RequestOutputStream o = display.getResponseOutputStream();
     synchronized (o) {
       o.beginRequest (80, 0, 3);
       o.writeInt32 (newID);
@@ -107,7 +107,7 @@ public class Colormap extends Resource {
    * @see <a href="XInstallColormap.html">XInstallColormap</a>
    */
   public void install () {
-    RequestOutputStream o = display.out;
+    RequestOutputStream o = display.getResponseOutputStream();
     synchronized (o) {
       o.beginRequest (81, 0, 3);
       o.writeInt32 (id);
@@ -121,7 +121,7 @@ public class Colormap extends Resource {
    * @see <a href="XUninstallColormap.html">XUninstallColormap</a>
    */
   public void uninstall () {
-    RequestOutputStream o = display.out;
+    RequestOutputStream o = display.getResponseOutputStream();
     synchronized (o) {
       o.beginRequest (82, 0, 3);
       o.writeInt32 (id);
@@ -131,7 +131,7 @@ public class Colormap extends Resource {
 
 
   public static Object intern (Display display, int id) {
-    Object value = display.resources.get (new Integer (id));
+    Object value = display.getResources().get (new Integer (id));
     if (value != null) return value;
     return new Colormap (display, id);
   }
@@ -156,7 +156,7 @@ public class Colormap extends Resource {
    * @see <a href="XAllocColor.html">XAllocColor</a>
    */
   public Color allocColor (int red, int green, int blue) {
-    RequestOutputStream o = display.out;
+    RequestOutputStream o = display.getResponseOutputStream();
     Color c;
     synchronized (o) {
       o.beginRequest (84, 0, 4);
@@ -165,7 +165,7 @@ public class Colormap extends Resource {
       o.writeInt16 (green);
       o.writeInt16 (blue);
       o.skip (2);
-      ResponseInputStream i = display.in;
+      ResponseInputStream i = display.getResponseInputStream();
       synchronized (i) {
         i.readReply (o);
         i.skip (8);
@@ -199,7 +199,7 @@ public class Colormap extends Resource {
    */  
   public Color allocNamedColor (String name) {
 
-    RequestOutputStream o = display.out;
+    RequestOutputStream o = display.getResponseOutputStream();
     int n = name.length ();
     int p = RequestOutputStream.pad (n);
 
@@ -211,7 +211,7 @@ public class Colormap extends Resource {
       o.skip (2);
       o.writeString8 (name);
       o.skip (p);
-      ResponseInputStream i = display.in;
+      ResponseInputStream i = display.getResponseInputStream();
       synchronized (i) {
         i.readReply (o);
         i.skip (8);
@@ -252,14 +252,14 @@ public class Colormap extends Resource {
   public ColorCellsReply allocColorCells (boolean contiguous, 
     int color_count, int plane_count) {
 
-    RequestOutputStream o = display.out;
+    RequestOutputStream o = display.getResponseOutputStream();
     ColorCellsReply r;
     synchronized (o) {
       o.beginRequest (86, contiguous ? 1 : 0, 3);
       o.writeInt32 (id);
       o.writeInt16 (color_count);
       o.writeInt16 (plane_count);
-      ResponseInputStream i = display.in;
+      ResponseInputStream i = display.getResponseInputStream();
       synchronized (i) {
         i.readReply (o);
         i.skip (8);
@@ -303,7 +303,7 @@ public class Colormap extends Resource {
                                        int red_count, int green_count,
                                        int blue_count) {
 
-    RequestOutputStream o = display.out;
+    RequestOutputStream o = display.getResponseOutputStream();
     ColorPlaneReply r;
     synchronized (o) {
       o.beginRequest (87, contiguous ? 1 : 0, 4);
@@ -313,7 +313,7 @@ public class Colormap extends Resource {
       o.writeInt16 (green_count);
       o.writeInt16 (blue_count);
 
-      ResponseInputStream i = display.in;
+      ResponseInputStream i = display.getResponseInputStream();
       synchronized (i) {
         i.readReply (o);
         i.skip (8);
@@ -340,7 +340,7 @@ public class Colormap extends Resource {
   public void freeColors (int [] pixels, int planeMask) {
 
     int n = pixels.length;
-    RequestOutputStream o = display.out;
+    RequestOutputStream o = display.getResponseOutputStream();
     synchronized (o) {
       o.beginRequest (88, 0, 3 + n);
       o.writeInt32 (id);
@@ -396,7 +396,7 @@ public class Colormap extends Resource {
   public void storeColors (ColorItem[] items) {
 
     int n = items.length;
-    RequestOutputStream o = display.out;
+    RequestOutputStream o = display.getResponseOutputStream();
     synchronized (o) {
       o.beginRequest (89, 0, 3 + 2 * n);
       o.writeInt32 (id);
@@ -422,7 +422,7 @@ public class Colormap extends Resource {
     int n = name.length ();
     int p = RequestOutputStream.pad (n);
 
-    RequestOutputStream o = display.out;
+    RequestOutputStream o = display.getResponseOutputStream();
     synchronized (o) {
       o.beginRequest (90, do_color, 4 + (n + p) / 4);
       o.writeInt32 (id);
@@ -450,7 +450,7 @@ public class Colormap extends Resource {
    */
   public RGB [] colors (int [] pixels) {
 
-    RequestOutputStream o = display.out;
+    RequestOutputStream o = display.getResponseOutputStream();
     int n = pixels.length;
     RGB [] rgbs;
     synchronized (o) {
@@ -459,7 +459,7 @@ public class Colormap extends Resource {
       for (int j = 0; j < n; j++)
         o.writeInt32 (pixels [j]);
 
-      ResponseInputStream i = display.in;
+      ResponseInputStream i = display.getResponseInputStream();
       synchronized (i) {
         i.readReply (o);
         i.skip (8);
@@ -497,7 +497,7 @@ public class Colormap extends Resource {
 
     int n = name.length ();
     int p = RequestOutputStream.pad (n);
-    RequestOutputStream o = display.out;
+    RequestOutputStream o = display.getResponseOutputStream();
     Color c;
     synchronized (o) {
       o.beginRequest (92, 0, 3 + (n + p) / 4);
@@ -507,7 +507,7 @@ public class Colormap extends Resource {
       o.writeString8 (name);
       o.skip (p);
 
-      ResponseInputStream i = display.in;
+      ResponseInputStream i = display.getResponseInputStream();
       synchronized (i) {
         i.readReply (o);
         i.skip (8);

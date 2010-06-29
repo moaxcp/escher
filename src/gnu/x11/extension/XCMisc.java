@@ -27,13 +27,13 @@ public class XCMisc extends Extension {
     super (display, "XC-MISC", MINOR_OPCODE_STRINGS); 
 
     // check version before any other operations
-    RequestOutputStream o = display.out;
+    RequestOutputStream o = display.getResponseOutputStream();
     synchronized (o) {
 
       o.beginRequest (major_opcode, 0, 2);
       o.writeInt16 (CLIENT_MAJOR_VERSION);
       o.writeInt16 (CLIENT_MINOR_VERSION);
-      ResponseInputStream i = display.in;
+      ResponseInputStream i = display.getResponseInputStream();
       synchronized (i) {
         i.readReply (o);
         i.skip (8);
@@ -59,10 +59,10 @@ public class XCMisc extends Extension {
   // xc-misc opcode 1 - get xid range
   public XIDRange xid_range () {
     XIDRange r;
-    RequestOutputStream o = display.out;
+    RequestOutputStream o = display.getResponseOutputStream();
     synchronized (o) {
       o.beginRequest (major_opcode, 1, 1);
-      ResponseInputStream i = display.in;
+      ResponseInputStream i = display.getResponseInputStream();
       synchronized (i) {
         i.readReply (o);
         i.skip (8);
@@ -78,10 +78,10 @@ public class XCMisc extends Extension {
   public int [] xid_list (int count) {
 
     int [] ids;
-    RequestOutputStream o = display.out;
+    RequestOutputStream o = display.getResponseOutputStream();
     synchronized (o) {
       o.beginRequest (major_opcode, 2, 2);
-      ResponseInputStream i = display.in;
+      ResponseInputStream i = display.getResponseInputStream();
       synchronized (i) {
         i.readReply (o);
         i.skip (8);

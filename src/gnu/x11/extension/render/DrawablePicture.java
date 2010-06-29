@@ -112,7 +112,7 @@ public class DrawablePicture extends Picture {
     super (render.display);
     this.render = render;
 
-    RequestOutputStream o = display.out;
+    RequestOutputStream o = display.getResponseOutputStream();
     synchronized (o) {
       o.beginRequest (render.major_opcode, 4, 5 + attr.count ());
       o.writeInt32 (id);
@@ -130,7 +130,7 @@ public class DrawablePicture extends Picture {
    * @see <a href="XRenderChangePicture.html">XRenderChangePicture</a>
    */
   public void change (Attributes attr) {
-    RequestOutputStream o = display.out;
+    RequestOutputStream o = display.getResponseOutputStream();
     synchronized (o) {
       o.beginRequest (render.major_opcode, 5, 5+attr.count ());
       o.writeInt32 (id);
@@ -149,7 +149,7 @@ public class DrawablePicture extends Picture {
   public void set_clip_rectangles (int x_origin, int y_origin,
     Rectangle [] rectangles) {
 
-    RequestOutputStream o = display.out;
+    RequestOutputStream o = display.getResponseOutputStream();
     synchronized (o) {
       o.beginRequest (render.major_opcode, 7, 3 + 2 * rectangles.length);
       o.writeInt32 (id);
@@ -170,7 +170,7 @@ public class DrawablePicture extends Picture {
    * @see <a href="XRenderFreePicture.html">XRenderFreePicture</a>
    */
   public void free () {
-    RequestOutputStream o = display.out;
+    RequestOutputStream o = display.getResponseOutputStream();
     synchronized (o) {
       o.beginRequest (render.major_opcode, 7, 2);
       o.writeInt32 (id);
@@ -184,7 +184,7 @@ public class DrawablePicture extends Picture {
     DrawablePicture src, int src_x, int src_y, 
     int dst_x, int dst_y, int width, int height) {
 
-    RequestOutputStream o = display.out;
+    RequestOutputStream o = display.getResponseOutputStream();
     synchronized (o) {
       o.beginRequest (render.major_opcode, 9, 8);
       o.writeInt32 (src.id);
@@ -209,7 +209,7 @@ public class DrawablePicture extends Picture {
   public void fill_rectangle (int op, Color color, int x, int y, 
     int width, int height) {
 
-    RequestOutputStream o = display.out;
+    RequestOutputStream o = display.getResponseOutputStream();
     synchronized (o) {
       o.beginRequest (render.major_opcode, 26, 7);
       o.writeInt8 (op);

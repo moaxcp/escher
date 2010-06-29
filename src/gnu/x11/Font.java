@@ -32,7 +32,7 @@ public class Font extends Fontable {
     int n = name.length ();
     int p = RequestOutputStream.pad (n);
 
-    RequestOutputStream o = display.out;
+    RequestOutputStream o = display.getResponseOutputStream();
     synchronized (o) {
       o.beginRequest (45, 0, 3 + (n + p) / 4);
       o.writeInt32 (id);
@@ -50,7 +50,7 @@ public class Font extends Fontable {
    */
   public void close () {
 
-    RequestOutputStream o = display.out;
+    RequestOutputStream o = display.getResponseOutputStream();
     synchronized (o) {
       o.beginRequest (46, 0, 2);
       o.writeInt32 (id);

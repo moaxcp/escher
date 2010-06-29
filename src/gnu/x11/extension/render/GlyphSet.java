@@ -18,7 +18,7 @@ public class GlyphSet extends gnu.x11.Resource {
     super (render.display);
     this.render = render;
 
-    RequestOutputStream o = display.out;
+    RequestOutputStream o = display.getResponseOutputStream();
     synchronized (o) {
       o.beginRequest (render.major_opcode, 17, 3);
       o.writeInt32 (id);
@@ -37,7 +37,7 @@ public class GlyphSet extends gnu.x11.Resource {
     super (src.display);
     render = src.render;
 
-    RequestOutputStream o = display.out;
+    RequestOutputStream o = display.getResponseOutputStream();
     synchronized (o) {
       o.beginRequest (render.major_opcode, 18, 3);
       o.writeInt32 (id);
@@ -64,7 +64,7 @@ public class GlyphSet extends gnu.x11.Resource {
   public void free () {
     // Only free the GlyphSet once.
     if (! disposed) {
-      RequestOutputStream o = display.out;
+      RequestOutputStream o = display.getResponseOutputStream();
       synchronized (o) {
         o.beginRequest (render.major_opcode, 19, 2);
         o.writeInt32 (id);
@@ -98,7 +98,7 @@ public class GlyphSet extends gnu.x11.Resource {
     }
     imageBytes += RequestOutputStream.pad (imageBytes);
     int len = numGlyphs * 4 + imageBytes / 4 + 3;
-    RequestOutputStream o = display.out;
+    RequestOutputStream o = display.getResponseOutputStream();
     Glyph [] glyphs = new Glyph [numGlyphs];
     synchronized (o) {
       o.beginRequest (render.major_opcode, 20, len);
@@ -139,7 +139,7 @@ public class GlyphSet extends gnu.x11.Resource {
    * @param glyphs the glyphs to be freed
    */
   public void free_glyphs (Glyph [] glyphs) {
-    RequestOutputStream o = display.out;
+    RequestOutputStream o = display.getResponseOutputStream();
     synchronized (o) {
       int numGlyphs = 0;
       for (int i = 0; i < glyphs.length; i++) {
