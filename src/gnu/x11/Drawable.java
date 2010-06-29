@@ -1,6 +1,8 @@
 
 package gnu.x11;
 
+import gnu.x11.Host.ChangeOperation;
+import gnu.x11.Host.Shape;
 import gnu.x11.image.Image;
 import gnu.x11.image.ZPixmap;
 
@@ -9,6 +11,79 @@ public abstract class Drawable extends Resource {
 
     public int width, height;
 
+    public enum CoordinateMode {
+        ORIGIN(0),
+        PREVIOUS(1);
+        
+        private int code;
+        
+        CoordinateMode(int cd) {
+            this.code =cd;
+        }
+        
+        public int getCode() {
+            return code;
+        }
+        
+        public static CoordinateMode getOperation(int code) {
+            return code == 0 ? CoordinateMode.ORIGIN : CoordinateMode.PREVIOUS;
+        }
+    }
+    
+    public enum Fill {
+        COMPLEX(0),
+        NONCONVEX(1),
+        CONVEX(2);
+        
+        private int code;
+        
+        Fill(int cd) {
+            this.code =cd;
+        }
+        
+        public int getCode() {
+            return code;
+        }
+        
+        public static Fill getFamily(int code) {
+            switch (code)
+            {
+                case 0: return Fill.COMPLEX;
+                case 1: return Fill.NONCONVEX;
+                case 2: return Fill.CONVEX;
+                
+                default: return Fill.COMPLEX;
+            }
+        }
+    }
+    
+    public enum Shape {
+        CURSOR(0),
+        TILE(1),
+        STIPPLE(2);
+        
+        private int code;
+        
+        Shape(int cd) {
+            this.code =cd;
+        }
+        
+        public int getCode() {
+            return code;
+        }
+        
+        public static Shape getFamily(int code) {
+            switch (code)
+            {
+                case 0: return Shape.CURSOR;
+                case 1: return Shape.TILE;
+                case 2: return Shape.STIPPLE;
+                
+                default: return Shape.CURSOR;
+            }
+        }
+    }
+    
     /** Predefined. */
     public Drawable(int id) {
 
@@ -28,10 +103,10 @@ public abstract class Drawable extends Resource {
     }
 
     public static class GeometryInfo {
-
+        // TODO: To private??
         public int depth;
 
-        public int root_window_id;
+        public int rootWindowID;
 
         public int x;
 
@@ -41,18 +116,18 @@ public abstract class Drawable extends Resource {
 
         public int height;
 
-        public int border_width;
+        public int borderWidth;
 
         GeometryInfo(ResponseInputStream i) {
 
             depth = i.readInt8();
             i.skip(6);
-            root_window_id = i.readInt32();
+            rootWindowID = i.readInt32();
             x = i.readInt16();
             y = i.readInt16();
             width = i.readInt16();
             height = i.readInt16();
-            border_width = i.readInt16();
+            borderWidth = i.readInt16();
             i.skip(10); // Unused.
         }
     }
@@ -61,12 +136,11 @@ public abstract class Drawable extends Resource {
     /**
      * @see <a href="XGetGeometry.html">XGetGeometry</a>
      */
-    public GeometryInfo get_geometry() {
+    public GeometryInfo getGeometry() {
 
         GeometryInfo info;
         RequestOutputStream o = display.getResponseOutputStream();
         synchronized (o) {
-            o.beginRequest(14, 0, 2);
             o.writeInt32(id);
             ResponseInputStream i = display.getResponseInputStream();
             synchronized (i) {
@@ -89,23 +163,23 @@ public abstract class Drawable extends Resource {
      *                the source drawable
      * @param gc
      *                the GC for the operation
-     * @param src_x
+     * @param srcX
      *                the source rectangle, x coordinate
-     * @param src_y
+     * @param srcY
      *                the source rectangle, y coordinate
      * @param width
      *                the width of the area to copy
      * @param height
      *                the height of the area to copy
-     * @param dst_x
+     * @param dstX
      *                the destination rectangle, x coordinate
-     * @param dst_y
+     * @param dstY
      *                the destination rectangle, y coordinate
      * 
      * @see <a href="XCopyArea.html">XCopyArea</a>
      */
-    public void copy_area(Drawable src, GC gc, int src_x, int src_y, int width,
-                          int height, int dst_x, int dst_y) {
+    public void copyArea(Drawable src, GC gc, int srcX, int srcY, int width,
+                          int height, int dstX, int dstY) {
 
         RequestOutputStream o = display.getResponseOutputStream();
         synchronized (o) {
@@ -113,10 +187,10 @@ public abstract class Drawable extends Resource {
             o.writeInt32(src.id); // Src-drawable.
             o.writeInt32(id); // Dst-drawable.
             o.writeInt32(gc.id); // GC.
-            o.writeInt16(src_x);
-            o.writeInt16(src_y);
-            o.writeInt16(dst_x);
-            o.writeInt16(dst_y);
+            o.writeInt16(srcX);
+            o.writeInt16(srcY);
+            o.writeInt16(dstX);
+            o.writeInt16(dstY);
             o.writeInt16(width);
             o.writeInt16(height);
             o.send();
@@ -127,9 +201,9 @@ public abstract class Drawable extends Resource {
     /**
      * @see <a href="XCopyPlane.html">XCopyPlane</a>
      */
-    public void copy_plane(Drawable src, GC gc, int src_x, int src_y,
-                           int dst_x, int dst_y, int width, int height,
-                           int bit_plane) {
+    public void copyPlane(Drawable src, GC gc, int srcX, int srcY,
+                           int dstX, int dstY, int width, int height,
+                           int bitPlane) {
 
         RequestOutputStream o = display.getResponseOutputStream();
         synchronized (o) {
@@ -137,29 +211,16 @@ public abstract class Drawable extends Resource {
             o.writeInt32(src.id);
             o.writeInt32(id);
             o.writeInt32(gc.id);
-            o.writeInt16(src_x);
-            o.writeInt16(src_y);
-            o.writeInt16(dst_x);
-            o.writeInt16(dst_y);
+            o.writeInt16(srcX);
+            o.writeInt16(srcY);
+            o.writeInt16(dstX);
+            o.writeInt16(dstY);
             o.writeInt16(width);
             o.writeInt16(height);
-            o.writeInt16(bit_plane);
+            o.writeInt16(bitPlane);
             o.send();
         }
     }
-
-    /**
-     * Coordinate mode ORIGIN, specifies that points are always considered
-     * relative to the origin.
-     */
-    public static final int ORIGIN = 0;
-
-    /**
-     * Coordinate mode PREVIOUS, specifies that points are considered relative
-     * to the previous point (where the first point is usually considered
-     * relative to the origin).
-     */
-    public static final int PREVIOUS = 1;
 
     // opcode 64 - poly point
     /**
@@ -173,18 +234,18 @@ public abstract class Drawable extends Resource {
      *                the points' y coodinates
      * @param npoints
      *                the number of points
-     * @param coordinate_mode
+     * @param coordinateMode
      *                valid: {@link #ORIGIN}, {@link #PREVIOUS}
      * 
      * @see <a href="XDrawPoints.html">XDrawPoints</a>
      */
-    public void poly_point(GC gc, int[] xpoints, int[] ypoints, int npoints,
-                           int coordinate_mode) {
+    public void polyPoint(GC gc, int[] xpoints, int[] ypoints, int npoints,
+                           CoordinateMode coordinateMode) {
 
         // FIXME: Handle aggregation.
         RequestOutputStream o = display.getResponseOutputStream();
         synchronized (o) {
-            o.beginRequest(64, coordinate_mode, 3 + npoints);
+            o.beginRequest(64, coordinateMode.getCode(), 3 + npoints);
             o.writeInt32(id);
             o.writeInt32(gc.id);
             for (int i = 0; i < npoints; i++) {
@@ -211,18 +272,17 @@ public abstract class Drawable extends Resource {
      * 
      * @see <a href="XDrawPoints.html">XDrawPoints</a>
      */
-    public void poly_point(GC gc, Point[] points, int coordinate_mode) {
+    public void polyPoint(GC gc, Point[] points, CoordinateMode coordinateMode) {
 
         // FIXME: Handle aggregation.
-        int npoints = points.length;
         RequestOutputStream o = display.getResponseOutputStream();
         synchronized (o) {
-            o.beginRequest(64, coordinate_mode, 3 + points.length);
+            o.beginRequest(64, coordinateMode.getCode(), 3 + points.length);
             o.writeInt32(id);
             o.writeInt32(gc.id);
-            for (int i = 0; i < npoints; i++) {
-                o.writeInt16(points[i].x);
-                o.writeInt16(points[i].y);
+            for (Point p : points) {
+                o.writeInt16(p.x);
+                o.writeInt16(p.y);
             }
             o.send();
         }
@@ -240,18 +300,18 @@ public abstract class Drawable extends Resource {
      *                the points' y coodinates
      * @param npoints
      *                the number of points
-     * @param coordinate_mode
+     * @param coordinateMode
      *                valid: {@link #ORIGIN}, {@link #PREVIOUS}
      * 
      * @see <a href="XDrawLines.html">XDrawLines</a>
      */
-    public void poly_line(GC gc, int[] xpoints, int[] ypoints, int npoints,
-                          int coordinate_mode) {
+    public void polyLine(GC gc, int[] xpoints, int[] ypoints, int npoints,
+                          CoordinateMode coordinateMode) {
 
         // FIXME: Handle aggregation.
         RequestOutputStream o = display.getResponseOutputStream();
         synchronized (o) {
-            o.beginRequest(65, coordinate_mode, 3 + npoints);
+            o.beginRequest(65, coordinateMode.getCode(), 3 + npoints);
             o.writeInt32(id);
             o.writeInt32(gc.id);
             for (int i = 0; i < npoints; i++) {
@@ -262,13 +322,13 @@ public abstract class Drawable extends Resource {
         }
     }
 
-    public void poly_line(GC gc, int[] xpoints, int[] ypoints, int npoints,
-                          int coordinate_mode, boolean close) {
+    public void polyLine(GC gc, int[] xpoints, int[] ypoints, int npoints,
+                          CoordinateMode coordinateMode, boolean close) {
 
         // FIXME: Handle aggregation.
         RequestOutputStream o = display.getResponseOutputStream();
         synchronized (o) {
-            o.beginRequest(65, coordinate_mode, 3 + npoints + (close ? 1 : 0));
+            o.beginRequest(65, coordinateMode.getCode(), 3 + npoints + (close ? 1 : 0));
             o.writeInt32(id);
             o.writeInt32(gc.id);
             for (int i = 0; i < npoints; i++) {
@@ -295,13 +355,13 @@ public abstract class Drawable extends Resource {
      * 
      * @see <a href="XDrawLines.html">XDrawLines</a>
      */
-    public void poly_line(GC gc, Point[] points, int coordinate_mode) {
+    public void polyLine(GC gc, Point[] points, CoordinateMode coordinateMode) {
 
         // FIXME: Handle aggregation.
         int npoints = points.length;
         RequestOutputStream o = display.getResponseOutputStream();
         synchronized (o) {
-            o.beginRequest(65, coordinate_mode, 3 + points.length);
+            o.beginRequest(65, coordinateMode.getCode(), 3 + points.length);
             o.writeInt32(id);
             o.writeInt32(gc.id);
             for (int i = 0; i < npoints; i++) {
@@ -323,7 +383,7 @@ public abstract class Drawable extends Resource {
      * 
      * @see <a href="XDrawSegments.html">XDrawSegments</a>
      */
-    public void poly_segment(GC gc, Segment[] segments) {
+    public void polySegment(GC gc, Segment[] segments) {
 
         // FIXME: Handle aggregation.
 
@@ -357,37 +417,34 @@ public abstract class Drawable extends Resource {
      * @see <a href="XFillRectangles.html">XFillRectangles</a>
      * @see Request.Aggregate aggregation
      */
-    public void poly_rectangle(GC gc, Rectangle[] rectangles) {
+    public void polyRectangle(GC gc, Rectangle[] rectangles) {
 
         // FIXME: Handle aggregation.
 
-        int nrects = rectangles.length;
         RequestOutputStream o = display.getResponseOutputStream();
         synchronized (o) {
-            o.beginRequest(67, 0, 3 + 2 * nrects);
+            o.beginRequest(67, 0, 3 + 2 * rectangles.length);
             o.writeInt32(id);
             o.writeInt32(gc.id);
-            for (int i = 0; i < nrects; i++) {
-                Rectangle rect = rectangles[i];
-                o.writeInt16(rect.x);
-                o.writeInt16(rect.y);
-                o.writeInt16(rect.width);
-                o.writeInt16(rect.height);
+            for (Rectangle rec : rectangles) {
+                o.writeInt16(rec.x);
+                o.writeInt16(rec.y);
+                o.writeInt16(rec.width);
+                o.writeInt16(rec.height);
             }
             o.send();
         }
     }
 
     // opcode 68 - poly arc
-    public void poly_arc(GC gc, Arc[] arcs) {
+    public void polyArc(GC gc, Arc[] arcs) {
 
         RequestOutputStream o = display.getResponseOutputStream();
         synchronized (o) {
             o.beginRequest(68, 0, 3 + 3 * arcs.length);
             o.writeInt32(id);
             o.writeInt32(gc.id);
-            for (int i = 0; i < arcs.length; i++) {
-                Arc arc = arcs[i];
+            for (Arc arc : arcs) {
                 o.writeInt16(arc.getX());
                 o.writeInt16(arc.getY());
                 o.writeInt16(arc.getWidth());
@@ -399,15 +456,14 @@ public abstract class Drawable extends Resource {
     }
 
     // opcode 71 - poly fill arc
-    public void poly_fill_arc(GC gc, Arc[] arcs) {
+    public void polyFillArc(GC gc, Arc[] arcs) {
 
         RequestOutputStream o = display.getResponseOutputStream();
         synchronized (o) {
             o.beginRequest(71, 0, 3 + 3 * arcs.length);
             o.writeInt32(id);
             o.writeInt32(gc.id);
-            for (int i = 0; i < arcs.length; i++) {
-                Arc arc = arcs[i];
+            for (Arc arc : arcs) {
                 o.writeInt16(arc.getX());
                 o.writeInt16(arc.getY());
                 o.writeInt16(arc.getWidth());
@@ -418,11 +474,7 @@ public abstract class Drawable extends Resource {
         }
     }
 
-    public static final int COMPLEX = 0;
-
-    public static final int NONCONVEX = 1;
-
-    public static final int CONVEX = 2;
+ 
 
     // opcode 69 - fill poly
     /**
@@ -438,18 +490,17 @@ public abstract class Drawable extends Resource {
      * @see <a href="XFillPolygon.html">XFillPolygon</a>
      * @see Request.Aggregate aggregation
      */
-    public void fill_poly(GC gc, Point[] points, int shape, int coordinate_mode) {
+    public void fillPoly(GC gc, Point[] points, Fill shape, CoordinateMode coordinateMode) {
 
         RequestOutputStream o = display.getResponseOutputStream();
         synchronized (o) {
             o.beginRequest(69, 0, 4 + points.length);
             o.writeInt32(id);
             o.writeInt32(gc.id);
-            o.writeInt8(shape);
-            o.writeInt8(coordinate_mode);
+            o.writeInt8(shape.getCode());
+            o.writeInt8(coordinateMode.getCode());
             o.skip(2);
-            for (int i = 0; i < points.length; i++) {
-                Point p = points[i];
+            for (Point p : points) {
                 o.writeInt16(p.x);
                 o.writeInt16(p.y);
             }
@@ -457,16 +508,16 @@ public abstract class Drawable extends Resource {
         }
     }
 
-    public void fill_poly(GC gc, int[] xpoints, int[] ypoints, int npoints,
-                          int shape, int coordinate_mode) {
+    public void fillPoly(GC gc, int[] xpoints, int[] ypoints, int npoints,
+                          Fill shape, CoordinateMode coordinateMode) {
 
         RequestOutputStream o = display.getResponseOutputStream();
         synchronized (o) {
             o.beginRequest(69, 0, 4 + npoints);
             o.writeInt32(id);
             o.writeInt32(gc.id);
-            o.writeInt8(shape);
-            o.writeInt8(coordinate_mode);
+            o.writeInt8(shape.getCode());
+            o.writeInt8(coordinateMode.getCode());
             o.skip(2);
             for (int i = 0; i < npoints; i++) {
                 o.writeInt16(xpoints[i]);
@@ -476,7 +527,7 @@ public abstract class Drawable extends Resource {
     }
 
     // opcode 72 - put image
-    public void put_small_image(GC gc, Image image, int y1, int y2, int x, int y) {
+    public void putSmallImage(GC gc, Image image, int y1, int y2, int x, int y) {
 
         RequestOutputStream o = display.getResponseOutputStream();
         synchronized (o) {
@@ -569,7 +620,7 @@ public abstract class Drawable extends Resource {
     /**
      * @see <a href="XDrawText.html">XDrawText</a>
      */
-    public void poly_text(GC gc, int x, int y, Text[] texts) {
+    public void polyText(GC gc, int x, int y, Text[] texts) {
 
         int n = length(texts, 8);
         int p = RequestOutputStream.pad(n);
@@ -604,7 +655,7 @@ public abstract class Drawable extends Resource {
     /**
      * @see <a href="XDrawText16.html">XDrawText16</a>
      */
-    public void poly_text16(GC gc, int x, int y, Text[] texts) {
+    public void polyText16(GC gc, int x, int y, Text[] texts) {
 
         int n = length(texts, 16);
         int p = RequestOutputStream.pad(n);
@@ -646,7 +697,7 @@ public abstract class Drawable extends Resource {
     /**
      * @see <a href="XDrawImageString.html">XDrawImageString</a>
      */
-    public void image_text(GC gc, int x, int y, String s) {
+    public void imageText(GC gc, int x, int y, String s) {
 
         int n = s.length();
         int p = RequestOutputStream.pad(n);
@@ -666,7 +717,7 @@ public abstract class Drawable extends Resource {
     /**
      * @see <a href="XDrawImageString16.html">XDrawImageString16</a>
      */
-    public void image_text16(GC gc, int x, int y, String s) {
+    public void imageText16(GC gc, int x, int y, String s) {
 
         int n = s.length();
         int p = RequestOutputStream.pad(2 * n);
@@ -683,12 +734,6 @@ public abstract class Drawable extends Resource {
         }
     }
 
-    public static final int CURSOR = 0;
-
-    public static final int TILE = 1;
-
-    public static final int STIPPLE = 2;
-
     // opcode 97 - query best size
     /**
      * @param klass
@@ -696,12 +741,12 @@ public abstract class Drawable extends Resource {
      * 
      * @see <a href="XQueryBestSize.html">XQueryBestSize</a>
      */
-    public Size best_size(int klass, int width, int height) {
+    public Size bestSize(Shape klass, int width, int height) {
 
         RequestOutputStream o = display.getResponseOutputStream();
         int w, h;
         synchronized (o) {
-            o.beginRequest(97, klass, 3);
+            o.beginRequest(97, klass.getCode(), 3);
             o.writeInt32(id);
             o.writeInt16(width);
             o.writeInt16(height);
@@ -737,7 +782,7 @@ public abstract class Drawable extends Resource {
      * @param angle2
      *                the span angle, from angle1 ccw, in degrees
      * 
-     * @see #poly_arc(GC, Arc[])
+     * @see #polyArc(GC, Arc[])
      */
     public void arc(GC gc, int x, int y, int width, int height, int angle1,
                     int angle2) {
@@ -778,9 +823,9 @@ public abstract class Drawable extends Resource {
      * @param angle2
      *                the span angle, from angle1 ccw, in degrees
      * 
-     * @see #poly_arc(GC, Arc[])
+     * @see #polyArc(GC, Arc[])
      */
-    public void fill_arc(GC gc, int x, int y, int width, int height,
+    public void fillArc(GC gc, int x, int y, int width, int height,
                          int angle1, int angle2) {
 
         // FIXME: Handle aggregation.
@@ -820,7 +865,7 @@ public abstract class Drawable extends Resource {
         // FIXME: Handle aggregation.
         RequestOutputStream o = display.getResponseOutputStream();
         synchronized (o) {
-            o.beginRequest(65, ORIGIN, 5);
+            o.beginRequest(65, CoordinateMode.ORIGIN.getCode(), 5);
             o.writeInt32(id);
             o.writeInt32(gc.id);
             o.writeInt16(x1);
@@ -842,7 +887,7 @@ public abstract class Drawable extends Resource {
                 o.writeInt16(x2);
                 o.writeInt16(y2);
             } else {
-                o.beginRequest(66, ORIGIN, 5);
+                o.beginRequest(66, CoordinateMode.ORIGIN.getCode(), 5);
                 o.writeInt32(id);
                 o.writeInt32(gc.id);
                 o.writeInt16(x1);
@@ -866,7 +911,7 @@ public abstract class Drawable extends Resource {
         // FIXME: Handle aggregation.
         RequestOutputStream o = display.getResponseOutputStream();
         synchronized (o) {
-            o.beginRequest(64, ORIGIN, 4);
+            o.beginRequest(64, CoordinateMode.ORIGIN.getCode(), 4);
             o.writeInt32(id);
             o.writeInt32(gc.id);
             o.writeInt16(x);
@@ -887,7 +932,7 @@ public abstract class Drawable extends Resource {
                 + (rem == 0 ? 0 : 1);
 
         for (int i = 0; i < request_count; i++) {
-            put_small_image(gc, image, i * request_height, Math.min(image
+            putSmallImage(gc, image, i * request_height, Math.min(image
                     .get_height(), (i + 1) * request_height), x, y + i
                     * request_height);
         }
@@ -902,7 +947,7 @@ public abstract class Drawable extends Resource {
      * @param width the width
      * @param height the height
      *
-     * @see #poly_rectangle(GC, Rectangle[])
+     * @see #polyRectangle(GC, Rectangle[])
      */
     public void rectangle(GC gc, int x, int y, int width, int height) {
 
@@ -957,11 +1002,11 @@ public abstract class Drawable extends Resource {
     }
 
     /**
-     * @see #poly_text(GC, int, int, Text[])
+     * @see #polyText(GC, int, int, Text[])
      */
     public void text8(GC gc, int x, int y, String s, int delta, Font font) {
 
-        poly_text(gc, x, y, new Text[] {
+        polyText(gc, x, y, new Text[] {
             new Text(s, delta, font)
         });
     }
@@ -971,14 +1016,14 @@ public abstract class Drawable extends Resource {
      */
     public void text(GC gc, int x, int y, String s) {
 
-        poly_text(gc, x, y, new Text[] {
+        polyText(gc, x, y, new Text[] {
             new Text(s, 0, null)
         });
     }
 
     public void text16(GC gc, int x, int y, String s) {
 
-        poly_text16(gc, x, y, new Text[] {
+        polyText16(gc, x, y, new Text[] {
             new Text(s, 0, null)
         });
     }

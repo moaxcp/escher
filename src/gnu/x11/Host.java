@@ -90,14 +90,14 @@ public class Host {
         }
     }
     
-    public enum CloseDownMethod {
+    public enum Shape {
         DESTROY(0),
         RETAIN_PERMANENT(1),
         RETAIN_TEMPORARY(2);
         
         private int code;
         
-        CloseDownMethod(int cd) {
+        Shape(int cd) {
             this.code =cd;
         }
         
@@ -105,14 +105,14 @@ public class Host {
             return code;
         }
         
-        public static CloseDownMethod getFamily(int code) {
+        public static Shape getFamily(int code) {
             switch (code)
             {
-                case 0: return CloseDownMethod.DESTROY;
-                case 1: return CloseDownMethod.RETAIN_PERMANENT;
-                case 2: return CloseDownMethod.RETAIN_TEMPORARY;
+                case 0: return Shape.DESTROY;
+                case 1: return Shape.RETAIN_PERMANENT;
+                case 2: return Shape.RETAIN_TEMPORARY;
                 
-                default: return CloseDownMethod.DESTROY;
+                default: return Shape.DESTROY;
             }
         }
     }

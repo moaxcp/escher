@@ -538,10 +538,10 @@ public class Display {
                 i.readReply(o);
                 i.skip(4);
                 int len = i.readInt32() * 4; // Number of bytes for the reply.
-                int num_strings = i.readInt16();
+                int numStrings = i.readInt16();
                 i.skip(22);
-                fonts = new Font[num_strings];
-                for (int j = 0; j < num_strings; j++) {
+                fonts = new Font[numStrings];
+                for (int j = 0; j < numStrings; j++) {
                     int strlen = i.readInt8();
                     String str = i.readString8(strlen);
                     len -= strlen + 1;
@@ -570,6 +570,7 @@ public class Display {
     public void setFontPath(int count, String[] path) {
 
         int n = 0;
+        // TODO: Verify this
         for (int i = 0; i < path.length; i++) {
             n += path.length + 1;
         }
@@ -580,9 +581,9 @@ public class Display {
             o.beginRequest(51, 0, 2 + (n + p) / 4);
             o.writeInt16(path.length);
             o.skip(2);
-            for (int i = 0; i < path.length; i++) {
-                o.writeInt8(path[i].length());
-                o.writeString8(path[i]);
+            for (String ph : path) {
+                o.writeInt8(ph.length());
+                o.writeString8(ph);
             }
             o.skip(p);
             o.send();
@@ -955,7 +956,7 @@ public class Display {
      *            {@link #RETAIN_TEMPORARY}
      * @see <a href="XSetCloseDownMode.html">XSetCloseDownMode</a>
      */
-    public void setCloseDownMode(Host.CloseDownMethod mode) {
+    public void setCloseDownMode(Host.Shape mode) {
 
         RequestOutputStream o = outputStream;
         synchronized (o) {
