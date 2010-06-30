@@ -83,8 +83,8 @@ public class Screen {
 
         if (default_gc_cache == null) {
             GC.Values gv = new GC.Values();
-            gv.set_foreground(black_pixel);
-            gv.set_background(white_pixel);
+            gv.setForeground(black_pixel);
+            gv.setBackground(white_pixel);
 
             default_gc_cache = new GC(display, gv);
         }

@@ -481,8 +481,8 @@ public abstract class Drawable extends Resource {
      * This request will be aggregated.
      * 
      * @param shape
-     *                valid: {@link #COMPLEX}, {@link #NONCONVEX},
-     *                {@link #CONVEX}
+     *                valid: {@link #NOT_LAST}, {@link #BUTT},
+     *                {@link #CAP_ROUND}
      * 
      * @param coordinate_mode
      *                valid: {@link #ORIGIN}, {@link #PREVIOUS}

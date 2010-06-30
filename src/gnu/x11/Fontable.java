@@ -26,40 +26,40 @@ public abstract class Fontable extends Resource {
 
     private CharInfo min_bounds;
     private CharInfo max_bounds;
-    private int min_char_or_byte2;
-    private int max_char_or_byte2;
-    public int default_char;
-    public int draw_direction;
-    private int min_byte1;
-    private int max_byte1;
-    public boolean all_chars_exist;
-    private int font_ascent;
-    private int font_descent;
-    public FontProperty [] properties;
-    private CharInfo [] char_infos;
+    private int minCharOrByte2;
+    private int maxCharOrByte2;
+    private int defaultChar;
+    private int drawDirection;
+    private int minByte1;
+    private int maxByte1;
+    private boolean allCharsExist;
+    private int fontAscent;
+    private int fontDescent;
+    private FontProperty [] properties;
+    private CharInfo [] charInfos;
 
     FontInfo (ResponseInputStream i) {
       min_bounds = new CharInfo (i);
       i.skip (4);
       max_bounds = new CharInfo (i);
       i.skip (4);
-      min_char_or_byte2 = i.readInt16 ();
-      max_char_or_byte2 = i.readInt16 ();
-      default_char = i.readInt16 ();
+      minCharOrByte2 = i.readInt16 ();
+      maxCharOrByte2 = i.readInt16 ();
+      defaultChar = i.readInt16 ();
       int num_props = i.readInt16 ();
-      draw_direction = i.readInt8 ();
-      min_byte1 = i.readInt8 ();
-      max_byte1 = i.readInt8 ();
-      all_chars_exist = i.readBool ();
-      font_ascent = i.readInt16 ();
-      font_descent = i.readInt16 ();
+      drawDirection = i.readInt8 ();
+      minByte1 = i.readInt8 ();
+      maxByte1 = i.readInt8 ();
+      allCharsExist = i.readBool ();
+      fontAscent = i.readInt16 ();
+      fontDescent = i.readInt16 ();
       int num_charinfo = i.readInt32 ();
       properties = new FontProperty [num_props];
       for (int j = 0; j < num_props; j++)
         properties [j] = new FontProperty (i);
-      char_infos = new CharInfo [num_charinfo];
+      charInfos = new CharInfo [num_charinfo];
       for (int j = 0; j < num_charinfo; j++)
-        char_infos [j] = new CharInfo (i);
+        charInfos [j] = new CharInfo (i);
     }
 
     /**
@@ -67,8 +67,8 @@ public abstract class Fontable extends Resource {
      */
     public class FontProperty {
 
-      public int name_id;
-      public int value;
+      private int name_id;
+      private int value;
       
       /**
        * Creates a new FontProperty that starts at the specified index.
@@ -90,12 +90,12 @@ public abstract class Fontable extends Resource {
      */
     public class CharInfo {
 
-      public int left_side_bearing;
-      public int right_side_bearing;
-      public int character_width;
-      public int ascent;
-      public int descent;
-      public int attributes;
+      private int leftSideBearing;
+      private int rightSideBearing;
+      private int characterWidth;
+      private int ascent;
+      private int descent;
+      private int attributes;
 
       /**
        * Creates a new CharInfo instance that starts at the specified offset
@@ -104,16 +104,16 @@ public abstract class Fontable extends Resource {
        * @param i the starting index of the CharInfo field
        */
       private CharInfo (ResponseInputStream i) {
-        left_side_bearing = i.readInt16 ();
-        right_side_bearing = i.readInt16 ();
-        character_width = i.readInt16 ();
+        leftSideBearing = i.readInt16 ();
+        rightSideBearing = i.readInt16 ();
+        characterWidth = i.readInt16 ();
         ascent = i.readInt16 ();
         descent = i.readInt16 ();
         attributes = i.readInt16 ();
       }
 
       public int character_width () {
-        return character_width;
+        return characterWidth;
       }
     }
 
@@ -121,11 +121,11 @@ public abstract class Fontable extends Resource {
     public static final int RIGHT_TO_LEFT = 1;
 
     public int font_ascent () {
-      return font_ascent;
+      return fontAscent;
     }
 
     public int font_descent () {
-      return font_descent;
+      return fontDescent;
     }
 
     public CharInfo max_bounds () {
@@ -137,23 +137,23 @@ public abstract class Fontable extends Resource {
     }
 
     public int max_byte1 () {
-      return max_byte1;
+      return maxByte1;
     }
 
     public int min_byte1 () {
-      return min_byte1;
+      return minByte1;
     }
 
     public int min_char_or_byte2 () {
-      return min_char_or_byte2;
+      return minCharOrByte2;
     }
 
     public int max_char_or_byte2 () {
-      return max_char_or_byte2;
+      return maxCharOrByte2;
     }
 
     public CharInfo[] char_infos () {
-      return char_infos;
+      return charInfos;
     }
   }
   
@@ -181,32 +181,32 @@ public abstract class Fontable extends Resource {
   }
 
   
-  /** Reply of {@link #text_extent(String)}. */
+  /** Reply of {@link #textExtent(String)}. */
   public class TextExtentInfo {
 
-    public boolean left_to_right;
-    public int font_ascent;
-    public int font_descent;
-    public int overall_ascent;
-    public int overall_descent;
-    private int overall_width;
-    public int overall_left;
-    public int overall_right;
+    private boolean leftToRight;
+    private int fontAscent;
+    private int fontDescent;
+    private int overallAscent;
+    private int overallDescent;
+    private int overallWidth;
+    private int overallLeft;
+    private int overallRight;
 
     TextExtentInfo (ResponseInputStream i) {
-      left_to_right = i.readBool ();
+      leftToRight = i.readBool ();
       i.skip (6);
-      font_ascent = i.readInt16 ();
-      font_descent = i.readInt16 ();
-      overall_ascent = i.readInt16 ();
-      overall_descent = i.readInt16 ();
-      overall_width = i.readInt32 ();
-      overall_left = i.readInt32 ();
-      overall_right = i.readInt32 ();
+      fontAscent = i.readInt16 ();
+      fontDescent = i.readInt16 ();
+      overallAscent = i.readInt16 ();
+      overallDescent = i.readInt16 ();
+      overallWidth = i.readInt32 ();
+      overallLeft = i.readInt32 ();
+      overallRight = i.readInt32 ();
     }
 
-    public int overall_width () {
-      return overall_width;
+    public int overallWidth () {
+      return overallWidth;
     }
   }
 
@@ -214,7 +214,7 @@ public abstract class Fontable extends Resource {
   /**
    * @see <a href="XQueryTextExtents.html">XQueryTextExtents</a>
    */
-  public TextExtentInfo text_extent (String s) {
+  public TextExtentInfo textExtent (String s) {
 
     TextExtentInfo info;
     boolean odd = s.length () % 2 == 1;
