@@ -1,52 +1,127 @@
 package gnu.x11;
 
+import gnu.x11.Host.ChangeOperation;
+import gnu.x11.Host.InternetFamily;
+
 /** X keyboard and pointer. */
 public class Input {
-  // KEYBUTMASK - keyboard button mask
-  public static final int SHIFT_MASK = 1<<0;
-  public static final int LOCK_MASK = 1<<1; // cap lock
-  public static final int CONTROL_MASK = 1<<2;
-  public static final int MOD1_MASK = 1<<3; // alt key
-  public static final int MOD2_MASK = 1<<4; // num lock
-  public static final int MOD3_MASK = 1<<5; // menu key
-  public static final int MOD4_MASK = 1<<6; // window key
-  public static final int MOD5_MASK = 1<<7; // scroll lock
-  public static final int BUTTON1_MASK = 1<<8;
-  public static final int BUTTON2_MASK = 1<<9;
-  public static final int BUTTON3_MASK = 1<<10;
-  public static final int BUTTON4_MASK = 1<<11;
-  public static final int BUTTON5_MASK = 1<<12;
-
-
-  // 104 PC keyboard
-  public static final int META_MASK = MOD1_MASK;
-  public static final int ALT_MASK = MOD3_MASK;
-  public static final int SUPER_MASK = MOD4_MASK;
-
-
-  public static final int BUTTON1 = 1;
-  public static final int BUTTON2 = 2;
-  public static final int BUTTON3 = 3;
-  public static final int BUTTON4 = 4;
-  public static final int BUTTON5 = 5;
-
+    
+  public enum KeyMask {
+      // KEYBUTMASK - keyboard button mask
+      SHIFT_MASK(1<<0),
+      LOCK_MASK(1<<1), // cap lock
+      CONTROL_MASK(1<<2),
+      MOD1_MASK(1<<3), // alt key
+      MOD2_MASK(1<<4), // num lock
+      MOD3_MASK(1<<5), // menu key
+      MOD4_MASK(1<<6), // window key
+      MOD5_MASK(1<<7), // scroll lock
+      BUTTON1_MASK(1<<8),
+      BUTTON2_MASK(1<<9),
+      BUTTON3_MASK(1<<10),
+      BUTTON4_MASK(1<<11),
+      BUTTON5_MASK(1<<12),
+      
+      // 104 PC keyboard
+      META_MASK(1<<3),
+      ALT_MASK(1<<5),
+      SUPER_MASK(1<<6),
+      
+      // Mouse
+      BUTTON1(1),
+      BUTTON2(2),
+      BUTTON3(3),
+      BUTTON4(4),
+      BUTTON5(5);
+      
+      private int code;
+      
+      KeyMask(int cd) {
+          this.code =cd;
+      }
+      
+      public int getCode() {
+          return code;
+      }
+      
+      public int logicOr(KeyMask km) {
+          return this.getCode() | km.getCode();
+      }
+      
+      public int logicOr(int i) {
+          return this.getCode() | i;
+      }
+  }
 
   public static final int [] LOCK_COMBINATIONS = {
-    0, LOCK_MASK, LOCK_MASK|MOD2_MASK, LOCK_MASK|MOD5_MASK, 
-    LOCK_MASK|MOD2_MASK|MOD5_MASK, MOD2_MASK, MOD2_MASK|MOD5_MASK,
-    MOD5_MASK
+    0,
+    KeyMask.LOCK_MASK.getCode(),
+    KeyMask.LOCK_MASK.logicOr(KeyMask.MOD2_MASK),
+    KeyMask.LOCK_MASK.logicOr(KeyMask.MOD5_MASK),
+    KeyMask.LOCK_MASK.logicOr(KeyMask.MOD2_MASK.logicOr(KeyMask.MOD5_MASK)),
+    KeyMask.MOD2_MASK.getCode(),
+    KeyMask.MOD2_MASK.logicOr(KeyMask.MOD5_MASK),
+    KeyMask.MOD5_MASK.getCode()
   };
 
 
-  public Display display;
-  public int min_keycode, max_keycode, keysyms_per_keycode;
-  public int [] keysyms;
+  public enum InputEvent {
+      ASYNC_POINTER(0),
+      SYNC_POINTER(1),
+      REPLY_POINTER(2),
+      ASYNC_KEYBOARD(3),
+      SYNC_KEYBOARD(4),
+      REPLY_KEYBOARD(5),
+      ASYNC_BOTH(6),
+      SYNC_BOTH(7);
+      private int code;
+      
+      InputEvent(int cd) {
+          this.code =cd;
+      }
+      
+      public int getCode() {
+          return code;
+      }
+
+  }
+  
+  public enum Status {
+      SUCCESS(0),
+      BUSY(1),
+      FAILED(2);
+      
+      private int code;
+      
+      Status(int cd) {
+          this.code =cd;
+      }
+      
+      public int getCode() {
+          return code;
+      }
+      
+      public static Status getStatus(int code) {
+          switch (code)
+          {
+              case 0: return Status.SUCCESS;
+              case 1: return Status.BUSY;
+              case 2: return Status.FAILED;
+              
+              default: return Status.SUCCESS;
+          }
+      }
+  }
+
+  private Display display;
+  private int minKeycode, maxKeycode, keysymsPerKeycode;
+  private int [] keysyms;
   
 
   public Input (Display display, int min_keycode, int max_keycode) {
     this.display = display;
-    this.min_keycode = min_keycode;
-    this.max_keycode = max_keycode;
+    this.minKeycode = min_keycode;
+    this.maxKeycode = max_keycode;
   }
 
 
@@ -55,7 +130,7 @@ public class Input {
    * @param time possible: {@link Display#CURRENT_TIME}
    * @see <a href="XUngrabPointer.html">XUngrabPointer</a>
    */
-  public void ungrab_pointer (int time) {
+  public void ungrabPointer (int time) {
     RequestOutputStream o = display.getResponseOutputStream();
     synchronized (o) {
       o.beginRequest (27, 0, 2);
@@ -72,7 +147,7 @@ public class Input {
    * @see <a href="XChangeActivePointerGrab.html">
    *  XChangeActivePointerGrab</a>
    */
-  public void change_active_pointer_grab (int event_mask, 
+  public void changeActivePointerGrab (int event_mask, 
                                           Cursor cursor, int time) {
 
     RequestOutputStream o = display.getResponseOutputStream();
@@ -91,7 +166,7 @@ public class Input {
    * @param time possible: {@link Display#CURRENT_TIME}
    * @see <a href="XUngrabKeyboard.html">XUngrabKeyboard</a>
    */
-  public void ungrab_keyboard (int time) {
+  public void ungrabKeyboard (int time) {
 
     RequestOutputStream o = display.getResponseOutputStream();
     synchronized (o) {
@@ -100,16 +175,6 @@ public class Input {
       o.send ();
     }
   }
-
-
-  public static final int ASYNC_POINTER = 0;
-  public static final int SYNC_POINTER = 1;
-  public static final int REPLY_POINTER = 2;
-  public static final int ASYNC_KEYBOARD = 3;
-  public static final int SYNC_KEYBOARD = 4;
-  public static final int REPLY_KEYBOARD = 5;
-  public static final int ASYNC_BOTH = 6;
-  public static final int SYNC_BOTH = 7;
 
 
   // opcode 35 - allow events
@@ -127,18 +192,18 @@ public class Input {
    * @param time possible: {@link Display#CURRENT_TIME}
    * @see <a href="XAllowEvents.html">XAllowEvents</a>
    */
-  public void allow_events (int mode, int time) {
+  public void allowEvents (InputEvent evt, int time) {
 
     RequestOutputStream o = display.getResponseOutputStream();
     synchronized (o) {
-      o.beginRequest (35, mode, 2);
+      o.beginRequest (35, evt.getCode(), 2);
       o.writeInt32 (time);
       o.send ();
     }
   }
 
-
-  /** Reply of {@link #input_focus()} */
+  
+  /** Reply of {@link #inputFocus()} */
   public class InputFocusInfo {
 
     public int revert_to;
@@ -159,7 +224,7 @@ public class Input {
   /**
    * @see <a href="XGetInputFocus.html">XGetInputFocus</a>
    */
-  public InputFocusInfo input_focus () {
+  public InputFocusInfo inputFocus () {
 
     InputFocusInfo info;
     RequestOutputStream o = display.getResponseOutputStream();
@@ -182,7 +247,7 @@ public class Input {
    * @return valid: {@link Enum#next1()}
    * @see <a href="XQueryKeymap.html">XQueryKeymap</a>
    */
-  public byte [] query_keymap () {
+  public byte [] queryKeymap () {
     RequestOutputStream o = display.getResponseOutputStream();
     byte [] data = new byte [32];
     synchronized (o) {
@@ -202,16 +267,16 @@ public class Input {
   /**
    * @see <a href="XChangeKeyboardMapping.html">XChangeKeyboardMapping</a>
    */
-  public void change_keyboard_mapping (int first_keycode, 
-                                       int keysyms_per_keycode, int [] keysyms) {
+  public void changeKeyboardMapping (int firstKeycode, int keySymsPerKeycode,
+                                     int [] keysyms) {
     
-    int keycode_count = keysyms.length / keysyms_per_keycode;
+    int keycode_count = keysyms.length / keySymsPerKeycode;
 
     RequestOutputStream o = display.getResponseOutputStream();
     synchronized (o) {
       o.beginRequest (100, keycode_count, 2 + keysyms.length);
-      o.writeInt8 (first_keycode);
-      o.writeInt8 (keysyms_per_keycode);
+      o.writeInt8 (firstKeycode);
+      o.writeInt8 (keySymsPerKeycode);
       o.skip (2);
 
       for (int i = 0; i < keysyms.length; i++)
@@ -226,14 +291,14 @@ public class Input {
   /**
    * @see <a href="XGetKeyboardMapping.html">XGetKeyboardMapping</a>
    */
-  public void keyboard_mapping () {
+  public void keyboardMapping () {
 
-    int keysym_count = max_keycode - min_keycode + 1;
+    int keysym_count = maxKeycode - minKeycode + 1;
 
     RequestOutputStream o = display.getResponseOutputStream();
     synchronized (o) {
       o.beginRequest (101, 0, 2);
-      o.writeInt8 (min_keycode);
+      o.writeInt8 (minKeycode);
       o.writeInt8 (keysym_count);
       o.writeInt16 (0); // Unused.
 
@@ -241,10 +306,10 @@ public class Input {
       synchronized (in) {
         in.readReply (o);
         in.skip (1);
-        keysyms_per_keycode = in.readInt8 ();
+        keysymsPerKeycode = in.readInt8 ();
         in.skip (2); // Unused.
         int nm = in.readInt32 (); // length.
-        assert nm == keysyms_per_keycode * keysym_count;
+        assert nm == keysymsPerKeycode * keysym_count;
         in.skip (24); // Unused.
         keysyms = new int [nm];
 
@@ -256,17 +321,17 @@ public class Input {
   }
 
 
-  /** Reply of {@link #keyboard_control()} */
+  /** Reply of {@link #keyboardControl()} */
   public class KeyboardControlInfo {
 
     public boolean global_auto_repeat;
     
-    public int led_mask;
-    public int key_click_percent;
-    public int bell_percent;
-    public int bell_pitch;
-    public int bell_duration;
-    public byte[] auto_repeats;
+    private int led_mask;
+    private int key_click_percent;
+    private int bell_percent;
+    private int bell_pitch;
+    private int bell_duration;
+    private byte[] auto_repeats;
 
     KeyboardControlInfo (ResponseInputStream i) {
       global_auto_repeat = i.readBool ();
@@ -287,13 +352,11 @@ public class Input {
   public static class KeyboardControl extends ValueList { // TODO
     public KeyboardControl () { super (8); }
   
-  
     public static final int OFF = 0;
     public static final int ON = 1;
   
   
-    public static final String [] GLOBAL_AUTO_REPEAT_STRINGS
-      = {"off", "on"};
+    public static final String [] GLOBAL_AUTO_REPEAT_STRINGS = {"off", "on"};
   }
 
 
@@ -301,7 +364,7 @@ public class Input {
   /**
    * @see <a href="XChangeKeyboardControl.html">XChangeKeyboardControl</a>
    */
-  public void change_keyboard_control (KeyboardControl control) {
+  public void changeKeyboardControl (KeyboardControl control) {
     RequestOutputStream o = display.getResponseOutputStream();
     synchronized (o) {
       o.beginRequest (102, 0, 2 + control.count ());
@@ -316,7 +379,7 @@ public class Input {
   /**
    * @see <a href="XGetKeyboardControl.html">XGetKeyboardControl</a>
    */
-  public KeyboardControlInfo keyboard_control () {
+  public KeyboardControlInfo keyboardControl () {
     KeyboardControlInfo info;
     RequestOutputStream o = display.getResponseOutputStream();
     synchronized (o) {
@@ -336,7 +399,7 @@ public class Input {
   /**
    * @see <a href="XChangePointerControl.html">XChangePointerControl</a>
    */
-  public void change_pointer_control (boolean do_accel, boolean do_threshold,
+  public void changePointerControl (boolean do_accel, boolean do_threshold,
                                       int accel_numerator,
                                       int accel_denominator, int threshold) {
 
@@ -353,7 +416,7 @@ public class Input {
   }
 
 
-  /** Reply of {@link #pointer_control()}. */
+  /** Reply of {@link #pointerControl()}. */
   public class PointerControlInfo {
 
     public int acceleration_numerator;
@@ -372,7 +435,7 @@ public class Input {
   /**
    * @see <a href="XGetPointerControl.html">XGetPointerControl</a>
    */
-  public PointerControlInfo pointer_control () {
+  public PointerControlInfo pointerControl () {
     PointerControlInfo info;
     RequestOutputStream o = display.getResponseOutputStream();
     synchronized (o) {
@@ -388,11 +451,6 @@ public class Input {
     return info;
   }
 
-
-  public static final int SUCCESS = 0;
-  public static final int BUSY = 1;
-
-
   // opcode 116 - set pointer mapping
   /**
    * @return valid:
@@ -401,7 +459,7 @@ public class Input {
    *
    * @see <a href="XSetPointerMapping.html">XSetPointerMapping</a>
    */
-  public int set_pointer_mapping (byte [] map) {
+  public Status setPointerMapping (byte [] map) {
 
     int n = map.length;
     int p = RequestOutputStream.pad (n);
@@ -421,7 +479,7 @@ public class Input {
         i.skip (30);
       }
     }
-    return status;
+    return Status.getStatus(status);
   }
 
 
@@ -429,7 +487,7 @@ public class Input {
   /**
    * @see <a href="XGetPointerMapping.html">XGetPointerMapping</a>
    */
-  public byte [] get_pointer_mapping () {
+  public byte [] getPointerMapping () {
 
     byte [] map;
     RequestOutputStream o = display.getResponseOutputStream();
@@ -448,10 +506,6 @@ public class Input {
     return map;
   }
 
-
-  public static final int FAILED = 2;
-
-
   // opcode 118 - set modifier mapping
   /**
    * @return valid:
@@ -461,14 +515,13 @@ public class Input {
    *
    * @see <a href="XSetModifierMapping.html">XSetModifierMapping</a>
    */
-  public int set_modifier_mapping (int keycodes_per_modifier, 
-                                   byte [] keycodes) {
+  public Status setModifierMapping (int keycodesPerModifier, byte [] keycodes) {
 
     int status;
     RequestOutputStream o = display.getResponseOutputStream();
     synchronized (o) {
-      o.beginRequest (118, keycodes_per_modifier,
-                       1 + 2 * keycodes_per_modifier);
+      o.beginRequest (118, keycodesPerModifier,
+                       1 + 2 * keycodesPerModifier);
       o.write (keycodes);
       ResponseInputStream i = display.getResponseInputStream();
       synchronized (i) {
@@ -478,18 +531,18 @@ public class Input {
         i.skip (30);
       }
     }
-    return status;
+    return Status.getStatus(status);
   }
 
   public class ModifierMapping {
 
-    public int keycodes_per_modifier;
+    public int keycodesPerModifier;
     byte [] map;
 
     ModifierMapping (ResponseInputStream i) {
-      keycodes_per_modifier = i.readInt8 ();
+      keycodesPerModifier = i.readInt8 ();
       i.skip (30);
-      map = new byte [keycodes_per_modifier * 8];
+      map = new byte [keycodesPerModifier * 8];
       i.readData (map);
     }
   }
@@ -499,7 +552,7 @@ public class Input {
    * @return valid: {@link Enum#next1()}
    * @see <a href="XModifierKeymap.html">XModifierKeymap</a>
    */
-  public ModifierMapping modifier_mapping () {
+  public ModifierMapping modifierMapping () {
 
     ModifierMapping map;
 
@@ -516,18 +569,18 @@ public class Input {
     return map;
   }
 
+// FIXME: CAN BE REMOVED?
+//  public static final String [] KEYBUT_STRINGS = {
+//    "shift", "lock", "control", "mod1", "mod2", "mod3", "mod4", "mod5",
+//    "button1", "button2", "button3", "button4", "button5"
+//  };
 
-  public static final String [] KEYBUT_STRINGS = {
-    "shift", "lock", "control", "mod1", "mod2", "mod3", "mod4", "mod5",
-    "button1", "button2", "button3", "button4", "button5"
-  };
-
-
-  public static void dump_keybut_mask (int m) {
-    for (int i=0; i<KEYBUT_STRINGS.length; i++)
-      if (((m & 0x1fff) & 1 << i) != 0)
-	System.out.print (KEYBUT_STRINGS [i] + " ");
-  }
+//FIXME: CAN BE REMOVED?
+//  public static void dump_keybut_mask (int m) {
+//    for (int i=0; i<KEYBUT_STRINGS.length; i++)
+//      if (((m & 0x1fff) & 1 << i) != 0)
+//	System.out.print (KEYBUT_STRINGS [i] + " ");
+//  }
 
   /**
    * Maps a keycode to a keysym.
@@ -537,8 +590,8 @@ public class Input {
    *
    * @return the keysym for the specified key code and modifier mask
    */
-  public int keycode_to_keysym (int keycode, int keystate) {
-    return keycode_to_keysym(keycode, keystate, false);
+  public int keycodeToKeysym (int keycode, int keystate) {
+    return keycodeToKeysym(keycode, keystate, false);
   }
 
   /**
@@ -554,9 +607,9 @@ public class Input {
    *
    * @return the keysym for the specified key code and modifier mask
    */
-  public int keycode_to_keysym (int keycode, int keystate,
+  public int keycodeToKeysym (int keycode, int keystate,
                                 boolean ignore_modifiers) {
-    if (keycode > max_keycode) 
+    if (keycode > maxKeycode) 
       throw new java.lang.Error ("Invalid keycode: " + keycode);
 
     int keysym = 0;
@@ -564,26 +617,26 @@ public class Input {
 
     // TODO: Maybe add handling of other modifiers.
     if (! ignore_modifiers) {
-      if ((keystate & SHIFT_MASK) != 0)
+      if ((keystate & KeyMask.SHIFT_MASK.getCode()) != 0)
         keysym_no = 1;
-      else if ((keystate & MOD5_MASK) != 0) // Alt Gr
+      else if ((keystate & KeyMask.MOD5_MASK.getCode()) != 0) // Alt Gr
         keysym_no = 2; // TODO: 4 seems also valid.
     }
 
-    int index = (keycode - min_keycode) * keysyms_per_keycode + keysym_no;
+    int index = (keycode - minKeycode) * keysymsPerKeycode + keysym_no;
     keysym = keysyms[index];
     return keysym;
   }
 
 
-  public int keysym_to_keycode (int keysym) {
+  public int keysymToKeycode (int keysym) {
     // linear lookup - expensive?
     //for (int i=0; i<keysyms.length; i++)
     // FIXME, hacked to do it in reverse order for solaris
 
     for (int i=keysyms.length-1; i>=0; i--)
       if (keysyms [i] == keysym)
-	return i + min_keycode;
+	return i + minKeycode;
     
     throw new java.lang.Error ("Invalid keysym: " + keysym);	
   }
@@ -592,7 +645,7 @@ public class Input {
   /** 
    * Input#ungrab_keyboard(int)
    */
-  public void ungrab_keyboard () {
-    ungrab_keyboard (Display.CURRENT_TIME);
+  public void ungrabKeyboard () {
+    ungrabKeyboard (Display.CURRENT_TIME);
   }
 }

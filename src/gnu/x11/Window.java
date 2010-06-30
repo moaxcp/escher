@@ -1271,7 +1271,7 @@ public class Window extends Drawable implements GLXDrawable {
     public void grab_key(int keysym, int modifiers, boolean owner_events,
                          int pointer_mode, int keyboard_mode) {
 
-        int keycode = display.getInput().keysym_to_keycode(keysym);
+        int keycode = display.getInput().keysymToKeycode(keysym);
 
 
         RequestOutputStream o = display.getResponseOutputStream();
@@ -1298,7 +1298,7 @@ public class Window extends Drawable implements GLXDrawable {
      */
     public void ungrab_key(int keysym, int modifiers) {
 
-        int keycode = keysym == 0 ? 0 : display.getInput().keysym_to_keycode(keysym);
+        int keycode = keysym == 0 ? 0 : display.getInput().keysymToKeycode(keysym);
 
         RequestOutputStream o = display.getResponseOutputStream();
         synchronized (o) {

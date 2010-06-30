@@ -1242,7 +1242,7 @@ public class Display {
     private void initKeyboarMapping() {
 
         input = new Input(this, minKeycode, maxKeycode);
-        input.keyboard_mapping();
+        input.keyboardMapping();
     }
 
     public Event next_event() {
@@ -1308,7 +1308,7 @@ public class Display {
 
         // `XSync' function in `xc/lib/X11/Sync.c' uses the same technique.
         try {
-            input.input_focus();
+            input.inputFocus();
 
         } catch (Error e) {
             /*
