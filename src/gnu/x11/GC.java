@@ -572,10 +572,10 @@ public class GC extends Fontable {
       o.writeInt16 (clip_y_origin);
 
       for (Rectangle rec : rectangles) {
-        o.writeInt16 (rec.x);
-        o.writeInt16 (rec.y);
-        o.writeInt16 (rec.width);
-        o.writeInt16 (rec.height);
+        o.writeInt16 (rec.getX());
+        o.writeInt16 (rec.getY());
+        o.writeInt16 (rec.getWidth());
+        o.writeInt16 (rec.getHeight());
       }
       o.send ();
     }

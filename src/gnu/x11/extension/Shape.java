@@ -112,10 +112,10 @@ public class Shape extends Extension implements EventFactory {
       o.writeInt16 (y_offset);
 
       for (int i = 0; i < rectangles.length; i++) {
-        o.writeInt16 (rectangles [i].x);
-        o.writeInt16 (rectangles [i].y);
-        o.writeInt16 (rectangles [i].width);
-        o.writeInt16 (rectangles [i].height);
+        o.writeInt16 (rectangles [i].getX());
+        o.writeInt16 (rectangles [i].getY());
+        o.writeInt16 (rectangles [i].getWidth());
+        o.writeInt16 (rectangles [i].getHeight());
       }
 
       o.send ();

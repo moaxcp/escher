@@ -3,7 +3,7 @@ package gnu.x11;
 
 /** Point in geometry. */
 public class Point {
-  public int x, y;
+  private int x, y;
 
 
   public Point () {}
@@ -17,5 +17,15 @@ public class Point {
 
   public String toString () {
     return "#Point +" + x + "+" + y;
+  }
+
+  // Set and Gets
+  
+  public int getX() {
+      return x;
+  }
+
+  public int getY() {
+      return y;
   }
 }

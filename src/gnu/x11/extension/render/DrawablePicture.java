@@ -155,10 +155,10 @@ public class DrawablePicture extends Picture {
       o.writeInt32 (id);
 
       for (int i = 0; i < rectangles.length; i++) {
-        o.writeInt16 (rectangles [i].x);
-        o.writeInt16 (rectangles [i].y);
-        o.writeInt16 (rectangles [i].width);
-        o.writeInt16 (rectangles [i].height);
+        o.writeInt16 (rectangles [i].getX());
+        o.writeInt16 (rectangles [i].getY());
+        o.writeInt16 (rectangles [i].getWidth());
+        o.writeInt16 (rectangles [i].getHeight());
       }
       o.send ();
     }

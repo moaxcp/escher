@@ -70,7 +70,7 @@ public class Window extends Drawable implements GLXDrawable {
      */
     public Window(Window parent, Rectangle geometry) {
 
-        this(parent, geometry.x, geometry.y, geometry.width, geometry.height);
+        this(parent, geometry.getX(), geometry.getY(), geometry.getWidth(), geometry.getHeight());
     }
 
     /** X window attributes. */
@@ -282,8 +282,8 @@ public class Window extends Drawable implements GLXDrawable {
     public Window(Window parent, Rectangle geometry, int border_width,
             Attributes attr) {
 
-        this(parent, geometry.x, geometry.y, geometry.width, geometry.height,
-             border_width, attr);
+        this(parent, geometry.getX(), geometry.getY(), geometry.getWidth(),
+             geometry.getHeight(), border_width, attr);
     }
 
     /**
@@ -1851,7 +1851,8 @@ public class Window extends Drawable implements GLXDrawable {
      */
     public void move_resize(Rectangle rectangle) {
 
-        move_resize(rectangle.x, rectangle.y, rectangle.width, rectangle.height);
+        move_resize(rectangle.getX(), rectangle.getY(), rectangle.getWidth(), 
+                    rectangle.getHeight());
     }
 
     /**
@@ -1910,7 +1911,7 @@ public class Window extends Drawable implements GLXDrawable {
 
     public boolean resized(Rectangle r) {
 
-        return r.width != width || r.height != height;
+        return r.getWidth() != width || r.getHeight() != height;
     }
 
     /**
@@ -1953,10 +1954,10 @@ public class Window extends Drawable implements GLXDrawable {
 
     public void set_geometry_cache(Rectangle r) {
 
-        x = r.x;
-        y = r.y;
-        width = r.width;
-        height = r.height;
+        x = r.getX();
+        y = r.getY();
+        width = r.getWidth();
+        height = r.getHeight();
     }
 
     /**
@@ -2479,7 +2480,7 @@ public class Window extends Drawable implements GLXDrawable {
      */
     public void warp_pointer(Point position) {
 
-        warp_pointer(position.x, position.y);
+        warp_pointer(position.getX(), position.getY());
     }
 
     public int id() {

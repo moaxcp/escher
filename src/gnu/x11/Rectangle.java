@@ -3,7 +3,7 @@ package gnu.x11;
 
 /** Position and size in geometry. */
 public class Rectangle {
-  public int x, y, width, height;
+  private int x, y, width, height;
 
 
   /**
@@ -85,5 +85,23 @@ public class Rectangle {
 
   public String toString () {
     return "#Rectangle " + spec ();
+  }
+  
+  // Getters
+  
+  public int getHeight() {
+      return height;
+  }
+
+  public int getWidth() {
+      return width;
+  }
+
+  public int getX() {
+      return x;
+  }
+
+  public int getY() {
+      return y;
   }
 }

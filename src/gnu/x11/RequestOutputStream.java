@@ -1,5 +1,6 @@
 package gnu.x11;
 
+import gnu.x11.Drawable.Fill;
 import gnu.x11.extension.glx.GLConstant;
 import gnu.x11.extension.glx.GLXCommand;
 import gnu.x11.extension.glx.GLXRenderingCommand;
@@ -42,14 +43,24 @@ public class RequestOutputStream extends FilterOutputStream {
   };
   
   /**
-   * The default buffer size.
+   * The buffers size.
    */
-  private static final int DEFAULT_BUFFER_SIZE = 512;
-
-  private static final int MAX_BUFFER_SIZE = 8192;
-
-  private static final int FLUSH_THRESHOLD = 64;
-
+  public enum Buffer {
+      DEFAULT_BUFFER_SIZE(512),
+      MAX_BUFFER_SIZE(8192),
+      FLUSH_THRESHOLD(64);
+      
+      private int code;
+      
+      Buffer(int cd) {
+          this.code =cd;
+      }
+      
+      public int getSize() {
+          return code;
+      }
+  }
+  
   /**
    * Maximum delay time between two flush request.
    */
@@ -118,7 +129,7 @@ public class RequestOutputStream extends FilterOutputStream {
    * @param sink the output stream to write to
    */
   RequestOutputStream (OutputStream sink, Display d) {
-    this (sink, DEFAULT_BUFFER_SIZE, d);
+    this (sink, Buffer.DEFAULT_BUFFER_SIZE.getSize(), d);
   }
 
   /**
@@ -133,7 +144,7 @@ public class RequestOutputStream extends FilterOutputStream {
     buffer = new byte [size];
     seqNumber = 0;
     display = d;
-    sendMode = get_default_send_mode ();
+    sendMode = getDefaultSendMode ();
     
     this.timerTask = new RequestTimerTask();
     this.flushTimer = new Timer(FLUSH_THREAD_NAME, true);
@@ -148,7 +159,7 @@ public class RequestOutputStream extends FilterOutputStream {
    *
    * @return the default send mode
    */
-  private SendMode get_default_send_mode () {
+  private SendMode getDefaultSendMode () {
     String prop = System.getProperty ("escher.send_mode", "ASYNCHRONOUS");
     SendMode sm;
     if (prop.equalsIgnoreCase ("SYNCHRONOUS")) {
@@ -174,7 +185,7 @@ public class RequestOutputStream extends FilterOutputStream {
       System.err.println("WARNING: Unflushed request data.");
       flush ();
     }
-    int actual_size = Math.min(size, MAX_BUFFER_SIZE);
+    int actual_size = Math.min(size, Buffer.MAX_BUFFER_SIZE.getSize());
     buffer = new byte [actual_size];
     index = 0;
     return actual_size;
@@ -205,12 +216,11 @@ public class RequestOutputStream extends FilterOutputStream {
    * Begins a new request. This flushes all pending request data.
    *
    * @param opcode the opcode for the request
-   * @param second_field the second field for the request
-   * @param request_length the length of the request
+   * @param secondField the second field for the request
+   * @param requestLength the length of the request
    */
   @Deprecated
-  public void beginRequest (int opcode, int second_field,
-                             int request_length) {
+  public void beginRequest (int opcode, int secondField, int requestLength) {
 
     assert Thread.holdsLock (this);
  
@@ -224,13 +234,13 @@ public class RequestOutputStream extends FilterOutputStream {
     
     this.seqNumber = (this.seqNumber + 1) & 0xffff;
     
-    if (buffer.length - index < request_length * 4) {
+    if (buffer.length - index < requestLength * 4) {
       flush();
     }
 
     writeInt8 (opcode);
-    writeInt8 (second_field);
-    writeInt16 (request_length);
+    writeInt8 (secondField);
+    writeInt16 (requestLength);
   }
 
   boolean sendPendingRequest() {
@@ -273,7 +283,7 @@ public class RequestOutputStream extends FilterOutputStream {
       if (pad != 0)
         skip (pad);
       request_index = index;
-      if (index > (buffer.length - FLUSH_THRESHOLD)
+      if (index > (buffer.length - Buffer.FLUSH_THRESHOLD.getSize())
           || sendMode == SendMode.SYNCHRONOUS
           || sendMode == SendMode.ROUND_TRIP) {
         flush ();

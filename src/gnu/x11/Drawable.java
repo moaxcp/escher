@@ -281,8 +281,8 @@ public abstract class Drawable extends Resource {
             o.writeInt32(id);
             o.writeInt32(gc.id);
             for (Point p : points) {
-                o.writeInt16(p.x);
-                o.writeInt16(p.y);
+                o.writeInt16(p.getX());
+                o.writeInt16(p.getY());
             }
             o.send();
         }
@@ -365,8 +365,8 @@ public abstract class Drawable extends Resource {
             o.writeInt32(id);
             o.writeInt32(gc.id);
             for (int i = 0; i < npoints; i++) {
-                o.writeInt16(points[i].x);
-                o.writeInt16(points[i].y);
+                o.writeInt16(points[i].getX());
+                o.writeInt16(points[i].getY());
             }
             o.send();
         }
@@ -427,10 +427,10 @@ public abstract class Drawable extends Resource {
             o.writeInt32(id);
             o.writeInt32(gc.id);
             for (Rectangle rec : rectangles) {
-                o.writeInt16(rec.x);
-                o.writeInt16(rec.y);
-                o.writeInt16(rec.width);
-                o.writeInt16(rec.height);
+                o.writeInt16(rec.getX());
+                o.writeInt16(rec.getY());
+                o.writeInt16(rec.getWidth());
+                o.writeInt16(rec.getHeight());
             }
             o.send();
         }
@@ -501,8 +501,8 @@ public abstract class Drawable extends Resource {
             o.writeInt8(coordinateMode.getCode());
             o.skip(2);
             for (Point p : points) {
-                o.writeInt16(p.x);
-                o.writeInt16(p.y);
+                o.writeInt16(p.getX());
+                o.writeInt16(p.getY());
             }
             o.send();
         }
