@@ -1245,7 +1245,7 @@ public class Display {
         input.keyboard_mapping();
     }
 
-    public Event next_event() {
+    public Event nextEvent() {
 
         return inputStream.readEvent();
     }

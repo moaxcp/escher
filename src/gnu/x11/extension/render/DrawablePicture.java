@@ -45,7 +45,7 @@ public class DrawablePicture extends Picture {
      * @param p possible:
      * {@link Pixmap#NONE} (default)
      */
-    public void set_clip_mask (Pixmap p) { set (6, p.id); }
+    public void set_clip_mask (Pixmap p) { set (6, p.getID()); }
 
 
     /** 
@@ -116,7 +116,7 @@ public class DrawablePicture extends Picture {
     synchronized (o) {
       o.beginRequest (render.major_opcode, 4, 5 + attr.count ());
       o.writeInt32 (id);
-      o.writeInt32 (drawable.id);
+      o.writeInt32 (drawable.getID());
       o.writeInt32 (format.id ());
       o.writeInt32 (attr.bitmask);
       attr.write (o);

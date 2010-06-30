@@ -3,8 +3,8 @@ package gnu.x11;
 
 /** X ID resource. */
 public abstract class Resource {
-  public Display display;
-  public int id;
+  protected Display display;
+  protected int id;
 
 
   /** Predefined. */  
@@ -41,7 +41,16 @@ public abstract class Resource {
    *
    * @return the resource ID of this resource
    */
-  public int id () {
+  public int getID () {
     return id;
+  }
+  
+  /**
+   * Returns the Display of this resource
+   * 
+   * @return the display of this resource
+   */
+  public Display getDisplay() {
+    return display;
   }
 }

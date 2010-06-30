@@ -83,7 +83,7 @@ public class DBE extends Extension implements ErrorFactory {
       o.beginRequest (major_opcode, 3, 2 + 2 * n);
       o.writeInt32 (n);
       for (int i = 0; i < n; i++) {
-        o.writeInt32 (windows [i].id);
+        o.writeInt32 (windows [i].getID());
         o.writeInt8 (actions [i]);
         o.skip (3);
       }
@@ -178,7 +178,7 @@ public class DBE extends Extension implements ErrorFactory {
       o.beginRequest (major_opcode, 6, 2 + screen_specifiers.length);
       o.writeInt32 (screen_specifiers.length);
       for (int i = 0; i < screen_specifiers.length; i++)
-        o.writeInt32 (screen_specifiers [i].id);
+        o.writeInt32 (screen_specifiers [i].getID());
       ResponseInputStream i = display.getResponseInputStream();
       synchronized (i) {
         i.readReply (o);
@@ -208,7 +208,7 @@ public class DBE extends Extension implements ErrorFactory {
      * {@link #COPIED}
      */
     public BackBuffer (Window window, int swap_action_hint) {
-      super (window.display);
+      super (window.getDisplay());
       this.window = window;
       width = window.width;
       height = window.height;
@@ -216,7 +216,7 @@ public class DBE extends Extension implements ErrorFactory {
       RequestOutputStream o = display.getResponseOutputStream();
       synchronized (o) {
         o.beginRequest (major_opcode, 1, 4);
-        o.writeInt32 (window.id);
+        o.writeInt32 (window.getID());
         o.writeInt32 (id);
         o.writeInt8 (swap_action_hint);
         o.skip (3);

@@ -625,7 +625,7 @@ public class Print extends gnu.x11.extension.Extension
     RequestOutputStream o = display.getResponseOutputStream();
     synchronized (o) {
       o.beginRequest (major_opcode, 13, 2);
-      o.writeInt32 (window.id);
+      o.writeInt32 (window.getID());
       o.send ();
     }
   }

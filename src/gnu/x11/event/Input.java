@@ -254,7 +254,7 @@ public abstract class Input extends Event {
      */
     public void set_window(Window w) {
 
-        setEventWindowID(w.id);
+        setEventWindowID(w.getID());
     }
 
     public void setWindow(Window w) {
