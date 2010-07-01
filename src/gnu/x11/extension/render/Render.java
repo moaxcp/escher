@@ -181,9 +181,9 @@ public class Render extends gnu.x11.extension.Extension
       o.beginRequest (major_opcode, 8, 9);
       o.writeInt8 (op);
       o.skip (3);
-      o.writeInt32 (src.id);
-      o.writeInt32 (mask.id);
-      o.writeInt32 (dst.id);
+      o.writeInt32 (src.getID());
+      o.writeInt32 (mask.getID());
+      o.writeInt32 (dst.getID());
       o.writeInt16 (src_x);
       o.writeInt16 (src_y);
       o.writeInt16 (mask_x);
@@ -208,10 +208,10 @@ public class Render extends gnu.x11.extension.Extension
       o.beginRequest (major_opcode, 25, len);
       o.writeInt8 (op);
       o.skip (3);
-      o.writeInt32 (src.id ());
-      o.writeInt32 (dst.id ());
+      o.writeInt32 (src.getID());
+      o.writeInt32 (dst.getID());
       o.writeInt32 (mask_format.id ());
-      o.writeInt32 (glyphset.id ());
+      o.writeInt32 (glyphset.getID());
       o.writeInt16 (src_x);
       o.writeInt16 (src_y);
       o.writeInt8 (glyphs.length);
@@ -275,7 +275,7 @@ public class Render extends gnu.x11.extension.Extension
     Picture pic = new Picture (display);
     synchronized (o) {
       o.beginRequest (major_opcode, 33, 4);
-      o.writeInt32 (pic.id ());
+      o.writeInt32 (pic.getID());
       o.writeInt16 (red);
       o.writeInt16 (green);
       o.writeInt16 (blue);

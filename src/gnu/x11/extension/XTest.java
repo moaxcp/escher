@@ -70,8 +70,8 @@ public class XTest extends Extension {
     RequestOutputStream o = display.getResponseOutputStream();
     synchronized (o) {
       o.beginRequest (major_opcode, 1, 3);
-      o.writeInt32 (window.id);
-      o.writeInt32 (cursor.id);
+      o.writeInt32 (window.getID());
+      o.writeInt32 (cursor.getID());
       ResponseInputStream i = display.getResponseInputStream();
       synchronized (i) {
         i.readReply (o);
@@ -112,7 +112,7 @@ public class XTest extends Extension {
       o.writeInt8 (detail);
       o.skip (2);
       o.writeInt32 (delay);
-      o.writeInt32 (root.id);
+      o.writeInt32 (root.getID());
       o.skip (8);
       o.writeInt16 (x);
       o.writeInt16 (y);

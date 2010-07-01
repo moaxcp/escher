@@ -570,7 +570,7 @@ public class GL extends gnu.x11.Resource implements GLConstant {
         synchronized (o) {
             o.beginRequest(glx.major_opcode, 12, 6);
             o.writeInt32(tag);
-            o.writeInt32(font.id);
+            o.writeInt32(font.getID());
             o.writeInt32(first);
             o.writeInt32(count);
             o.writeInt32(base);

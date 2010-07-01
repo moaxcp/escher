@@ -24,7 +24,7 @@ public class GLXPixmap extends gnu.x11.Resource implements GLXDrawable {
       
       o.writeInt32 (screen_no);
       o.writeInt32 (visual.getID());
-      o.writeInt32 (pixmap.id);
+      o.writeInt32 (pixmap.getID());
       o.writeInt32 (id);
       o.send ();
     }
