@@ -72,8 +72,8 @@ public class ResponseInputStream extends FilterInputStream {
         this.display = d;
     }
 
-    private Error build_extension_error(Display display, int code, int seq_no,
-            int bad, int minor_opcode, int major_opcode) {
+    private Error buildExtensionError(Display display, int code, int seqNo,
+            int bad, int minorOpcode, int majorOpcode) {
 
         gnu.x11.extension.ErrorFactory factory = display.extensionErrorFactories[code - 128];
 
@@ -81,11 +81,11 @@ public class ResponseInputStream extends FilterInputStream {
             throw new java.lang.Error("Unsupported extension error: " + code);
         }
 
-        return factory.build(display, code, seq_no, bad, minor_opcode,
-                major_opcode);
+        return factory.build(display, code, seqNo, bad, minorOpcode,
+                majorOpcode);
     }
 
-    private void handle_exception(Throwable ex) {
+    private void handleException(Throwable ex) {
 
         ex.printStackTrace();
     }
@@ -124,7 +124,7 @@ public class ResponseInputStream extends FilterInputStream {
         try {
             v = this.read() != 0;
         } catch (IOException ex) {
-            this.handle_exception(ex);
+            this.handleException(ex);
         }
         return v;
     }
@@ -142,7 +142,7 @@ public class ResponseInputStream extends FilterInputStream {
         try {
             v = this.read();
         } catch (IOException ex) {
-            this.handle_exception(ex);
+            this.handleException(ex);
         }
         return v & 0xff;
     }
@@ -285,7 +285,7 @@ public class ResponseInputStream extends FilterInputStream {
                 offset += numread;
             }
         } catch (IOException ex) {
-            this.handle_exception(ex);
+            this.handleException(ex);
         }
     }
 
@@ -303,7 +303,7 @@ public class ResponseInputStream extends FilterInputStream {
         int major_opcode = this.readInt8();
         this.skip(21);
         if (code >= 128 && code <= 255) {
-            throw this.build_extension_error(this.display, code, seq_no, bad_value,
+            throw this.buildExtensionError(this.display, code, seq_no, bad_value,
                     minor_opcode, major_opcode);
         }
 
@@ -357,7 +357,7 @@ public class ResponseInputStream extends FilterInputStream {
             available = this.in.available();
             // System.err.println("available: " + available);
         } catch (IOException ex) {
-            this.handle_exception(ex);
+            this.handleException(ex);
         }
 
         if (available == 0) {
@@ -422,7 +422,7 @@ public class ResponseInputStream extends FilterInputStream {
         try {
             v = (this.read() << 8) | this.read();
         } catch (IOException ex) {
-            this.handle_exception(ex);
+            this.handleException(ex);
         }
         return v;
     }
@@ -440,7 +440,7 @@ public class ResponseInputStream extends FilterInputStream {
         try {
             v = (this.read() << 24) | (this.read() << 16) | (this.read() << 8) | this.read();
         } catch (IOException ex) {
-            this.handle_exception(ex);
+            this.handleException(ex);
         }
         return v;
     }
@@ -460,7 +460,7 @@ public class ResponseInputStream extends FilterInputStream {
                     | (this.read() << 32) | (this.read() << 24) | (this.read() << 16)
                     | (this.read() << 8) | this.read();
         } catch (IOException ex) {
-            this.handle_exception(ex);
+            this.handleException(ex);
         }
         return v;
     }
@@ -473,7 +473,7 @@ public class ResponseInputStream extends FilterInputStream {
         try {
             v = this.read();
         } catch (IOException ex) {
-            this.handle_exception(ex);
+            this.handleException(ex);
         }
         return v;
     }
@@ -512,7 +512,7 @@ public class ResponseInputStream extends FilterInputStream {
                 code = this.readInt8();
                 this.reset();
             } catch (IOException ex) {
-                this.handle_exception(ex);
+                this.handleException(ex);
             }
             if (code == 0) {
                 this.readError();
@@ -535,7 +535,7 @@ public class ResponseInputStream extends FilterInputStream {
                     + exp_seq_no + " got sequence number: " + seq_no;
             this.reset();
         } catch (IOException ex) {
-            this.handle_exception(ex);
+            this.handleException(ex);
         }
 
         // Now the calling thread can safely read the reply.
@@ -570,7 +570,7 @@ public class ResponseInputStream extends FilterInputStream {
                 s += super.skip(n - s);
             }
         } catch (Exception ex) {
-            this.handle_exception(ex);
+            this.handleException(ex);
         }
         return s;
     }

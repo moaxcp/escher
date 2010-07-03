@@ -98,13 +98,13 @@ public class RequestOutputStream extends FilterOutputStream {
   /**
    * The index into the current request.
    */
-  private int request_index;
+  private int requestIndex;
 
   /**
    * The request object. This is written to the stream when flushing.
    */
   // TODO: Restrict visibility.
-  RequestObject request_object;
+  RequestObject requestObject;
 
   /**
    * The sequence number of the current request.
@@ -245,7 +245,7 @@ public class RequestOutputStream extends FilterOutputStream {
 
   boolean sendPendingRequest() {
       
-      if (request_object != null || index > request_index) {
+      if (requestObject != null || index > requestIndex) {
           send ();
           return true;
       }
@@ -273,16 +273,16 @@ public class RequestOutputStream extends FilterOutputStream {
 
     assert Thread.holdsLock (this);
 
-    if (request_object != null) {
-      request_object.write (this);
-      request_object = null;
+    if (requestObject != null) {
+      requestObject.write (this);
+      requestObject = null;
     }
-    if (index > request_index) {
+    if (index > requestIndex) {
       // Possibly pad request.
-      int pad = pad (index - request_index);
+      int pad = pad (index - requestIndex);
       if (pad != 0)
         skip (pad);
-      request_index = index;
+      requestIndex = index;
       if (index > (buffer.length - Buffer.FLUSH_THRESHOLD.getSize())
           || sendMode == SendMode.SYNCHRONOUS
           || sendMode == SendMode.ROUND_TRIP) {
@@ -313,7 +313,7 @@ public class RequestOutputStream extends FilterOutputStream {
    * @return the opcode of the current request
    */
   public int currentOpcode () {
-    return index > request_index ? buffer [request_index] : -1;
+    return index > requestIndex ? buffer [requestIndex] : -1;
   }
 
   /**
@@ -322,7 +322,7 @@ public class RequestOutputStream extends FilterOutputStream {
    * @param i the write index to set
    */
   public void setIndex (int i) {
-    index = i + request_index;
+    index = i + requestIndex;
   }
 
   /**
@@ -331,7 +331,7 @@ public class RequestOutputStream extends FilterOutputStream {
    * @return the current index in the current request buffer
    */
   public int getIndex() {
-      return index - request_index;
+      return index - requestIndex;
   }
 
   /**
@@ -375,14 +375,14 @@ public class RequestOutputStream extends FilterOutputStream {
   public synchronized void flush () {
     try {
 
-      if (request_object != null) {
+      if (requestObject != null) {
         //System.err.println("request object: " + request_object);
-        request_object.write (this);
-        request_object = null;
+        requestObject.write (this);
+        requestObject = null;
       }
       if (index > 0) {
         // Possibly pad request.
-        int pad = pad (index - request_index);
+        int pad = pad (index - requestIndex);
         if (pad != 0)
           skip (pad);
         try {
@@ -391,7 +391,7 @@ public class RequestOutputStream extends FilterOutputStream {
           handleException (ex);
         }
         index = 0;
-        request_index = 0;
+        requestIndex = 0;
       }
 
       out.flush ();
@@ -462,7 +462,7 @@ public class RequestOutputStream extends FilterOutputStream {
    * @return the INT32 value at the specified index
    */
   public int getInt32 (int index) {
-    int req_index = index + request_index;
+    int req_index = index + requestIndex;
     int int32 = (buffer[req_index] << 24) | (buffer[req_index + 1] << 16)
                 | (buffer[req_index + 2] << 8) | buffer[req_index + 3];
     return int32;
@@ -609,11 +609,11 @@ public class RequestOutputStream extends FilterOutputStream {
   }
 
   public void increaseLength (int i) {
-    int l = (((int) (buffer[request_index + 2] & 0xff)) << 8)
-            + (buffer[request_index + 3] & 0xff);
+    int l = (((int) (buffer[requestIndex + 2] & 0xff)) << 8)
+            + (buffer[requestIndex + 3] & 0xff);
     l += i;
-    buffer [request_index + 2] = (byte) (l >> 8);
-    buffer [request_index + 3] = (byte) l;
+    buffer [requestIndex + 2] = (byte) (l >> 8);
+    buffer [requestIndex + 3] = (byte) l;
 
   }
 
@@ -630,11 +630,11 @@ public class RequestOutputStream extends FilterOutputStream {
    *         <code>null</code>
    */
   public RequestObject getRequestObject() {
-    return request_object;
+    return requestObject;
   }
 
   public void setRequestObject(RequestObject ro) {
-    request_object = ro;
+    requestObject = ro;
   }
 
   public int getBufferLength() {

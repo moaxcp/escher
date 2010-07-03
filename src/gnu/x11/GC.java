@@ -646,15 +646,15 @@ public class GC extends Fontable {
     RequestOutputStream o = display.getResponseOutputStream();
     synchronized (o) {
       if (o.opcode () == 56
-          && o.request_object instanceof ChangeGCRequestObject) {
+          && o.requestObject instanceof ChangeGCRequestObject) {
         // Aggregate request.
-        ChangeGCRequestObject r = (ChangeGCRequestObject) o.request_object;
+        ChangeGCRequestObject r = (ChangeGCRequestObject) o.requestObject;
         r.values.setArcMode (am);
       } else {
         o.beginRequest (56, 0, 0);
         changeGCRequest.clear ();
         changeGCRequest.values.setArcMode (am);
-        o.request_object = changeGCRequest;
+        o.requestObject = changeGCRequest;
       }
     }
   }    
@@ -676,15 +676,15 @@ public class GC extends Fontable {
     RequestOutputStream o = display.getResponseOutputStream();
     synchronized (o) {
       if (o.opcode () == 56
-          && o.request_object instanceof ChangeGCRequestObject) {
+          && o.requestObject instanceof ChangeGCRequestObject) {
         // Aggregate request.
-        ChangeGCRequestObject r = (ChangeGCRequestObject) o.request_object;
+        ChangeGCRequestObject r = (ChangeGCRequestObject) o.requestObject;
         r.values.setBackground (pixel);
       } else {
         o.beginRequest (56, 0, 0);
         changeGCRequest.clear ();
         changeGCRequest.values.setBackground (pixel);
-        o.request_object = changeGCRequest;
+        o.requestObject = changeGCRequest;
       }
     }
   }
@@ -698,15 +698,15 @@ public class GC extends Fontable {
     RequestOutputStream o = display.getResponseOutputStream();
     synchronized (o) {
       if (o.opcode () == 56
-          && o.request_object instanceof ChangeGCRequestObject) {
+          && o.requestObject instanceof ChangeGCRequestObject) {
         // Aggregate request.
-        ChangeGCRequestObject r = (ChangeGCRequestObject) o.request_object;
+        ChangeGCRequestObject r = (ChangeGCRequestObject) o.requestObject;
         r.values.setCapStyle (cs);
       } else {
         o.beginRequest (56, 0, 0);
         changeGCRequest.clear ();
         changeGCRequest.values.setCapStyle (cs);
-        o.request_object = changeGCRequest;
+        o.requestObject = changeGCRequest;
       }
     }
   }
@@ -720,15 +720,15 @@ public class GC extends Fontable {
     RequestOutputStream o = display.getResponseOutputStream();
     synchronized (o) {
       if (o.opcode () == 56
-          && o.request_object instanceof ChangeGCRequestObject) {
+          && o.requestObject instanceof ChangeGCRequestObject) {
         // Aggregate request.
-        ChangeGCRequestObject r = (ChangeGCRequestObject) o.request_object;
+        ChangeGCRequestObject r = (ChangeGCRequestObject) o.requestObject;
         r.values.setClipMask (pixmap);
       } else {
         o.beginRequest (56, 0, 0);
         changeGCRequest.clear ();
         changeGCRequest.values.setClipMask (pixmap);
-        o.request_object = changeGCRequest;
+        o.requestObject = changeGCRequest;
       }
     }
   }
@@ -742,15 +742,15 @@ public class GC extends Fontable {
     RequestOutputStream o = display.getResponseOutputStream();
     synchronized (o) {
       if (o.opcode () == 56
-          && o.request_object instanceof ChangeGCRequestObject) {
+          && o.requestObject instanceof ChangeGCRequestObject) {
         // Aggregate request.
-        ChangeGCRequestObject r = (ChangeGCRequestObject) o.request_object;
+        ChangeGCRequestObject r = (ChangeGCRequestObject) o.requestObject;
         r.values.setClipXOrigin (i);
       } else {
         o.beginRequest (56, 0, 0);
         changeGCRequest.clear ();
         changeGCRequest.values.setClipXOrigin (i);
-        o.request_object = changeGCRequest;
+        o.requestObject = changeGCRequest;
       }
     }
   }
@@ -764,15 +764,15 @@ public class GC extends Fontable {
     RequestOutputStream o = display.getResponseOutputStream();
     synchronized (o) {
       if (o.opcode () == 56
-          && o.request_object instanceof ChangeGCRequestObject) {
+          && o.requestObject instanceof ChangeGCRequestObject) {
         // Aggregate request.
-        ChangeGCRequestObject r = (ChangeGCRequestObject) o.request_object;
+        ChangeGCRequestObject r = (ChangeGCRequestObject) o.requestObject;
         r.values.setClipYOrigin (i);
       } else {
         o.beginRequest (56, 0, 0);
         changeGCRequest.clear ();
         changeGCRequest.values.setClipYOrigin (i);
-        o.request_object = changeGCRequest;
+        o.requestObject = changeGCRequest;
       }
     }
   }
@@ -786,15 +786,15 @@ public class GC extends Fontable {
     RequestOutputStream o = display.getResponseOutputStream();
     synchronized (o) {
       if (o.opcode () == 56
-          && o.request_object instanceof ChangeGCRequestObject) {
+          && o.requestObject instanceof ChangeGCRequestObject) {
         // Aggregate request.
-        ChangeGCRequestObject r = (ChangeGCRequestObject) o.request_object;
+        ChangeGCRequestObject r = (ChangeGCRequestObject) o.requestObject;
         r.values.setDashes (i);
       } else {
         o.beginRequest (56, 0, 0);
         changeGCRequest.clear ();
         changeGCRequest.values.setDashes (i);
-        o.request_object = changeGCRequest;
+        o.requestObject = changeGCRequest;
       }
     }
   }
@@ -808,15 +808,15 @@ public class GC extends Fontable {
     RequestOutputStream o = display.getResponseOutputStream();
     synchronized (o) {
       if (o.opcode () == 56
-          && o.request_object instanceof ChangeGCRequestObject) {
+          && o.requestObject instanceof ChangeGCRequestObject) {
         // Aggregate request.
-        ChangeGCRequestObject r = (ChangeGCRequestObject) o.request_object;
+        ChangeGCRequestObject r = (ChangeGCRequestObject) o.requestObject;
         r.values.setDashOffset (i);
       } else {
         o.beginRequest (56, 0, 0);
         changeGCRequest.clear ();
         changeGCRequest.values.setDashOffset (i);
-        o.request_object = changeGCRequest;
+        o.requestObject = changeGCRequest;
       }
     }
   }
@@ -830,15 +830,15 @@ public class GC extends Fontable {
     RequestOutputStream o = display.getResponseOutputStream();
     synchronized (o) {
       if (o.opcode () == 56
-          && o.request_object instanceof ChangeGCRequestObject) {
+          && o.requestObject instanceof ChangeGCRequestObject) {
         // Aggregate request.
-        ChangeGCRequestObject r = (ChangeGCRequestObject) o.request_object;
+        ChangeGCRequestObject r = (ChangeGCRequestObject) o.requestObject;
         r.values.setFillRule (fr);
       } else {
         o.beginRequest (56, 0, 0);
         changeGCRequest.clear ();
         changeGCRequest.values.setFillRule (fr);
-        o.request_object = changeGCRequest;
+        o.requestObject = changeGCRequest;
       }
     }
   }
@@ -852,15 +852,15 @@ public class GC extends Fontable {
     RequestOutputStream o = display.getResponseOutputStream();
     synchronized (o) {
       if (o.opcode () == 56
-          && o.request_object instanceof ChangeGCRequestObject) {
+          && o.requestObject instanceof ChangeGCRequestObject) {
         // Aggregate request.
-        ChangeGCRequestObject r = (ChangeGCRequestObject) o.request_object;
+        ChangeGCRequestObject r = (ChangeGCRequestObject) o.requestObject;
         r.values.setFillStyle (fs);
       } else {
         o.beginRequest (56, 0, 0);
         changeGCRequest.clear ();
         changeGCRequest.values.setFillStyle (fs);
-        o.request_object = changeGCRequest;
+        o.requestObject = changeGCRequest;
       }
     }
   }
@@ -874,15 +874,15 @@ public class GC extends Fontable {
     RequestOutputStream o = display.getResponseOutputStream();
     synchronized (o) {
       if (o.opcode () == 56
-          && o.request_object instanceof ChangeGCRequestObject) {
+          && o.requestObject instanceof ChangeGCRequestObject) {
         // Aggregate request.
-        ChangeGCRequestObject r = (ChangeGCRequestObject) o.request_object;
+        ChangeGCRequestObject r = (ChangeGCRequestObject) o.requestObject;
         r.values.set_font (font);
       } else {
         o.beginRequest (56, 0, 0);
         changeGCRequest.clear ();
         changeGCRequest.values.set_font (font);
-        o.request_object = changeGCRequest;
+        o.requestObject = changeGCRequest;
       }
     }
   }
@@ -904,15 +904,15 @@ public class GC extends Fontable {
     RequestOutputStream o = display.getResponseOutputStream();
     synchronized (o) {
       if (o.opcode () == 56
-          && o.request_object instanceof ChangeGCRequestObject) {
+          && o.requestObject instanceof ChangeGCRequestObject) {
         // Aggregate request.
-        ChangeGCRequestObject r = (ChangeGCRequestObject) o.request_object;
+        ChangeGCRequestObject r = (ChangeGCRequestObject) o.requestObject;
         r.values.setForeground (pixel);
       } else {
         o.beginRequest (56, 0, 0);
         changeGCRequest.clear ();
         changeGCRequest.values.setForeground (pixel);
-        o.request_object = changeGCRequest;
+        o.requestObject = changeGCRequest;
       }
     }
   }
@@ -926,15 +926,15 @@ public class GC extends Fontable {
     RequestOutputStream o = display.getResponseOutputStream();
     synchronized (o) {
       if (o.opcode () == 56
-          && o.request_object instanceof ChangeGCRequestObject) {
+          && o.requestObject instanceof ChangeGCRequestObject) {
         // Aggregate request.
-        ChangeGCRequestObject r = (ChangeGCRequestObject) o.request_object;
+        ChangeGCRequestObject r = (ChangeGCRequestObject) o.requestObject;
         r.values.setFunction (fv);
       } else {
         o.beginRequest (56, 0, 0);
         changeGCRequest.clear ();
         changeGCRequest.values.setFunction (fv);
-        o.request_object = changeGCRequest;
+        o.requestObject = changeGCRequest;
       }
     }
   }
@@ -948,15 +948,15 @@ public class GC extends Fontable {
     RequestOutputStream o = display.getResponseOutputStream();
     synchronized (o) {
       if (o.opcode () == 56
-          && o.request_object instanceof ChangeGCRequestObject) {
+          && o.requestObject instanceof ChangeGCRequestObject) {
         // Aggregate request.
-        ChangeGCRequestObject r = (ChangeGCRequestObject) o.request_object;
+        ChangeGCRequestObject r = (ChangeGCRequestObject) o.requestObject;
         r.values.setGraphicsExposures (b);
       } else {
         o.beginRequest (56, 0, 0);
         changeGCRequest.clear ();
         changeGCRequest.values.setGraphicsExposures (b);
-        o.request_object = changeGCRequest;
+        o.requestObject = changeGCRequest;
       }
     }
   }
@@ -970,15 +970,15 @@ public class GC extends Fontable {
     RequestOutputStream o = display.getResponseOutputStream();
     synchronized (o) {
       if (o.opcode () == 56
-          && o.request_object instanceof ChangeGCRequestObject) {
+          && o.requestObject instanceof ChangeGCRequestObject) {
         // Aggregate request.
-        ChangeGCRequestObject r = (ChangeGCRequestObject) o.request_object;
+        ChangeGCRequestObject r = (ChangeGCRequestObject) o.requestObject;
         r.values.setJoinStyle (js);
       } else {
         o.beginRequest (56, 0, 0);
         changeGCRequest.clear ();
         changeGCRequest.values.setJoinStyle (js);
-        o.request_object = changeGCRequest;
+        o.requestObject = changeGCRequest;
       }
     }
   }
@@ -992,15 +992,15 @@ public class GC extends Fontable {
     RequestOutputStream o = display.getResponseOutputStream();
     synchronized (o) {
       if (o.opcode () == 56
-          && o.request_object instanceof ChangeGCRequestObject) {
+          && o.requestObject instanceof ChangeGCRequestObject) {
         // Aggregate request.
-        ChangeGCRequestObject r = (ChangeGCRequestObject) o.request_object;
+        ChangeGCRequestObject r = (ChangeGCRequestObject) o.requestObject;
         r.values.setLineStyle (ls);
       } else {
         o.beginRequest (56, 0, 0);
         changeGCRequest.clear ();
         changeGCRequest.values.setLineStyle (ls);
-        o.request_object = changeGCRequest;
+        o.requestObject = changeGCRequest;
       }
     }
   }
@@ -1014,15 +1014,15 @@ public class GC extends Fontable {
     RequestOutputStream o = display.getResponseOutputStream();
     synchronized (o) {
       if (o.opcode () == 56
-          && o.request_object instanceof ChangeGCRequestObject) {
+          && o.requestObject instanceof ChangeGCRequestObject) {
         // Aggregate request.
-        ChangeGCRequestObject r = (ChangeGCRequestObject) o.request_object;
+        ChangeGCRequestObject r = (ChangeGCRequestObject) o.requestObject;
         r.values.setLineWidth (i);
       } else {
         o.beginRequest (56, 0, 0);
         changeGCRequest.clear ();
         changeGCRequest.values.setLineWidth (i);
-        o.request_object = changeGCRequest;
+        o.requestObject = changeGCRequest;
       }
     }
   }
@@ -1036,15 +1036,15 @@ public class GC extends Fontable {
     RequestOutputStream o = display.getResponseOutputStream();
     synchronized (o) {
       if (o.opcode () == 56
-          && o.request_object instanceof ChangeGCRequestObject) {
+          && o.requestObject instanceof ChangeGCRequestObject) {
         // Aggregate request.
-        ChangeGCRequestObject r = (ChangeGCRequestObject) o.request_object;
+        ChangeGCRequestObject r = (ChangeGCRequestObject) o.requestObject;
         r.values.setPlaneMask (i);
       } else {
         o.beginRequest (56, 0, 0);
         changeGCRequest.clear ();
         changeGCRequest.values.setPlaneMask (i);
-        o.request_object = changeGCRequest;
+        o.requestObject = changeGCRequest;
       }
     }
   }
@@ -1058,15 +1058,15 @@ public class GC extends Fontable {
     RequestOutputStream o = display.getResponseOutputStream();
     synchronized (o) {
       if (o.opcode () == 56
-          && o.request_object instanceof ChangeGCRequestObject) {
+          && o.requestObject instanceof ChangeGCRequestObject) {
         // Aggregate request.
-        ChangeGCRequestObject r = (ChangeGCRequestObject) o.request_object;
+        ChangeGCRequestObject r = (ChangeGCRequestObject) o.requestObject;
         r.values.setStipple (pixmap);
       } else {
         o.beginRequest (56, 0, 0);
         changeGCRequest.clear ();
         changeGCRequest.values.setStipple (pixmap);
-        o.request_object = changeGCRequest;
+        o.requestObject = changeGCRequest;
       }
     }
   }
@@ -1080,15 +1080,15 @@ public class GC extends Fontable {
     RequestOutputStream o = display.getResponseOutputStream();
     synchronized (o) {
       if (o.opcode () == 56
-          && o.request_object instanceof ChangeGCRequestObject) {
+          && o.requestObject instanceof ChangeGCRequestObject) {
         // Aggregate request.
-        ChangeGCRequestObject r = (ChangeGCRequestObject) o.request_object;
+        ChangeGCRequestObject r = (ChangeGCRequestObject) o.requestObject;
         r.values.setSubwindowMode (swm);
       } else {
         o.beginRequest (56, 0, 0);
         changeGCRequest.clear ();
         changeGCRequest.values.setSubwindowMode (swm);
-        o.request_object = changeGCRequest;
+        o.requestObject = changeGCRequest;
       }
     }
   }
@@ -1102,15 +1102,15 @@ public class GC extends Fontable {
     RequestOutputStream o = display.getResponseOutputStream();
     synchronized (o) {
       if (o.opcode () == 56
-          && o.request_object instanceof ChangeGCRequestObject) {
+          && o.requestObject instanceof ChangeGCRequestObject) {
         // Aggregate request.
-        ChangeGCRequestObject r = (ChangeGCRequestObject) o.request_object;
+        ChangeGCRequestObject r = (ChangeGCRequestObject) o.requestObject;
         r.values.setTile (pixmap);
       } else {
         o.beginRequest (56, 0, 0);
         changeGCRequest.clear ();
         changeGCRequest.values.setTile (pixmap);
-        o.request_object = changeGCRequest;
+        o.requestObject = changeGCRequest;
       }
     }
   }
@@ -1124,15 +1124,15 @@ public class GC extends Fontable {
     RequestOutputStream o = display.getResponseOutputStream();
     synchronized (o) {
       if (o.opcode () == 56
-          && o.request_object instanceof ChangeGCRequestObject) {
+          && o.requestObject instanceof ChangeGCRequestObject) {
         // Aggregate request.
-        ChangeGCRequestObject r = (ChangeGCRequestObject) o.request_object;
+        ChangeGCRequestObject r = (ChangeGCRequestObject) o.requestObject;
         r.values.setTileStippleXOrigin (i);
       } else {
         o.beginRequest (56, 0, 0);
         changeGCRequest.clear ();
         changeGCRequest.values.setTileStippleXOrigin (i);
-        o.request_object = changeGCRequest;
+        o.requestObject = changeGCRequest;
       }
     }
   }
@@ -1146,15 +1146,15 @@ public class GC extends Fontable {
     RequestOutputStream o = display.getResponseOutputStream();
     synchronized (o) {
       if (o.opcode () == 56
-          && o.request_object instanceof ChangeGCRequestObject) {
+          && o.requestObject instanceof ChangeGCRequestObject) {
         // Aggregate request.
-        ChangeGCRequestObject r = (ChangeGCRequestObject) o.request_object;
+        ChangeGCRequestObject r = (ChangeGCRequestObject) o.requestObject;
         r.values.setTileStippleXOrigin (i);
       } else {
         o.beginRequest (56, 0, 0);
         changeGCRequest.clear ();
         changeGCRequest.values.setTileStippleXOrigin (i);
-        o.request_object = changeGCRequest;
+        o.requestObject = changeGCRequest;
       }
     }
   }
