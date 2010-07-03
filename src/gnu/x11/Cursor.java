@@ -228,12 +228,12 @@ public class Cursor extends Resource {
     synchronized (o) {
       o.beginRequest (96, 0, 5);
       o.writeInt32 (id);
-      o.writeInt16 (foreground.red);
-      o.writeInt16 (foreground.green);
-      o.writeInt16 (foreground.blue);
-      o.writeInt16 (background.red);
-      o.writeInt16 (background.green);
-      o.writeInt16 (background.blue);
+      o.writeInt16 (foreground.getRed());
+      o.writeInt16 (foreground.getGreen());
+      o.writeInt16 (foreground.getBlue());
+      o.writeInt16 (background.getRed());
+      o.writeInt16 (background.getRed());
+      o.writeInt16 (background.getBlue());
       o.send ();
     }
   }

@@ -531,7 +531,7 @@ public class Colormap extends Resource {
    * @see #allocColor(int, int, int)
    */
   public Color allocColor (RGB rgb) {
-    return allocColor (rgb.red, rgb.green, rgb.blue);
+    return allocColor (rgb.getRed(), rgb.getGreen(), rgb.getBlue());
   }
 
   

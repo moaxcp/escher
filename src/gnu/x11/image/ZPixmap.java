@@ -183,7 +183,7 @@ public class ZPixmap extends Image {
     
     public void putRGB(int x, int y, RGB rgb) {
 
-        int pixel = delegate.getPixelFromRGB(rgb.red, rgb.green, rgb.blue);
+        int pixel = delegate.getPixelFromRGB(rgb.getRed(), rgb.getGreen(), rgb.getBlue());
         delegate.putPixel(x, y, pixel);
     }
 
@@ -311,9 +311,9 @@ public class ZPixmap extends Image {
          
             RGB rgb = super.getRGBFromPixel(pixel);
             
-            rgb.red = rgb.red << this.redScaleShift;
-            rgb.green = rgb.green << this.greenScaleShift;
-            rgb.blue = rgb.blue << this.blueScaleShift;
+            rgb.setRed(rgb.getRed() << this.redScaleShift);
+            rgb.setGreen(rgb.getGreen() << this.greenScaleShift);
+            rgb.setBlue(rgb.getBlue() << this.blueScaleShift);
             
             return rgb;
         }

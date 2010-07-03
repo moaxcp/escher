@@ -28,7 +28,7 @@ public class RGB {
   public static final RGB JAVA_WHITE = rgb8 (0xff, 0xff, 0xff);  
 
 
-  public int red, green, blue;
+  private int red, green, blue;
 
 
   public RGB (String spec) {
@@ -124,6 +124,32 @@ public class RGB {
 
   public String toString () {
     return "#RGB [" + red + " " + green + " " + blue + "]";
+  }
+  
+  // Getters and setters
+  
+  public int getRed() {
+    return red;
+  }
+  
+  public int getGreen() {
+      return green;
+  }
+  
+  public int getBlue() {
+    return blue;
+  }
+ 
+  public void setRed(int red) {
+    this.red = red;
+  }
+
+  public void setGreen(int green) {
+    this.green = green;
+  }
+
+  public void setBlue(int blue) {
+    this.blue = blue;
   }
 } 
 
