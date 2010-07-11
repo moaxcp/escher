@@ -1097,7 +1097,7 @@ public class Display {
         defaultColormap = defaultScreen.default_colormap();
         defaultGC = defaultScreen.default_gc();
         defaultBlack = new Color(defaultScreen.black_pixel);
-        defaultWhite = new Color(defaultScreen.white_pixel);
+        defaultWhite = new Color(defaultScreen.whitePixel);
 
         for (Pixmap.Format px : pixmapFormats) {
             if (px.getDepth() == defaultDepth) {

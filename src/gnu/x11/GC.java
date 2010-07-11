@@ -1,6 +1,5 @@
 package gnu.x11;
 
-import gnu.x11.Drawable.Fill;
 import gnu.x11.GC.Values.ArcMode;
 import gnu.x11.GC.Values.CapStyle;
 import gnu.x11.GC.Values.FillRule;

@@ -1,17 +1,12 @@
 package gnu.x11;
 
-import gnu.x11.Drawable.Fill;
-import gnu.x11.extension.glx.GLConstant;
 import gnu.x11.extension.glx.GLXCommand;
-import gnu.x11.extension.glx.GLXRenderingCommand;
 
 import java.io.FilterOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.Timer;
 import java.util.TimerTask;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * Used to create and manage requests to the X server.

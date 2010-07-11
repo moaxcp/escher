@@ -1,8 +1,5 @@
 package gnu.x11;
 
-import gnu.x11.Host.ChangeOperation;
-import gnu.x11.Host.InternetFamily;
-
 /** X keyboard and pointer. */
 public class Input {
     
@@ -50,6 +47,19 @@ public class Input {
       
       public int logicOr(int i) {
           return this.getCode() | i;
+      }
+      
+      public static KeyMask getButton(int buttonID) {
+          switch (buttonID) {
+            case 1:
+                return BUTTON1;
+            case 2:
+                return BUTTON2;
+            case 3:
+                return BUTTON3;
+            default:
+                return BUTTON1;
+          }
       }
   }
 
