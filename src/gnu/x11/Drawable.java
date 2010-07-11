@@ -395,10 +395,10 @@ public abstract class Drawable extends Resource {
             o.writeInt32(gc.id);
             for (int i = 0; i < nsegs; i++) {
                 Segment seg = segments[i];
-                o.writeInt16(seg.x1);
-                o.writeInt16(seg.y1);
-                o.writeInt16(seg.x2);
-                o.writeInt16(seg.y2);
+                o.writeInt16(seg.getX1());
+                o.writeInt16(seg.getY1());
+                o.writeInt16(seg.getX2());
+                o.writeInt16(seg.getY2());
             }
             o.send();
         }
@@ -633,13 +633,13 @@ public abstract class Drawable extends Resource {
             o.writeInt16(y);
 
             for (int i = 0; i < texts.length; i++) {
-                if (texts[i].font != null) {
+                if (texts[i].getFont() != null) {
                     o.writeInt8(255);// font-shift indicator
-                    o.writeInt32(texts[i].font.id); // java = MSB
+                    o.writeInt32(texts[i].getFont().getID()); // java = MSB
                 }
-                o.writeInt8(texts[i].s.length());
-                o.writeInt8(texts[i].delta);
-                o.writeString8(texts[i].s);
+                o.writeInt8(texts[i].getStr().length());
+                o.writeInt8(texts[i].getDelta());
+                o.writeString8(texts[i].getStr());
             }
             // Can't simply skip the padding bytes, otherwise the X server
             // would think that there are more items if the next byte in the
@@ -670,20 +670,20 @@ public abstract class Drawable extends Resource {
             o.writeInt16(y);
 
             for (int i = 0; i < texts.length; i++) {
-                if (texts[i].font != null) {
+                if (texts[i].getFont() != null) {
                     o.writeInt8(255);// font-shift indicator
-                    o.writeInt32(texts[i].font.id); // java = MSB
+                    o.writeInt32(texts[i].getFont().getID()); // java = MSB
                 }
 
-                String s = texts[i].s;
+                String s = texts[i].getStr();
 
                 if (s.charAt(0) > 128) { // non-ascii
                     o.writeInt8(s.length() / 2);
-                    o.writeInt8(texts[i].delta);
+                    o.writeInt8(texts[i].getDelta());
                     o.writeString8(s);
                 } else {// ascii
                     o.writeInt8(s.length());
-                    o.writeInt8(texts[i].delta);
+                    o.writeInt8(texts[i].getDelta());
                     o.writeString16(s);
                 }
             }

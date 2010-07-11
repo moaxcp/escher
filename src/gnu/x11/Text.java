@@ -3,21 +3,21 @@ package gnu.x11;
 
 /** Text item for drawing text to X server. */
 public class Text {
-  public String s;
-  public int delta;
-  public Font font;
+  private String str;
+  private int delta;
+  private Font font;
   
 
-  public Text (String s) { this.s = s; }
+  public Text (String s) { this.str = s; }
 
   public Text (String s, int delta) {
-    this.s = s;
+    this.str = s;
     this.delta = delta;
   }
 
 
   public Text (String s, int delta, Font font) {
-    this.s = s;
+    this.str = s;
     this.delta = delta;
     this.font = font;
   }
@@ -29,16 +29,31 @@ public class Text {
     // 5 = font field
     int n = font == null ? 2 : 5;
 
-    if (bit == 8 || s.charAt (0) > 128) // non-ascii	  
-      n = n + s.length ();
+    if (bit == 8 || str.charAt (0) > 128) // non-ascii	  
+      n = n + str.length ();
     else
-      n = n + 2 * s.length ();
+      n = n + 2 * str.length ();
 
     return n;
   }
 
 
   public String toString () {
-    return "#Text [" + s + " " + delta + " " + font + "]";
+    return "#Text [" + str + " " + delta + " " + font + "]";
+  }
+  
+   
+  public int getDelta() {
+    return delta;
+  }
+
+
+  public Font getFont() {
+    return font;
+  }
+
+
+  public String getStr() {
+    return str;
   }
 }

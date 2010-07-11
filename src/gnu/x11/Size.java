@@ -3,7 +3,7 @@ package gnu.x11;
 
 /** Width and height in geometry. */
 public class Size {
-  public int width, height;
+  private int width, height;
 
 
   public Size (int width, int height) {
@@ -14,5 +14,16 @@ public class Size {
 
   public String toString () {
     return "#Size " +  width + "x" + height;
+  }
+  
+  
+  public int getHeight() {
+
+    return height;
+  }
+
+  public int getWidth() {
+
+    return width;
   }
 }

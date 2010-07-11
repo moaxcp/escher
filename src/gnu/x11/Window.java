@@ -1921,7 +1921,7 @@ public class Window extends Drawable implements GLXDrawable {
     public Screen screen() {
 
         for (Screen screen : display.getScreens()) {
-            if (screen.root_id == id)
+            if (screen.getRootID() == id)
                 return screen;
         }
 

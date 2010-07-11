@@ -460,7 +460,7 @@ public class Display {
      */
     public VisualInfo getDefaultVisual(Screen screen) {
      
-        return this.getVisualInfo(screen.root_visual_id());
+        return this.getVisualInfo(screen.rootVisualID());
     }
     
     /**
@@ -468,7 +468,7 @@ public class Display {
      */
     public VisualInfo getDefaultVisual() {
      
-        return this.getVisualInfo(this.defaultScreen.root_visual_id());
+        return this.getVisualInfo(this.defaultScreen.rootVisualID());
     }
     
     // opcode 23 - get selection owner
@@ -1093,11 +1093,11 @@ public class Display {
 
         defaultScreen = screens[defaultScreenNumber];
         defaultRoot = defaultScreen.root(); // before init default_gc
-        defaultDepth = defaultScreen.root_depth;
-        defaultColormap = defaultScreen.default_colormap();
-        defaultGC = defaultScreen.default_gc();
-        defaultBlack = new Color(defaultScreen.black_pixel);
-        defaultWhite = new Color(defaultScreen.whitePixel);
+        defaultDepth = defaultScreen.getRootDepth();
+        defaultColormap = defaultScreen.defaultColormap();
+        defaultGC = defaultScreen.defaultGC();
+        defaultBlack = new Color(defaultScreen.getBlackPixel());
+        defaultWhite = new Color(defaultScreen.getWhitePixel());
 
         for (Pixmap.Format px : pixmapFormats) {
             if (px.getDepth() == defaultDepth) {
