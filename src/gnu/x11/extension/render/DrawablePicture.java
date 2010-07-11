@@ -118,7 +118,7 @@ public class DrawablePicture extends Picture {
       o.writeInt32 (id);
       o.writeInt32 (drawable.getID());
       o.writeInt32 (format.id ());
-      o.writeInt32 (attr.bitmask);
+      o.writeInt32 (attr.getBitmask());
       attr.write (o);
       o.send ();
     }
@@ -134,7 +134,7 @@ public class DrawablePicture extends Picture {
     synchronized (o) {
       o.beginRequest (render.major_opcode, 5, 5+attr.count ());
       o.writeInt32 (id);
-      o.writeInt32 (attr.bitmask);
+      o.writeInt32 (attr.getBitmask());
       attr.write (o);
       o.send ();    
     }

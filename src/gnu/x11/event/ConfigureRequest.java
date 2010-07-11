@@ -51,7 +51,7 @@ public final class ConfigureRequest extends Event {
 
     // since above function calls will change bitmask, 
     // read bitmask last
-    c.bitmask = bitmask ();
+    c.setBitmask(bitmask());
     return c;
   }
 

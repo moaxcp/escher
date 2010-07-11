@@ -6,8 +6,8 @@ public class ValueList {
   public static final int ALL = 0xffff;
 
 
-  public int bitmask;
-  public int [] data;
+  protected int bitmask;
+  protected int [] data;
 
 
   public ValueList (int count) {
@@ -19,7 +19,7 @@ public class ValueList {
 
 
   public void aggregate (ValueList vl) {
-    for (int i=0; i<vl.data.length && i<32; i++)
+    for (int i = 0; i < vl.data.length && i < 32; i++)
       if ((vl.bitmask & 1 << i) != 0)
         set (i, vl.data [i]);   // overwrite
   }
@@ -28,7 +28,7 @@ public class ValueList {
   public int count () {
     int k = 0;
 
-    for (int i=0; i<data.length && i<32; i++)
+    for (int i = 0; i < data.length && i < 32; i++)
       if ((bitmask & 1 << i) != 0) k++;
 
     return k;
@@ -58,5 +58,29 @@ public class ValueList {
       if ((bitmask & (1 << i)) != 0) {
         o.writeInt32 (data [i]);
       }
+  }
+  
+  
+  public int getBitmask() {
+
+    return bitmask;
+  }
+
+  
+  public void setBitmask(int bitmask) {
+
+    this.bitmask = bitmask;
+  }
+
+  
+  public int[] getData() {
+
+    return data;
+  }
+  
+  
+  public void setData(int[] data) {
+
+    this.data = data;
   }
 }
