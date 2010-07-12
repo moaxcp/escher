@@ -254,7 +254,7 @@ public class Display {
             socket = new Socket(hostname, 6000 + displayNumber);
             setSocket(socket);
         } catch (IOException ex) {
-            handle_exception(ex);
+            handleException(ex);
         }
         init_streams();
         init();
@@ -269,17 +269,17 @@ public class Display {
     private void init() throws EscherServerConnectionException {
 
         // authorization protocol
-        XAuthority xauth = get_authority();
+        XAuthority xauth = getAuthority();
 
-        byte[] auth_name;
-        byte[] auth_data;
+        byte[] authName;
+        byte[] authData;
         if (xauth != null) {
-            auth_name = xauth.protocol_name;
-            auth_data = xauth.protocol_data;
+            authName = xauth.getProtocolName();
+            authData = xauth.getProtocolData();
         } else {
             // In case the X authority couldn't be established...
-            auth_name = new byte[0];
-            auth_data = new byte[0];
+            authName = new byte[0];
+            authData = new byte[0];
         }
 
         RequestOutputStream o = outputStream;
@@ -288,13 +288,13 @@ public class Display {
             o.writeInt8(0); // Unused.
             o.writeInt16(11);// major version
             o.writeInt16(0);// minor version
-            o.writeInt16(auth_name.length);
-            o.writeInt16(auth_data.length);
+            o.writeInt16(authName.length);
+            o.writeInt16(authData.length);
             o.writeInt16(0); // Unused.
-            o.writeBytes(auth_name);
-            o.writePad(auth_name.length);
-            o.writeBytes(auth_data);
-            o.writePad(auth_data.length);
+            o.writeBytes(authName);
+            o.writePad(authName.length);
+            o.writeBytes(authData);
+            o.writePad(authData.length);
             o.flush();
             ResponseInputStream i = inputStream;
             synchronized (i) {
@@ -1051,7 +1051,7 @@ public class Display {
             outputStream.close();
             socket.close();
         } catch (IOException ex) {
-            handle_exception(ex);
+            handleException(ex);
         }
         connected = false;
     }
@@ -1194,7 +1194,7 @@ public class Display {
         resourceMask = i.readInt32();
         i.skip(4); // motion-buffer-size.
 
-        int vendor_length = i.readInt16();
+        int vendorLength = i.readInt16();
         maximumRequestLength = i.readInt16();
         extendedMaximumRequestLength = maximumRequestLength;
         
@@ -1211,8 +1211,8 @@ public class Display {
         maxKeycode = i.readInt8();
         i.skip(4); // Unused.
 
-        vendor = i.readString8(vendor_length);
-        i.pad(vendor_length);
+        vendor = i.readString8(vendorLength);
+        i.pad(vendorLength);
 
         /* ***** FORMAT ***** */
         pixmapFormats = new Pixmap.Format[pixmap_format_count];
@@ -1259,9 +1259,9 @@ public class Display {
      * 
      * @return the XAuthority that matches this display
      */
-    private XAuthority get_authority() {
+    private XAuthority getAuthority() {
 
-        XAuthority[] auths = XAuthority.get_authorities();
+        XAuthority[] auths = XAuthority.getAuthorities();
 
         // Fetch hostname.
         if (hostname == null || hostname.equals("")
@@ -1276,25 +1276,22 @@ public class Display {
         }
 
         // Fetch display no.
-        String display_no_str = String.valueOf(displayNumber);
+        String displayNo = String.valueOf(displayNumber);
 
         // Find the XAuthority that matches the hostname and display no.
         XAuthority found = null;
         for (int i = 0; i < auths.length; i++) {
             XAuthority auth = auths[i];
             try {
-                if (auth.hostname != null
-                                && auth.display.equals(display_no_str)
-                                && InetAddress
-                                                .getByName(auth.hostname)
-                                                .equals(
-                                                        InetAddress
-                                                                        .getByName(hostname))) {
+                if (auth.getHostname() != null
+                    && auth.getDisplayNumber().equals(displayNo)
+                    && InetAddress.getByName(auth.getHostname()).equals(
+                       InetAddress.getByName(hostname))) {
                     found = auth;
                     break;
                 }
             } catch (UnknownHostException ex) {
-                System.err.println("warning unknown host :" + auth.hostname);
+                System.err.println("warning unknown host :" + auth.getHostname());
             }
         }
         return found;
@@ -1353,7 +1350,7 @@ public class Display {
             inputStream = new ResponseInputStream(buf_in, this);
             
         } catch (IOException ex) {
-            handle_exception(ex);
+            handleException(ex);
         }
     }
 
@@ -1371,7 +1368,7 @@ public class Display {
         return defaultRoot;
     }
     
-    private void handle_exception(Throwable ex) {
+    private void handleException(Throwable ex) {
 
         ex.printStackTrace();
     }
