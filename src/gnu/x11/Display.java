@@ -868,10 +868,6 @@ public class Display {
         return info;
     }
 
-    public static final int INSERT = 0;
-
-    public static final int DELETE = 1;
-
     // opcode 109 - change hosts
     /**
      * @param mode

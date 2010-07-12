@@ -111,7 +111,6 @@ public class Host {
                 case 0: return Shape.DESTROY;
                 case 1: return Shape.RETAIN_PERMANENT;
                 case 2: return Shape.RETAIN_TEMPORARY;
-                
                 default: return Shape.DESTROY;
             }
         }

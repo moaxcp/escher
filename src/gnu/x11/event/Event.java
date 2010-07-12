@@ -96,7 +96,7 @@ public abstract class Event {
 
   /**
    * Writes this event into a request. This is used in
-   * {@link gnu.x11.Window#send_event(boolean, int, Event)}.
+   * {@link gnu.x11.Window#sendEvent(boolean, int, Event)}.
    *
    * @param o the output stream to write to
    */

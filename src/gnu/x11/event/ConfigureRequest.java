@@ -41,23 +41,23 @@ public final class ConfigureRequest extends Event {
   public Window.Changes changes () {
     Window.Changes c = new Window.Changes ();
 
-    c.stack_mode (stack_mode ());
+    c.stackMode (stackMode ());
     c.sibling_id (sibling_id ());
-    c.x (x ());
-    c.y (y ());
-    c.width (width ());
-    c.height (height ());
-    c.border_width (border_width ());
+    c.setX (x ());
+    c.setY (y ());
+    c.setWidth (width ());
+    c.setHeight (height ());
+    c.borderWidth (border_width ());
 
     // since above function calls will change bitmask, 
     // read bitmask last
-    c.setBitmask(bitmask());
+    c.setBitmask(bitmask ());
     return c;
   }
 
 
-  public int stack_mode () {
-    return detail;
+  public Window.Changes.StackMode stackMode () {
+    return Window.Changes.StackMode.getByCode(detail);
   }
 
   public int sibling_id () {

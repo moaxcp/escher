@@ -11,7 +11,7 @@ public class Window extends Drawable implements GLXDrawable {
      * Predefined windows.
      * 
      * <p>
-     * All predefined resources are not "properly" initialzied, in the sense
+     * All predefined resources are not "properly" initialized, in the sense
      * that member variable <code>display</code> is <code>null</code>. That
      * is, they are not connected to any X server, and cannot be used for server
      * interaction (because <code>display == null</code>, resulting in
@@ -22,8 +22,8 @@ public class Window extends Drawable implements GLXDrawable {
      * do:
      * 
      * <pre><code>
-     *   Window.NONE.display = ...;
-     *   Window.NONE.set_selection_owner (...);
+     *   Window.NONE.setDisplay = ...;
+     *   Window.NONE.setSelectionOwner (...);
      * </code></pre>
      * 
      * <p>
@@ -49,10 +49,721 @@ public class Window extends Drawable implements GLXDrawable {
      */
     public static final Window NONE = new Window(0);
 
-    public int x, y;
+    private int x, y;
 
-    public Window parent;
+    
+    private Window parent;
+    
+    
+    public enum WinClass {
+        COPY_FROM_PARENT(0),
+        INPUT_OUTPUT(1),
+        INPUT_ONLY(2);
+        
+        private int code;
+        
+        WinClass(int cd) {
+            this.code = cd;
+        }
+        
+        public int getCode() {
+            return code;
+        }
+        
+        public static WinClass getByID(int id) {
+            switch (id)
+            {
+                case 0: return COPY_FROM_PARENT;
+                case 1: return INPUT_OUTPUT;
+                case 2: return INPUT_ONLY;
+                default: return COPY_FROM_PARENT;
+            }
+        }
+    }
+    
+    
+    public enum MapState {
+        UNMAPPED(0),
+        UNVIEWABLE(1),
+        VIEWABLE(2);
+        
+        private int code;
+        
+        
+        private MapState(int code) {
+            this.code = code;
+        }
+        
+        public int getCode() {
+            return code;
+        }
+        
+        public static MapState getByCode(int code) {
+            switch (code) {
+                case 0: return UNMAPPED;
+                case 1: return UNVIEWABLE;
+                case 2: return VIEWABLE;
+                default: return UNMAPPED;
+            }
+        }
+    }
+    
+    
+    public enum CirculateDirection {
+        RAISE_LOWEST(0),
+        LOWER_HIGHEST(1);
+        
+        private int code;
+        
+        CirculateDirection(int code) {
+            this.code = code;
+        }
+        
+        public int getCode() {
+            return code;
+        }
+    }
+    
+    
+    public enum PropertyMode {
+        REPLACE(0),
+        PREPEND(1),
+        APPEND(2);
+        
+        private int code;
+        
+        PropertyMode(int code) {
+            this.code = code;
+        }
+        
+        public int getCode() {
+            return code;
+        }
+    }
+    
+    
+    public enum GrabMode {
+        SYNCHRONOUS(0),
+        ASYNCHRONOUS(1);
+        
+        private int code;
+        
+        GrabMode(int code) {
+            this.code = code;
+        }
+        
+        public int getCode() {
+            return code;
+        }
+    }
+    
+    
+    public enum GrabStatus {
+        SUCCESS(0),
+        ALREADY_GRABBED(1),
+        INVALID_TIME(2),
+        NOT_VIEWABLE(3),
+        FROZEN(4);        
+        
+        private int code;
+        
+        GrabStatus(int code) {
+            this.code = code;
+        }
+        
+        public int getCode() {
+            return code;
+        }
+        
+        public static GrabStatus getByCode(int code) {
+            switch (code) {
+                case 0: return SUCCESS;
+                case 1: return ALREADY_GRABBED;
+                case 2: return INVALID_TIME;
+                case 3: return NOT_VIEWABLE;
+                case 4: return FROZEN;
+                default: return SUCCESS;
+            }
+        }
+    }
+    
+    
+    public enum RevertTo {
+        TO_NONE(0),
+        TO_POINTER_ROOT(1),
+        TO_PARENT(2);
+        
+        private int code;
+        
+        RevertTo(int code) {
+            this.code = code;
+        }
+        
+        public int getCode() {
+            return code;
+        }
+    }
 
+    
+    public enum WMInitialState {
+        WITHDRAWN(0),
+        NORMAL(1),
+        ICONIC(3);
+        
+        private int code;
+        
+        WMInitialState(int code) {
+            this.code = code;
+        }
+        
+        public int getCode() {
+            return code;
+        }
+        
+        public static WMInitialState getByCode(int code) {
+            switch (code) {
+                case 0: return WITHDRAWN;
+                case 1: return NORMAL;
+                case 2: return ICONIC;
+                default: return WITHDRAWN;
+            }
+        }
+    }
+
+    
+    /** X window changes. */
+    public static class Changes extends ValueList {
+
+        public Changes() {
+
+            super(7);
+        }
+
+        public void setX(int i) {
+
+            set(0, i);
+        }
+
+        public void setY(int i) {
+
+            set(1, i);
+        }
+
+        public void setWidth(int i) {
+
+            set(2, i);
+        }
+
+        public void setHeight(int i) {
+
+            set(3, i);
+        }
+
+        public void borderWidth(int i) {
+
+            set(4, i);
+        }
+
+        public void sibling_id(int i) {
+
+            set(5, i);
+        }
+
+        public void sibling(Window window) {
+
+            sibling_id(window.id);
+        }
+
+        public enum StackMode {
+            ABOVE(0),
+            BELOW(1),
+            TOP_IF(2),
+            BOTTOM_IF(3),
+            OPPOSITE(4);
+            
+            private int code;
+            
+            StackMode(int code) {
+                this.code = code;
+            }
+            
+            public int getCode() {
+
+                return code;
+            }
+            
+            public static StackMode getByCode(int code) {
+                switch (code) {
+                    case 0: return ABOVE;
+                    case 1: return BELOW;
+                    case 2: return TOP_IF;
+                    case 3: return BOTTOM_IF;
+                    case 4: return OPPOSITE;
+                    default: return ABOVE;
+                }
+            }
+        }
+
+        /**
+         * @param i
+         *                valid: {@link #ABOVE}, {@link #BELOW},
+         *                {@link #TOP_IF}, {@link #BOTTOM_IF},
+         *                {@link #OPPOSITE}
+         */
+        public void stackMode(StackMode mode) {
+
+            set(6, mode.getCode());
+        }
+
+        public Object clone() {
+
+            Changes changes = new Changes();
+            changes.copy(this);
+            return changes;
+        }
+    }
+    
+   
+    /** Reply of {@link #tree()}. */
+    public class TreeInfo {
+
+        Window root;
+
+        Window parent;
+
+        private Window[] children;
+
+        TreeInfo(ResponseInputStream i) {
+
+            root = (Window) intern(display, i.readInt32());
+            int parent_id = i.readInt32();
+            if (parent_id != 0)
+                parent = (Window) intern(display, parent_id);
+            else
+                parent = null;
+
+            int numWindows = i.readInt16();
+            i.skip(14);
+            children = new Window[numWindows];
+            for (int j = 0; j < numWindows; j++) {
+                int id = i.readInt32();
+                children[j] = (Window) intern(display, id);
+            }
+        }
+
+        public Window[] children() {
+
+            return children;
+        }
+    }
+
+    
+    /** Reply of {@link #property(boolean, Atom, Atom, int, int)}. */
+    public class Property {
+
+        private int format;
+
+        private int typeID;
+
+        private int bytesAfter;
+
+        private int length;
+
+        private byte[] value;
+
+        Property(ResponseInputStream i) {
+
+            format = i.readInt8();
+            i.skip(6);
+            typeID = i.readInt32();
+            bytesAfter = i.readInt32();
+            length = i.readInt32();
+            i.skip(12);
+            int num_bytes;
+            switch (format) {
+            case 8:
+                num_bytes = length;
+                break;
+            case 16:
+                num_bytes = length * 2;
+                break;
+            case 32:
+                num_bytes = length * 4;
+                break;
+            default:
+                num_bytes = 0;
+            }
+            value = new byte[num_bytes];
+            i.readData(value);
+            int p = RequestOutputStream.pad(num_bytes);
+            if (p > 0)
+                i.skip(p);
+        }
+
+        public int format() {
+
+            return format;
+        }
+
+        public int typeID() {
+
+            return typeID;
+        }
+
+        /**
+         * Returns the value at index <code>i</code>. This interprets the
+         * underlying byte data according to the format of this property.
+         * 
+         * @param i
+         *                the index
+         * 
+         * @return the value at the specified index
+         */
+        public int value(int i) {
+
+            int v;
+            switch (format) {
+            case 8:
+                v = value[i];
+                break;
+            case 16:
+                v = ((0xff & value[i * 2]) << 8) | (0xff & value[i * 2 + 1]);
+                break;
+            case 32:
+                v = ((0xff & value[i * 4]) << 24)
+                        | ((0xff & value[i * 4 + 1]) << 16)
+                        | ((0xff & value[i * 4 + 2] << 8))
+                        | (0xff & ((int) value[i * 4 + 3]));
+                break;
+            default:
+                throw new ArrayIndexOutOfBoundsException();
+            }
+            return v;
+        }
+
+        /**
+         * Returns the property value as string.
+         * 
+         * @return the property value as string
+         */
+        public String stringValue() {
+
+            return new String(value);
+        }
+    }
+    
+    
+    /** Reply of {@link #getAttributes()}. */
+    public static class AttributesReply {
+
+        private Screen.BackingStore backingStore;
+
+        private Visual visualID;
+
+        private WinClass windowClass;
+
+        private int bitGravity;
+
+        private int winGravity;
+
+        private int backingPlanes;
+
+        private int backingPixel;
+
+        private boolean saveUnder;
+
+        private boolean mapIsInstalled;
+
+        private MapState mapState;
+
+        private boolean overrideRedirect;
+
+        private int colormapID;
+
+        private int allEventMasks;
+
+        private int yourEventMask;
+
+        private int doNotPropagateMask;
+
+        /**
+         * Reads the AttributesReply data from the specified input stream.
+         */
+        public AttributesReply(ResponseInputStream in) {
+
+            int code = in.readInt8();
+            assert code == 1 : "Errors and events should be catched in Connection";
+
+            backingStore = Screen.BackingStore.getCode(in.readInt8());
+
+            in.readInt16(); // Sequence number, not needed.
+
+            in.readInt32(); // Reply length, not needed.
+
+            visualID = Visual.getVisual(in.readInt32());
+            windowClass = WinClass.getByID(in.readInt16());
+            bitGravity = in.readInt8();
+            winGravity = in.readInt8();
+            backingPlanes = in.readInt32();
+            backingPixel = in.readInt32();
+            saveUnder = in.readBool();
+            mapIsInstalled = in.readBool();
+            mapState = MapState.getByCode(in.readInt8());
+            overrideRedirect = in.readBool();
+            colormapID = in.readInt32();
+            allEventMasks = in.readInt32();
+            yourEventMask = in.readInt32();
+            doNotPropagateMask = in.readInt16();
+            in.skip(2); // Unused.
+        }
+
+        /**
+         * @return valid: {@link MapState}
+         */
+        public MapState mapState() {
+            return mapState;
+        }
+
+        public boolean overrideRedirect() {
+            return overrideRedirect;
+        }
+    }
+
+    
+    /** Reply of {@link #pointer()}. */
+    public class PointerInfo {
+
+        private boolean sameScreen;
+
+        private Window root;
+
+        private Window child;
+
+        private int rootX;
+
+        private int rootY;
+
+        private int winX;
+
+        private int winY;
+
+        private int mask;
+
+        PointerInfo(ResponseInputStream i) {
+
+            sameScreen = i.readBool();
+            i.skip(6);
+
+            int root_id = i.readInt32();
+            root = (Window) intern(display, root_id);
+
+            int child_id = i.readInt32();
+            if (child_id != 0)
+                child = (Window) intern(display, root_id);
+            else
+                child = null;
+
+            rootX = i.readInt16();
+            rootY = i.readInt16();
+            winX = i.readInt16();
+            winY = i.readInt16();
+            mask = i.readInt16();
+        }
+
+        public Point rootPosition() {
+            return new Point(rootX, rootY);
+        }
+    }
+    
+    
+    /** Reply of {@link #getMotionEvents(int, int)} */
+    public static class TimeCoord {
+
+        public long timestamp;
+
+        public int x;
+
+        public int y;
+
+        TimeCoord(ResponseInputStream i) {
+
+            timestamp = i.readInt32();
+            x = i.readInt16();
+            y = i.readInt16();
+        }
+    }
+    
+    
+    /** Reply of {@link #translateCoordinates(Window, int, int)}. */
+    public class Coordinates {
+
+        private boolean sameScreen;
+
+        private Window child;
+
+        private int x;
+
+        private int y;
+
+        Coordinates(ResponseInputStream i) {
+
+            sameScreen = i.readBool();
+            i.skip(6);
+            int child_id = i.readInt32();
+            if (child_id != 0)
+                child = (Window) intern(display, child_id);
+            else
+                child = null;
+            x = i.readInt16();
+            y = i.readInt16();
+        }
+    }
+
+    
+    /** X window manager class hint. */
+    public static class WMClassHint {
+
+        public String res;
+
+        public int middle;
+
+        public WMClassHint(Data data) {
+
+            int len = data.read4(16) - 1;
+            res = data.readString(32, len);
+            middle = res.indexOf(0);
+        }
+
+        public boolean classEquals(String res_class) {
+
+            if (res_class == null)
+                return false;
+            return res.endsWith(res_class);
+        }
+
+        public boolean classEquals(WMClassHint hint) {
+
+            if (hint == null)
+                return false;
+            return classEquals(hint.resClass());
+        }
+
+        public boolean equals(WMClassHint hint) {
+
+            if (hint == null)
+                return false;
+            return res.equals(hint.res);
+        }
+
+        public boolean equals(String resName, String resClass) {
+
+            if (resName == null || resClass == null)
+                return false;
+            if (resName.length() + resClass.length() != res.length() - 1)
+                return false;
+
+            String res0 = resName + "\0" + resClass;
+            return res.equals(res0);
+        }
+
+        public String resName() {
+
+            return res.substring(0, middle);
+        }
+
+        public String resClass() {
+
+            return res.substring(middle + 1, res.length());
+        }
+
+        public String toString() {
+
+            return "[" + resName() + " " + resClass() + "]";
+        }
+    }
+    
+    /** X window manager hints. */
+    public static class WMHints extends Data {
+
+        public WMHints(Data data) {
+
+            super(data);
+        }
+
+        public static final int INPUT_HINT_MASK = 1 << 0;
+
+        public static final int STATE_HINT_MASK = 1 << 1;
+
+        public static final int ICON_PIXMAP_HINT_MASK = 1 << 2;
+
+        public static final int ICON_WINDOW_HINT_MASK = 1 << 3;
+
+        public static final int ICON_POSITION_HINT_MASK = 1 << 4;
+
+        public static final int ICON_MASK_HINT_MASK = 1 << 5;
+
+        public static final int WINDOW_GROUP_HINT_MASK = 1 << 6;
+
+        public static final int URGENCY_HINT_MASK = 1 << 8;
+
+        /**
+         * @return valid: {@link #INPUT_HINT_MASK}, {@link #STATE_HINT_MASK},
+         *         {@link #ICON_PIXMAP_HINT_MASK},
+         *         {@link #ICON_WINDOW_HINT_MASK},
+         *         {@link #ICON_POSITION_HINT_MASK},
+         *         {@link #ICON_MASK_HINT_MASK},
+         *         {@link #WINDOW_GROUP_HINT_MASK}, {@link #URGENCY_HINT_MASK}
+         */
+        public int flags() {
+
+            return read4(32);
+        }
+
+
+        /**
+         * @return valid: {@link WMInitialState.WITHDRAWN}, {@link WMInitialState.NORMAL}, {@link WMInitialState.ICONIC}
+         */
+        public WMInitialState initialState() {
+
+            return WMInitialState.getByCode(read4(40));
+        }
+    }
+
+    
+    /** X window manager state. */
+    public static class WMState extends Data {
+
+        private Display display;
+
+        public WMState(Display display, Data data) {
+
+            super(data);
+            this.display = display;
+        }
+
+        /**
+         * @return valid:
+         * {@link WMInitialState.WITHDRAWN},
+         * {@link WMInitialState.NORMAL},
+         * {@link WMInitialState.ICONIC}
+         */
+        public WMInitialState state() {
+
+            return WMInitialState.getByCode(read4(32));
+        }
+
+        public int iconID() {
+
+            return read4(36);
+        }
+
+        public Window icon() {
+
+            return (Window) intern(display, iconID());
+        }
+    }
+    
+    
     /** Predefined. */
     public Window(int id) {
 
@@ -73,217 +784,14 @@ public class Window extends Drawable implements GLXDrawable {
         this(parent, geometry.getX(), geometry.getY(), geometry.getWidth(), geometry.getHeight());
     }
 
-    /** X window attributes. */
-    public static class Attributes extends ValueList {
-
-        public final static Attributes EMPTY = new Attributes();
-
-        public Attributes() {
-
-            super(15);
-        }
-
-        /**
-         * @param p
-         *                possible: {@link Pixmap#NONE} (default),
-         *                {@link Pixmap#PARENT_RELATIVE}
-         */
-        public void set_background(Pixmap p) {
-
-            set(0, p.id);
-        }
-
-        /**
-         * @see #set_background(int)
-         */
-        public void set_background(Color c) {
-
-            set_background(c.getPixel());
-        }
-
-        public void set_background(int pixel) {
-
-            set(1, pixel);
-        }
-
-        /**
-         * @param p
-         *                possible: {@link Pixmap#COPY_FROM_PARENT} (default)
-         */
-        public void set_border(Pixmap p) {
-
-            set(2, p.id);
-        }
-
-        /**
-         * @see #set_border(int)
-         */
-        public void set_border(Color c) {
-
-            set_border(c.getPixel());
-        }
-
-        public void set_border(int pixel) {
-
-            set(3, pixel);
-        }
-
-        public static final int FORGET = 0;
-
-        public static final int NORTH_WEST = 1;
-
-        public static final int NORTH = 2;
-
-        public static final int NORTH_EAST = 3;
-
-        public static final int WEST = 4;
-
-        public static final int CENTER = 5;
-
-        public static final int EAST = 6;
-
-        public static final int SOUTH_WEST = 7;
-
-        public static final int SOUTH = 8;
-
-        public static final int SOUTH_EAST = 9;
-
-        public static final int STATIC = 10;
-
-        /**
-         * @param i
-         *                valid: {@link #FORGET} (default), {@link #NORTH_WEST},
-         *                {@link #NORTH}, {@link #NORTH_EAST}, {@link #WEST},
-         *                {@link #CENTER}, {@link #EAST}, {@link #SOUTH_WEST},
-         *                {@link #SOUTH}, {@link #SOUTH_EAST}, {@link #STATIC}
-         */
-        public void set_win_gravity(int i) {
-
-            set(5, i);
-        }
-
-        public static final int NOT_USEFUL = 0;
-
-        public static final int WHEN_MAPPED = 1;
-
-        public static final int ALWAYS = 2;
-
-        /**
-         * @param i
-         *                valid: {@link #NOT_USEFUL}(default),
-         *                {@link #WHEN_MAPPED}, {@link #ALWAYS}
-         */
-        public void set_backing_store(int i) {
-
-            set(6, i);
-        }
-
-        /**
-         * @param i
-         *                default: all ones
-         */
-        public void set_backing_plane(int i) {
-
-            set(7, i);
-        }
-
-        /**
-         * #set_backing(int)
-         */
-        public void set_backing(Color c) {
-
-            set_backing(c.getPixel());
-        }
-
-        /**
-         * @param i
-         *                default: zero
-         */
-        public void set_backing(int pixel) {
-
-            set(8, pixel);
-        }
-
-        /**
-         * @param b
-         *                default: false
-         */
-        public void set_override_redirect(boolean b) {
-
-            set(9, b);
-        }
-
-        /**
-         * @param b
-         *                default: false
-         */
-        public void set_save_under(boolean b) {
-
-            set(10, b);
-        }
-
-        /**
-         * @param i
-         *                default: {}
-         */
-        public void set_event_mask(int i) {
-
-            set(11, i);
-        }
-
-        public void add_event_mask(int i) {
-
-            set_event_mask(event_mask() | i);
-        }
-
-        public int event_mask() {
-
-            return data[11];
-        }
-
-        /**
-         * @param i
-         *                default: {}
-         */
-        public void set_do_not_propagate_mask(int i) {
-
-            set(12, i);
-        }
-
-        /**
-         * @param c
-         *                possible: {@link Colormap#COPY_FROM_PARENT} (default)
-         */
-        public void set_colormap(Colormap c) {
-
-            set(13, c.id);
-        }
-
-        /**
-         * @param c
-         *                possible: {@link Cursor#NONE}
-         */
-        public void set_cursor(Cursor c) {
-
-            set(14, c.id);
-        }
-
-        public Object clone() {
-
-            Attributes attr = new Attributes();
-            attr.copy(this);
-            return attr;
-        }
-    }
-
     /**
      * @see #Window(Window, int, int, int, int, int, Window.Attributes)
      */
-    public Window(Window parent, Rectangle geometry, int border_width,
-            Attributes attr) {
+    public Window(Window parent, Rectangle geometry, int borderWidth,
+            WindowAttributes attr) {
 
         this(parent, geometry.getX(), geometry.getY(), geometry.getWidth(),
-             geometry.getHeight(), border_width, attr);
+             geometry.getHeight(), borderWidth, attr);
     }
 
     /**
@@ -304,33 +812,27 @@ public class Window extends Drawable implements GLXDrawable {
      * @see #create(int, int, int, int, Window.Attributes)
      */
     public Window(Window parent, int x, int y, int width, int height,
-            int border_width, Attributes attr) {
+            int borderWidth, WindowAttributes attr) {
 
         this(parent, x, y, width, height);
-        create(border_width, attr);
+        create(borderWidth, attr);
     }
-
-    public static final int COPY_FROM_PARENT = 0;
-
-    public static final int INPUT_OUTPUT = 1;
-
-    public static final int INPUT_ONLY = 2;
 
     // opcode 1 - create window
     /**
      * @param depth
-     *                possible: {@link #COPY_FROM_PARENT}
+     *                possible: {@link WinClass.COPY_FROM_PARENT}
      * 
      * @param klass
-     *                valid: {@link #COPY_FROM_PARENT}, {@link #INPUT_OUTPUT},
-     *                {@link #INPUT_ONLY}
+     *                valid: {@link WinClass}
      * 
-     * @param visual_id
-     *                possible: {@link #COPY_FROM_PARENT}
+     * @param visualID
+     *                possible: {@link WinClass.COPY_FROM_PARENT} or {@link Visual}
+     *                
      * @see <a href="XCreateWindow.html">XCreateWindow</a>
      */
-    public void create(int border_width, int depth, int klass, int visual_id,
-                       Attributes attr) {
+    public void create(int borderWidth, int depth, WinClass klass, int visualID,
+                       WindowAttributes attr) {
 
         RequestOutputStream o = display.getResponseOutputStream();
         synchronized (o) {
@@ -341,32 +843,36 @@ public class Window extends Drawable implements GLXDrawable {
             o.writeInt16(y);
             o.writeInt16(width);
             o.writeInt16(height);
-            o.writeInt16(border_width);
-            o.writeInt16(klass);
-            o.writeInt32(visual_id);
+            o.writeInt16(borderWidth);
+            o.writeInt16(klass.getCode());
+            o.writeInt32(visualID);
             o.writeInt32(attr.bitmask);
             attr.write(o);
             o.send();
         }
     }
 
+    
     /**
-     * @see #create(int, int, int, int, Window.Attributes)
+     * @see #create(int, int, int, int, WindowAttributes)
      */
-    public void create(int border_width, Attributes attr) {
+    public void create(int borderWidth, WindowAttributes attr) {
 
-        create(border_width, COPY_FROM_PARENT, COPY_FROM_PARENT,
-               COPY_FROM_PARENT, attr);
+        create(borderWidth, WinClass.COPY_FROM_PARENT.getCode(), 
+               WinClass.COPY_FROM_PARENT, WinClass.COPY_FROM_PARENT.getCode(),
+               attr);
     }
 
+    
     /**
      * @see #create(int, Window.Attributes)
      */
     public void create() {
 
-        create(0, Attributes.EMPTY);
+        create(0, WindowAttributes.EMPTY);
     }
 
+    
     // opcode 2 - change window attributes
     /**
      * This request will be aggregated.
@@ -375,7 +881,7 @@ public class Window extends Drawable implements GLXDrawable {
      * 
      * @see Request.Aggregate aggregation
      */
-    public void change_attributes(Attributes attr) {
+    public void changeAttributes(WindowAttributes attr) {
 
         // FIXME: Implement aggregation.
         RequestOutputStream o = display.getResponseOutputStream();
@@ -388,96 +894,12 @@ public class Window extends Drawable implements GLXDrawable {
         }
     }
 
-    /** Reply of {@link #attributes()}. */
-    public static class AttributesReply {
-
-        public int backing_store;
-
-        public int visual_id;
-
-        public int window_class;
-
-        public int bit_gravity;
-
-        public int win_gravity;
-
-        public int backing_planes;
-
-        public int backing_pixel;
-
-        public boolean save_under;
-
-        public boolean map_is_installed;
-
-        public int map_state;
-
-        public boolean override_redirect;
-
-        public int colormap_id;
-
-        public int all_event_masks;
-
-        public int your_event_mask;
-
-        public int do_not_propagate_mask;
-
-        /**
-         * Reads the AttributesReply data from the specified input stream.
-         */
-        public AttributesReply(ResponseInputStream in) {
-
-            int code = in.readInt8();
-            assert code == 1 : "Errors and events should be catched in Connection";
-
-            backing_store = in.readInt8();
-
-            in.readInt16(); // Sequence number, not needed.
-
-            in.readInt32(); // Reply length, not needed.
-
-            visual_id = in.readInt32();
-            window_class = in.readInt16();
-            bit_gravity = in.readInt8();
-            win_gravity = in.readInt8();
-            backing_planes = in.readInt32();
-            backing_pixel = in.readInt32();
-            save_under = in.readBool();
-            map_is_installed = in.readBool();
-            map_state = in.readInt8();
-            override_redirect = in.readBool();
-            colormap_id = in.readInt32();
-            all_event_masks = in.readInt32();
-            your_event_mask = in.readInt32();
-            do_not_propagate_mask = in.readInt16();
-            in.skip(2); // Unused.
-        }
-
-        public static final int UNMAPPED = 0;
-
-        public static final int UNVIEWABLE = 1;
-
-        public static final int VIEWABLE = 2;
-
-        /**
-         * @return valid: {@link #UNMAPPED}, {@link #UNVIEWABLE},
-         *         {@link #VIEWABLE}
-         */
-        public int map_state() {
-
-            return map_state;
-        }
-
-        public boolean override_redirect() {
-
-            return override_redirect;
-        }
-    }
-
+    
     // opcode 3 - get window attributes
     /**
      * @see <a href="XGetAttributes.html">XGetAttributes</a>
      */
-    public AttributesReply attributes() {
+    public AttributesReply getAttributes() {
 
         RequestOutputStream o = display.getResponseOutputStream();
         AttributesReply r;
@@ -493,11 +915,12 @@ public class Window extends Drawable implements GLXDrawable {
         return r;
     }
 
+    
     // opcode 4 - destroy window
     /**
      * @see <a href="XDestroyWindow.html">XDestroyWindow</a>
      */
-    public void destroy() {
+    public void destroyWindow() {
 
         RequestOutputStream o = display.getResponseOutputStream();
         synchronized (o) {
@@ -507,11 +930,12 @@ public class Window extends Drawable implements GLXDrawable {
         }
     }
 
+    
     // opcode 5 - destroy subwindows
     /**
      * @see <a href="XDestroySubwindows.html">XDestroySubwindows</a>
      */
-    public void destroy_subwindows() {
+    public void destroySubwindows() {
 
         RequestOutputStream o = display.getResponseOutputStream();
         synchronized (o) {
@@ -521,32 +945,31 @@ public class Window extends Drawable implements GLXDrawable {
         }
     }
 
-    public static final int INSERT = 0;
-
-    public static final int DELETE = 1;
-
+    
     // opcode 6 - change save set
     /**
      * @param mode
-     *                valid: {@link #INSERT}, {@link #DELETE}
+     *                valid: {@link Host.ChangeOperation.INSERT},
+     *                {@link Host.ChangeOperation.DELETE}
      * 
      * @see <a href="XChangeSaveSet.html">XChangeSaveSet</a>
      */
-    public void change_save_set(boolean mode) {
+    public void changeSaveSet(Host.ChangeOperation mode) {
 
         RequestOutputStream o = display.getResponseOutputStream();
         synchronized (o) {
-            o.beginRequest(6, mode ? 1 : 0, 2);
+            o.beginRequest(6, mode.getCode(), 2);
             o.writeInt32(id);
             o.send();
         }
     }
 
+    
     // opcode 7 - reparent window
     /**
      * @see <a href="XReparentWindow.html">XReparentWindow</a>
      */
-    public void reparent(Window parent, int x, int y) {
+    public void reparentWindow(Window parent, int x, int y) {
 
         RequestOutputStream o = display.getResponseOutputStream();
         synchronized (o) {
@@ -559,6 +982,7 @@ public class Window extends Drawable implements GLXDrawable {
         }
     }
 
+    
     // opcode 8 - map window
     /**
      * @see <a href="XMapWindow.html">XMapWindow</a>
@@ -574,11 +998,12 @@ public class Window extends Drawable implements GLXDrawable {
         }
     }
 
+    
     // opcode 9 - map subwindows
     /**
      * @see <a href="XMapSubwindows.html">XMapSubwindows</a>
      */
-    public void map_subwindows() {
+    public void mapSubwindows() {
 
         RequestOutputStream o = display.getResponseOutputStream();
         synchronized (o) {
@@ -588,6 +1013,7 @@ public class Window extends Drawable implements GLXDrawable {
         }
     }
 
+    
     // opcode 10 - unmap window
     /**
      * @see <a href="XUnmapWindow.html">XUnmapWindow</a>
@@ -602,11 +1028,13 @@ public class Window extends Drawable implements GLXDrawable {
         }
     }
 
+    
+    
     // opcode 11 - unmap subwindows
     /**
      * @see <a href="XUnmapSubwindows.html">XUnmapSubwindows</a>
      */
-    public void unmap_subwindows() {
+    public void unmapSubwindows() {
 
         RequestOutputStream o = display.getResponseOutputStream();
         synchronized (o) {
@@ -616,77 +1044,6 @@ public class Window extends Drawable implements GLXDrawable {
         }
     }
 
-    /** X window changes. */
-    public static class Changes extends ValueList {
-
-        public Changes() {
-
-            super(7);
-        }
-
-        public void x(int i) {
-
-            set(0, i);
-        }
-
-        public void y(int i) {
-
-            set(1, i);
-        }
-
-        public void width(int i) {
-
-            set(2, i);
-        }
-
-        public void height(int i) {
-
-            set(3, i);
-        }
-
-        public void border_width(int i) {
-
-            set(4, i);
-        }
-
-        public void sibling_id(int i) {
-
-            set(5, i);
-        }
-
-        public void sibling(Window window) {
-
-            sibling_id(window.id);
-        }
-
-        public static final int ABOVE = 0;
-
-        public static final int BELOW = 1;
-
-        public static final int TOP_IF = 2;
-
-        public static final int BOTTOM_IF = 3;
-
-        public static final int OPPOSITE = 4;
-
-        /**
-         * @param i
-         *                valid: {@link #ABOVE}, {@link #BELOW},
-         *                {@link #TOP_IF}, {@link #BOTTOM_IF},
-         *                {@link #OPPOSITE}
-         */
-        public void stack_mode(int i) {
-
-            set(6, i);
-        }
-
-        public Object clone() {
-
-            Changes changes = new Changes();
-            changes.copy(this);
-            return changes;
-        }
-    }
 
     // opcode 12 - configure window
     /**
@@ -709,10 +1066,7 @@ public class Window extends Drawable implements GLXDrawable {
         }
     }
 
-    public static final int RAISE_LOWEST = 0;
-
-    public static final int LOWER_HIGHEST = 1;
-
+    
     // opcode 13 - circulate window
     /**
      * @param direction
@@ -720,55 +1074,22 @@ public class Window extends Drawable implements GLXDrawable {
      * 
      * @see <a href="XCirculateSubwindows.html">XCirculateSubwindows</a>
      */
-    public void circulate_window(int direction) {
+    public void circulateWindow(CirculateDirection direction) {
 
         RequestOutputStream o = display.getResponseOutputStream();
         synchronized (o) {
-            o.beginRequest(13, direction, 2);
+            o.beginRequest(13, direction.getCode(), 2);
             o.writeInt32(id);
             o.send();
         }
     }
 
-    /** Reply of {@link #tree()}. */
-    public class TreeInfo {
-
-        Window root;
-
-        Window parent;
-
-        private Window[] children;
-
-        TreeInfo(ResponseInputStream i) {
-
-            root = (Window) intern(display, i.readInt32());
-            int parent_id = i.readInt32();
-            if (parent_id != 0)
-                parent = (Window) intern(display, parent_id);
-            else
-                parent = null;
-
-            int num_windows = i.readInt16();
-            i.skip(14);
-            children = new Window[num_windows];
-            for (int j = 0; j < num_windows; j++) {
-                int id = i.readInt32();
-                children[j] = (Window) intern(display, id);
-            }
-        }
-
-        public Window[] children() {
-
-            return children;
-        }
-    }
-
+    
     // opcode 15 - query tree
     /**
      * @see <a href="XQueryTree.html">XQueryTree</a>
      */
     public TreeInfo tree() {
-
         TreeInfo info;
         RequestOutputStream o = display.getResponseOutputStream();
         synchronized (o) {
@@ -784,20 +1105,15 @@ public class Window extends Drawable implements GLXDrawable {
         return info;
     }
 
-    public static final int REPLACE = 0;
-
-    public static final int PREPEND = 1;
-
-    public static final int APPEND = 2;
-
+    
     // opcode 18 - change property
     /**
      * Extra parameters (offset and data_format) are used to support Data class
-     * as parameter for writing. See set_wm_normal_hints ().
+     * as parameter for writing. See setWMNormalHints ().
      * 
      * @param mode
-     *                valid: {@link #REPLACE}, {@link #PREPEND},
-     *                {@link #APPEND}
+     *                valid: {@link PropertyMode.REPLACE}, {@link PropertyMode.PREPEND},
+     *                {@link PropertyMode.APPEND}
      * 
      * @param format:
      *                valid: <code>8</code>, <code>16</code>,
@@ -809,8 +1125,8 @@ public class Window extends Drawable implements GLXDrawable {
      * 
      * @see <a href="XChangeProperty.html">XChangeProperty</a>
      */
-    public void change_property(int mode, Atom property, Atom type, int format,
-                                Object data, int offset, int data_format) {
+    public void changeProperty(PropertyMode mode, Atom property, Atom type,
+                               int format, Object data, int offset, int data_format) {
 
         byte[] byteData;
         switch (format) {
@@ -859,7 +1175,7 @@ public class Window extends Drawable implements GLXDrawable {
 
         RequestOutputStream o = display.getResponseOutputStream();
         synchronized (o) {
-            o.beginRequest(18, mode, 6 + (n + p) / 4);
+            o.beginRequest(18, mode.getCode(), 6 + (n + p) / 4);
             o.writeInt32(id);
             o.writeInt32(property.getID());
             o.writeInt32(type.getID());
@@ -872,11 +1188,12 @@ public class Window extends Drawable implements GLXDrawable {
         }
     }
 
+    
     // opcode 19 - delete property
     /**
      * @see <a href="XDeleteProperty.html">XDeleteProperty</a>
      */
-    public void delete_property(Atom property) {
+    public void deleteProperty(Atom property) {
 
         RequestOutputStream o = display.getResponseOutputStream();
         synchronized (o) {
@@ -887,105 +1204,12 @@ public class Window extends Drawable implements GLXDrawable {
         }
     }
 
-    /** Reply of {@link #property(boolean, Atom, Atom, int, int)}. */
-    public class Property {
-
-        private int format;
-
-        private int type_id;
-
-        private int bytes_after;
-
-        private int length;
-
-        private byte[] value;
-
-        Property(ResponseInputStream i) {
-
-            format = i.readInt8();
-            i.skip(6);
-            type_id = i.readInt32();
-            bytes_after = i.readInt32();
-            length = i.readInt32();
-            i.skip(12);
-            int num_bytes;
-            switch (format) {
-            case 8:
-                num_bytes = length;
-                break;
-            case 16:
-                num_bytes = length * 2;
-                break;
-            case 32:
-                num_bytes = length * 4;
-                break;
-            default:
-                num_bytes = 0;
-            }
-            value = new byte[num_bytes];
-            i.readData(value);
-            int p = RequestOutputStream.pad(num_bytes);
-            if (p > 0)
-                i.skip(p);
-        }
-
-        public int format() {
-
-            return format;
-        }
-
-        public int type_id() {
-
-            return type_id;
-        }
-
-        /**
-         * Returns the value at index <code>i</code>. This interprets the
-         * underlying byte data according to the format of this property.
-         * 
-         * @param i
-         *                the index
-         * 
-         * @return the value at the specified index
-         */
-        public int value(int i) {
-
-            int v;
-            switch (format) {
-            case 8:
-                v = value[i];
-                break;
-            case 16:
-                v = ((0xff & value[i * 2]) << 8) | (0xff & value[i * 2 + 1]);
-                break;
-            case 32:
-                v = ((0xff & value[i * 4]) << 24)
-                        | ((0xff & value[i * 4 + 1]) << 16)
-                        | ((0xff & value[i * 4 + 2] << 8))
-                        | (0xff & ((int) value[i * 4 + 3]));
-                break;
-            default:
-                throw new ArrayIndexOutOfBoundsException();
-            }
-            return v;
-        }
-
-        /**
-         * Returns the property value as string.
-         * 
-         * @return the property value as string
-         */
-        public String string_value() {
-
-            return new String(value);
-        }
-    }
-
+    
     // opcode 20 - get property
     /**
      * @see <a href="XGetWindowProperty.html">XGetWindowProperty</a>
      */
-    public Property get_property(boolean delete, Atom property, Atom type,
+    public Property getProperty(boolean delete, Atom property, Atom type,
                                  int offset, int length) {
 
         Property prop;
@@ -1007,6 +1231,7 @@ public class Window extends Drawable implements GLXDrawable {
         return prop;
     }
 
+    
     // opcode 21 - list properties
     /**
      * @return valid: {@link Enum#next()} of type {@link Atom},
@@ -1014,7 +1239,7 @@ public class Window extends Drawable implements GLXDrawable {
      * 
      * @see <a href="XRotateWindowProperties.html"> XRotateWindowProperties</a>
      */
-    public Atom[] properties() {
+    public Atom[] rotateWindowProperties() {
 
         Atom[] atoms;
         RequestOutputStream o = display.getResponseOutputStream();
@@ -1026,10 +1251,10 @@ public class Window extends Drawable implements GLXDrawable {
             synchronized (i) {
                 i.readReply(o);
                 i.skip(8);
-                int num_atoms = i.readInt16();
-                atomIds = new int[num_atoms];
+                int numAtoms = i.readInt16();
+                atomIds = new int[numAtoms];
                 i.skip(22);
-                for (int j = 0; j < num_atoms; j++) {
+                for (int j = 0; j < numAtoms; j++) {
                     atomIds[j] = i.readInt32();
                 }
             }
@@ -1040,13 +1265,14 @@ public class Window extends Drawable implements GLXDrawable {
         return atoms;
     }
 
+    
     // opcode 22 - set selection owner
     /**
      * @param time
      *                possible: {@link Display#CURRENT_TIME}
      * @see <a href="XSetSelectionOwner.html">XSetSelectionOwner</a>
      */
-    public void set_selection_owner(Atom selection, int time) {
+    public void setSelectionOwner(Atom selection, int time) {
 
         RequestOutputStream o = display.getResponseOutputStream();
         synchronized (o) {
@@ -1058,13 +1284,14 @@ public class Window extends Drawable implements GLXDrawable {
         }
     }
 
+    
     // opcode 24 - convert selection
     /**
      * @param time
      *                possible: {@link Display#CURRENT_TIME}
      * @see <a href="XConvertSelection.html">XConvertSelection</a>
      */
-    public void convert_selection(Atom selection, Atom target, Atom property,
+    public void convertSelection(Atom selection, Atom target, Atom property,
                                   int time) {
 
         RequestOutputStream o = display.getResponseOutputStream();
@@ -1079,11 +1306,12 @@ public class Window extends Drawable implements GLXDrawable {
         }
     }
 
+    
     // opcode 25 - send event
     /**
      * @see <a href="XSendEvent.html">XSendEvent</a>
      */
-    public void send_event(boolean propagate, int event_mask, Event event) {
+    public void sendEvent(boolean propagate, int event_mask, Event event) {
 
         RequestOutputStream o = display.getResponseOutputStream();
         synchronized (o) {
@@ -1095,54 +1323,41 @@ public class Window extends Drawable implements GLXDrawable {
         }
     }
 
-    public static final int SYNCHRONOUS = 0;
-
-    public static final int ASYNCHRONOUS = 1;
-
-    public static final int SUCCESS = 0;
-
-    public static final int ALREADY_GRABBED = 1;
-
-    public static final int INVALID_TIME = 2;
-
-    public static final int NOT_VIEWABLE = 3;
-
-    public static final int FROZEN = 4;
-
+    
     // opcode 26 - grab pointer
     /**
-     * @param pointer_mode
-     *                valid: {@link #SYNCHRONOUS}, {@link #ASYNCHRONOUS}
+     * @param pointerMode
+     *                valid: {@link GrabMode.SYNCHRONOUS}, {@link GrabMode.ASYNCHRONOUS}
      * 
-     * @param keyboard_mode
-     *                valid: {@link #SYNCHRONOUS}, {@link #ASYNCHRONOUS}
+     * @param keyboardMode
+     *                valid: {@link GrabMode.SYNCHRONOUS}, {@link GrabMode.ASYNCHRONOUS}
      * 
-     * @param confine_to
+     * @param confineTo
      *                possible: {@link #NONE}
      * @param cursor
      *                possible: {@link Cursor#NONE}
      * @param time
      *                possible: {@link Display#CURRENT_TIME}
      * 
-     * @return valid: {@link #SUCCESS}, {@link #ALREADY_GRABBED},
-     *         {@link #FROZEN}, {@link #INVALID_TIME}, {@link #NOT_VIEWABLE}
+     * @return valid: {@link GrabStatus.SUCCESS}, {@link GrabStatus.ALREADY_GRABBED},
+     *         {@link GrabStatus.FROZEN}, {@link GrabStatus.INVALID_TIME}, {@link GrabStatus.NOT_VIEWABLE}
      * 
      * @see <a href="XGrabPointer.html">XGrabPointer</a>
      */
-    public int grab_pointer(boolean owner_events, int event_mask,
-                            int pointer_mode, int keyboard_mode,
-                            Window confine_to, Cursor cursor, int time) {
+    public GrabStatus grabPointer(boolean owner_events, int eventMask,
+                            GrabMode pointerMode, GrabMode keyboardMode,
+                            Window confineTo, Cursor cursor, int time) {
 
         int status;
         RequestOutputStream o = display.getResponseOutputStream();
         synchronized (o) {
             o.beginRequest(26, owner_events ? 1 : 0, 6);
             o.writeInt32(id);
-            o.writeInt16(event_mask);
-            o.writeInt16(pointer_mode);
-            o.writeInt16(keyboard_mode);
-            o.writeInt32(confine_to.id);
-            o.writeInt32(cursor.id);
+            o.writeInt16(eventMask);
+            o.writeInt16(pointerMode.getCode());
+            o.writeInt16(keyboardMode.getCode());
+            o.writeInt32(confineTo.getID());
+            o.writeInt32(cursor.getID());
             o.writeInt32(time);
             ResponseInputStream i = display.getResponseInputStream();
             synchronized (i) {
@@ -1152,44 +1367,50 @@ public class Window extends Drawable implements GLXDrawable {
                 i.skip(30);
             }
         }
-        return status;
+        return GrabStatus.getByCode(status);
     }
 
+    
     public static final int ANY_BUTTON = 0;
 
+    
     public static final int ANY_MODIFIER = 0x8000;
 
+    
     // opcode 28 - grab button
     /**
      * @param button
      *                possible: {@link #ANY_BUTTON}
      * @param modifiers
      *                possible: {@link #ANY_MODIFIER}
-     * @param pointer_mode
-     *                valid: {@link #SYNCHRONOUS}, {@link #ASYNCHRONOUS}
+     * @param pointerMode
+     *                valid: {@link GrabMode.SYNCHRONOUS},
+     *                       {@link GrabMode.ASYNCHRONOUS}
      * 
-     * @param keyboard_mode
-     *                valid: {@link #SYNCHRONOUS}, {@link #ASYNCHRONOUS}
+     * @param keyboardMode
+     *                valid: {@link GrabMode.SYNCHRONOUS},
+     *                       {@link GrabMode.ASYNCHRONOUS}
      * 
-     * @param confine_to
+     * @param confineTo
      *                possible: {@link #NONE}
      * @param cursor
      *                possible: {@link Cursor#NONE}
      * @see <a href="XGrabButton.html">XGrabButton</a>
      */
-    public void grab_button(int button, int modifiers, boolean owner_events,
-                            int event_mask, int pointer_mode,
-                            int keyboard_mode, Window confine_to, Cursor cursor) {
+    public void grabButton(int button, int modifiers, boolean ownerEvents,
+                            int eventMask, GrabMode pointerMode, 
+                            GrabMode keyboardMode, Window confineTo,
+                            Cursor cursor) {
 
         RequestOutputStream o = display.getResponseOutputStream();
         synchronized (o) {
-            o.beginRequest(28, owner_events ? 1 : 0, 6);
+            o.beginRequest(28, ownerEvents ? 1 : 0, 6);
             o.writeInt32(id);
-            o.writeInt16(event_mask);
-            o.writeInt8(pointer_mode);
-            o.writeInt8(keyboard_mode);
-            o.writeInt32(confine_to.id);
-            o.writeInt32(cursor.id);
+            o.writeInt16(eventMask);
+            o.writeInt8(pointerMode.getCode());
+            o.writeInt8(keyboardMode.getCode());
+            o.writeInt32(confineTo.getID());
+            o.writeInt32(cursor.getID());
             o.writeInt8(button);
             o.skip(1);
             o.writeInt16(modifiers);
@@ -1197,6 +1418,7 @@ public class Window extends Drawable implements GLXDrawable {
         }
     }
 
+    
     // opcode 29 - ungrab button
     /**
      * @param button
@@ -1205,7 +1427,7 @@ public class Window extends Drawable implements GLXDrawable {
      *                possible: {@link #ANY_MODIFIER}
      * @see <a href="XUngrabButton.html">XUngrabButton</a>
      */
-    public void ungrab_button(int button, int modifiers) {
+    public void ungrabButton(int button, int modifiers) {
 
         RequestOutputStream o = display.getResponseOutputStream();
         synchronized (o) {
@@ -1217,33 +1439,34 @@ public class Window extends Drawable implements GLXDrawable {
         }
     }
 
+    
     // opcode 31 - grab keyboard
     /**
-     * @param pointer_mode
-     *                valid: {@link #SYNCHRONOUS}, {@link #ASYNCHRONOUS}
+     * @param pointerMode
+     *                valid: {@link GrabMode.SYNCHRONOUS}, {@link GrabMode.ASYNCHRONOUS}
      * 
-     * @param keyboard_mode
-     *                valid: {@link #SYNCHRONOUS}, {@link #ASYNCHRONOUS}
+     * @param keyboardMode
+     *                valid: {@link GrabMode.SYNCHRONOUS}, {@link GrabMode.ASYNCHRONOUS}
      * 
      * @param time
      *                possible: {@link Display#CURRENT_TIME}
      * 
-     * @return valid: {@link #SUCCESS}, {@link #ALREADY_GRABBED},
-     *         {@link #FROZEN}, {@link #INVALID_TIME}, {@link #NOT_VIEWABLE}
+     * @return valid: {@link GrabStatus.SUCCESS}, {@link GrabStatus.ALREADY_GRABBED},
+     *         {@link GrabStatus.FROZEN}, {@link GrabStatus.INVALID_TIME}, {@link GrabStatus.NOT_VIEWABLE}
      * 
      * @see <a href="XGrabKeyboard.html">XGrabKeyboard</a>
      */
-    public int grab_keyboard(boolean owner_events, int pointer_mode,
-                             int keyboard_mode, int time) {
+    public GrabStatus grabKeyboard(boolean ownerEvents, GrabMode pointerMode,
+                                   GrabMode keyboardMode, int time) {
 
         int status;
         RequestOutputStream o = display.getResponseOutputStream();
         synchronized (o) {
-            o.beginRequest(31, owner_events ? 1 : 0, 4);
+            o.beginRequest(31, ownerEvents ? 1 : 0, 4);
             o.writeInt32(id);
             o.writeInt32(time);
-            o.writeInt8(pointer_mode);
-            o.writeInt8(keyboard_mode);
+            o.writeInt8(pointerMode.getCode());
+            o.writeInt8(keyboardMode.getCode());
             o.skip(2);
             ResponseInputStream i = display.getResponseInputStream();
             synchronized (i) {
@@ -1253,41 +1476,46 @@ public class Window extends Drawable implements GLXDrawable {
                 i.skip(30);
             }
         }
-        return status;
+        return GrabStatus.getByCode(status);
     }
 
+    
     // opcode 33 - grab key
     /**
      * @param modifiers
      *                possible: {@link #ANY_MODIFIER}
-     * @param pointer_mode
-     *                valid: {@link #SYNCHRONOUS}, {@link #ASYNCHRONOUS}
+     * @param pointerMode
+     *                valid: {@link GrabMode.SYNCHRONOUS},
+     *                       {@link GrabMode.ASYNCHRONOUS}
      * 
-     * @param keyboard_mode
-     *                valid: {@link #SYNCHRONOUS}, {@link #ASYNCHRONOUS}
+     * @param keyboardMode
+     *                valid: {@link GrabMode.SYNCHRONOUS},
+     *                       {@link GrabMode.ASYNCHRONOUS}
      * 
      * @see <a href="XGrabKey.html">XGrabKey</a>
      */
-    public void grab_key(int keysym, int modifiers, boolean owner_events,
-                         int pointer_mode, int keyboard_mode) {
+    public void grabKey(int keysym, int modifiers, boolean ownerEvents,
+                        GrabMode pointerMode, GrabMode keyboardMode) {
 
         int keycode = display.getInput().keysymToKeycode(keysym);
 
 
         RequestOutputStream o = display.getResponseOutputStream();
         synchronized (o) {
-            o.beginRequest(33, owner_events ? 1 : 0, 4);
+            o.beginRequest(33, ownerEvents ? 1 : 0, 4);
             o.writeInt32(id);
             o.writeInt16(modifiers);
             o.writeInt8(keycode);
-            o.writeInt8(pointer_mode);
-            o.writeInt8(keyboard_mode);
+            o.writeInt8(pointerMode.getCode());
+            o.writeInt8(keyboardMode.getCode());
             o.send();
         }
     }
 
+    
     public static final int ANY_KEY = 0;
 
+    
     // opcode 34 - ungrab key
     /**
      * @param key
@@ -1296,7 +1524,7 @@ public class Window extends Drawable implements GLXDrawable {
      *                possible: {@link #ANY_MODIFIER}
      * @see <a href="XUngrabKey.html">XUngrabKey</a>
      */
-    public void ungrab_key(int keysym, int modifiers) {
+    public void ungrabKey(int keysym, int modifiers) {
 
         int keycode = keysym == 0 ? 0 : display.getInput().keysymToKeycode(keysym);
 
@@ -1309,58 +1537,13 @@ public class Window extends Drawable implements GLXDrawable {
             o.send();
         }
     }
-
-    /** Reply of {@link #pointer()}. */
-    public class PointerInfo {
-
-        public boolean same_screen;
-
-        public Window root;
-
-        public Window child;
-
-        public int root_x;
-
-        public int root_y;
-
-        public int win_x;
-
-        public int win_y;
-
-        public int mask;
-
-        PointerInfo(ResponseInputStream i) {
-
-            same_screen = i.readBool();
-            i.skip(6);
-
-            int root_id = i.readInt32();
-            root = (Window) intern(display, root_id);
-
-            int child_id = i.readInt32();
-            if (child_id != 0)
-                child = (Window) intern(display, root_id);
-            else
-                child = null;
-
-            root_x = i.readInt16();
-            root_y = i.readInt16();
-            win_x = i.readInt16();
-            win_y = i.readInt16();
-            mask = i.readInt16();
-        }
-
-        public Point root_position() {
-
-            return new Point(root_x, root_y);
-        }
-    }
+    
 
     // opcode 38 - query pointer
     /**
      * @see <a href="XQueryPointer.html">XQueryPointer</a>
      */
-    public PointerInfo query_pointer() {
+    public PointerInfo queryPointer() {
 
         PointerInfo info;
         RequestOutputStream o = display.getResponseOutputStream();
@@ -1377,22 +1560,7 @@ public class Window extends Drawable implements GLXDrawable {
         }
         return info;
     }
-
-    public static class TimeCoord {
-
-        public long timestamp;
-
-        public int x;
-
-        public int y;
-
-        TimeCoord(ResponseInputStream i) {
-
-            timestamp = i.readInt32();
-            x = i.readInt16();
-            y = i.readInt16();
-        }
-    }
+    
 
     // opcode 39 - get motion events
     /**
@@ -1402,7 +1570,7 @@ public class Window extends Drawable implements GLXDrawable {
      *                possible: {@link Display#CURRENT_TIME}
      * @see <a href="XGetMotionEvents.html">XGetMotionEvents</a>
      */
-    public TimeCoord[] get_motion_events(int start, int stop) {
+    public TimeCoord[] getMotionEvents(int start, int stop) {
 
         TimeCoord[] timecoords;
 
@@ -1419,43 +1587,19 @@ public class Window extends Drawable implements GLXDrawable {
                 int len = i.readInt32();
                 timecoords = new TimeCoord[len];
                 i.skip(20);
-                for (int j = 0; j < len; j++)
-                    timecoords[j] = new TimeCoord(i);
+                for (TimeCoord t : timecoords)
+                    t = new TimeCoord(i);
             }
         }
         return timecoords;
     }
 
-    /** Reply of {@link #translate_coordinates(Window, int, int)}. */
-    public class Coordinates {
-
-        boolean same_screen;
-
-        Window child;
-
-        public int x;
-
-        public int y;
-
-        Coordinates(ResponseInputStream i) {
-
-            same_screen = i.readBool();
-            i.skip(6);
-            int child_id = i.readInt32();
-            if (child_id != 0)
-                child = (Window) intern(display, child_id);
-            else
-                child = null;
-            x = i.readInt16();
-            y = i.readInt16();
-        }
-    }
-
+    
     // opcode 40 - translate coordinates
     /**
      * @see <a href="XTranslateCoordinates.html">XTranslateCoordinates</a>
      */
-    public Coordinates translate_coordinates(Window src, int src_x, int src_y) {
+    public Coordinates translateCoordinates(Window src, int srcX, int srcY) {
 
         Coordinates coords;
         RequestOutputStream o = display.getResponseOutputStream();
@@ -1463,8 +1607,8 @@ public class Window extends Drawable implements GLXDrawable {
             o.beginRequest(40, 0, 4);
             o.writeInt32(src.id);
             o.writeInt32(id);
-            o.writeInt16(src_x);
-            o.writeInt16(src_y);
+            o.writeInt16(srcX);
+            o.writeInt16(srcY);
             ResponseInputStream i = display.getResponseInputStream();
             synchronized (i) {
                 i.readReply(o);
@@ -1476,141 +1620,145 @@ public class Window extends Drawable implements GLXDrawable {
         return coords;
     }
 
+    
     // opcode 41 - warp pointer
     /**
      * @param src
      *                possible: {@link #NONE}
      * @see <a href="XWarpPointer.html">XWarpPointer</a>
      */
-    public void warp_pointer(Window src, int src_x, int src_y, int src_width,
-                             int src_height, int dest_x, int dest_y) {
+    public void warpPointer(Window src, int srcX, int srcY, int srcWidth,
+                             int srcHeight, int destX, int destY) {
 
         RequestOutputStream o = display.getResponseOutputStream();
         synchronized (o) {
             o.beginRequest(41, 0, 6);
-            o.writeInt32(src.id);
+            o.writeInt32(src.getID());
             o.writeInt32(id);
-            o.writeInt16(src_x);
-            o.writeInt16(src_y);
-            o.writeInt16(src_width);
-            o.writeInt16(src_height);
-            o.writeInt16(dest_x);
-            o.writeInt16(dest_y);
+            o.writeInt16(srcX);
+            o.writeInt16(srcY);
+            o.writeInt16(srcWidth);
+            o.writeInt16(srcHeight);
+            o.writeInt16(destX);
+            o.writeInt16(destY);
             o.send();
         }
     }
 
+    
     /**
-     * @see #change_attributes(Window.Attributes)
-     * @see Attributes#set_background(Color)
+     * @see #changeAttributes(Window.Attributes)
+     * @see Attributes#setBackground(Color)
      */
-    public void set_background(Color c) {
+    public void setBackground(Color c) {
 
-        Attributes attr = new Attributes();
-        attr.set_background(c);
-        change_attributes(attr);
+        WindowAttributes attr = new WindowAttributes();
+        attr.setBackground(c);
+        changeAttributes(attr);
     }
 
+    
     /**
-     * @see #change_attributes(Window.Attributes)
-     * @see Attributes#set_background(int)
+     * @see #changeAttributes(Window.Attributes)
+     * @see Attributes#setBackground(int)
      */
-    public void set_background(int pixel) {
+    public void setBackground(int pixel) {
 
-        Attributes attr = new Attributes();
-        attr.set_background(pixel);
-        change_attributes(attr);
+        WindowAttributes attr = new WindowAttributes();
+        attr.setBackground(pixel);
+        changeAttributes(attr);
     }
 
+    
     /**
-     * @see #change_attributes(Window.Attributes)
-     * @see Attributes#set_background(Pixmap)
+     * @see #changeAttributes(Window.Attributes)
+     * @see Attributes#setBackground(Pixmap)
      */
-    public void set_background(Pixmap p) {
+    public void setBackground(Pixmap p) {
 
-        Attributes attr = new Attributes();
-        attr.set_background(p);
-        change_attributes(attr);
+        WindowAttributes attr = new WindowAttributes();
+        attr.setBackground(p);
+        changeAttributes(attr);
     }
 
+    
     /**
-     * @see #change_attributes(Window.Attributes)
-     * @see Attributes#set_border(Color)
+     * @see #changeAttributes(Window.Attributes)
+     * @see Attributes#setBorder(Color)
      */
-    public void set_border(Color c) {
+    public void setBorder(Color c) {
 
-        Attributes attr = new Attributes();
-        attr.set_border(c);
-        change_attributes(attr);
+        WindowAttributes attr = new WindowAttributes();
+        attr.setBorder(c);
+        changeAttributes(attr);
     }
 
+    
     /**
-     * @see #change_attributes(Window.Attributes)
-     * @see Attributes#set_border(int)
+     * @see #changeAttributes(Window.Attributes)
+     * @see Attributes#setBorder(int)
      */
-    public void set_border(int pixel) {
+    public void setBorder(int pixel) {
 
-        Attributes attr = new Attributes();
-        attr.set_border(pixel);
-        change_attributes(attr);
+        WindowAttributes attr = new WindowAttributes();
+        attr.setBorder(pixel);
+        changeAttributes(attr);
     }
 
+    
     /**
-     * @see #change_attributes(Window.Attributes)
-     * @see Attributes#set_border(Pixmap)
+     * @see #changeAttributes(Window.Attributes)
+     * @see Attributes#setBorder(Pixmap)
      */
-    public void set_border(Pixmap p) {
+    public void setBorder(Pixmap p) {
 
-        Attributes attr = new Attributes();
-        attr.set_border(p);
-        change_attributes(attr);
+        WindowAttributes attr = new WindowAttributes();
+        attr.setBorder(p);
+        changeAttributes(attr);
     }
 
+    
     /**
-     * @see #change_attributes(Window.Attributes)
-     * @see Attributes#set_colormap(Colormap)
+     * @see #changeAttributes(Window.Attributes)
+     * @see Attributes#setColormap(Colormap)
      */
-    public void set_colormap(Colormap cmap) {
+    public void setColormap(Colormap cmap) {
 
-        Attributes attr = new Attributes();
-        attr.set_colormap(cmap);
-        change_attributes(attr);
+        WindowAttributes attr = new WindowAttributes();
+        attr.setColormap(cmap);
+        changeAttributes(attr);
     }
 
+    
     public static final Window POINTER_ROOT = new Window(1);
-
-    public static final int TO_NONE = 0;
-
-    public static final int TO_POINTER_ROOT = 1;
-
-    public static final int TO_PARENT = 2;
 
     // opcode 42 - set input focus
     /**
      * @param mode
-     *                valid: {@link #TO_NONE}, {@link #TO_POINTER_ROOT},
-     *                {@link #TO_PARENT}
+     *                valid: {@link RevertTo.TO_NONE}, {@link RevertTo.TO_POINTER_ROOT},
+     *                {@link RevertTo.TO_PARENT}
      * 
      * @param time
      *                possible: {@link Display#CURRENT_TIME}
      * @see <a href="XSetInputFocus.html">XSetInputFocus</a>
      */
-    public void set_input_focus(int revert_to, int time) {
+    public void setInputFocus(RevertTo revertTo, int time) {
 
         RequestOutputStream o = display.getResponseOutputStream();
         synchronized (o) {
-            o.beginX11CoreRequest(X11CoreCommand.SetInputFocus, revert_to);
+            o.beginX11CoreRequest(X11CoreCommand.SetInputFocus, revertTo.getCode());
             o.writeInt32(id);
             o.writeInt32(time);
             o.send();
         }
     }
 
+    
     // opcode 61 - clear area
     /**
      * @see <a href="XClearArea.html">XClearArea</a>
      */
-    public void clear_area(int x, int y, int width, int height,
+    public void clearArea(int x, int y, int width, int height,
                            boolean exposures) {
 
         RequestOutputStream o = display.getResponseOutputStream();
@@ -1625,6 +1773,7 @@ public class Window extends Drawable implements GLXDrawable {
         }
     }
 
+    
     // opcode 83 - list installed colormaps
     /**
      * @return valid: {@link Enum#next()} of type {@link Colormap},
@@ -1632,7 +1781,7 @@ public class Window extends Drawable implements GLXDrawable {
      * 
      * @see <a href="XListInstalledColormaps.html"> XListInstalledColormaps</a>
      */
-    public Colormap[] list_installed_colormaps() {
+    public Colormap[] listInstalledColormaps() {
 
         Colormap[] maps;
         RequestOutputStream o = display.getResponseOutputStream();
@@ -1643,23 +1792,24 @@ public class Window extends Drawable implements GLXDrawable {
             synchronized (i) {
                 i.readReply(o);
                 i.skip(8);
-                int num_maps = i.readInt16();
-                maps = new Colormap[num_maps];
+                int numMaps = i.readInt16();
+                maps = new Colormap[numMaps];
                 i.skip(22);
-                for (int j = 0; j < num_maps; j++) {
+                for (Colormap map : maps) {
                     int id = i.readInt32();
-                    maps[j] = (Colormap) Colormap.intern(display, id);
+                    map = (Colormap) Colormap.intern(display, id);
                 }
             }
         }
         return maps;
     }
 
+    
     // opcode 114 - rotate properties
     /**
      * @see <a href="XRotateWindowProperties.html"> XRotateWindowProperties</a>
      */
-    public void rotate_properties(Atom[] properties, int delta) {
+    public void rotateProperties(Atom[] properties, int delta) {
 
         RequestOutputStream o = display.getResponseOutputStream();
         synchronized (o) {
@@ -1675,25 +1825,28 @@ public class Window extends Drawable implements GLXDrawable {
         }
     }
 
+    
     /**
      * @see #change_property(int, int, Atom, Atom, int, Object, int, int)
      */
-    public void change_property(Atom property, Atom type, int data) {
+    public void changeProperty(Atom property, Atom type, int data) {
 
-        change_property(REPLACE, property, type, 32, new int[] {
+        changeProperty(PropertyMode.REPLACE, property, type, 32, new int[] {
             data
         }, 0, 32);
     }
 
+    
     /**
      * @see <a href="XClearWindow.html">XClearWindow</a>
-     * @see #clear_area(int, int, int, int, boolean)
+     * @see #clearArea(int, int, int, int, boolean)
      */
     public void clear(boolean exposures) {
 
-        clear_area(0, 0, width, height, exposures);
+        clearArea(0, 0, width, height, exposures);
     }
 
+    
     public void delete() {
 
         // FIXME: Re-think WM -messages.
@@ -1712,61 +1865,67 @@ public class Window extends Drawable implements GLXDrawable {
         // send_event (false, Event.NO_EVENT_MASK, event);
     }
 
+    
     /**
      * @see #configure(Window.Changes)
      */
     public void flip() {
 
         Changes changes = new Changes();
-        changes.stack_mode(Changes.OPPOSITE);
+        changes.stackMode(Changes.StackMode.OPPOSITE);
         configure(changes);
     }
 
+    
     /**
      * Grab button ignoring caps lock (LOCK), num lock (MOD2), and scroll lock
      * (MOD5).
      * 
-     * @see #grab_button(int, int, boolean, int, int, int, Window, Cursor)
+     * @see #grabButton(int, int, boolean, int, GrabMode, GrabMode, Window, Cursor)
      */
-    public void grab_button_ignore_locks(int button, int modifiers,
-                                         boolean owner_events, int event_mask,
-                                         int pointer_mode, int keyboard_mode,
-                                         Window confine_to, Cursor cursor) {
+    public void grabButtonIgnoreLocks(int button, int modifiers,
+                                         boolean ownerEvents, int eventMask,
+                                         GrabMode pointerMode,
+                                         GrabMode keyboardMode,
+                                         Window confineTo, Cursor cursor) {
 
         // Are there a portable way to do this?
         // Sawfish and Icewm use the same technique as well.
         // TODO highly inefficient (many X requests)
         for (int i = 0; i < Input.LOCK_COMBINATIONS.length; i++)
-            grab_button(button, modifiers | Input.LOCK_COMBINATIONS[i],
-                        owner_events, event_mask, pointer_mode, keyboard_mode,
-                        confine_to, cursor);
+            grabButton(button, modifiers | Input.LOCK_COMBINATIONS[i],
+                        ownerEvents, eventMask, pointerMode, keyboardMode,
+                        confineTo, cursor);
     }
 
+    
     /**
      * Grab key ignoring caps lock (LOCK), num lock (MOD2), and scroll lock
      * (MOD5).
      * 
-     * @see #grab_key(int, int, boolean, int, int)
+     * @see #grabKey(int, int, boolean, int, int)
      * 
-     * @see #grab_button_ignore_locks(int, int, boolean, int, int, int, Window,
-     *      Cursor)
+     * @see #grabButtonIgnoreLocks(int, int, boolean, int, GrabMode, GrabMode,
+     *  Window, Cursor)
      */
-    public void grab_key_ignore_locks(int keysym, int modifiers,
-                                      boolean owner_events, int pointer_mode,
-                                      int keyboard_mode) {
+    public void grabKeyIgnoreLocks(int keysym, int modifiers,
+                                      boolean ownerEvents, 
+                                      GrabMode pointerMode,
+                                      GrabMode keyboard_mode) {
 
         for (int i = 0; i < Input.LOCK_COMBINATIONS.length; i++)
-            grab_key(keysym, modifiers | Input.LOCK_COMBINATIONS[i],
-                     owner_events, pointer_mode, keyboard_mode);
+            grabKey(keysym, modifiers | Input.LOCK_COMBINATIONS[i],
+                     ownerEvents, pointerMode, keyboard_mode);
     }
 
+    
     /**
      * @see <a href="XIconifyWindow.html">XIconifyWindow</a>
      * @see <a href="icccm.html#4.1.4">ICCCM Section 4.1.4</a>
-     * @see #send_event(boolean, int, Event)
+     * @see #sendEvent(boolean, int, Event)
      */
     public void iconify() {
-
+        // TODO: Imp
         // FIXME: Re-think WM -messages.
         // Atom wm_change_state = (Atom) Atom.intern (display,
         // "WM_CHANGE_STATE");
@@ -1780,14 +1939,16 @@ public class Window extends Drawable implements GLXDrawable {
         // | Event.SUBSTRUCTURE_NOTIFY_MASK, event);
     }
 
+    
     public static Object intern(Display display, int id) {
-
+        
         Object value = display.getResources().get(new Integer(id));
         if (value != null)
             return value;
         return new Window(display, id);
     }
 
+    
     /**
      * @see <a href="XLowerWindow.html">XLowerWindow</a>
      * @see #configure(Window.Changes)
@@ -1795,22 +1956,24 @@ public class Window extends Drawable implements GLXDrawable {
     public void lower() {
 
         Changes changes = new Changes();
-        changes.stack_mode(Changes.BELOW);
+        changes.stackMode(Changes.StackMode.BELOW);
         configure(changes);
     }
 
-    /*
+    
+    /**
      * @see <a href="XMoveWindow.html">XMoveWindow</a>
      * @see #configure(Window.Changes)
      */
     public void move() {
 
         Changes changes = new Changes();
-        changes.x(x);
-        changes.y(y);
+        changes.setX(x);
+        changes.setY(y);
         configure(changes);
     }
 
+    
     /**
      * @see <a href="XMoveWindow.html">XMoveWindow</a>
      * @see #configure(Window.Changes)
@@ -1825,36 +1988,40 @@ public class Window extends Drawable implements GLXDrawable {
         move();
     }
 
+    
     /**
      * @see <a href="XMoveResizeWindow.html">XMoveResizeWindow</a>
      * @see #configure(Window.Changes)
      */
-    public void move_resize() {
+    public void moveResize() {
 
         move();
         resize();
     }
 
+    
     /**
      * @see <a href="XMoveResizeWindow.html">XMoveResizeWindow</a>
      * @see #configure(Window.Changes)
      */
-    public void move_resize(int x, int y, int width, int height) {
+    public void moveResize(int x, int y, int width, int height) {
 
         move(x, y);
         resize(width, height);
     }
 
+    
     /**
      * @see <a href="XMoveResizeWindow.html">XMoveResizeWindow</a>
      * @see #configure(Window.Changes)
      */
-    public void move_resize(Rectangle rectangle) {
+    public void moveResize(Rectangle rectangle) {
 
-        move_resize(rectangle.getX(), rectangle.getY(), rectangle.getWidth(), 
+        moveResize(rectangle.getX(), rectangle.getY(), rectangle.getWidth(), 
                     rectangle.getHeight());
     }
 
+    
     /**
      * @see Display#killClient(Resource)
      */
@@ -1863,21 +2030,24 @@ public class Window extends Drawable implements GLXDrawable {
         display.killClient(this);
     }
 
+    
     /**
      * @see #configure(Window.Changes)
      */
     public void raise() {
 
         Changes changes = new Changes();
-        changes.stack_mode(Changes.ABOVE);
+        changes.stackMode(Changes.StackMode.ABOVE);
         configure(changes);
     }
+
 
     public Rectangle rectangle() {
 
         return new Rectangle(x, y, width, height);
     }
 
+    
     /**
      * @see <a href="XResizeWindow.html">XResizeWindow</a>
      * @see #configure(Window.Changes)
@@ -1888,13 +2058,14 @@ public class Window extends Drawable implements GLXDrawable {
 
         // width/height == 0 causes BAD_VALUE Error
         if (width != 0)
-            changes.width(width);
+            changes.setWidth(width);
         if (height != 0)
-            changes.height(height);
+            changes.setHeight(height);
         if (changes.bitmask != 0)
             configure(changes);
     }
 
+    
     /**
      * @see <a href="XResizeWindow.html">XResizeWindow</a>
      * @see #configure(Window.Changes)
@@ -1909,11 +2080,12 @@ public class Window extends Drawable implements GLXDrawable {
         resize();
     }
 
+    
     public boolean resized(Rectangle r) {
-
         return r.getWidth() != width || r.getHeight() != height;
     }
 
+    
     /**
      * @deprecated Use {@link #getScreen()} instead
      */
@@ -1928,192 +2100,86 @@ public class Window extends Drawable implements GLXDrawable {
         return null;
     }
 
+  
     public Screen getScreen() {
 
         return this.screen();
     }
 
+  
     /**
      * @see <a href="XSelectInput.html">XSelectInput</a>
-     * @see #change_attributes(Window.Attributes)
+     * @see #changeAttributes(Window.Attributes)
      */
-    public void select_input(int event_mask) {
+    public void selectInput(int eventMask) {
 
-        Attributes attr = new Attributes();
-        attr.set_event_mask(event_mask);
-        change_attributes(attr);
+        WindowAttributes attr = new WindowAttributes();
+        attr.setEventMask(eventMask);
+        changeAttributes(attr);
     }
 
+    
     /**
-     * @see #set_input_focus(int, int)
+     * @see #setInputFocus(int, int)
      */
-    public void set_input_focus() {
+    public void setInputFocus() {
 
-        set_input_focus(TO_POINTER_ROOT, Display.CURRENT_TIME);
+        setInputFocus(RevertTo.TO_POINTER_ROOT, Display.CURRENT_TIME);
     }
+    
 
-    public void set_geometry_cache(Rectangle r) {
+    public void setGeometryCache(Rectangle r) {
 
         x = r.getX();
         y = r.getY();
         width = r.getWidth();
         height = r.getHeight();
     }
+    
 
     /**
      * A standard way to set wm class hint and name in Java.
      * 
-     * @see #set_wm_class_hint(String, String)
-     * @see #set_wm_name(String)
+     * @see #setWMClassHint(String, String)
+     * @see #setWMName(String)
      */
-    public void set_wm(Object app, String topic) {
+    public void setWM(Object app, String topic) {
 
-        String res_class = app.getClass().getName();
-        set_wm_class_hint(topic, res_class);
-        set_wm_name(topic + " - " + res_class);
+        String resClass = app.getClass().getName();
+        setWMClassHint(topic, resClass);
+        setWMName(topic + " - " + resClass);
     }
-
-    /** X window manager class hint. */
-    public static class WMClassHint {
-
-        public String res;
-
-        public int middle;
-
-        public WMClassHint(Data data) {
-
-            int len = data.read4(16) - 1;
-            res = data.read_string(32, len);
-            middle = res.indexOf(0);
-        }
-
-        public boolean class_equals(String res_class) {
-
-            if (res_class == null)
-                return false;
-            return res.endsWith(res_class);
-        }
-
-        public boolean class_equals(WMClassHint hint) {
-
-            if (hint == null)
-                return false;
-            return class_equals(hint.res_class());
-        }
-
-        public boolean equals(WMClassHint hint) {
-
-            if (hint == null)
-                return false;
-            return res.equals(hint.res);
-        }
-
-        public boolean equals(String res_name, String res_class) {
-
-            if (res_name == null || res_class == null)
-                return false;
-            if (res_name.length() + res_class.length() != res.length() - 1)
-                return false;
-
-            String res0 = res_name + "\0" + res_class;
-            return res.equals(res0);
-        }
-
-        public String res_name() {
-
-            return res.substring(0, middle);
-        }
-
-        public String res_class() {
-
-            return res.substring(middle + 1, res.length());
-        }
-
-        public String toString() {
-
-            return "[" + res_name() + " " + res_class() + "]";
-        }
-    }
+    
 
     /**
-     * @see #set_wm_class_hint(String, String)
+     * @see #setWMClassHint(String, String)
      */
-    public void set_wm_class_hint(WMClassHint class_hint) {
+    public void setWMClassHint(WMClassHint class_hint) {
 
-        set_wm_class_hint(class_hint.res_name(), class_hint.res_class());
+        setWMClassHint(class_hint.resName(), class_hint.resClass());
     }
 
+    
     /**
      * @see <a href="XSetClassHint.html">XSetClassHint</a>
      * @see #change_property(int, int, Atom, Atom, int, Object, int, int)
      */
-    public void set_wm_class_hint(String res_name, String res_class) {
+    public void setWMClassHint(String res_name, String res_class) {
 
         String wm_class = res_name + '\0' + res_class + '\0';
 
-        change_property(REPLACE, Atom.WM_CLASS, Atom.STRING, 8, wm_class
+        changeProperty(PropertyMode.REPLACE, Atom.WM_CLASS, Atom.STRING, 8, wm_class
                 .getBytes(), 0, 8);
     }
 
-    /** X window manager hints. */
-    public static class WMHints extends Data {
-
-        public WMHints(Data data) {
-
-            super(data);
-        }
-
-        public static final int INPUT_HINT_MASK = 1 << 0;
-
-        public static final int STATE_HINT_MASK = 1 << 1;
-
-        public static final int ICON_PIXMAP_HINT_MASK = 1 << 2;
-
-        public static final int ICON_WINDOW_HINT_MASK = 1 << 3;
-
-        public static final int ICON_POSITION_HINT_MASK = 1 << 4;
-
-        public static final int ICON_MASK_HINT_MASK = 1 << 5;
-
-        public static final int WINDOW_GROUP_HINT_MASK = 1 << 6;
-
-        public static final int URGENCY_HINT_MASK = 1 << 8;
-
-        /**
-         * @return valid: {@link #INPUT_HINT_MASK}, {@link #STATE_HINT_MASK},
-         *         {@link #ICON_PIXMAP_HINT_MASK},
-         *         {@link #ICON_WINDOW_HINT_MASK},
-         *         {@link #ICON_POSITION_HINT_MASK},
-         *         {@link #ICON_MASK_HINT_MASK},
-         *         {@link #WINDOW_GROUP_HINT_MASK}, {@link #URGENCY_HINT_MASK}
-         */
-        public int flags() {
-
-            return read4(32);
-        }
-
-        public final static int WITHDRAWN = 0;
-
-        public final static int NORMAL = 1;
-
-        public final static int ICONIC = 3;
-
-        /**
-         * @return valid: {@link #WITHDRAWN}, {@link #NORMAL}, {@link #ICONIC}
-         */
-        public int initial_state() {
-
-            return read4(40);
-        }
-    }
-
+    
     /**
      * @see <a href="XSetWMHints.html">XSetWMHints</a>
      * @see #change_property(int, int, Atom, Atom, int, Object, int, int)
      */
     public void set_wm_hints(WMHints wm_hints) {
 
-        change_property(REPLACE, Atom.WM_HINTS, Atom.WM_HINTS, 8,
+        changeProperty(PropertyMode.REPLACE, Atom.WM_HINTS, Atom.WM_HINTS, 8,
                         wm_hints.getData(), 32, 8);
     }
 
@@ -2223,110 +2289,72 @@ public class Window extends Drawable implements GLXDrawable {
      * @see <a href="XSetWMNormalHints.html">XSetWMNormalHints</a>
      * @see #change_property(int, int, Atom, Atom, int, Object, int, int)
      */
-    public void set_wm_normal_hints(WMSizeHints size_hints) {
+    public void setWMNormalHints(WMSizeHints sizeHints) {
 
-        change_property(REPLACE, Atom.WM_NORMAL_HINTS, Atom.WM_SIZE_HINTS, 32,
-                        size_hints.getData(), 32, 8);
+        changeProperty(PropertyMode.REPLACE, Atom.WM_NORMAL_HINTS,
+                       Atom.WM_SIZE_HINTS, 32, sizeHints.getData(), 32, 8);
     }
 
     /**
      * @see <a href="XSetWMName.html">XSetWMName</a>
      * @see #change_property(int, int, Atom, Atom, int, Object, int, int)
      */
-    public void set_wm_name(String wm_name) {
+    public void setWMName(String wmName) {
 
-        change_property(REPLACE, Atom.WM_NAME, Atom.STRING, 8, wm_name
-                .getBytes(), 0, 8); // support other types?
+        changeProperty(PropertyMode.REPLACE, Atom.WM_NAME, Atom.STRING,
+                       8, wmName.getBytes(), 0, 8); // support other types?
     }
 
     /** 
-     * @see #set_wm_protocol(String)
+     * @see #setWMProtocol(String)
      */
-    public void set_wm_delete_window() {
+    public void setWMDeleteWindow() {
 
-        set_wm_protocol("WM_DELETE_WINDOW");
+        setWMProtocol("WM_DELETE_WINDOW");
     }
 
     /** 
-     * @see #change_property(Atom, Atom, int)
+     * @see #changeProperty(Atom, Atom, int)
      */
-    public void set_wm_protocol(String name) {
+    public void setWMProtocol(String name) {
 
-        Atom wm_protocols = (Atom) Atom.intern(display, "WM_PROTOCOLS");
+        Atom wmProtocols = (Atom) Atom.intern(display, "WM_PROTOCOLS");
         Atom protocol = (Atom) Atom.intern(display, name);
 
-        change_property(wm_protocols, Atom.ATOM, protocol.getID());
+        changeProperty(wmProtocols, Atom.ATOM, protocol.getID());
     }
 
     /** 
-     * @see #set_wm_state(int, Window)
+     * @see #setWMState(int, Window)
      */
-    public void set_wm_state(int state) {
+    public void setWMState(WMInitialState state) {
 
-        set_wm_state(state, NONE);
+        setWMState(state, NONE);
     }
 
-    /** X window manager state. */
-    public static class WMState extends Data {
-
-        public Display display;
-
-        public WMState(Display display, Data data) {
-
-            super(data);
-            this.display = display;
-        }
-
-        public final static int WITHDRAWN = 0;
-
-        public final static int NORMAL = 1;
-
-        public final static int ICONIC = 3;
-
-        /**
-         * @return valid:
-         * {@link #WITHDRAWN},
-         * {@link #NORMAL},
-         * {@link #ICONIC}
-         */
-        public int state() {
-
-            return read4(32);
-        }
-
-        public int icon_id() {
-
-            return read4(36);
-        }
-
-        public Window icon() {
-
-            return (Window) intern(display, icon_id());
-        }
-    }
 
     /** 
-     * @see #set_wm_state(int, Window)
+     * @see #setWMState(int, Window)
      */
-    public void set_wm_state(WMState state) {
+    public void setWMState(WMState state) {
 
-        set_wm_state(state.state(), state.icon());
+        setWMState(state.state(), state.icon());
     }
 
     /** 
      * @see #change_property(int, int, Atom, Atom, int, Object, int, int)
      */
-    public void set_wm_state(int state, Window icon) {
+    public void setWMState(WMInitialState state, Window icon) {
 
         // FIXME: Re-think WM -stuff. Maybe do outside of Window as this is
         // not in the core protocol.
 
-        Atom wm_state = (Atom) Atom.intern(display, "WM_STATE");
+        Atom wmState = (Atom) Atom.intern(display, "WM_STATE");
         int[] data = {
-                        state, icon.id
+                        state.getCode(), icon.id
         };
 
-        change_property(REPLACE, wm_state, wm_state, 32, data, 0, 32);
+        changeProperty(PropertyMode.REPLACE, wmState, wmState, 32, data, 0, 32);
     }
 
     public String toString() {
@@ -2341,7 +2369,7 @@ public class Window extends Drawable implements GLXDrawable {
      * @see <a href="XGetClassHint.html">XGetClassHint</a>
      * @see #property(boolean, Atom, Atom, int, int)
      */
-    public WMClassHint wm_class_hint() {
+    public WMClassHint wmClassHint() {
 
         // FIXME: Re-think WM -stuff. Maybe do outside of Window as this is
         // not in the core protocol.
@@ -2359,7 +2387,7 @@ public class Window extends Drawable implements GLXDrawable {
      * @see <a href="XGetWMHints.html">XGetWMHints</a>
      * @see #property(boolean, Atom, Atom, int, int)
      */
-    public WMHints wm_hints() {
+    public WMHints wmHints() {
 
         // FIXME: Re-think WM -stuff. Maybe do outside of Window as this is
         // not in the core protocol.
@@ -2376,22 +2404,22 @@ public class Window extends Drawable implements GLXDrawable {
      * @see <a href="XGetWMName.html">XGetWMName</a>
      * @see #property(boolean, Atom, Atom, int, int)
      */
-    public String wm_name() {
+    public String wmName() {
 
-        Property pi = get_property(false, Atom.WM_NAME, Atom.STRING, 0,
+        Property pi = getProperty(false, Atom.WM_NAME, Atom.STRING, 0,
                                    MAX_WM_LENGTH); // support other types?
 
-        if (pi.format() != 8 || pi.type_id() != Atom.STRING.getID())
+        if (pi.format() != 8 || pi.typeID() != Atom.STRING.getID())
             return null;
 
-        return pi.string_value();
+        return pi.stringValue();
     }
 
     /**
      * @see <a href="XGetWMNormalHints.html">XGetWMNormalHints</a>
      * @see #property(boolean, Atom, Atom, int, int)
      */
-    public WMSizeHints wm_normal_hints() {
+    public WMSizeHints wmNormalHints() {
 
         // FIXME: Re-think WM -stuff. Maybe do outside of Window as this is
         // not in the core protocol.
@@ -2407,12 +2435,12 @@ public class Window extends Drawable implements GLXDrawable {
     }
 
     /**
-     * @see #wm_protocols()
+     * @see #wmProtocols()
      */
-    public boolean wm_protocol(String name) {
+    public boolean wmProtocol(String name) {
 
         Atom protocol = (Atom) Atom.intern(display, name);
-        int[] list = wm_protocols();
+        int[] list = wmProtocols();
 
         for (int i : list) {
             if (i == protocol.getID())
@@ -2429,7 +2457,7 @@ public class Window extends Drawable implements GLXDrawable {
      *
      * @see #property(boolean, Atom, Atom, int, int)
      */
-    public int[] wm_protocols() {
+    public int[] wmProtocols() {
 
         // FIXME: Re-think WM -stuff. Maybe do outside of Window as this is
         // not in the core protocol.
@@ -2452,7 +2480,7 @@ public class Window extends Drawable implements GLXDrawable {
     /** 
      * @see #property(boolean, Atom, Atom, int, int)
      */
-    public WMState wm_state() {
+    public WMState wmState() {
 
         // FIXME: Re-think WM -stuff. Maybe do outside of Window as this is
         // not in the core protocol.
@@ -2468,19 +2496,19 @@ public class Window extends Drawable implements GLXDrawable {
     }
 
     /**
-     * @see #warp_pointer(Window, int, int, int, int, int, int)
+     * @see #warpPointer(Window, int, int, int, int, int, int)
      */
-    public void warp_pointer(int x, int y) {
+    public void warpPointer(int x, int y) {
 
-        warp_pointer(NONE, 0, 0, 0, 0, x, y);
+        warpPointer(NONE, 0, 0, 0, 0, x, y);
     }
 
     /**
-     * @see #warp_pointer(int, int)
+     * @see #warpPointer(int, int)
      */
-    public void warp_pointer(Point position) {
+    public void warpPointer(Point position) {
 
-        warp_pointer(position.getX(), position.getY());
+        warpPointer(position.getX(), position.getY());
     }
 
     public int id() {
@@ -2488,4 +2516,16 @@ public class Window extends Drawable implements GLXDrawable {
         return id;
     }
 
+    
+    public int getX() {
+
+        return x;
+    }
+    
+    
+    public int getY() {
+
+        return y;
+    }
+    
 }

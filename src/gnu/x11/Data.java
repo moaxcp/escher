@@ -122,7 +122,7 @@ public class Data {
   }
 
 
-  public String read_string (int j, int length) {
+  public String readString (int j, int length) {
     return new String (data, j+offset, length);
   }
 
