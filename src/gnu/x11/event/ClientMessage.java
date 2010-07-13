@@ -10,15 +10,15 @@ public final class ClientMessage extends Event {
   public static final int CODE = 33;
 
 
-  public int window_id;
-  public int type_atom_id;
-  public byte[] data;
+  private int windowID;
+  private int typeAtomID;
+  private byte[] data;
 
   /** Reading. */
   public ClientMessage (Display display, ResponseInputStream in) {
-    super (display, in); 
-    window_id = in.readInt32 ();
-    type_atom_id = in.readInt32 ();
+    super(display, in); 
+    windowID = in.readInt32();
+    typeAtomID = in.readInt32();
     data = new byte[20];
     in.readData(data);
   }
@@ -31,7 +31,7 @@ public final class ClientMessage extends Event {
   }
 
   public int type_id () {
-    return type_atom_id;
+    return typeAtomID;
   }
 
   public int wm_data () {
@@ -49,7 +49,7 @@ public final class ClientMessage extends Event {
   }
 
 
-  public boolean delete_window () {
+  public boolean deleteWindow () {
     Atom wm_protocols = (Atom) Atom.intern (display, "WM_PROTOCOLS");
     Atom wm_delete_window = (Atom) Atom.intern (display,
       "WM_DELETE_WINDOW");
@@ -63,6 +63,10 @@ public final class ClientMessage extends Event {
   public Atom type () { 
     return (Atom) Atom.intern (display, type_id (), true); 
   }
-
+  
+  
+  public int getWindowID() {
+    return windowID;
+  }
 
 }

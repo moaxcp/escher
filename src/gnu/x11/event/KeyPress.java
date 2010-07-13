@@ -9,10 +9,8 @@ import gnu.x11.ResponseInputStream;
  */
 public final class KeyPress extends Input {
 
-  public static final int CODE = 2;
-
   public KeyPress (Display display) {
-    super (display, CODE);
+    super (display, EventCode.KEY_PRESS);
   }
 
   /**

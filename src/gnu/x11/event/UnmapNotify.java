@@ -5,26 +5,25 @@ import gnu.x11.ResponseInputStream;
 
 /** X unmap notify event. */
 public final class UnmapNotify extends Event {
-  public static final int CODE = 18;
 
-  public int event_window_id;
-  public int window_id;
+  private int eventWindowID;
+  private int windowID;
 
-  public boolean from_configure;
+  private boolean fromConfigure;
 
   /** Reading. */
   public UnmapNotify (Display display, ResponseInputStream in) {
-    super (display, in);
-    event_window_id = in.readInt32 ();
-    window_id = in.readInt32 ();
-    from_configure = in.readBool ();
-    in.skip (19);
+    super(display, in);
+    eventWindowID = in.readInt32();
+    windowID = in.readInt32();
+    fromConfigure = in.readBool();
+    in.skip(19);
   }
 
 
   //-- reading
-  public boolean from_configure () {
-    return from_configure;
+  public boolean fromConfigure () {
+    return fromConfigure;
   }
 
 

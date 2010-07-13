@@ -555,7 +555,7 @@ public class ResponseInputStream extends FilterInputStream {
      * Skips n bytes in the stream.
      * 
      * @param n
-     *                the number of bytes to skip
+     *         the number of bytes to skip
      * 
      * @return the actual number of bytes skipped
      */

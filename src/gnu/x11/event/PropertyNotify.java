@@ -7,23 +7,38 @@ import gnu.x11.ResponseInputStream;
 
 /** X property notify event. */
 public final class PropertyNotify extends Event {
-  public static final int CODE = 28;
 
-  public static final int NEW_VALUE = 0;
-  public static final int DELETED = 1;
+  public enum State {
+      NEW_VALUE(0),
+      DELETED(1);
+      
+      private int code;
+      
+      State(int code) {
+          this.code = code;
+      }
+      
+      public int getCode() {
+          return code;
+      }
+      
+      public static State getByCode(int code) {
+          return code == 0 ? NEW_VALUE : DELETED;
+      }
+  }
 
-  private int window_id;
-  private int atom_id;
+  private int windowID;
+  private int atomID;
   private int time;
-  private int state;
+  private State state;
 
   public PropertyNotify (Display display, ResponseInputStream in) {
-    super (display, in);
-    window_id = in.readInt32 ();
-    atom_id = in.readInt32 ();
-    time = in.readInt32 ();
-    state = in.readInt8 ();
-    in.skip (15);
+    super(display, in);
+    windowID = in.readInt32();
+    atomID = in.readInt32();
+    time = in.readInt32();
+    state = State.getByCode(in.readInt8());
+    in.skip(15);
   }
 
   /**
@@ -33,7 +48,7 @@ public final class PropertyNotify extends Event {
    */
   @Deprecated
   public Atom atom (Display display) { 
-    return (Atom) Atom.intern (display, atom_id, true);
+    return (Atom) Atom.intern (display, atomID, true);
   }
   
   public Atom getAtom(Display display) {
@@ -43,12 +58,12 @@ public final class PropertyNotify extends Event {
   
   public int getAtomID() {
       
-      return this.atom_id;
+      return this.atomID;
   }
   
   public int getWindowID() {
       
-      return this.window_id;
+      return this.windowID;
   }
   
   public int getTime() {
@@ -56,7 +71,7 @@ public final class PropertyNotify extends Event {
       return this.time;
   }
   
-  public int getState() {
+  public State getState() {
       
       return this.state;
   }

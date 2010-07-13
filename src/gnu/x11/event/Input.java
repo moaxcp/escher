@@ -12,23 +12,23 @@ public abstract class Input extends Event {
 
     private int time;
 
-    private int root_window_id;
+    private int rootWindowID;
 
-    private int event_window_id;
+    private int eventWindowID;
 
-    private int child_window_id;
+    private int childWindowID;
 
-    private int root_x;
+    private int rootX;
 
-    private int root_y;
+    private int rootY;
 
-    private int event_x;
+    private int eventX;
 
-    private int event_y;
+    private int eventY;
 
     private int state;
 
-    private boolean same_screen;
+    private boolean sameScreen;
 
     /**
      * Reads the event from the input stream.
@@ -38,20 +38,20 @@ public abstract class Input extends Event {
         super(display, in);
         
         this.time = in.readInt32();
-        this.root_window_id = in.readInt32();
-        this.event_window_id = in.readInt32();
-        this.child_window_id = in.readInt32();
-        this.root_x = in.readInt16();
-        this.root_y = in.readInt16();
-        this.event_x = in.readInt16();
-        this.event_y = in.readInt16();
+        this.rootWindowID = in.readInt32();
+        this.eventWindowID = in.readInt32();
+        this.childWindowID = in.readInt32();
+        this.rootX = in.readInt16();
+        this.rootY = in.readInt16();
+        this.eventX = in.readInt16();
+        this.eventY = in.readInt16();
         this.state = in.readInt16();
-        this.same_screen = in.readBool();
+        this.sameScreen = in.readBool();
         
         in.skip(1); // Unused.
     }
 
-    public Input(Display display, int code) {
+    public Input(Display display, EventCode code) {
 
         super(display, code);
     }
@@ -82,7 +82,7 @@ public abstract class Input extends Event {
      */
     public void setRootWindowID(int root_window_id) {
 
-        this.root_window_id = root_window_id;
+        this.rootWindowID = root_window_id;
     }
 
     /**
@@ -90,7 +90,7 @@ public abstract class Input extends Event {
      */
     public int getRootWindowID() {
 
-        return root_window_id;
+        return rootWindowID;
     }
 
     /**
@@ -98,7 +98,7 @@ public abstract class Input extends Event {
      */
     public void setEventWindowID(int event_window_id) {
 
-        this.event_window_id = event_window_id;
+        this.eventWindowID = event_window_id;
     }
 
     /**
@@ -106,7 +106,7 @@ public abstract class Input extends Event {
      */
     public int getEventWindowID() {
 
-        return event_window_id;
+        return eventWindowID;
     }
 
     /**
@@ -114,7 +114,7 @@ public abstract class Input extends Event {
      */
     public void setSameScreen(boolean same_screen) {
 
-        this.same_screen = same_screen;
+        this.sameScreen = same_screen;
     }
 
     /**
@@ -122,7 +122,7 @@ public abstract class Input extends Event {
      */
     public boolean isSameScreen() {
 
-        return this.same_screen();
+        return this.sameScreen();
     }
 
     /**
@@ -139,68 +139,68 @@ public abstract class Input extends Event {
     }
 
     /**
-     * @deprecated Use {@link #childID()} instead
+     * @deprecated Use {@link #getChildID()} instead
      */
-    public int child_id() {
+    public int childID() {
         
-        return child_window_id;
+        return childWindowID;
     }
 
-    public int childID() {
+    public int getChildID() {
 
-        return child_id();
+        return childID();
     }
 
     /**
      * @deprecated Use {@link #getRootX()} instead
      */
-    public int root_x() {
+    public int rootX() {
         
-        return root_x;
+        return rootX;
     }
 
     public int getRootX() {
 
-        return root_x();
+        return rootX();
     }
 
     /**
      * @deprecated Use {@link #getRootY()} instead
      */
-    public int root_y() {
+    public int rootY() {
         
-        return root_y;
+        return rootY;
     }
 
     public int getRootY() {
 
-        return root_y();
+        return rootY();
     }
 
     /**
      * @deprecated Use {@link #getEventX()} instead
      */
-    public int event_x() {
+    public int eventX() {
         
-        return event_x;
+        return eventX;
     }
 
     public int getEventX() {
 
-        return event_x();
+        return eventX();
     }
 
     /**
      * @deprecated Use {@link #getEventY()} instead
      */
-    public int event_y() {
+    public int eventY() {
         
-        return event_y;
+        return eventY;
     }
 
     public int getEventY() {
 
-        return event_y();
+        return eventY();
     }
 
     /**
@@ -219,9 +219,9 @@ public abstract class Input extends Event {
     /**
      * @deprecated use {@link #isSameScreen()} instead
      */
-    public boolean same_screen() {
+    public boolean sameScreen() {
 
-        return this.same_screen;
+        return this.sameScreen;
     }
 
     /**
@@ -241,7 +241,7 @@ public abstract class Input extends Event {
      */
     public Window child() {
         
-        return (Window) Window.intern(display, child_window_id);
+        return (Window) Window.intern(display, childWindowID);
     }
 
     public Window getChild() {
@@ -292,15 +292,15 @@ public abstract class Input extends Event {
 
         super.write(o);
         o.writeInt32(time);
-        o.writeInt32(root_window_id);
-        o.writeInt32(event_window_id);
-        o.writeInt32(child_window_id);
-        o.writeInt16(root_x);
-        o.writeInt16(root_y);
-        o.writeInt16(event_x);
-        o.writeInt16(event_y);
+        o.writeInt32(rootWindowID);
+        o.writeInt32(eventWindowID);
+        o.writeInt32(childWindowID);
+        o.writeInt16(rootX);
+        o.writeInt16(rootY);
+        o.writeInt16(eventX);
+        o.writeInt16(eventY);
         o.writeInt16(state);
-        o.writeBool(same_screen);
+        o.writeBool(sameScreen);
         o.skip(1); // Unused.
 
     }

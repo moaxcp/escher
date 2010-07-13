@@ -6,17 +6,16 @@ import gnu.x11.ResponseInputStream;
 
 /** X map notify event. */
 public final class MapNotify extends Event {
-  public static final int CODE = 19;
 
-  public int event_window_id;
-  public int window_id;
-  public boolean override_redirect;
+  private int eventWindowID;
+  private int windowID;
+  private boolean overrideRedirect;
 
   public MapNotify (Display display, ResponseInputStream in) {
     super (display, in);
-    event_window_id = in.readInt32 ();
-    window_id = in.readInt32 ();
-    override_redirect = in.readBool ();
+    eventWindowID = in.readInt32 ();
+    windowID = in.readInt32 ();
+    overrideRedirect = in.readBool ();
     in.skip (19);
   }
 }

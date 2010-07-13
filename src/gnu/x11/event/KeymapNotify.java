@@ -6,20 +6,19 @@ import gnu.x11.ResponseInputStream;
 
 /** X keymap notify event. */
 public final class KeymapNotify extends Event {
-  public static final int CODE = 11;
 
-  public Display display;
+  private Display display;
 
-  public int code;
+  private int code;
 
-  public byte[] keys;
+  private byte[] keys;
 
   public KeymapNotify (Display display, ResponseInputStream in) {
     super ();
     this.display = display;
-    code = in.readInt8 ();
+    code = in.readInt8();
     keys = new byte[31];
-    in.readData (keys);
+    in.readData(keys);
   }
 
 }

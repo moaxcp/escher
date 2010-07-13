@@ -5,20 +5,39 @@ import gnu.x11.ResponseInputStream;
 
 public abstract class FocusEvent extends Event {
 
-  public static final int NORMAL = 0;
-  public static final int GRAB = 1;
-  public static final int UNGRAB = 2;
-  public static final int WHILE_GRABBED = 3;
+  public enum Mode {
+      NORMAL(0),
+      GRAB(1),
+      UNGRAB(2),
+      WHILE_GRABBED(3);
+      
+      private int code;
+      
+      Mode(int code) {
+          this.code = code;
+      }
+      
+      public static Mode getByCode(int code) {
+          switch (code) {
+              case 0: return NORMAL;
+              case 1: return GRAB;
+              case 2: return UNGRAB;
+              case 3: return WHILE_GRABBED;
+              default: return NORMAL;
+          }
+      }
+      
+  }
 
   private int eventWindowID;
 
-  public int mode;
+  private Mode mode;
 
   public FocusEvent (Display display, ResponseInputStream in) {
     super (display, in);
-    eventWindowID = in.readInt32 ();
-    mode = in.readInt8 ();
-    in.skip (23); // Unused.
+    eventWindowID = in.readInt32();
+    mode = Mode.getByCode(in.readInt8());
+    in.skip(23); // Unused.
   }
 
     public int getEventWindowID() {

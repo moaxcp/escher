@@ -7,9 +7,6 @@ import gnu.x11.ResponseInputStream;
 /** X key release event. */
 public final class KeyRelease extends Input {
 
-  public static final int CODE = 3;
-
-
   /**
    * Reads a KeyRelease event from the input stream.
    *

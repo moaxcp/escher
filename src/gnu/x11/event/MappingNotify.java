@@ -6,17 +6,16 @@ import gnu.x11.ResponseInputStream;
 
 /** X mapping notify event. */
 public final class MappingNotify extends Event {
-  public static final int CODE = 34;
 
-  public int request;
-  public int first_keycode;
-  public int count;
+  private int request;
+  private int firstKeycode;
+  private int count;
 
   public MappingNotify (Display display, ResponseInputStream in) {
     super (display, in);
-    request = in.readInt8 ();
-    first_keycode = in.readInt8 ();
-    count = in.readInt8 ();
-    in.skip (25);
+    request = in.readInt8();
+    firstKeycode = in.readInt8();
+    count = in.readInt8();
+    in.skip(25);
   }
 }

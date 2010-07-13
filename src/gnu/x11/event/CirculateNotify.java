@@ -6,22 +6,18 @@ import gnu.x11.ResponseInputStream;
 
 /** X circulate notify event. */
 public final class CirculateNotify extends Event {
-  public static final int CODE = 26;
 
-  public static final int TOP = 0;
-  public static final int BOTTOM = 1;
-
-  public int event_window_id;
-  public int window_id;
+  private int eventWindowID;
+  private int windowID;
   
-  public int place;
+  private Place place;
 
   public CirculateNotify (Display display, ResponseInputStream in) {
     super (display, in);
-    event_window_id = in.readInt32 ();
-    window_id = in.readInt32 ();
+    eventWindowID = in.readInt32();
+    windowID = in.readInt32();
     in.skip (4); // Unused.
-    place = in.readInt8 ();
+    place = Place.getByCode(in.readInt8());
     in.skip (15);
   }
 

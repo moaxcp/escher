@@ -6,20 +6,18 @@ import gnu.x11.ResponseInputStream;
 
 /** X resize request event. */
 public final class ResizeRequest extends Event {
-  public static final int CODE = 25;
 
-  public int window_id;
-
-  public int width;
-  public int height;
+  private int windowID;
+  private int width;
+  private int height;
 
   
   public ResizeRequest (Display display, ResponseInputStream in) {
-    super (display, in);
-    window_id = in.readInt32 ();
-    width = in.readInt16 ();
-    height = in.readInt16 ();
-    in.skip (20);
+    super(display, in);
+    windowID = in.readInt32();
+    width = in.readInt16();
+    height = in.readInt16();
+    in.skip(20);
   }
 
 
@@ -39,6 +37,6 @@ public final class ResizeRequest extends Event {
    * @return the window ID of the resize request
    */
   public int window_id () {
-    return window_id;
+    return windowID;
   }
 }

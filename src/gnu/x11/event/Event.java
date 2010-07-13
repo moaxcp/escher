@@ -9,34 +9,56 @@ import gnu.x11.ResponseInputStream;
  */
 public abstract class Event {
 
-  public static final int NO_EVENT_MASK = 0;
-  public static final int KEY_PRESS_MASK = 1<<0;
-  public static final int KEY_RELEASE_MASK = 1<<1;
-  public static final int BUTTON_PRESS_MASK = 1<<2;
-  public static final int BUTTON_RELEASE_MASK = 1<<3;
-  public static final int ENTER_WINDOW_MASK = 1<<4;
-  public static final int LEAVE_WINDOW_MASK = 1<<5;
-  public static final int POINTER_MOTION_MASK = 1<<6;
-  public static final int POINTER_MOTION_HINT_MASK = 1<<7;
-  public static final int BUTTON1_MOTION_MASK = 1<<8;
-  public static final int BUTTON2_MOTION_MASK = 1<<9;
-  public static final int BUTTON3_MOTION_MASK = 1<<10;
-  public static final int BUTTON4_MOTION_MASK = 1<<11;
-  public static final int BUTTON5_MOTION_MASK = 1<<12;
-  public static final int BUTTON_MOTION_MASK = 1<<13;
-  public static final int KEYMAP_STATE_MASK = 1<<14;
-  public static final int EXPOSURE_MASK = 1<<15;
-  public static final int VISIBILITY_CHANGE_MASK = 1<<16;
-  public static final int STRUCTURE_NOTIFY_MASK = 1<<17;
-  public static final int RESIZE_REDIRECT_MASK = 1<<18;
-  public static final int SUBSTRUCTURE_NOTIFY_MASK = 1<<19;
-  public static final int SUBSTRUCTURE_REDIRECT_MASK = 1<<20;
-  public static final int FOCUS_CHANGE_MASK = 1<<21;
-  public static final int PROPERTY_CHANGE_MASK = 1<<22;
-  public static final int COLORMAP_CHANGE_MASK = 1<<23;
-  public static final int OWNER_GRAB_BUTTON_MASK = 1<<24;
-  public static final int LAST_MASK_INDEX = 24;
-
+  public enum EventMask {
+      NO_EVENT_MASK(0),
+      KEY_PRESS_MASK(1<<0),
+      KEY_RELEASE_MASK(1<<1),
+      BUTTON_PRESS_MASK(1<<2),
+      BUTTON_RELEASE_MASK(1<<3),
+      ENTER_WINDOW_MASK(1<<4),
+      LEAVE_WINDOW_MASK(1<<5),
+      POINTER_MOTION_MASK(1<<6),
+      POINTER_MOTION_HINT_MASK(1<<7),
+      BUTTON1_MOTION_MASK(1<<8),
+      BUTTON2_MOTION_MASK(1<<9),
+      BUTTON3_MOTION_MASK(1<<10),
+      BUTTON4_MOTION_MASK(1<<11),
+      BUTTON5_MOTION_MASK(1<<12),
+      BUTTON_MOTION_MASK(1<<13),
+      KEYMAP_STATE_MASK(1<<14),
+      EXPOSURE_MASK(1<<15),
+      VISIBILITY_CHANGE_MASK(1<<16),
+      STRUCTURE_NOTIFY_MASK(1<<17),
+      RESIZE_REDIRECT_MASK(1<<18),
+      SUBSTRUCTURE_NOTIFY_MASK(1<<19),
+      SUBSTRUCTURE_REDIRECT_MASK(1<<20),
+      FOCUS_CHANGE_MASK(1<<21),
+      PROPERTY_CHANGE_MASK(1<<22),
+      COLORMAP_CHANGE_MASK(1<<23),
+      OWNER_GRAB_BUTTON_MASK(1<<24),
+      LAST_MASK_INDEX(24);
+      
+      private int mask;
+      
+      EventMask(int mask) {
+          this.mask = mask;
+      }
+      
+      public int getMask() {
+        return mask;
+      }
+      
+      public static int maskOr(EventMask[] eventMasks) {
+         int resultMask = 0;
+         
+         for (EventMask m : eventMasks) {
+             resultMask = resultMask | m.getMask();
+         }
+         
+         return resultMask;
+      }
+  }
+  
   /**
    * The display from which this event originated.
    */
@@ -45,7 +67,7 @@ public abstract class Event {
   /**
    * The event code;
    */
-  public int code;
+  public EventCode code;
 
   /**
    * Event-specific detail information.
@@ -55,7 +77,7 @@ public abstract class Event {
   /**
    * The sequence number of the event.
    */
-  public int sequence_number;
+  public int sequenceNumber;
 
   /**
    * Creates an event without reading. This is used in subclasses that
@@ -70,26 +92,26 @@ public abstract class Event {
    */
   public Event (Display display, ResponseInputStream in) {
     this.display = display;
-    code = in.readInt8 ();
+    code = EventCode.getEventByID(in.readInt8());
     detail = in.readInt8 ();
-    sequence_number = in.readInt16();
+    sequenceNumber = in.readInt16();
   }
 
 
-  public Event (Display disp, int c) {
+  public Event (Display disp, EventCode c) {
     display = disp;
     code = c;
   }
 
-  public int code () {
+  public EventCode code () {
     return code;
   }
 
-  public int seq_no () {
-    return sequence_number;
+  public int sequenceNumber() {
+    return sequenceNumber;
   }
 
-  public String toString () {
+  public String toString() {
     String class_name = "#" + getClass ().getName ();
     return class_name + " " + code ();
   }
@@ -101,9 +123,9 @@ public abstract class Event {
    * @param o the output stream to write to
    */
   public void write (RequestOutputStream o) {
-    o.writeInt8 (code);
-    o.writeInt8 (detail);
-    o.writeInt16 (sequence_number); // Is this correct?
+    o.writeInt8(code.getCode());
+    o.writeInt8(detail);
+    o.writeInt16(sequenceNumber); // Is this correct?
 
     // The remaining pieces must be written by the subclasses.
   }

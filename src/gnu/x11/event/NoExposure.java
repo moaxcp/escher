@@ -6,17 +6,16 @@ import gnu.x11.ResponseInputStream;
 
 /** X no exposure event. */
 public final class NoExposure extends Event {
-  public static final int CODE = 14;
 
-  public int drawable_id;
-  public int minor_opcode;
-  public int major_opcode;
+  private int drawableID;
+  private int minorOpcode;
+  private int majorOpcode;
   
   public NoExposure (Display display, ResponseInputStream in) {
-    super (display, in);
-    drawable_id = in.readInt32 ();
-    minor_opcode = in.readInt16();
-    major_opcode = in.readInt8 ();
-    in.skip (21);
+    super(display, in);
+    drawableID = in.readInt32();
+    minorOpcode = in.readInt16();
+    majorOpcode = in.readInt8();
+    in.skip(21);
   }
 }

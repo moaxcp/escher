@@ -6,46 +6,49 @@ import gnu.x11.ResponseInputStream;
 
 /** X expose event. */
 public final class Expose extends Event {
-  public static final int CODE = 12;
 
-  public int window_id;
+  private int windowID;
 
-  public int x;
-  public int y;
-  public int width;
-  public int height;
+  private int x;
+  private int y;
+  private int width;
+  private int height;
 
-  public int count;
+  private int count;
 
   public Expose (Display display, ResponseInputStream in) {
     super (display, in);
-    window_id = in.readInt32 ();
-    x = in.readInt16 ();
-    y = in.readInt16 ();
-    width = in.readInt16 ();
-    height = in.readInt16 ();
-    count = in.readInt16 ();
-    in.skip (14); // Unused.
+    windowID = in.readInt32();
+    x = in.readInt16();
+    y = in.readInt16();
+    width = in.readInt16();
+    height = in.readInt16();
+    count = in.readInt16();
+    in.skip(14); // Unused.
   }
 
-  public int x () {
+  public int x() {
     return x;
   }
 
-  public int y () {
+  public int y() {
     return y;
   }
 
-  public int width () {
+  public int width() {
     return width;
   }
 
-  public int height () {
+  public int height() {
     return height;
   }
 
-  public int count () {
+  public int count() {
     return count;
+  }
+  
+  public int getWindowID() {
+    return windowID;
   }
 
 }
