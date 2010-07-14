@@ -22,7 +22,7 @@ public class Print extends gnu.x11.extension.Extension
   implements gnu.x11.extension.ErrorFactory,
   gnu.x11.extension.EventFactory {
 
-  public static final String [] MINOR_OPCODE_STRINGS = {
+  private static final String [] MINOR_OPCODE_STRINGS = {
     "QueryVersion",             // 0
     "GetPrinterList",           // 1
     "CreateContext",            // 2
@@ -56,13 +56,107 @@ public class Print extends gnu.x11.extension.Extension
 
 
   public String locale = "";
-  public int server_major_version, server_minor_version;
+  public int serverMajorVersion, serverMinorVersion;
 
+  
+  public enum EventMask {
+      XPNoEventMask(0),
+      XPPrintMask(1),
+      XPAttributeMask(2);
+      
+      private int code;
+      
+      EventMask(int code) {
+          this.code = code;
+      }
+      
+      public int getCode() {
+          return this.code;
+      }
+      
+      public boolean onMask(int mask) {
+          return (this.code & mask) != 0;
+      }
+  }
+  
+    
+  public enum OutputMode {
+      SPOOL(1),
+      GET_DATA(2);
+      
+      private int code;
+      
+      OutputMode(int code) {
+          this.code = code;
+      }
+      
+      public int getCode() {
+          return this.code;
+      }
+  }
+  
+  
+  public enum Attributes {
+      JOB_ATTRIBUTE_POOL(1),
+      DOC_ATTRIBUTE_POOL(2),
+      PAGE_ATTRIBUTE_POOL(3),
+      PRINTER_ATTRIBUTE_POOL(4),
+      SERVER_ATTRIBUTE_POOL(5),
+      MEDIUM_ATTRIBUTE_POOL(6),
+      SPOOLER_ATTRIBUTE_POOL(7);
+      
+      private int code;
+      
+      Attributes(int code) {
+          this.code = code;
+      }
+      
+      public int getCode() {
+          return this.code;
+      }
+  }
+  
+  
+  public enum Rule {
+      ATTRIBUTE_REPLACE(1),
+      ATTRIBUTE_MERGE(2);
+      
+      private int code;
+      
+      Rule(int code) {
+          this.code = code;
+      }
+      
+      public int getCode() {
+          return this.code;
+      }
+  }
+  
+  
+  public enum Notify {
+      START_JOB_NOTIFY(0),
+      END_JOB_NOTIFY(1),
+      START_DOC_NOTIFY(2),
+      END_DOC_NOTIFY(3),
+      START_PAGE_NOTIFY(4),
+      END_PAGE_NOTIFY(5);
 
+      private int code;
+      
+      Notify(int code) {
+          this.code = code;
+      }
+      
+      public int getCode() { 
+          return this.code;
+      }
+  }
+  
+  
   public class Context extends gnu.x11.Resource {
     /** Intern. */
-    Context (int id) {
-      super (Print.this.display, id);
+    Context(int id) {
+      super(Print.this.display, id);
     }
   
     
@@ -70,19 +164,19 @@ public class Print extends gnu.x11.extension.Extension
     /**
      * @see <a href="XpCreateContext.html">XpCreateContext</a>
      */
-    public Context (String name) {
-      super (Print.this.display);
+    public Context(String name) {
+      super(Print.this.display);
 
-      int len = 4 + Data.unit (name) + Data.unit (locale);
+      int len = 4 + Data.unit(name) + Data.unit(locale);
       RequestOutputStream o = display.getResponseOutputStream();
-      synchronized (o) {
-        o.beginRequest (majorOpcode, 2, len);
-        o.writeInt32 (id);
-        o.writeInt32 (name.length ());
-        o.writeInt32 (locale.length ());
-        o.writeString8 (name);
-        o.writeString8 (locale);
-        o.send ();
+      synchronized(o) {
+        o.beginRequest(majorOpcode, 2, len);
+        o.writeInt32(id);
+        o.writeInt32(name.length());
+        o.writeInt32(locale.length());
+        o.writeString8(name);
+        o.writeString8(locale);
+        o.send();
       }
     }
   
@@ -91,12 +185,12 @@ public class Print extends gnu.x11.extension.Extension
     /**
      * @see <a href="XpSetContext.html">XpSetContext</a>
      */
-    public void set () {
+    public void set() {
       RequestOutputStream o = display.getResponseOutputStream();
-      synchronized (o) {
-        o.beginRequest (majorOpcode, 3, 2);
-        o.writeInt32 (id);
-        o.send ();
+      synchronized(o) {
+        o.beginRequest(majorOpcode, 3, 2);
+        o.writeInt32(id);
+        o.send();
       }
     }
   
@@ -105,12 +199,12 @@ public class Print extends gnu.x11.extension.Extension
     /**
      * @see <a href="XpDestroyContext.html">XpDestroyContext</a>
      */
-    public void destroy () {
+    public void destroy() {
       RequestOutputStream o = display.getResponseOutputStream();
-      synchronized (o) {
-        o.beginRequest (majorOpcode, 5, 2);
-        o.writeInt32 (id);
-        o.send ();
+      synchronized(o) {
+        o.beginRequest(majorOpcode, 5, 2);
+        o.writeInt32(id);
+        o.send();
       }
     }
   
@@ -119,50 +213,51 @@ public class Print extends gnu.x11.extension.Extension
     /**
      * @see <a href="XpGetScreenOfContext.html">XpGetScreenOfContext</a>
      */
-    public Window screen () {
-      int root_id;
+    public Window screen() {
+      int rootID;
       RequestOutputStream o = display.getResponseOutputStream();
-      synchronized (o) {
-        o.beginRequest (majorOpcode, 6, 2);
+      synchronized(o) {
+        o.beginRequest(majorOpcode, 6, 2);
         // error in spec: missing context field
-        o.writeInt32 (id);
+        o.writeInt32(id);
         ResponseInputStream i = display.getResponseInputStream();
-        synchronized (i) {
-          i.readReply (o);
-          i.skip (8);
-          root_id = i.readInt32 ();
-          i.skip (16);
+        synchronized(i) {
+          i.readReply(o);
+          i.skip(8);
+          rootID = i.readInt32();
+          i.skip(16);
         }
       }
-      return (Window) Window.intern (this.display, root_id);
+      return (Window) Window.intern(this.display, rootID);
     }
-  
-  
+
+
+    
     // print 15 - select input
     /**
      * @see <a href="XpSelectInput.html">XpSelectInput</a>
      */
-    public void select_input (int event_mask) {
+    public void selectInput(EventMask eventMask) {
       RequestOutputStream o = display.getResponseOutputStream();
-      synchronized (o) {
-        o.beginRequest (majorOpcode, 15, 3);
-        o.writeInt32 (id);
-        o.writeInt32 (event_mask);
-        o.send ();
+      synchronized(o) {
+        o.beginRequest(majorOpcode, 15, 3);
+        o.writeInt32(id);
+        o.writeInt32(eventMask.getCode());
+        o.send();
       }
     }
   
   
-    /** Reply of {@link #input_selected(int)}. */
+    /** Reply of {@link #inputSelected(int)}. */
     public class InputSelectedInfo {
-      public int event_mask;
-      public int all_event_masks;
-      InputSelectedInfo (ResponseInputStream i) {
-        event_mask = i.readInt32 ();
-        all_event_masks = i.readInt32 ();
+      public EventMask eventMask;
+      public int allEventMasks;
+      InputSelectedInfo(ResponseInputStream i) {
+        eventMask = EventMask.values()[i.readInt32()];
+        allEventMasks = i.readInt32();
       }
-      public int event_mask () { return event_mask; }
-      public int all_events_mask () { return all_event_masks; }
+      public EventMask eventMask() { return eventMask; }
+      public int allEventsMask() { return allEventMasks; }
     }
   
   
@@ -170,95 +265,73 @@ public class Print extends gnu.x11.extension.Extension
     /**
      * @see <a href="XpInputSelected.html">XpInputSelected</a>
      */
-    public InputSelectedInfo input_selected (int event_mask) {
+    public InputSelectedInfo inputSelected(EventMask eventMask) {
 
       InputSelectedInfo info;
       RequestOutputStream o = display.getResponseOutputStream();
-      synchronized (o) {
-        o.beginRequest (majorOpcode, 16, 2);
-        o.writeInt32 (id);
+      synchronized(o) {
+        o.beginRequest(majorOpcode, 16, 2);
+        o.writeInt32(id);
         ResponseInputStream i = display.getResponseInputStream();
-        synchronized (i) {
-          i.readReply (o);
-          i.skip (8);
-          info = new InputSelectedInfo (i);
-          i.skip (16);
+        synchronized(i) {
+          i.readReply(o);
+          i.skip(8);
+          info = new InputSelectedInfo(i);
+          i.skip(16);
         }
       }
       return info;
     }
   
-  
-    public static final int JOB_ATTRIBUTE_POOL = 1;
-    public static final int DOC_ATTRIBUTE_POOL = 2;
-    public static final int PAGE_ATTRIBUTE_POOL = 3;
-    public static final int PRINTER_ATTRIBUTE_POOL = 4;
-    public static final int SERVER_ATTRIBUTE_POOL = 5;
-    public static final int MEDIUM_ATTRIBUTE_POOL = 6;
-    public static final int SPOOLER_ATTRIBUTE_POOL = 7;
-  
-  
     // print 17 - get attributes
     /**
      * @param pool valid:
-     * {@link #JOB_ATTRIBUTE_POOL},
-     * {@link #DOC_ATTRIBUTE_POOL},
-     * {@link #PAGE_ATTRIBUTE_POOL},
-     * {@link #PRINTER_ATTRIBUTE_POOL},
-     * {@link #SERVER_ATTRIBUTE_POOL},
-     * {@link #MEDIUM_ATTRIBUTE_POOL},
-     * {@link #SPOOLER_ATTRIBUTE_POOL}
+     * {@link Attributes}
      *
      * @see <a href="XpGetAttributes.html">XpGetAttributes</a>
      */
-    public String attributes (int pool) {
+    public String attributes(Attributes pool) {
 
       String atts;
       RequestOutputStream o = display.getResponseOutputStream();
-      synchronized (o) {
-        o.beginRequest (majorOpcode, 17, 3);
-        o.writeInt32 (id);
-        o.writeInt8 (pool);
+      synchronized(o) {
+        o.beginRequest(majorOpcode, 17, 3);
+        o.writeInt32(id);
+        o.writeInt8(pool.getCode());
         ResponseInputStream i = display.getResponseInputStream();
-        synchronized (i) {
-          i.readReply (o);
-          i.skip (8);
-          int strlen = i.readInt32 ();
-          i.skip (20);
-          atts = i.readString8 (strlen);
+        synchronized(i) {
+          i.readReply(o);
+          i.skip(8);
+          int strlen = i.readInt32();
+          i.skip(20);
+          atts = i.readString8(strlen);
         }
       }
       return atts;
     }   
   
-  
-    public static final int ATTRIBUTE_REPLACE = 1;
-    public static final int ATTRIBUTE_MERGE = 2;
+
   
   
     // print 18 - set attributes
     /**
      * @param pool valid:
-     * {@link #JOB_ATTRIBUTE_POOL},
-     * {@link #DOC_ATTRIBUTE_POOL},
-     * {@link #PAGE_ATTRIBUTE_POOL},
-     * {@link #PRINTER_ATTRIBUTE_POOL},
-     * {@link #SERVER_ATTRIBUTE_POOL}
+     * {@link Attributes}
      *
      * @see <a href="XpSetAttributes.html">XpSetAttributes</a>
      */
-    public void set_attributes (int pool, int rule, String attributes) {
-      int len = 4 + Data.unit (attributes);
+    public void set_attributes(Attributes pool, Rule rule, String attributes) {
+      int len = 4 + Data.unit(attributes);
       RequestOutputStream o = display.getResponseOutputStream();
-      synchronized (o) {
-        o.beginRequest (majorOpcode, 18, len);
-        o.writeInt32 (id);
-        o.writeInt32 (attributes.length ());
-        o.writeInt8 (pool);
-        o.writeInt8 (rule);
-        o.skip (2);
-        o.writeString8 (attributes);
-        o.send ();
+      synchronized(o) {
+        o.beginRequest(majorOpcode, 18, len);
+        o.writeInt32(id);
+        o.writeInt32(attributes.length());
+        o.writeInt8(pool.getCode());
+        o.writeInt8(rule.getCode());
+        o.skip(2);
+        o.writeString8(attributes);
+        o.send();
       }
     };   
   
@@ -266,91 +339,86 @@ public class Print extends gnu.x11.extension.Extension
     // print 19 - get one attribute
     /**
      * @param pool valid:
-     * {@link #JOB_ATTRIBUTE_POOL},
-     * {@link #DOC_ATTRIBUTE_POOL},
-     * {@link #PAGE_ATTRIBUTE_POOL},
-     * {@link #PRINTER_ATTRIBUTE_POOL},
-     * {@link #SERVER_ATTRIBUTE_POOL}
+     * {@link Attributes},
      *
      * @param rule valid:
-     * {@link #ATTRIBUTE_REPLACE},
-     * {@link #ATTRIBUTE_MERGE}
+     * {@link Rule}
      *
      * @see <a href="XpGetOneAttribute.html">XpGetOneAttribute</a>
      */
-    public String one_attribute (int pool, String name) {
+    public String oneAttribute(Attributes pool, String name) {
       String attr;
-      int len = 4 + Data.unit (name);
+      int len = 4 + Data.unit(name);
       RequestOutputStream o = display.getResponseOutputStream();
-      synchronized (o) {
-        o.beginRequest (majorOpcode, 19, len);
-        o.writeInt32 (id);
-        o.writeInt32 (name.length ());
-        o.writeInt8 (pool);
-        o.skip (3);
-        o.writeString8 (name);
+      synchronized(o) {
+        o.beginRequest(majorOpcode, 19, len);
+        o.writeInt32(id);
+        o.writeInt32(name.length());
+        o.writeInt8(pool.getCode());
+        o.skip(3);
+        o.writeString8(name);
         ResponseInputStream i = display.getResponseInputStream();
-        synchronized (i) {
-          i.readReply (o);
-          i.skip (8);
-          int strlen = i.readInt32 ();
-          i.skip (20);
-          attr = i.readString8 (strlen);
-          i.skip (RequestOutputStream.pad (strlen));
+        synchronized(i) {
+          i.readReply(o);
+          i.skip(8);
+          int strlen = i.readInt32();
+          i.skip(20);
+          attr = i.readString8(strlen);
+          i.skip(RequestOutputStream.pad(strlen));
         }
       }
       return attr;
     }
   
   
-    /** Reply of {@link #page_dimensions()}. */  
+    /** Reply of {@link #pageDimensions()}. */  
     public class PageDimensions {
-      public int width;
-      public int height;
-      public int offset_x;
-      public int offset_y;
-      public int reproducible_width;
-      public int reproducible_height;
-      PageDimensions (ResponseInputStream i) {
-        width = i.readInt16 ();
-        height = i.readInt16 ();
-        offset_x = i.readInt16 ();
-        offset_y = i.readInt16 ();
-        reproducible_width = i.readInt16 ();
-        reproducible_height = i.readInt16 ();
+      private int width;
+      private int height;
+      private int offsetX;
+      private int offsetY;
+      private int reproducibleWidth;
+      private int reproducibleHeight;
+      PageDimensions(ResponseInputStream i) {
+        width = i.readInt16();
+        height = i.readInt16();
+        offsetX = i.readInt16();
+        offsetY = i.readInt16();
+        reproducibleWidth = i.readInt16();
+        reproducibleHeight = i.readInt16();
       }
 
-      public int width () { return width; }
-      public int height () { return height; }
-      public int offset_x () { return offset_x; }
-      public int offset_y () { return offset_y; }
-      public int reproducible_x () { return reproducible_width; }
-      public int reproducible_y () { return reproducible_height; }
+      public int width() { return width; }
+      public int height() { return height; }
+      public int offsetX() { return offsetX; }
+      public int offsetY() { return offsetY; }
+      public int reproducibleX() { return reproducibleWidth; }
+      public int reproducibleY() { return reproducibleHeight; }
   
   
-      public String toString () {
+      public String toString() {
         return "#PageDimensionsReply"
-          + "\nwidth: " + width ()
-          + "\nheight: " + height ()
-          + "\noffset-x: " + offset_x ()
-          + "\noffset-x: " + offset_y ()
-          + "\nreproducible-x: " + reproducible_x ()
-          + "\nreproducible-y: " + reproducible_y ();
+          + "\nwidth: " + width()
+          + "\nheight: " + height()
+          + "\noffset-x: " + offsetX()
+          + "\noffset-x: " + offsetY()
+          + "\nreproducible-x: " + reproducibleX()
+          + "\nreproducible-y: " + reproducibleY();
       }
     }
   
   
-    /** Reply of {@link #page_dimensions()}. */  
+    /** Reply of {@link #pageDimensions()}. */  
     public class SetImageResolutionInfo {
-      public boolean status;
-      public int previous_resolution;
-      SetImageResolutionInfo (ResponseInputStream i) {
-        status = i.readBool ();
-        i.skip (6);
-        previous_resolution = i.readInt16 ();
+      private boolean status;
+      private int previousResolution;
+      SetImageResolutionInfo(ResponseInputStream i) {
+        status = i.readBool();
+        i.skip(6);
+        previousResolution = i.readInt16();
       }
-      public boolean status () { return status; }
-      public int previous_resolution () { return previous_resolution; }
+      public boolean status() { return status; }
+      public int previousResolution() { return previousResolution; }
     }
   
   
@@ -358,18 +426,18 @@ public class Print extends gnu.x11.extension.Extension
     /**
      * @see <a href="XpGetPageDimensions.html">XpGetPageDimensions</a>
      */
-    public PageDimensions page_dimensions () {
+    public PageDimensions pageDimensions() {
       PageDimensions dim;
       RequestOutputStream o = display.getResponseOutputStream();
-      synchronized (o) {
-        o.beginRequest (majorOpcode, 21, 2);
-        o.writeInt32 (id);
+      synchronized(o) {
+        o.beginRequest(majorOpcode, 21, 2);
+        o.writeInt32(id);
         ResponseInputStream i = display.getResponseInputStream();
-        synchronized (i) {
-          i.readReply (o);
-          i.skip (8);
-          dim = new PageDimensions (i);
-          i.skip (12);
+        synchronized(i) {
+          i.readReply(o);
+          i.skip(8);
+          dim = new PageDimensions(i);
+          i.skip(12);
         }
       }
       return dim;
@@ -380,19 +448,19 @@ public class Print extends gnu.x11.extension.Extension
     /**
      * @see <a href="XpSetImageResolution.html">XpSetImageResolution</a>
      */
-    public SetImageResolutionInfo set_image_resolution (int resolution) {
+    public SetImageResolutionInfo setImageResolution(int resolution) {
 
       SetImageResolutionInfo info;
       RequestOutputStream o = display.getResponseOutputStream();
-      synchronized (o) {
-        o.beginRequest (majorOpcode, 23, 3);
-        o.writeInt32 (id);
-        o.writeInt16 (resolution);
+      synchronized(o) {
+        o.beginRequest(majorOpcode, 23, 3);
+        o.writeInt32(id);
+        o.writeInt16(resolution);
         ResponseInputStream i = display.getResponseInputStream();
-        synchronized (i) {
-          i.skip (1);
-          info = new SetImageResolutionInfo (i);
-          i.skip (22);
+        synchronized(i) {
+          i.skip(1);
+          info = new SetImageResolutionInfo(i);
+          i.skip(22);
         }
       }
       return info;
@@ -403,18 +471,18 @@ public class Print extends gnu.x11.extension.Extension
     /**
      * @see <a href="XpGetImageResolution.html">XpGetImageResolution</a>
      */
-    public int image_resolution () {
+    public int imageResolution() {
 
       int res;
       RequestOutputStream o = display.getResponseOutputStream();
-      synchronized (o) {
-        o.beginRequest (majorOpcode, 24, 2);
-        o.writeInt32 (id);
+      synchronized(o) {
+        o.beginRequest(majorOpcode, 24, 2);
+        o.writeInt32(id);
         ResponseInputStream i = display.getResponseInputStream();
-        synchronized (i) {
-          i.skip (8);
-          res = i.readInt16 ();
-          i.skip (22);
+        synchronized(i) {
+          i.skip(8);
+          res = i.readInt16();
+          i.skip(22);
         }
       }
       return res;
@@ -426,18 +494,18 @@ public class Print extends gnu.x11.extension.Extension
      *
      * @see #attributes(int)
      */
-    public String attributes () {
-      return attributes (JOB_ATTRIBUTE_POOL)
-        + attributes (DOC_ATTRIBUTE_POOL)
-        + attributes (PAGE_ATTRIBUTE_POOL)
-        + attributes (PRINTER_ATTRIBUTE_POOL)
-        + attributes (SERVER_ATTRIBUTE_POOL);
+    public String attributes() {
+      return attributes(Attributes.JOB_ATTRIBUTE_POOL)
+        + attributes(Attributes.DOC_ATTRIBUTE_POOL)
+        + attributes(Attributes.PAGE_ATTRIBUTE_POOL)
+        + attributes(Attributes.PRINTER_ATTRIBUTE_POOL)
+        + attributes(Attributes.SERVER_ATTRIBUTE_POOL);
     }
   
   
-    public String toString () {
+    public String toString() {
       return "#Context\n" 
-        + attributes ();
+        + attributes();
     }
   }
   
@@ -446,58 +514,57 @@ public class Print extends gnu.x11.extension.Extension
   /**
    * @see <a href="XpQueryVersion.html">XpQueryVersion</a>
    */
-  public Print (Display display) 
+  public Print(Display display) 
     throws gnu.x11.extension.NotFoundException { 
 
-    super (display, "XpExtension", MINOR_OPCODE_STRINGS, 2, 2);
+    super(display, "XpExtension", MINOR_OPCODE_STRINGS, 2, 2);
 
     // check version before any other operations
     RequestOutputStream o = display.getResponseOutputStream();
-    synchronized (o) {
-      o.beginRequest (majorOpcode, 0, 1);
+    synchronized(o) {
+      o.beginRequest(majorOpcode, 0, 1);
       ResponseInputStream i = display.getResponseInputStream();
-      synchronized (i) {
-        i.readReply (o);
-        i.skip (8);
-        server_major_version = i.readInt16 ();
-        server_minor_version = i.readInt16 ();
-        i.skip (20);
+      synchronized(i) {
+        i.readReply(o);
+        i.skip(8);
+        serverMajorVersion = i.readInt16();
+        serverMinorVersion = i.readInt16();
+        i.skip(20);
       }
     }
   }
 
 
-  /** Reply of {@link #printer_list(String)}. */
+  /** Reply of {@link #printerList(String)}. */
   public class Printer {
 
-    public String name;
-    public String desc;
-    Printer (ResponseInputStream i) {
-      int name_len = i.readInt32 ();
-      name = i.readString8 (name_len);
-      i.skip (RequestOutputStream.pad (name_len));
-      int desc_len = i.readInt32 ();
-      desc = i.readString8 (desc_len);
-      i.skip (RequestOutputStream.pad (desc_len));
+    private String name;
+    private String desc;
+    
+    Printer(ResponseInputStream i) {
+      int nameLength = i.readInt32();
+      name = i.readString8(nameLength);
+      i.skip(RequestOutputStream.pad(nameLength));
+      int descLength = i.readInt32();
+      desc = i.readString8(descLength);
+      i.skip(RequestOutputStream.pad(descLength));
     }
 
-    public String name () { return name; }
-    public String description () {
-      return desc;
-    }
+    public String name() { return name; }
+    public String description() { return desc; }
 
 
     /**
-     * @see #create_context(String)
+     * @see #createContext(String)
      */
-    public Context context () {
-      return create_context (name ());
+    public Context context() {
+      return createContext(name());
     }
 
-    public String toString () {
+    public String toString() {
       return "#Printer"
-        + "\nprinter-name: " + name ()
-        + "\nprinter-description: "  + description ();
+        + "\nprinter-name: " + name()
+        + "\nprinter-description: "  + description();
     }
   }
 
@@ -507,25 +574,25 @@ public class Print extends gnu.x11.extension.Extension
    * @return valid: {@link Enum#next()}
    * @see <a href="XpGetPrinterList.html">XpGetPrinterList</a>
    */
-  public Printer [] printer_list (String name) {
+  public Printer[] printerList(String name) {
 
-    Printer [] printers;
-    int len = 3 + Data.unit (name) + Data.unit (locale);
+    Printer[] printers;
+    int len = 3 + Data.unit(name) + Data.unit(locale);
     RequestOutputStream o = display.getResponseOutputStream();
-    synchronized (o) {
+    synchronized(o) {
       o.beginRequest(majorOpcode, 1, len);
-      o.writeInt32 (name.length ());
-      o.writeInt32 (locale.length ());
-      o.writeString8 (name);
-      o.writeString8 (locale);
+      o.writeInt32(name.length());
+      o.writeInt32(locale.length());
+      o.writeString8(name);
+      o.writeString8(locale);
       ResponseInputStream i = display.getResponseInputStream();
-      synchronized (i) {
-        i.skip (8);
-        int num = i.readInt32 ();
-        printers = new Printer [num];
-        for (int j = 0; j < num; j++) {
-          printers [j] = new Printer (i);
-        }
+      synchronized(i) {
+        i.skip(8);
+        int num = i.readInt32();
+        printers = new Printer[num];
+        
+        for (Printer p : printers) 
+          p = new Printer(i);
       }
     }
     return printers;
@@ -536,41 +603,37 @@ public class Print extends gnu.x11.extension.Extension
   /**
    * @see <a href="XpGetContext.html">XpGetContext</a>
    */
-  public Context context () {
+  public Context context() {
     int id;
     RequestOutputStream o = display.getResponseOutputStream();
-    synchronized (o) {
-      o.beginRequest (majorOpcode, 4, 1);
+    synchronized(o) {
+      o.beginRequest(majorOpcode, 4, 1);
       ResponseInputStream i = display.getResponseInputStream();
-      synchronized (i) {
-        i.readReply (o);
-        i.skip (8);
-        id = i.readInt32 ();
-        i.skip (16);
+      synchronized(i) {
+        i.readReply(o);
+        i.skip(8);
+        id = i.readInt32();
+        i.skip(16);
       }
     }
-    return new Context (id);
+    return new Context(id);
   }
 
-
-  public static final int SPOOL = 1;
-  public static final int GET_DATA = 2;
 
 
   // print 7 - start job
   /**
-   * @param output_mode valid:
-   * {@link #SPOOL},
-   * {@link #GET_DATA}
-   *
+   * @param outputMode valid:
+   * {@link OutputMode}
+   * 
    * @see <a href="XpStartJob.html">XpStartJob</a>
    */
-  public void start_job (int output_mode) {
+  public void startJob(OutputMode outputMode) {
     RequestOutputStream o = display.getResponseOutputStream();
-    synchronized (o) {
-      o.beginRequest (majorOpcode, 7, 2);
-      o.writeInt8 (output_mode);
-      o.send ();
+    synchronized(o) {
+      o.beginRequest(majorOpcode, 7, 2);
+      o.writeInt8(outputMode.getCode());
+      o.send();
     }
   }
 
@@ -579,12 +642,12 @@ public class Print extends gnu.x11.extension.Extension
   /**
    * @see <a href="XpEndJob.html">XpEndJob</a>
    */
-  public void end_job (boolean cancel) {
+  public void endJob(boolean cancel) {
     RequestOutputStream o = display.getResponseOutputStream();
-    synchronized (o) {
-      o.beginRequest (majorOpcode, 8, 2);
-      o.writeBool (cancel);
-      o.send ();
+    synchronized(o) {
+      o.beginRequest(majorOpcode, 8, 2);
+      o.writeBool(cancel);
+      o.send();
     }
   }
 
@@ -593,12 +656,12 @@ public class Print extends gnu.x11.extension.Extension
   /**
    * @see <a href="XpStartDoc.html">XpStartDoc</a>
    */
-  public void start_doc (int type) {
+  public void startDoc(int type) {
     RequestOutputStream o = display.getResponseOutputStream();
-    synchronized (o) {
-      o.beginRequest (majorOpcode, 9, 2);
-      o.writeInt8 (type);
-      o.send ();
+    synchronized(o) {
+      o.beginRequest(majorOpcode, 9, 2);
+      o.writeInt8(type);
+      o.send();
     }
   }
 
@@ -607,12 +670,12 @@ public class Print extends gnu.x11.extension.Extension
   /**
    * @see <a href="XpEndDoc.html">XpEndDoc</a>
    */
-  public void end_doc (boolean cancel) {
+  public void endDoc(boolean cancel) {
     RequestOutputStream o = display.getResponseOutputStream();
-    synchronized (o) {
-      o.beginRequest (majorOpcode, 10, 2);
-      o.writeBool (cancel);
-      o.send ();
+    synchronized(o) {
+      o.beginRequest(majorOpcode, 10, 2);
+      o.writeBool(cancel);
+      o.send();
     }
   }
 
@@ -621,12 +684,12 @@ public class Print extends gnu.x11.extension.Extension
   /**
    * @see <a href="XpStartPage.html">XpStartPage</a>
    */
-  public void start_page (Window window) {
+  public void startPage(Window window) {
     RequestOutputStream o = display.getResponseOutputStream();
-    synchronized (o) {
-      o.beginRequest (majorOpcode, 13, 2);
-      o.writeInt32 (window.getID());
-      o.send ();
+    synchronized(o) {
+      o.beginRequest(majorOpcode, 13, 2);
+      o.writeInt32(window.getID());
+      o.send();
     }
   }
 
@@ -635,12 +698,12 @@ public class Print extends gnu.x11.extension.Extension
   /**
    * @see <a href="XpEndPage.html">XpEndPage</a>
    */
-  public void end_page (boolean cancel) {
+  public void endPage(boolean cancel) {
     RequestOutputStream o = display.getResponseOutputStream();
-    synchronized (o) {
-      o.beginRequest (majorOpcode, 14, 2);
-      o.writeBool (cancel);
-      o.send ();
+    synchronized(o) {
+      o.beginRequest(majorOpcode, 14, 2);
+      o.writeBool(cancel);
+      o.send();
     }
   }
 
@@ -649,11 +712,11 @@ public class Print extends gnu.x11.extension.Extension
   /**
    * @see <a href="XpRehashPrinterList.html">XpRehashPrinterList</a>
    */
-  public void rehash_printer_list () {
+  public void rehashPrinterList() {
     RequestOutputStream o = display.getResponseOutputStream();
-    synchronized (o) {
-      o.beginRequest (majorOpcode, 20, 1);
-      o.send ();
+    synchronized(o) {
+      o.beginRequest(majorOpcode, 20, 1);
+      o.send();
     }
   }
 
@@ -666,26 +729,27 @@ public class Print extends gnu.x11.extension.Extension
    *
    * @see <a href="XpQueryScreens.html">XpQueryScreens</a>
    */
-  public Window [] screens () {
+  public Window [] screens() {
     int [] ids;
     RequestOutputStream o = display.getResponseOutputStream();
-    synchronized (o) {
+    synchronized(o) {
       // error in spec: request length = 1 vs. 2
-      o.beginRequest (majorOpcode, 22, 1);
+      o.beginRequest(majorOpcode, 22, 1);
       ResponseInputStream i = display.getResponseInputStream();
-      synchronized (i) {
-        i.readReply (o);
-        i.skip (8);
-        int count = i.readInt32 ();
+      synchronized(i) {
+        i.readReply(o);
+        i.skip(8);
+        int count = i.readInt32();
         ids = new int [count + 1];
-        i.skip (20);
+        i.skip(20);
         for (int j = 0; j <= count; j++)
-          ids [j] = i.readInt32 ();
+          ids[j] = i.readInt32();
       }
     }
-    Window [] windows = new Window [ids.length];
+    Window[] windows = new Window [ids.length];
+
     for (int j = 0; j < windows.length; j++)
-      windows [j] = (Window) Window.intern (display, ids [j]);
+      windows [j] =(Window) Window.intern(display, ids [j]);
     return windows;
   }
     
@@ -697,11 +761,11 @@ public class Print extends gnu.x11.extension.Extension
   };
 
 
-  public Error build (Display display, int code, int seq_no, int bad,
+  public Error build(Display display, int code, int seq_no, int bad,
                       int minor_opcode, int major_opcode) {
 
     String error_string = ERROR_STRINGS [code - firstError];
-    return new Error (display, error_string, ErrorCode.getError(code), seq_no, bad, 
+    return new Error(display, error_string, ErrorCode.getError(code), seq_no, bad, 
       minor_opcode, major_opcode);
   }
 
@@ -711,73 +775,54 @@ public class Print extends gnu.x11.extension.Extension
     public static final int code = 0;
   
 
-    public int context_id;
-    AttributeNotifyEvent (Display display, ResponseInputStream in) {
-      super (display, in);
-      context_id = in.readInt32 ();
-      in.skip (24);
+    public int contextID;
+    AttributeNotifyEvent(Display display, ResponseInputStream in) {
+      super(display, in);
+      contextID = in.readInt32();
+      in.skip(24);
     }
   
   
     /**
      * @return valid:
-     * {@link Print.Context#JOB_ATTRIBUTE_POOL},
-     * {@link Print.Context#DOC_ATTRIBUTE_POOL},
-     * {@link Print.Context#PAGE_ATTRIBUTE_POOL},
-     * {@link Print.Context#PRINTER_ATTRIBUTE_POOL},
-     * {@link Print.Context#SERVER_ATTRIBUTE_POOL},
-     * {@link Print.Context#MEDIUM_ATTRIBUTE_POOL},
-     * {@link Print.Context#SPOOLER_ATTRIBUTE_POOL}
+     * {@link Attributes}
      */
-    public int detail () { return detail; }
-    public int context_id () { return context_id; }
+    public Attributes detail() { return Attributes.values()[detail + 1]; }
+    public int contextID() { return contextID; }
   }  
   
   
   /** PRINT print notify event. */
-  public class PrintNotifyEvent extends gnu.x11.event.Event {
+  public class ContextID extends gnu.x11.event.Event {
     public static final int code = 0;
   
   
-    public int context_id;
+    public int contextID;
     public boolean cancel;
-    public PrintNotifyEvent (Display display, ResponseInputStream i) { 
-      super (display, i);
-      context_id = i.readInt32 ();
-      cancel = i.readBool ();
-      i.skip (23);
+    public ContextID(Display display, ResponseInputStream i) { 
+      super(display, i);
+      contextID = i.readInt32();
+      cancel = i.readBool();
+      i.skip(23);
     }
   
-  
-    public static final int START_JOB_NOTIFY = 0;
-    public static final int END_JOB_NOTIFY = 1;
-    public static final int START_DOC_NOTIFY = 2;
-    public static final int END_DOC_NOTIFY = 3;
-    public static final int START_PAGE_NOTIFY = 4;
-    public static final int END_PAGE_NOTIFY = 5;
-  
-  
+
     /**
      * @return valid:
-     * {@link #START_JOB_NOTIFY},
-     * {@link #END_JOB_NOTIFY},
-     * {@link #START_DOC_NOTIFY},
-     * {@link #END_DOC_NOTIFY},
-     * {@link #START_PAGE_NOTIFY},
-     * {@link #END_PAGE_NOTIFY}
+     * {@link Notify},
      */
-    public int detail () { return detail; }
+    public Notify detail() { return Notify.values()[detail]; }
   
   
-    public int context_id () { return context_id; }
-    public boolean cancel () { return cancel; }
+    public int getContextID() { return contextID; }
+    public boolean cancel() { return cancel; }
   }
   
   
-  public gnu.x11.event.Event build (Display display, 
+  public gnu.x11.event.Event build(Display display, 
                                     ResponseInputStream i, int code) {
 
-    return new PrintNotifyEvent (display, i);
+    return new ContextID(display, i);
   }
 
 
@@ -789,52 +834,52 @@ public class Print extends gnu.x11.extension.Extension
    *
    * @see Context
    */
-  public Context create_context (String name) {
-    if (name.length () == 0) {
-      Printer printer = (Printer) printer_list () [0];
-      name = printer.name ();
+  public Context createContext(String name) {
+    if (name.length() == 0) {
+      Printer printer = (Printer) printerList() [0];
+      name = printer.name();
     }
 
-    return new Context (name);    
+    return new Context(name);    
   }
 
 
   /**
-   * @see #end_doc(boolean)
+   * @see #endDoc(boolean)
    */
-  public void end_doc () { 
-    end_doc (false); 
+  public void endDoc() { 
+    endDoc(false); 
   }
 
 
   /**
-   * @see #end_job(boolean)
+   * @see #endJob(boolean)
    */
-  public void end_job () { 
-    end_job (false); 
+  public void endJob() { 
+    endJob(false); 
   }
 
 
   /**
-   * @see #end_page(boolean)
+   * @see #endPage(boolean)
    */
-  public void end_page () { 
-    end_page (false); 
+  public void endPage() { 
+    endPage(false); 
   }
 
 
-  public String moreString () {
+  public String moreString() {
     return "\n  client-version: " 
       + CLIENT_MAJOR_VERSION + "." + CLIENT_MINOR_VERSION
       + "\n  server-version: "
-      + server_major_version + "." + server_minor_version;
+      + serverMajorVersion + "." + serverMinorVersion;
   }
 
 
   /**
-   * @see #printer_list(String)
+   * @see #printerList(String)
    */
-  public Printer [] printer_list () {
-    return printer_list ("");
+  public Printer[] printerList() {
+    return printerList("");
   }
 }
