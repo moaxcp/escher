@@ -14,7 +14,7 @@ import gnu.x11.ResponseInputStream;
  * 
  */
 public class DPMS extends Extension {
-  public static final String [] MINOR_OPCODE_STRINGS = {
+  public static final String[] MINOR_OPCODE_STRINGS = {
     "GetVersion",               // 0
     "Capable",                  // 1
     "GetTimeouts",              // 2
@@ -37,23 +37,23 @@ public class DPMS extends Extension {
   /**
    * @see <a href="DPMSQueryExtension.html">DPMSQueryExtension</a>
    */
-  public DPMS (gnu.x11.Display display) throws NotFoundException {  
-    super (display, "DPMS", MINOR_OPCODE_STRINGS); 
+  public DPMS(gnu.x11.Display display) throws NotFoundException {  
+    super(display, "DPMS", MINOR_OPCODE_STRINGS); 
 
     // check version before any other operations
     RequestOutputStream o = display.getResponseOutputStream();
-    synchronized (o) {
-      o.beginRequest (majorOpcode, 0, 2);
-      o.writeInt16 (CLIENT_MAJOR_VERSION);
-      o.writeInt16 (CLIENT_MINOR_VERSION);
+    synchronized(o) {
+      o.beginRequest(majorOpcode, 0, 2);
+      o.writeInt16(CLIENT_MAJOR_VERSION);
+      o.writeInt16(CLIENT_MINOR_VERSION);
 
       ResponseInputStream i = display.getResponseInputStream();
-      synchronized (i) {
-        i.readReply (o);
-        i.skip (8);
-        serverMajorVersion = i.readInt16 ();
-        serverMinorVersion = i.readInt16 ();
-        i.skip (20);
+      synchronized(i) {
+        i.readReply(o);
+        i.skip(8);
+        serverMajorVersion = i.readInt16();
+        serverMinorVersion = i.readInt16();
+        i.skip(20);
       }
     }
   }
@@ -70,35 +70,35 @@ public class DPMS extends Extension {
    *
    * @see <a href="DPMSCapable.html">DPMSCapable</a>
    */
-  public boolean capable () {
+  public boolean capable() {
     boolean capable;
     RequestOutputStream o = display.getResponseOutputStream();
-    synchronized (o) {
-      o.beginRequest (majorOpcode, 1, 1);
+    synchronized(o) {
+      o.beginRequest(majorOpcode, 1, 1);
       ResponseInputStream i = display.getResponseInputStream();
-      synchronized (i) {
-        i.skip (8);
-        capable = i.readBool ();
-        i.skip (23);
+      synchronized(i) {
+        i.skip(8);
+        capable = i.readBool();
+        i.skip(23);
       }
     }
     return capable;
   }
 
   
-  /** Reply of {@link #timeouts()} */
+  /** Reply of {@link #getTimeouts()} */
   public static class TimeoutsInfo {
 
-    public int standby;
-    public int suspend;
-    public int off;
-    TimeoutsInfo (ResponseInputStream i) {
-      standby = i.readInt16 ();
-      suspend = i.readInt16 ();
-      off = i.readInt16 ();
+    private int standby;
+    private int suspend;
+    private int off;
+    TimeoutsInfo(ResponseInputStream i) {
+      standby = i.readInt16();
+      suspend = i.readInt16();
+      off = i.readInt16();
     }
 
-    public String toString () {
+    public String toString() {
       return "#TimeoutsReply"
         + "\n  standby: " + standby
         + "\n  suspend: " + suspend
@@ -111,16 +111,16 @@ public class DPMS extends Extension {
   /**
    * @see <a href="DPMSGetTimeouts.html">DPMSGetTimeouts</a>
    */
-  public TimeoutsInfo timeouts () {
+  public TimeoutsInfo getTimeouts() {
     TimeoutsInfo info;
     RequestOutputStream o = display.getResponseOutputStream();
-    synchronized (o) {
-      o.beginRequest (majorOpcode, 2, 1);
+    synchronized(o) {
+      o.beginRequest(majorOpcode, 2, 1);
       ResponseInputStream i = display.getResponseInputStream();
-      synchronized (i) {
-        i.skip (8);
+      synchronized(i) {
+        i.skip(8);
         info = new TimeoutsInfo(i);
-        i.skip (18);
+        i.skip(18);
       }
     }
     return info;
@@ -131,16 +131,16 @@ public class DPMS extends Extension {
   /**
    * @see <a href="DPMSSetTimeouts.html">DPMSSetTimeouts</a>
    */
-  public void set_timeouts (int standby, int suspend, int off) {
+  public void setTimeouts(int standby, int suspend, int off) {
 
     RequestOutputStream o = display.getResponseOutputStream();
-    synchronized (o) {
-      o.beginRequest (majorOpcode, 3, 3);
-      o.writeInt16 (standby);
-      o.writeInt16 (suspend);
-      o.writeInt16 (off);
-      o.skip (2);
-      o.send ();
+    synchronized(o) {
+      o.beginRequest(majorOpcode, 3, 3);
+      o.writeInt16(standby);
+      o.writeInt16(suspend);
+      o.writeInt16(off);
+      o.skip(2);
+      o.send();
     }
   }
 
@@ -149,11 +149,11 @@ public class DPMS extends Extension {
   /**
    * @see <a href="DPMSEnable.html">DPMSEnable</a>
    */
-  public void enable () {
+  public void enable() {
     RequestOutputStream o = display.getResponseOutputStream();
-    synchronized (o) {
-      o.beginRequest (majorOpcode, 4, 1);
-      o.send ();
+    synchronized(o) {
+      o.beginRequest(majorOpcode, 4, 1);
+      o.send();
     }
   }
 
@@ -162,63 +162,78 @@ public class DPMS extends Extension {
   /**
    * @see <a href="DPMSDisable.html">DPMSDisable</a>
    */
-  public void disable () {
+  public void disable() {
     RequestOutputStream o = display.getResponseOutputStream();
-    synchronized (o) {
-      o.beginRequest (majorOpcode, 5, 1);
-      o.send ();
+    synchronized(o) {
+      o.beginRequest(majorOpcode, 5, 1);
+      o.send();
     }
   }
 
-
-  public static final int ON = 0;
-  public static final int STAND_BY = 1;
-  public static final int SUSPEND = 2;
-  public static final int OFF = 3;
-
-
-  public static final String [] LEVEL_STRINGS
-    = {"on", "stand-by", "suspend", "off"};
-
+  /** DPMS Level */
+  public enum Level {
+    ON(0) {@Override public String toString() { return "on"; }},
+    STAND_BY(1) {@Override public String toString() { return "stand-by"; }},
+    SUSPEND(2) {@Override public String toString() { return "suspend"; }},
+    OFF(3) {@Override public String toString() { return "off"; }};
+   
+    private int code;
+    
+    Level(int code) {
+        this.code = code;
+    }
+    
+    public abstract String toString();
+    
+    public int getCode() {
+        return this.code;
+    }
+    
+    public static Level getByID(int id) {
+        switch (id) {
+            case 0: return ON;
+            case 1: return STAND_BY;
+            case 2: return SUSPEND;
+            case 3: return OFF;
+            default: return ON;
+        }
+    }
+  }
 
   // dpms opcode 6 - force level
   /**
    * @param level valid:
-   * {@link #ON},
-   * {@link #STAND_BY},
-   * {@link #SUSPEND},
-   * {@link #OFF}
+   * {@link Level},
    *
    * @see <a href="DPMSForceLevel.html">DPMSForceLevel</a>
    */
-  public void force_level (int level) {
+  public void forceLevel(Level level) {
     RequestOutputStream o = display.getResponseOutputStream();
-    synchronized (o) {
-      o.beginRequest (majorOpcode, 6, 2);
-      o.writeInt16 (level);
-      o.send ();
+    synchronized(o) {
+      o.beginRequest(majorOpcode, 6, 2);
+      o.writeInt16(level.getCode());
+      o.send();
     }
   }
-
 
   /** Reply of {@link #info()} */
   public static class Info {
 
     /**
-     * One of: {@link #ON}, {@link #STAND_BY}, {@link #SUSPEND}, {@link #OFF}.
+     * One of: {@link Level}
      */
-    public int power_level;
+    private Level powerLevel;
     boolean state;
 
-    Info (ResponseInputStream i) {
-      power_level = i.readInt16 ();
-      state = i.readBool ();
+    Info(ResponseInputStream i) {
+      powerLevel = Level.getByID(i.readInt16());
+      state = i.readBool();
     } 
 
-    public String toString () {
+    public String toString() {
       return "#InfoReply"
         + "\n  state: " + state
-        + "\n  level: " + LEVEL_STRINGS [power_level];
+        + "\n  level: " + powerLevel.toString();
     }
   }
 
@@ -227,24 +242,24 @@ public class DPMS extends Extension {
   /**
    * @see <a href="DPMSInfo.html">DPMSInfo</a>
    */
-  public Info info () {
+  public Info info() {
     Info info;
     RequestOutputStream o = display.getResponseOutputStream();
-    synchronized (o) {
-      o.beginRequest (majorOpcode, 7, 1);
+    synchronized(o) {
+      o.beginRequest(majorOpcode, 7, 1);
       ResponseInputStream i = display.getResponseInputStream();
-      synchronized (i) {
-        i.readReply (o);
-        i.skip (8);
-        info = new Info (i);
-        i.skip (21);
+      synchronized(i) {
+        i.readReply(o);
+        i.skip(8);
+        info = new Info(i);
+        i.skip(21);
       }
     }
     return info;
   }
 
 
-  public String moreString () {
+  public String moreString() {
     return "\n  client-version: " 
       + CLIENT_MAJOR_VERSION + "." + CLIENT_MINOR_VERSION
       + "\n  server-version: "
