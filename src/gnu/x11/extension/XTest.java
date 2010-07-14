@@ -14,7 +14,7 @@ import gnu.x11.Window;
  * >protocol</a>).
  */
 public class XTest extends Extension {
-  public static final String [] MINOR_OPCODE_STRINGS = {
+  private static final String [] MINOR_OPCODE_STRINGS = {
     "GetVersion",               // 0
     "CompareCursor",            // 1
     "FakeInput",                // 2
@@ -26,30 +26,30 @@ public class XTest extends Extension {
   public static final int CLIENT_MINOR_VERSION = 1;
 
 
-  public int server_major_version, server_minor_version;
+  private int serverMajorVersion, serverMinorVersion;
 
 
   // xtest opcode 0 - get version
   /**
    * @see <a href="XTestQueryExtension.html">XTestQueryExtension</a>
    */
-  public XTest (gnu.x11.Display display) throws NotFoundException { 
-    super (display, "XTEST", MINOR_OPCODE_STRINGS); 
+  public XTest(gnu.x11.Display display) throws NotFoundException { 
+    super(display, "XTEST", MINOR_OPCODE_STRINGS); 
 
     RequestOutputStream o = display.getResponseOutputStream();
-    synchronized (o) {
-      o.beginRequest (majorOpcode, 0, 2);
-      o.writeInt8 (CLIENT_MAJOR_VERSION);
-      o.skip (1);
-      o.writeInt16 (CLIENT_MINOR_VERSION);
+    synchronized(o) {
+      o.beginRequest(majorOpcode, 0, 2);
+      o.writeInt8(CLIENT_MAJOR_VERSION);
+      o.skip(1);
+      o.writeInt16(CLIENT_MINOR_VERSION);
       ResponseInputStream i = display.getResponseInputStream();
-      synchronized (i) {
-        i.readReply (o);
-        i.skip (1);
-        server_major_version = i.readInt8 ();
-        i.skip (6);
-        server_minor_version = i.readInt16 ();
-        i.skip (22);
+      synchronized(i) {
+        i.readReply(o);
+        i.skip(1);
+        serverMajorVersion = i.readInt8();
+        i.skip(6);
+        serverMinorVersion = i.readInt16();
+        i.skip(22);
       }
     }
   }
@@ -64,59 +64,67 @@ public class XTest extends Extension {
    * @see <a href="XTestCompareCursorWithWindow.html">
    * XTestCompareCursorWithWindow</a>
    */
-  public boolean compare_cursor (Window window, Cursor cursor) {
+  public boolean compareCursor(Window window, Cursor cursor) {
 
     boolean same;
     RequestOutputStream o = display.getResponseOutputStream();
-    synchronized (o) {
-      o.beginRequest (majorOpcode, 1, 3);
-      o.writeInt32 (window.getID());
-      o.writeInt32 (cursor.getID());
+    synchronized(o) {
+      o.beginRequest(majorOpcode, 1, 3);
+      o.writeInt32(window.getID());
+      o.writeInt32(cursor.getID());
       ResponseInputStream i = display.getResponseInputStream();
-      synchronized (i) {
-        i.readReply (o);
-        i.skip (1);
-        same = i.readBool ();
-        i.skip (30);
+      synchronized(i) {
+        i.readReply(o);
+        i.skip(1);
+        same = i.readBool();
+        i.skip(30);
       }
     }
     return same;
   }
-
-
-  public static final int KEY_PRESS = 2;
-  public static final int KEY_RELEASE = 3;
-  public static final int BUTTON_PRESS = 4;
-  public static final int BUTTON_RELEASE = 5;
-  public static final int MOTION_NOTIFY = 6;
+  
+  /**
+   * Fake Event Types
+   */
+  public enum FakeEvent {
+      KEY_PRESS(2),
+      KEY_RELEASE(3),
+      BUTTON_PRESS(4),
+      BUTTON_RELEASE(5),
+      MOTION_NOTIFY(6);
+      
+      private int code;
+      
+      FakeEvent(int code) {
+          this.code = code;
+      }
+      
+      public int getCode() {
+          return this.code;
+      }
+  }
 
 
   // xtest opcode 2 - fake input
   /**
-   * @param type valid:
-   * {@link #KEY_PRESS},
-   * {@link #KEY_RELEASE},
-   * {@link #BUTTON_PRESS},
-   * {@link #BUTTON_RELEASE},
-   * {@link #MOTION_NOTIFY}
-   *
+   * @param type valid {@link FakeEvent}
    * @param time possible: {@link gnu.x11.Display#CURRENT_TIME}
    */
-  public void fake_input (int type, int detail, int delay, Window root, 
+  public void fakeInput(FakeEvent type, int detail, int delay, Window root, 
                           int x, int y) {
 
     RequestOutputStream o = display.getResponseOutputStream();
-    synchronized (o) {
-      o.beginRequest (majorOpcode, 2, 9);
-      o.writeInt8 (type);
-      o.writeInt8 (detail);
-      o.skip (2);
-      o.writeInt32 (delay);
-      o.writeInt32 (root.getID());
-      o.skip (8);
-      o.writeInt16 (x);
-      o.writeInt16 (y);
-      o.send ();
+    synchronized(o) {
+      o.beginRequest(majorOpcode, 2, 9);
+      o.writeInt8(type.getCode());
+      o.writeInt8(detail);
+      o.skip(2);
+      o.writeInt32(delay);
+      o.writeInt32(root.getID());
+      o.skip(8);
+      o.writeInt16(x);
+      o.writeInt16(y);
+      o.send();
     }
   }
 
@@ -125,13 +133,13 @@ public class XTest extends Extension {
   /**
    * @see <a href="XTestGrabControl.html">XTestGrabControl</a>
    */
-  public void grab_control (boolean impervious) {
+  public void grabControl(boolean impervious) {
 
     RequestOutputStream o = display.getResponseOutputStream();
-    synchronized (o) {
-      o.beginRequest (majorOpcode, 3, 2);
-      o.writeBool (impervious);
-      o.send ();
+    synchronized(o) {
+      o.beginRequest(majorOpcode, 3, 2);
+      o.writeBool(impervious);
+      o.send();
     }
   }
 
@@ -139,35 +147,35 @@ public class XTest extends Extension {
   /**
    * @see <a href="XTestFakeButtonEvent.html">XTestFakeButtonEvent</a>
    */
-  public void fake_button_event (int button, boolean press, int delay) {
-    fake_input (press ? BUTTON_PRESS : BUTTON_RELEASE, button, delay,
-      Window.NONE, 0, 0);
+  public void fake_button_event(int button, boolean press, int delay) {
+    fakeInput(press ? FakeEvent.BUTTON_PRESS : FakeEvent.BUTTON_RELEASE,
+                    button, delay, Window.NONE, 0, 0);
   }
 
     
   /**
    * @see <a href="XTestFakeKeyEvent.html">XTestFakeKeyEvent</a>
    */
-  public void fake_key_event (int keycode, boolean press, int delay) {
-    fake_input (press ? KEY_PRESS : KEY_RELEASE, keycode, delay, 
-      Window.NONE, 0, 0);
+  public void fakeKeyEvent(int keycode, boolean press, int delay) {
+    fakeInput(press ? FakeEvent.KEY_PRESS : FakeEvent.KEY_RELEASE, keycode,
+                    delay, Window.NONE, 0, 0);
   }
 
 
   /**
    * @see <a href="XTestFakeMotionEvent.html">XTestFakeMotionEvent</a>
    */
-  public void fake_motion_event (Window root, int x, int y, 
+  public void fakeMotionEvent(Window root, int x, int y, 
     boolean relative, int delay) {
 
-    fake_input (MOTION_NOTIFY, relative ? 1 : 0, delay, root, x, y);
+    fakeInput(FakeEvent.MOTION_NOTIFY, relative ? 1 : 0, delay, root, x, y);
   }
 
 
-  public String moreString () {
+  public String moreString() {
     return "\n  client-version: " 
       + CLIENT_MAJOR_VERSION + "." + CLIENT_MINOR_VERSION
       + "\n  server-version: "
-      + server_major_version + "." + server_minor_version;
+      + serverMajorVersion + "." + serverMinorVersion;
   }
 }
