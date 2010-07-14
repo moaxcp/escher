@@ -38,7 +38,7 @@ public class XTest extends Extension {
 
     RequestOutputStream o = display.getResponseOutputStream();
     synchronized (o) {
-      o.beginRequest (major_opcode, 0, 2);
+      o.beginRequest (majorOpcode, 0, 2);
       o.writeInt8 (CLIENT_MAJOR_VERSION);
       o.skip (1);
       o.writeInt16 (CLIENT_MINOR_VERSION);
@@ -69,7 +69,7 @@ public class XTest extends Extension {
     boolean same;
     RequestOutputStream o = display.getResponseOutputStream();
     synchronized (o) {
-      o.beginRequest (major_opcode, 1, 3);
+      o.beginRequest (majorOpcode, 1, 3);
       o.writeInt32 (window.getID());
       o.writeInt32 (cursor.getID());
       ResponseInputStream i = display.getResponseInputStream();
@@ -107,7 +107,7 @@ public class XTest extends Extension {
 
     RequestOutputStream o = display.getResponseOutputStream();
     synchronized (o) {
-      o.beginRequest (major_opcode, 2, 9);
+      o.beginRequest (majorOpcode, 2, 9);
       o.writeInt8 (type);
       o.writeInt8 (detail);
       o.skip (2);
@@ -129,7 +129,7 @@ public class XTest extends Extension {
 
     RequestOutputStream o = display.getResponseOutputStream();
     synchronized (o) {
-      o.beginRequest (major_opcode, 3, 2);
+      o.beginRequest (majorOpcode, 3, 2);
       o.writeBool (impervious);
       o.send ();
     }
@@ -164,7 +164,7 @@ public class XTest extends Extension {
   }
 
 
-  public String more_string () {
+  public String moreString () {
     return "\n  client-version: " 
       + CLIENT_MAJOR_VERSION + "." + CLIENT_MINOR_VERSION
       + "\n  server-version: "

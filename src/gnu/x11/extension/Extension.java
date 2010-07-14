@@ -5,46 +5,43 @@ import gnu.x11.Display;
 
 /** Base class for X extension. */
 abstract public class Extension {
-  public Display display;
-  public int first_event, first_error, major_opcode;
-  public String name;
+  protected Display display;
+  protected int firstEvent, firstError, majorOpcode;
+  protected String name;
 
 
   protected Extension (Display display, String name, 
-    String [] minor_opcode_strings) throws NotFoundException {
+   String[] minorOpcodeStrings) throws NotFoundException {
 
-    this (display, name, minor_opcode_strings, 0, 0);
+    this (display, name, minorOpcodeStrings, 0, 0);
   }
 
 
-  protected Extension (Display display, String name, 
-                       String [] minor_opcode_strings, int error_count,
-                       int event_count)
-    throws NotFoundException {
-
+  protected Extension (Display display, String name, String[] minorOpcodeStrings,
+                       int errorCount, int eventCount) throws NotFoundException {
     this.display = display;
     this.name = name;
     
     Display.ExtensionInfo er = display.queryExtension (name);
     if (!er.present ()) throw new NotFoundException (name);
 
-    first_event = er.firstEvent ();
-    first_error = er.firstError ();
-    major_opcode = er.majorOpcode ();
+    firstEvent = er.firstEvent ();
+    firstError = er.firstError ();
+    majorOpcode = er.majorOpcode ();
 
     // register opcode strings
-    display.extensionOpcodeStrings [major_opcode - 128] = name;
-    display.extensionMinorOpcodeStrings [major_opcode - 128] 
-      = minor_opcode_strings;
+    display.extensionOpcodeStrings [majorOpcode - 128] = name;
+    display.extensionMinorOpcodeStrings [majorOpcode - 128] 
+      = minorOpcodeStrings;
 
     // register error factory
-    for (int i=0; i<error_count; i++)
-      display.extensionErrorFactories [first_error - 128 + i]
+    for (int i=0; i<errorCount; i++)
+      display.extensionErrorFactories [firstError - 128 + i]
         = (ErrorFactory) this;
 
     // register event factory
-    for (int i=0; i<event_count; i++)
-      display.extensionEventFactories [first_event - 64 + i]
+    for (int i=0; i<eventCount; i++)
+      display.extensionEventFactories [firstEvent - 64 + i]
         = (EventFactory) this;
   }
 
@@ -53,16 +50,27 @@ abstract public class Extension {
    * Additional information such as client version and server version to
    * display in <code>toString()</code>.
    */
-  public String more_string () {
+  public String moreString () {
     return "";
   }
 
 
   public String toString () {
     return "#Extension \"" + name + "\" "
-      + "\n  major-opcode: " + major_opcode
-      + "\n  first-event: " + first_event
-      + "\n  first-error: " + first_error
-      + more_string ();    
+      + "\n  major-opcode: " + majorOpcode
+      + "\n  first-event: " + firstEvent
+      + "\n  first-error: " + firstError
+      + moreString ();    
   }
+  
+  
+  public Display getDisplay() {
+    return display;
+  }
+
+
+  public int getMajorOpcode() {
+    return majorOpcode;
+  }
+
 }

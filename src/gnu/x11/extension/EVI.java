@@ -38,7 +38,7 @@ public class EVI extends Extension {
      */
     RequestOutputStream o = display.getResponseOutputStream();
     synchronized (o) {
-      o.beginRequest (major_opcode, 0, 1);
+      o.beginRequest (majorOpcode, 0, 1);
       ResponseInputStream i = display.getResponseInputStream();
       synchronized (i) {
         i.readReply (o);
@@ -78,7 +78,7 @@ public class EVI extends Extension {
   }
 
 
-  /** Reply of {@link #visual_info(Visual[])} */
+  /** Reply of {@link #visualInfo(Visual[])} */
   public static class VisualInfoReply {
 
     public int n_conflicts;
@@ -104,7 +104,7 @@ public class EVI extends Extension {
     VisualInfoReply reply;
     RequestOutputStream o = display.getResponseOutputStream();
     synchronized (o) {
-      o.beginRequest (major_opcode, 1, 2 + visuals.length);
+      o.beginRequest (majorOpcode, 1, 2 + visuals.length);
       o.writeInt32 (visuals.length);
       for (int i = 0; i < visuals.length; i++)
         o.writeInt32 (visuals [i].getID());
@@ -120,7 +120,7 @@ public class EVI extends Extension {
   }
 
 
-  public String more_string () {
+  public String moreString () {
     return "\n  client-version: " 
       + CLIENT_MAJOR_VERSION + "." + CLIENT_MINOR_VERSION
       + "\n  server-version: "

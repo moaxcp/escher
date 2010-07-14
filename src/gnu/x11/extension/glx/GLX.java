@@ -270,7 +270,7 @@ public class GLX extends gnu.x11.extension.Extension implements
         synchronized (o) {
             
             // set only once
-            o.setGLXMajorOpcode(major_opcode);
+            o.setGLXMajorOpcode(majorOpcode);
             
             o.beginGLXRequest(GLXCommand.GLXQueryVersion);
             o.writeInt32(SUPPORTED_GLX_VERSION.major);
@@ -476,7 +476,7 @@ public class GLX extends gnu.x11.extension.Extension implements
         synchronized (o) {
             int n = CLIENT_EXTENSION_STRING.length();
             int p = RequestOutputStream.pad(n);
-            o.beginRequest(major_opcode, 20, 4 + (n + p) / 4);
+            o.beginRequest(majorOpcode, 20, 4 + (n + p) / 4);
             o.writeInt32(this.SUPPORTED_GLX_VERSION.major);
             o.writeInt32(this.SUPPORTED_GLX_VERSION.minor);
             o.writeInt32(CLIENT_EXTENSION_STRING.length());
@@ -492,7 +492,7 @@ public class GLX extends gnu.x11.extension.Extension implements
         int[] props;
         RequestOutputStream o = display.getResponseOutputStream();
         synchronized (o) {
-            o.beginRequest(major_opcode, 21, 2);
+            o.beginRequest(majorOpcode, 21, 2);
             o.writeInt32(screen_no);
             ResponseInputStream i = display.getResponseInputStream();
             synchronized (i) {
@@ -523,7 +523,7 @@ public class GLX extends gnu.x11.extension.Extension implements
     public gnu.x11.Error build(Display display, int code, int seq_no, int bad,
                                int minor_opcode, int major_opcode) {
 
-        return new Error(display, code - first_error, seq_no, bad,
+        return new Error(display, code - firstError, seq_no, bad,
                          minor_opcode, major_opcode);
     }
 
@@ -610,7 +610,7 @@ public class GLX extends gnu.x11.extension.Extension implements
     /**
      * @see GLX#server_string(int, int)
      */
-    public String more_string() {
+    public String moreString() {
 
         int screen = display.getDefaultScreenNumber();
 

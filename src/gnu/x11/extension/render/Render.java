@@ -71,7 +71,7 @@ public class Render extends gnu.x11.extension.Extension
     // check version before any other operations
     RequestOutputStream o = display.getResponseOutputStream();
     synchronized (o) {
-      o.beginRequest (major_opcode, 0, 3);
+      o.beginRequest (majorOpcode, 0, 3);
       o.writeInt32 (CLIENT_MAJOR_VERSION);
       o.writeInt32 (CLIENT_MINOR_VERSION);
       ResponseInputStream i = display.getResponseInputStream();
@@ -92,7 +92,7 @@ public class Render extends gnu.x11.extension.Extension
     if (picture_formats_cache == null) {
       RequestOutputStream o = display.getResponseOutputStream();
       synchronized (o) {
-        o.beginRequest (major_opcode, 1, 1);
+        o.beginRequest (majorOpcode, 1, 1);
         ResponseInputStream i = display.getResponseInputStream();
         synchronized (i) {
           i.readReply (o);
@@ -117,7 +117,7 @@ public class Render extends gnu.x11.extension.Extension
   public void picture_index_values () {
     RequestOutputStream o = display.getResponseOutputStream();
     synchronized (o) {
-      o.beginRequest (major_opcode, 2, 2);
+      o.beginRequest (majorOpcode, 2, 2);
       o.send ();
     }
   }
@@ -127,7 +127,7 @@ public class Render extends gnu.x11.extension.Extension
   public void dithers (Drawable drawable) {
     RequestOutputStream o = display.getResponseOutputStream();
     synchronized (o) {
-      o.beginRequest (major_opcode, 3, 2);
+      o.beginRequest (majorOpcode, 3, 2);
       o.send ();
     }
   }
@@ -178,7 +178,7 @@ public class Render extends gnu.x11.extension.Extension
 
     RequestOutputStream o = display.getResponseOutputStream();
     synchronized (o) {
-      o.beginRequest (major_opcode, 8, 9);
+      o.beginRequest (majorOpcode, 8, 9);
       o.writeInt8 (op);
       o.skip (3);
       o.writeInt32 (src.getID());
@@ -205,7 +205,7 @@ public class Render extends gnu.x11.extension.Extension
     RequestOutputStream o = display.getResponseOutputStream();
     synchronized (o) {
       int len = 9 + glyphs.length;
-      o.beginRequest (major_opcode, 25, len);
+      o.beginRequest (majorOpcode, 25, len);
       o.writeInt8 (op);
       o.skip (3);
       o.writeInt32 (src.getID());
@@ -243,7 +243,7 @@ public class Render extends gnu.x11.extension.Extension
   public Error build (Display display, int code, int seq_no, int bad,
                       int minor_opcode, int major_opcode) {
 
-    String error_string = ERROR_STRINGS [code - first_error];
+    String error_string = ERROR_STRINGS [code - firstError];
     return new Error (display, error_string, ErrorCode.getError(code), seq_no, bad, 
       minor_opcode, major_opcode);
   }
@@ -274,7 +274,7 @@ public class Render extends gnu.x11.extension.Extension
     RequestOutputStream o = display.getResponseOutputStream();
     Picture pic = new Picture (display);
     synchronized (o) {
-      o.beginRequest (major_opcode, 33, 4);
+      o.beginRequest (majorOpcode, 33, 4);
       o.writeInt32 (pic.getID());
       o.writeInt16 (red);
       o.writeInt16 (green);
@@ -305,7 +305,7 @@ public class Render extends gnu.x11.extension.Extension
   }
 
 
-  public String more_string () {
+  public String moreString () {
     return "\n  client-version: " 
       + CLIENT_MAJOR_VERSION + "." + CLIENT_MINOR_VERSION
       + "\n  server-version: "

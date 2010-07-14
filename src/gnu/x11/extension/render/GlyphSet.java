@@ -15,12 +15,12 @@ public class GlyphSet extends gnu.x11.Resource {
    * @see <a href="XRenderCreateGlyphSet.html">XRenderCreateGlyphSet</a>
    */
   public GlyphSet (Render render, PictFormat format) {
-    super (render.display);
+    super (render.getDisplay());
     this.render = render;
 
     RequestOutputStream o = display.getResponseOutputStream();
     synchronized (o) {
-      o.beginRequest (render.major_opcode, 17, 3);
+      o.beginRequest (render.getMajorOpcode(), 17, 3);
       o.writeInt32 (id);
       o.writeInt32 (format.id ());
       o.send ();
@@ -39,7 +39,7 @@ public class GlyphSet extends gnu.x11.Resource {
 
     RequestOutputStream o = display.getResponseOutputStream();
     synchronized (o) {
-      o.beginRequest (render.major_opcode, 18, 3);
+      o.beginRequest (render.getMajorOpcode(), 18, 3);
       o.writeInt32 (id);
       o.writeInt32 (src.id);
       o.send ();
@@ -66,7 +66,7 @@ public class GlyphSet extends gnu.x11.Resource {
     if (! disposed) {
       RequestOutputStream o = display.getResponseOutputStream();
       synchronized (o) {
-        o.beginRequest (render.major_opcode, 19, 2);
+        o.beginRequest (render.getMajorOpcode(), 19, 2);
         o.writeInt32 (id);
         o.send ();
       }
@@ -101,7 +101,7 @@ public class GlyphSet extends gnu.x11.Resource {
     RequestOutputStream o = display.getResponseOutputStream();
     Glyph [] glyphs = new Glyph [numGlyphs];
     synchronized (o) {
-      o.beginRequest (render.major_opcode, 20, len);
+      o.beginRequest (render.getMajorOpcode(), 20, len);
       o.writeInt32 (id);
       o.writeInt32 (numGlyphs);
       for (int i = 0; i < numGlyphs; i++) {
@@ -148,7 +148,7 @@ public class GlyphSet extends gnu.x11.Resource {
         }
       }
       if (numGlyphs > 0) {
-        o.beginRequest (render.major_opcode, 22, 2 + numGlyphs);
+        o.beginRequest (render.getMajorOpcode(), 22, 2 + numGlyphs);
         o.writeInt32 (id);
         for (int i = 0; i < glyphs.length; i++) {
           if (! glyphs [i].disposed) {

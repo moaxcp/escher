@@ -109,12 +109,12 @@ public class DrawablePicture extends Picture {
   public DrawablePicture (Render render, Drawable drawable, PictFormat format, 
                   Attributes attr) {
     
-    super (render.display);
+    super (render.getDisplay());
     this.render = render;
 
     RequestOutputStream o = display.getResponseOutputStream();
     synchronized (o) {
-      o.beginRequest (render.major_opcode, 4, 5 + attr.count ());
+      o.beginRequest (render.getMajorOpcode(), 4, 5 + attr.count ());
       o.writeInt32 (id);
       o.writeInt32 (drawable.getID());
       o.writeInt32 (format.id ());
@@ -132,7 +132,7 @@ public class DrawablePicture extends Picture {
   public void change (Attributes attr) {
     RequestOutputStream o = display.getResponseOutputStream();
     synchronized (o) {
-      o.beginRequest (render.major_opcode, 5, 5+attr.count ());
+      o.beginRequest (render.getMajorOpcode(), 5, 5+attr.count ());
       o.writeInt32 (id);
       o.writeInt32 (attr.getBitmask());
       attr.write (o);
@@ -151,7 +151,7 @@ public class DrawablePicture extends Picture {
 
     RequestOutputStream o = display.getResponseOutputStream();
     synchronized (o) {
-      o.beginRequest (render.major_opcode, 7, 3 + 2 * rectangles.length);
+      o.beginRequest (render.getMajorOpcode(), 7, 3 + 2 * rectangles.length);
       o.writeInt32 (id);
 
       for (int i = 0; i < rectangles.length; i++) {
@@ -172,7 +172,7 @@ public class DrawablePicture extends Picture {
   public void free () {
     RequestOutputStream o = display.getResponseOutputStream();
     synchronized (o) {
-      o.beginRequest (render.major_opcode, 7, 2);
+      o.beginRequest (render.getMajorOpcode(), 7, 2);
       o.writeInt32 (id);
       o.send ();
     }
@@ -186,7 +186,7 @@ public class DrawablePicture extends Picture {
 
     RequestOutputStream o = display.getResponseOutputStream();
     synchronized (o) {
-      o.beginRequest (render.major_opcode, 9, 8);
+      o.beginRequest (render.getMajorOpcode(), 9, 8);
       o.writeInt32 (src.id);
       o.writeInt32 (id);
       o.writeInt32 (color_scale);
@@ -211,7 +211,7 @@ public class DrawablePicture extends Picture {
 
     RequestOutputStream o = display.getResponseOutputStream();
     synchronized (o) {
-      o.beginRequest (render.major_opcode, 26, 7);
+      o.beginRequest (render.getMajorOpcode(), 26, 7);
       o.writeInt8 (op);
       o.skip (3);
       o.writeInt32 (id);

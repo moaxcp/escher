@@ -1,6 +1,5 @@
 package gnu.x11.extension;
 
-import gnu.x11.Data;
 import gnu.x11.Drawable;
 import gnu.x11.RequestOutputStream;
 import gnu.x11.ResponseInputStream;
@@ -19,6 +18,7 @@ import gnu.x11.Error.ErrorCode;
  * discusson on the merit of DBE. 
  */
 public class DBE extends Extension implements ErrorFactory {
+    
   public static final String [] MINOR_OPCODE_STRINGS = {
     "GetVersion",               // 0
     "AllocateBackBufferName",   // 1
@@ -28,38 +28,48 @@ public class DBE extends Extension implements ErrorFactory {
     "EndIdiom",                 // 5
     "GetVisualInfo"             // 6
   };
-     
-
-  public static final int UNDEFINED = 0;
-  public static final int BACKGROUND = 1;
-  public static final int UNTOUCHED = 2;
-  public static final int COPIED = 3;
-
+  
   public static final int CLIENT_MAJOR_VERSION = 1;
   public static final int CLIENT_MINOR_VERSION = 0;
 
-
-  public int server_major_version, server_minor_version;
+  public int serverMajorVersion, serverMinorVersion;
+     
+  public enum SwapAction {
+      UNDEFINED(0),
+      BACKGROUND(1),
+      UNTOUCHED(2),
+      COPIED(3);
+      
+      private int code;
+      
+      SwapAction(int action) {
+          this.code = action;
+      }
+      
+      public int getCode() {
+        return code;
+      }
+  }
 
 
   // dbe opcode 0 - get version
-  public DBE (gnu.x11.Display display) throws NotFoundException { 
-    super (display, "DOUBLE-BUFFER", MINOR_OPCODE_STRINGS, 1, 0);
+  public DBE(gnu.x11.Display display) throws NotFoundException { 
+    super(display, "DOUBLE-BUFFER", MINOR_OPCODE_STRINGS, 1, 0);
 
     // check version before any other operations
     RequestOutputStream o = display.getResponseOutputStream();
-    synchronized (o) {
-      o.beginRequest (major_opcode, 0, 2);
-      o.writeInt8 (CLIENT_MAJOR_VERSION);
-      o.writeInt8 (CLIENT_MINOR_VERSION);
-      o.skip (2);
+    synchronized(o) {
+      o.beginRequest(majorOpcode, 0, 2);
+      o.writeInt8(CLIENT_MAJOR_VERSION);
+      o.writeInt8(CLIENT_MINOR_VERSION);
+      o.skip(2);
       ResponseInputStream i = display.getResponseInputStream();
-      synchronized (i) {
-        i.readReply (o);
-        i.skip (8);
-        server_major_version = i.readInt8 ();
-        server_minor_version = i.readInt8 ();
-        i.skip (22);
+      synchronized(i) {
+        i.readReply(o);
+        i.skip(8);
+        serverMajorVersion = i.readInt8();
+        serverMinorVersion = i.readInt8();
+        i.skip(22);
       }
     }
   }
@@ -68,26 +78,26 @@ public class DBE extends Extension implements ErrorFactory {
   // dbe opcode 3 - swap buffers
   /**
    * @param actions array of actions; valid action: 
-   * {@link #UNDEFINED}
-   * {@link #BACKGROUND}
-   * {@link #UNTOUCHED}
-   * {@link #COPIED}
+   * {@link SwapAction.UNDEFINED}
+   * {@link SwapAction.BACKGROUND}
+   * {@link SwapAction.UNTOUCHED}
+   * {@link SwapAction.COPIED}
    *
    * @see <a href="XdbeSwapBuffers.html">XdbeSwapBuffers</a>
    */  
-  public void swap (Window [] windows, int [] actions) {
+  public void swap(Window [] windows, SwapAction[] actions) {
     int n = windows.length;
 
     RequestOutputStream o = display.getResponseOutputStream();
-    synchronized (o) {
-      o.beginRequest (major_opcode, 3, 2 + 2 * n);
-      o.writeInt32 (n);
+    synchronized(o) {
+      o.beginRequest(majorOpcode, 3, 2 + 2 * n);
+      o.writeInt32(n);
       for (int i = 0; i < n; i++) {
-        o.writeInt32 (windows [i].getID());
-        o.writeInt8 (actions [i]);
-        o.skip (3);
+        o.writeInt32(windows[i].getID());
+        o.writeInt8(actions[i].getCode());
+        o.skip(3);
       }
-      o.send ();
+      o.send();
     }
   }
 
@@ -96,11 +106,11 @@ public class DBE extends Extension implements ErrorFactory {
   /**
    * @see <a href="XdbeBeginIdiom.html">XdbeBeginIdiom</a>
    */
-  public void begin_idiom () {
+  public void beginIdiom() {
     RequestOutputStream o = display.getResponseOutputStream();
-    synchronized (o) {
-      o.beginRequest (major_opcode, 4, 1);
-      o.send ();
+    synchronized(o) {
+      o.beginRequest(majorOpcode, 4, 1);
+      o.send();
     }
   }
 
@@ -109,11 +119,11 @@ public class DBE extends Extension implements ErrorFactory {
   /**
    * @see <a href="XdbeEndIdiom.html">XdbeEndIdiom</a>
    */
-  public void end_idiom () {
+  public void endIdiom() {
     RequestOutputStream o = display.getResponseOutputStream();
-    synchronized (o) {
-      o.beginRequest (major_opcode, 5, 1);
-      o.send ();
+    synchronized(o) {
+      o.beginRequest(majorOpcode, 5, 1);
+      o.send();
     }
   }
 
@@ -121,19 +131,19 @@ public class DBE extends Extension implements ErrorFactory {
   /** DBE visual info. */
   public static class XdbeScreenVisualInfo {
 
-    public int visual_id;
-    public int depth;
-    public int perflevel;
-    public XdbeScreenVisualInfo (ResponseInputStream i) {
-      visual_id = i.readInt32 ();
-      depth = i.readInt8 ();
-      perflevel = i.readInt8 ();
-      i.skip (2);
+    private int visualID;
+    private int depth;
+    private int perflevel;
+    public XdbeScreenVisualInfo(ResponseInputStream i) {
+      visualID = i.readInt32();
+      depth = i.readInt8();
+      perflevel = i.readInt8();
+      i.skip(2);
     }
 
-    public String toString () {
+    public String toString() {
       return "#XdbeScreenVisualInfo"
-        + "\n  visual-id: " + visual_id
+        + "\n  visual-id: " + visualID
         + "\n  depth: " + depth
         + "\n  performance hint: " + perflevel;
     }
@@ -145,11 +155,11 @@ public class DBE extends Extension implements ErrorFactory {
 
     public XdbeScreenVisualInfo [] infos;
 
-    public ScreenVisualInfo (ResponseInputStream i) { 
-      int number = i.readInt32 ();
+    public ScreenVisualInfo(ResponseInputStream i) { 
+      int number = i.readInt32();
       infos = new XdbeScreenVisualInfo [number];
-      for (int j = 0; j < number; j++) {
-        infos [j] = new XdbeScreenVisualInfo (i);
+      for(int j = 0; j < number; j++) {
+        infos [j] = new XdbeScreenVisualInfo(i);
       }
     }
 
@@ -167,60 +177,61 @@ public class DBE extends Extension implements ErrorFactory {
    * XFree86 4.0.1 or earlier): the reply length of the reply is incorrect
    * , causing a "read timed out" error.
    *
-   * @param screen_specifiers valid: {@link #EMPTY}
+   * @param screenSpecifiers valid: {@link #EMPTY}
    * @see <a href="XdbeGetVisualInfo.html">XdbeGetVisualInfo</a>
    */
-  public ScreenVisualInfo [] visual_info (Drawable [] screen_specifiers) {
+  public ScreenVisualInfo [] visualInfo(Drawable [] screenSpecifiers) {
 
     ScreenVisualInfo[] infos;
     RequestOutputStream o = display.getResponseOutputStream();
-    synchronized (o) {
-      o.beginRequest (major_opcode, 6, 2 + screen_specifiers.length);
-      o.writeInt32 (screen_specifiers.length);
-      for (int i = 0; i < screen_specifiers.length; i++)
-        o.writeInt32 (screen_specifiers [i].getID());
+    synchronized(o) {
+      o.beginRequest(majorOpcode, 6, 2 + screenSpecifiers.length);
+      o.writeInt32(screenSpecifiers.length);
+      for (Drawable screen : screenSpecifiers)
+        o.writeInt32(screen.getID());
+      
       ResponseInputStream i = display.getResponseInputStream();
-      synchronized (i) {
-        i.readReply (o);
-        i.skip (8);
-        int num = i.readInt32 ();
-        i.skip (20);
+      synchronized(i) {
+        i.readReply(o);
+        i.skip(8);
+        int num = i.readInt32();
+        i.skip(20);
         infos = new ScreenVisualInfo [num];
-        for (int j = 0; j < num; j++) {
-          infos [j] = new ScreenVisualInfo (i);
-        }
+        for (ScreenVisualInfo screen : infos)
+          screen = new ScreenVisualInfo(i);
       }
     }
     return infos;
   }
 
 
+  /** BackBuffer - The core of this extension */
   public class BackBuffer extends Drawable {
-    public Window window;
+    private Window window;
 
 
     // dbe opcode 1 - allocate back buffer name
     /**
-     * @param swap_action_hint valid: 
-     * {@link #UNDEFINED}
-     * {@link #BACKGROUND}
-     * {@link #UNTOUCHED}
-     * {@link #COPIED}
+     * @param swapActionHint valid: 
+     * {@link SwapAction.UNDEFINED}
+     * {@link SwapAction.BACKGROUND}
+     * {@link SwapAction.UNTOUCHED}
+     * {@link SwapAction.COPIED}
      */
-    public BackBuffer (Window window, int swap_action_hint) {
-      super (window.getDisplay());
+    public BackBuffer(Window window, SwapAction swapActionHint) {
+      super(window.getDisplay());
       this.window = window;
       width = window.width;
       height = window.height;
 
       RequestOutputStream o = display.getResponseOutputStream();
-      synchronized (o) {
-        o.beginRequest (major_opcode, 1, 4);
-        o.writeInt32 (window.getID());
-        o.writeInt32 (id);
-        o.writeInt8 (swap_action_hint);
-        o.skip (3);
-        o.send ();
+      synchronized(o) {
+        o.beginRequest(majorOpcode, 1, 4);
+        o.writeInt32(window.getID());
+        o.writeInt32(id);
+        o.writeInt8(swapActionHint.getCode());
+        o.skip(3);
+        o.send();
       }
     }
 
@@ -230,12 +241,12 @@ public class DBE extends Extension implements ErrorFactory {
      * @see <a href="XdbeDeallocateBackBufferName.html">
      * XdbeDeallocateBackBufferName</a>
      */
-    public void deallocate () {
+    public void deallocate() {
       RequestOutputStream o = display.getResponseOutputStream();
-      synchronized (o) {
-        o.beginRequest (major_opcode, 2, 2);
-        o.writeInt32 (id);
-        o.send ();
+      synchronized(o) {
+        o.beginRequest(majorOpcode, 2, 2);
+        o.writeInt32(id);
+        o.send();
       }
     }
 
@@ -245,30 +256,30 @@ public class DBE extends Extension implements ErrorFactory {
      * @see <a href="XdbeGetBackBufferAttributes.html">
      * XdbeGetBackBufferAttributes</a>
      */
-    public Window attributes () {
+    public Window attributes() {
 
       int atts;
       RequestOutputStream o = display.getResponseOutputStream();
-      synchronized (o) {
-        o.beginRequest (major_opcode, 7, 2);
-        o.writeInt32 (id);
+      synchronized(o) {
+        o.beginRequest(majorOpcode, 7, 2);
+        o.writeInt32(id);
         ResponseInputStream i = display.getResponseInputStream();
-        synchronized (i) {
-          i.readReply (o);
-          i.skip (8);
-          atts = i.readInt32 ();
-          i.skip (20);
+        synchronized(i) {
+          i.readReply(o);
+          i.skip(8);
+          atts = i.readInt32();
+          i.skip(20);
         }
       }
-      return (Window) Window.intern (this.display, atts);
+      return (Window) Window.intern(this.display, atts);
     }
 
 
     /**
      * DBE#swap(Window, int)
      */
-    public void swap (int action) {
-      DBE.this.swap (window, action);
+    public void swap(SwapAction action) {
+      DBE.this.swap(window, new SwapAction[]{action});
     }
   }
 
@@ -280,8 +291,8 @@ public class DBE extends Extension implements ErrorFactory {
    *
    * @see BackBuffer
    */
-  public BackBuffer allocate (Window window, int swap_action_hint) {
-    return new BackBuffer (window, swap_action_hint);
+  public BackBuffer allocate(Window window, SwapAction swapActionHint) {
+    return new BackBuffer(window, swapActionHint);
   }
 
   
@@ -289,26 +300,26 @@ public class DBE extends Extension implements ErrorFactory {
     = "BAD_DBE_BUFFER: parameter not a DBE back buffer";
 
 
-  public gnu.x11.Error build (gnu.x11.Display display, int code, int seq_no,
-                              int bad, int minor_opcode, int major_opcode) {
+  public gnu.x11.Error build(gnu.x11.Display display, int code, int seqNumber,
+                              int bad, int minorOpcode, int majorOpcode) {
     ErrorCode errorCd = ErrorCode.getError(code);
-    return new gnu.x11.Error (display, ERROR_STRING, errorCd, seq_no, bad,
-                              minor_opcode, major_opcode);
+    return new gnu.x11.Error(display, ERROR_STRING, errorCd, seqNumber, bad,
+                              minorOpcode, majorOpcode);
   }
 
 
   /** 
    * @see #swap(Window[], int[])
    */
-  public void swap (Window window, int action) {
-    swap (new Window [] {window}, new int [] {action});
+  public void swap(Window window, SwapAction[] action) {
+    swap(new Window [] {window}, action);
   }
 
 
-  public String more_string () {
+  public String moreString() {
     return "\n  client-version: " 
       + CLIENT_MAJOR_VERSION + "." + CLIENT_MINOR_VERSION
       + "\n  server-version: "
-      + server_major_version + "." + server_minor_version;
+      + serverMajorVersion + "." + serverMinorVersion;
   }
 }

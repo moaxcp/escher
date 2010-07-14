@@ -46,7 +46,7 @@ public class Shape extends Extension implements EventFactory {
     // check version before any other operations
     RequestOutputStream o = display.getResponseOutputStream();
     synchronized (o) {
-      o.beginRequest (major_opcode, 0, 1);
+      o.beginRequest (majorOpcode, 0, 1);
       ResponseInputStream i = display.getResponseInputStream();
       synchronized (i) {
         i.readReply (o);
@@ -102,7 +102,7 @@ public class Shape extends Extension implements EventFactory {
 
     RequestOutputStream o = display.getResponseOutputStream();
     synchronized (o) {
-      o.beginRequest (major_opcode, 1, 4 + 2 * rectangles.length);
+      o.beginRequest (majorOpcode, 1, 4 + 2 * rectangles.length);
       o.writeInt8 (operation);
       o.writeInt8 (dest_kind);
       o.writeInt8 (ordering);
@@ -144,7 +144,7 @@ public class Shape extends Extension implements EventFactory {
 
     RequestOutputStream o = display.getResponseOutputStream();
     synchronized (o) {
-      o.beginRequest (major_opcode, 2, 5);
+      o.beginRequest (majorOpcode, 2, 5);
       o.writeInt8 (operation);
       o.writeInt8 (dest_kind);
       o.skip (2);
@@ -181,7 +181,7 @@ public class Shape extends Extension implements EventFactory {
 
     RequestOutputStream o = display.getResponseOutputStream();
     synchronized (o) {
-      o.beginRequest (major_opcode, 3, 5);
+      o.beginRequest (majorOpcode, 3, 5);
       o.writeInt8 (operation);
       o.writeInt8 (dest_kind);
       o.writeInt8 (src_kind);
@@ -204,7 +204,7 @@ public class Shape extends Extension implements EventFactory {
 
     RequestOutputStream o = display.getResponseOutputStream();
     synchronized (o) {
-      o.beginRequest (major_opcode, 4, 4);
+      o.beginRequest (majorOpcode, 4, 4);
       o.writeInt8 (dest_kind);
       o.skip (3);
       o.writeInt32 (dest.getID());
@@ -277,7 +277,7 @@ public class Shape extends Extension implements EventFactory {
     ExtentsInfo info;
     RequestOutputStream o = display.getResponseOutputStream();
     synchronized (o) {
-      o.beginRequest (major_opcode, 5, 2);
+      o.beginRequest (majorOpcode, 5, 2);
       o.writeInt32 (dest.getID());
       ResponseInputStream i = display.getResponseInputStream();
       synchronized (i) {
@@ -299,7 +299,7 @@ public class Shape extends Extension implements EventFactory {
 
     RequestOutputStream o = display.getResponseOutputStream();
     synchronized (o) {
-      o.beginRequest (major_opcode, 6, 3);
+      o.beginRequest (majorOpcode, 6, 3);
       o.writeInt32 (dest.getID());
       o.writeBool (enable);
       o.send ();    
@@ -315,7 +315,7 @@ public class Shape extends Extension implements EventFactory {
     boolean enabled;
     RequestOutputStream o = display.getResponseOutputStream();
     synchronized (o) {
-      o.beginRequest (major_opcode, 6, 2);
+      o.beginRequest (majorOpcode, 6, 2);
       o.writeInt32 (dest.getID());
       ResponseInputStream i = display.getResponseInputStream();
       synchronized (i) {
@@ -367,7 +367,7 @@ public class Shape extends Extension implements EventFactory {
     RectanglesInfo info;
     RequestOutputStream o = display.getResponseOutputStream();
     synchronized (o) {
-      o.beginRequest (major_opcode, 7, 3);
+      o.beginRequest (majorOpcode, 7, 3);
       o.writeInt32 (window.getID());
       o.writeInt8 (kind);
       ResponseInputStream i = display.getResponseInputStream();
@@ -432,7 +432,7 @@ public class Shape extends Extension implements EventFactory {
   }
 
 
-  public String more_string () {
+  public String moreString () {
     return "\n  client-version: " 
       + CLIENT_MAJOR_VERSION + "." + CLIENT_MINOR_VERSION
       + "\n  server-version: "

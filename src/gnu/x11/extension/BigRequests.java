@@ -24,7 +24,7 @@ public class BigRequests extends Extension {
         int st;
         RequestOutputStream o = display.getResponseOutputStream();
         synchronized (o) {
-            o.beginRequest(major_opcode, 0, 1);
+            o.beginRequest(majorOpcode, 0, 1);
             ResponseInputStream i = display.getResponseInputStream();
             synchronized (i) {
                 i.readReply(o);

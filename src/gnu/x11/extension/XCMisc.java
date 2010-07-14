@@ -30,7 +30,7 @@ public class XCMisc extends Extension {
     RequestOutputStream o = display.getResponseOutputStream();
     synchronized (o) {
 
-      o.beginRequest (major_opcode, 0, 2);
+      o.beginRequest (majorOpcode, 0, 2);
       o.writeInt16 (CLIENT_MAJOR_VERSION);
       o.writeInt16 (CLIENT_MINOR_VERSION);
       ResponseInputStream i = display.getResponseInputStream();
@@ -61,7 +61,7 @@ public class XCMisc extends Extension {
     XIDRange r;
     RequestOutputStream o = display.getResponseOutputStream();
     synchronized (o) {
-      o.beginRequest (major_opcode, 1, 1);
+      o.beginRequest (majorOpcode, 1, 1);
       ResponseInputStream i = display.getResponseInputStream();
       synchronized (i) {
         i.readReply (o);
@@ -80,7 +80,7 @@ public class XCMisc extends Extension {
     int [] ids;
     RequestOutputStream o = display.getResponseOutputStream();
     synchronized (o) {
-      o.beginRequest (major_opcode, 2, 2);
+      o.beginRequest (majorOpcode, 2, 2);
       ResponseInputStream i = display.getResponseInputStream();
       synchronized (i) {
         i.readReply (o);
@@ -96,7 +96,7 @@ public class XCMisc extends Extension {
   }
 
 
-  public String more_string () {
+  public String moreString () {
     return "\n  client-version: " 
       + CLIENT_MAJOR_VERSION + "." + CLIENT_MINOR_VERSION
       + "\n  server-version: "
