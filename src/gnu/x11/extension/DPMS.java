@@ -14,7 +14,7 @@ import gnu.x11.ResponseInputStream;
  * 
  */
 public class DPMS extends Extension {
-  public static final String[] MINOR_OPCODE_STRINGS = {
+  private static final String[] MINOR_OPCODE_STRINGS = {
     "GetVersion",               // 0
     "Capable",                  // 1
     "GetTimeouts",              // 2
@@ -30,7 +30,7 @@ public class DPMS extends Extension {
   public static final int CLIENT_MINOR_VERSION = 1;
 
 
-  public int serverMajorVersion, serverMinorVersion;
+  private int serverMajorVersion, serverMinorVersion;
 
 
   // dpms opcode 0 - get version

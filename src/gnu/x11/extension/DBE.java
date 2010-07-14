@@ -19,7 +19,7 @@ import gnu.x11.Error.ErrorCode;
  */
 public class DBE extends Extension implements ErrorFactory {
     
-  public static final String [] MINOR_OPCODE_STRINGS = {
+  private static final String [] MINOR_OPCODE_STRINGS = {
     "GetVersion",               // 0
     "AllocateBackBufferName",   // 1
     "DeallocateBackBufferName", // 2
@@ -32,7 +32,7 @@ public class DBE extends Extension implements ErrorFactory {
   public static final int CLIENT_MAJOR_VERSION = 1;
   public static final int CLIENT_MINOR_VERSION = 0;
 
-  public int serverMajorVersion, serverMinorVersion;
+  private int serverMajorVersion, serverMinorVersion;
      
   public enum SwapAction {
       UNDEFINED(0),
