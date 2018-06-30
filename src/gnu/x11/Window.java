@@ -1589,7 +1589,7 @@ public class Window extends Drawable implements GLXDrawable {
    * @see #change_property(int, int, Atom, Atom, int, Object, int, int)
    */
   public void change_property (Atom property, Atom type, int data) {   
-    change_property (REPLACE, property, type, 32, 
+    change_property (REPLACE, property, type, 8, 
       new byte [] {(byte) (data >> 24), (byte) (data >> 16),
                    (byte) (data >> 8), (byte) data}, 0, 32);
   }
