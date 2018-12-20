@@ -12,3 +12,6 @@ var name = "escher";
 jar("dist/" + name + ".jar", "build/classes");
 jar("dist/" + name + "-source.jar", "build/sources");
 jar("dist/" + name + "-javadoc.jar", "build/javadoc");
+cp("pom.xml", "dist/" + name + ".pom")
+
+publish("dist")
