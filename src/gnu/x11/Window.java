@@ -1502,7 +1502,7 @@ public class Window extends Drawable implements GLXDrawable {
   public void set_input_focus (int revert_to, int time) {
     RequestOutputStream o = display.out;
     synchronized (o) {
-      o.begin_request (43, revert_to, 3);
+      o.begin_request (42, revert_to, 3);
       o.write_int32 (id);
       o.write_int32 (time);
       o.send ();
