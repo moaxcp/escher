@@ -228,11 +228,11 @@ public class Display {
     this.hostname = hostname;
     try {
       socket = new Socket (hostname, 6000 + display_no);
+      init_streams ();
+      init ();
     } catch (IOException ex) {
       handle_exception (ex);
     }
-    init_streams ();
-    init ();
   }
 
   private void init() {
@@ -960,13 +960,13 @@ public class Display {
   public void close () {
     // FIXME: Implement more sensible shutdown.
     try {
-    in.close ();
-    out.close ();
-    socket.close ();
+      in.close ();
+      out.close ();
+      socket.close ();
+      connected = false;
     } catch (IOException ex) {
       handle_exception (ex);
     }
-    connected = false;
   }
 
   public void init_big_request_extension () {
@@ -1170,7 +1170,7 @@ public class Display {
    * Initializes the input and output streams.
    */
   private void init_streams () {
-    
+
     try {
       // TODO: Evaluate if we gain performance by using BufferedOutputStream
       // here.
