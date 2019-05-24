@@ -277,8 +277,8 @@ public class ResponseInputStream extends FilterInputStream {
    */
   public List pull_all_events () {
     LinkedList l = new LinkedList(events);
-    Event e = read_event_from_stream ();
-    while (e != null) {
+    Event e;
+    while ((e = read_event_from_stream ()) != null) {
       l.add (e);
     }
     return l;
