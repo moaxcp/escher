@@ -48,7 +48,7 @@ public class XAuthority {
   /**
    * The display number.
    */
-  public String display;
+  public int display;
 
   /**
    * The protocol name.
@@ -94,7 +94,8 @@ public class XAuthority {
 
     // The following block is the port or something similar as string.
     data = read_block (in);
-    display = new String (data);
+    final String display_str = new String (data);
+    display = display_str.isEmpty()?0:Integer.parseInt(display_str);
 
     in.read (); // Read one \0.
 

@@ -1119,15 +1119,12 @@ public class Display {
       }
     }
 
-    // Fetch display no.
-    String display_no_str = String.valueOf (display_no);
-
     // Find the XAuthority that matches the hostname and display no.
     XAuthority found = null;
     for (int i = 0; i < auths.length; i++) {
       XAuthority auth = auths[i];
       try {
-        if (auth.hostname != null && auth.display.equals (display_no_str)
+        if (auth.hostname != null && auth.display == display_no
             && InetAddress.getByName(auth.hostname)
                  .equals(InetAddress.getByName(hostname))) {
           found = auth;
