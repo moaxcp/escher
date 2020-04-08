@@ -6,11 +6,9 @@ import gnu.x11.extension.EventFactory;
 import gnu.x11.extension.BigRequests;
 import gnu.x11.extension.NotFoundException;
 import gnu.x11.extension.XCMisc;
+import org.newsclub.net.unix.*;
 
-import java.io.BufferedInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
+import java.io.*;
 import java.net.InetAddress;
 import java.net.Socket;
 import java.net.UnknownHostException;
@@ -231,7 +229,11 @@ public class Display {
       init_streams ();
       init ();
     } catch (IOException ex) {
-      handle_exception (ex);
+      try {
+        socket = AFUNIXSocket.connectTo(new AFUNIXSocketAddress(new File("/tmp/.X11-unix/X" + display_no)));
+      } catch (IOException e) {
+        handle_exception (e);
+      }
     }
   }
 
