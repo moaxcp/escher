@@ -231,6 +231,8 @@ public class Display {
     } catch (IOException ex) {
       try {
         socket = AFUNIXSocket.connectTo(new AFUNIXSocketAddress(new File("/tmp/.X11-unix/X" + display_no)));
+        init_streams ();
+        init ();
       } catch (IOException e) {
         handle_exception (e);
       }

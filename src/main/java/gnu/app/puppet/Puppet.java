@@ -393,8 +393,11 @@ public class Puppet extends Application {
     control_root_window ();
     scan_children ();
 
-    focus = (Client) Client.intern (root.query_pointer ().child);
-    focus.set_input_focus ();
+    Window child = root.query_pointer().child;
+    if(child != null) {
+      focus = (Client) Client.intern(child);
+      focus.set_input_focus();
+    }
     
     grab_keybut ();
     System.out.println ("Initialization completed.");
