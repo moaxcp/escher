@@ -2,11 +2,15 @@ plugins {
     id 'java-library'
     id 'org.ajoberstar.reckon' version '0.12.0'
     id 'jacoco'
-    id 'io.freefair.lombok'
+    id 'io.freefair.lombok' version '5.0.0-rc6'
 }
 
 sourceCompatibility = 8
 targetCompatibility = 8
+
+repositories {
+    jcenter()
+}
 
 dependencies {
     testImplementation enforcedPlatform('org.junit:junit-bom:5.5.2')
