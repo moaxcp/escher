@@ -1,10 +1,6 @@
 package gnu.x11;
 
 import com.github.moaxcp.xephyr.*;
-import gnu.app.displayhack.*;
-import gnu.app.puppet.*;
-import gnu.x11.extension.*;
-import gnu.app.x11.test.*;
 import org.junit.jupiter.api.*;
 
 import java.io.*;
@@ -34,20 +30,5 @@ public class DisplayConnect {
     //todo this should throw an exception when it doesn't work
     //todo need to be able to connect using Unix Socket as well as http
     new Display(null, 1, 0);
-  }
-
-  @Test
-  void puppet() throws NotFoundException {
-    new Puppet(new String[]{"--display", ":1"});
-  }
-
-  @Test
-  void hello() {
-    new Hello(new String[]{"--display", ":1"});
-  }
-
-  @Test
-  void hello2() {
-    new gnu.app.redbook.Hello(new String[]{"--display", ":1"});
   }
 }

@@ -130,62 +130,15 @@ public class Display implements AutoCloseable {
    * #Display(String, int, int)
    */
   public Display () {
-    this ("", 0, 0);
-  }
-
-
-  /** X display name. */
-  public static class Name {
-    public String hostname = "";
-    public int display_no, screen_no;
-
-
-    public Name (String display_name) {
-      if (display_name == null) return;
-      int i = display_name.indexOf (':');
-
-      // case 1: display_name = hostname
-      if (i == -1) {
-        hostname = display_name;
-        return;
-      }
-      
-      hostname = display_name.substring (0, i);
-      int j = display_name.indexOf ('.', i);
-  
-      if (j == -1) {
-        // case 2: display_name = hostname:display_no
-        display_no = Integer.parseInt (
-          display_name.substring (i+1, display_name.length ())); 
-        return;
-      }
-  
-      // case 3: display_name = hostname:display_no.screen_no
-      display_no = Integer.parseInt (
-        display_name.substring (i+1, j));
-      screen_no = Integer.parseInt (
-        display_name.substring (j+1, display_name.length ()));      
-    }
-
-
-    public Name (String hostname, int display_no, int screen_no) {
-      this.hostname = hostname;
-      this.display_no = display_no;
-      this.screen_no = screen_no;
-    }
-
-    
-    public String toString () {
-      return hostname + ":" + display_no + "." + screen_no;
-    }
+    this (null, 0, 0);
   }
 
 
   /**
    * #Display(String, int, int)
    */
-  public Display (Name name) {        
-    this (name.hostname, name.display_no, name.screen_no);
+  public Display (DisplayName name) {
+    this (name.getHostName(), name.getDisplayNumber(), name.getScreenNumber());
   }
 
 
