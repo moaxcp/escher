@@ -70,7 +70,7 @@ public class Display implements AutoCloseable {
   // defaults
   public Color default_black, default_white;
   public Colormap default_colormap;
-  public int default_depth; 
+  public int default_depth;
   public Pixmap.Format default_pixmap_format;
   public Window default_root;
   public Screen default_screen;
@@ -79,7 +79,7 @@ public class Display implements AutoCloseable {
   int min_keycode;
   int max_keycode;
 
-  /** 
+  /**
    * @see Screen#default_gc()
    */
   public GC default_gc;
@@ -90,7 +90,7 @@ public class Display implements AutoCloseable {
   public int resource_index;
   public Hashtable atom_ids = new Hashtable (257);
   public Hashtable atom_names = new Hashtable (257);
-  
+
 
   // xcmisc
   public XCMisc xcmisc;
@@ -107,46 +107,41 @@ public class Display implements AutoCloseable {
 
   /**
    * Major opcodes 128 through 255 are reserved for extensions,
-   * totally 128. 
+   * totally 128.
    */
   public String [] extension_opcode_strings = new String [128];
   public String [] [] extension_minor_opcode_strings = new String [128] [];
 
 
-  /** 
-   * Event codes 64 through 127 are reserved for extensiones, 
-   * totally 64. 
+  /**
+   * Event codes 64 through 127 are reserved for extensiones,
+   * totally 64.
    */
   public EventFactory [] extension_event_factories = new EventFactory [64];
 
 
-  /** 
+  /**
    * Error codes 128 through 255 are reserved for extensiones,
-   * totally 128. 
+   * totally 128.
    */
   public ErrorFactory [] extension_error_factories = new ErrorFactory [128];
 
-  /**
-   * #Display(String, int, int)
-   */
-  public Display () {
-    this (null, 0, 0);
+  public static Display netConnection(DisplayName name) {
+    try {
+      Socket socket = new Socket(name.getHostName(), 6000 + name.getDisplayNumber());
+      return new Display(socket, name.getHostName(), name.getDisplayNumber(), name.getScreenNumber());
+    } catch (IOException e) {
+      throw new X11ClientException(String.format("failed to create socket for %s", name), e);
+    }
   }
 
-
-  /**
-   * #Display(String, int, int)
-   */
-  public Display (DisplayName name) {
-    this (name.getHostName(), name.getDisplayNumber(), name.getScreenNumber());
-  }
-
-
-  /**
-   * #Display(String, int, int)
-   */
-  public Display (String hostname, int display_no) {
-    this (hostname, display_no, 0);
+  public static Display unixConnection(DisplayName name) {
+    try {
+      Socket socket = AFUNIXSocket.connectTo(new AFUNIXSocketAddress(new File("/tmp/.X11-unix/X" + name.getDisplayNumber())));
+      return new Display(socket, name.getHostName(), name.getDisplayNumber(), name.getScreenNumber());
+    } catch(IOException e) {
+      throw new X11ClientException(String.format("failed to create socket for %s", name), e);
+    }
   }
 
   /**
@@ -160,7 +155,7 @@ public class Display implements AutoCloseable {
    * @param display_no the display number
    * @param screen_no the screen number
    */
-  public Display (Socket socket, String hostname, int display_no,
+  private Display (Socket socket, String hostname, int display_no,
                   int screen_no) {
     default_screen_no = screen_no;
     this.hostname = hostname;
@@ -285,13 +280,13 @@ public class Display implements AutoCloseable {
    * @return valid:
    * {@link Enum#next()} of type {@link Font},
    * {@link Enum#next_string()}
-   * 
+   *
    * @see <a href="XListFonts.html">XListFonts</a>
    */
   public Font[] fonts (String pattern, int max_name_count) {
 
     int n = pattern.length();
-    int p = RequestOutputStream.pad (n); 
+    int p = RequestOutputStream.pad (n);
 
     RequestOutputStream o = out;
     Font[] fonts = null;
@@ -327,7 +322,7 @@ public class Display implements AutoCloseable {
   /**
    * @see <a href="XListFontsWithInfo.html">XListFontsWithInfo</a>
    */
-  public Data fonts_with_info (String pattern, 
+  public Data fonts_with_info (String pattern,
     int max_name_count) {
 
     // FIXME: Implement.
@@ -396,7 +391,7 @@ public class Display implements AutoCloseable {
     return path;
   }
 
-  
+
   /**
    * Information about an X extension.
    *
@@ -434,8 +429,8 @@ public class Display implements AutoCloseable {
       return first_error;
     }
   }
-  
-  
+
+
   // opcode 98 - query extension
   /**
    * Determines if the named extension is present. If so, the major opcode for the extension is returned,
@@ -550,20 +545,20 @@ public class Display implements AutoCloseable {
 
   // opcode 107 - set screen saver
   /**
-   * 
+   *
    * @param prefer_blanking valid:
    * {@link #NO},
    * {@link #YES},
    * {@link #DEFAULT}
-   * 
-   * @param allow_exposures valid: 
+   *
+   * @param allow_exposures valid:
    * {@link #NO},
    * {@link #YES},
    * {@link #DEFAULT}
-   * 
+   *
    * @see <a href="XSetScreenSaver.html">XSetScreenSaver</a>
    */
-  public void set_screen_saver (int timeout, int interval, 
+  public void set_screen_saver (int timeout, int interval,
                                 int prefer_blanking, int allow_exposures) {
 
     RequestOutputStream o = out;
@@ -605,15 +600,15 @@ public class Display implements AutoCloseable {
     public int interval () {
       return interval;
     }
-  
+
     public boolean prefer_blanking () {
       return prefer_blanking;
     }
-  
+
     public boolean allow_exposures () {
       return allow_exposures;
     }
-  
+
     public String toString () {
       return "#ScreenSaverReply"
         + "\n  timeout: " + timeout ()
@@ -624,8 +619,8 @@ public class Display implements AutoCloseable {
         + allow_exposures ();
     }
   }
-  
-  
+
+
   // opcode 108 - get screen saver
   /**
    * Returns the screensaver control values.
@@ -640,7 +635,7 @@ public class Display implements AutoCloseable {
     RequestOutputStream o = out;
     synchronized (o) {
       o.begin_request (108, 0, 1);
-      ResponseInputStream i = in;      
+      ResponseInputStream i = in;
       synchronized (i) {
         i.read_reply (o);
         i.skip (8);
@@ -661,12 +656,12 @@ public class Display implements AutoCloseable {
    * @param mode valid:
    * {@link #INSERT},
    * {@link #DELETE}
-   * 
+   *
    * @see <a href="XAddHost.html">XAddHost</a>
    * @see <a href="XRemoveHost.html">XRemoveHost</a>
    */
   public void change_hosts (int mode, int family, byte [] host) {
-    
+
     int n = host.length;
     int p = RequestOutputStream.pad (n);
 
@@ -734,8 +729,8 @@ public class Display implements AutoCloseable {
     }
 
   }
-  
-  
+
+
   // opcode 110 - list hosts
   /**
    * Returns the hosts currently on the access control list and whether use of
@@ -767,7 +762,7 @@ public class Display implements AutoCloseable {
    * @param mode valid:
    * {@link #ENABLE},
    * {@link #DISABLE}
-   * 
+   *
    * @see <a href="XSetAccessControl.html">XSetAccessControl</a>
    */
   public void set_access_control (int mode) {
@@ -778,7 +773,7 @@ public class Display implements AutoCloseable {
     }
   }
 
-  
+
   // opcode 113 - kill client
   /**
    * @see <a href="XKillClient.html">XKillClient</a>
@@ -804,7 +799,7 @@ public class Display implements AutoCloseable {
    * {@link #DESTROY},
    * {@link #RETAIN_PERMANENT},
    * {@link #RETAIN_TEMPORARY}
-   * 
+   *
    * @see <a href="XSetCloseDownMode.html">XSetCloseDownMode</a>
    */
   public void set_close_down_mode (int mode) {
@@ -814,7 +809,7 @@ public class Display implements AutoCloseable {
       o.send ();
     }
   }
-    
+
 
   public static final int ACTIVATE = 0;
   public static final int RESET = 1;
@@ -825,7 +820,7 @@ public class Display implements AutoCloseable {
    * @param mode valid:
    * {@link #ACTIVATE},
    * {@link #RESET}
-   * 
+   *
    * @see <a href="XForceScreenSaver.html">XForceScreenSaver</a>
    */
   public void force_screen_saver (int mode) {
@@ -839,11 +834,11 @@ public class Display implements AutoCloseable {
 
   public int allocate_id (Object object) {
     /* From XC-MISC extension specification:
-     * 
+     *
      * When an X client connects to an X server, it receives a fixed range
      * of resource IDs to use to identify the client's resources inside the
      * X server. Xlib hands these out sequentially as needed. When it
-     * overruns the end of the range, an IDChoice protocol error results. 
+     * overruns the end of the range, an IDChoice protocol error results.
      * Long running clients, or clients that use resource IDs at a rapid
      * rate, may encounter this circumstance. When it happens, there are
      * usually many resource IDs available, but Xlib doesn't know about
@@ -888,15 +883,15 @@ public class Display implements AutoCloseable {
       return id;
     }
 
-    
-    if (xcmisc == null) 
+
+    if (xcmisc == null)
       try {
         xcmisc = new XCMisc (this);
       } catch (NotFoundException e) {
         throw new RuntimeException ("Failed to allocate new resource id");
       }
 
-    
+
     if (xcmisc_resource_count == 0) {
       // first time, or used up
       gnu.x11.extension.XCMisc.XIDRange rr = xcmisc.xid_range ();
@@ -904,16 +899,16 @@ public class Display implements AutoCloseable {
       xcmisc_resource_count = rr.count;
     }
 
-    
+
     // give out in descending order
     xcmisc_resource_count--;
-    return xcmisc_resource_base+xcmisc_resource_count;   
+    return xcmisc_resource_base+xcmisc_resource_count;
   }
 
 
   /**
    * @see <a href="XCloseDisplay.html">XCloseDisplay</a>
-   */  
+   */
   public void close () {
     // FIXME: Implement more sensible shutdown.
     try {
@@ -996,7 +991,7 @@ public class Display implements AutoCloseable {
     i.skip (4); // motion-buffer-size.
 
     int vendor_length = i.read_int16 ();
-    extended_maximum_request_length 
+    extended_maximum_request_length
       = maximum_request_length = i.read_int16 ();
     int screen_count = i.read_int8 ();
     int pixmap_format_count = i.read_int8 ();
@@ -1021,7 +1016,7 @@ public class Display implements AutoCloseable {
 
     // screens
 
-    if (default_screen_no < 0 || default_screen_no >= screen_count)    
+    if (default_screen_no < 0 || default_screen_no >= screen_count)
       throw new RuntimeException ("Invalid screen number (screen-count "
         + screen_count + "): " + default_screen_no);
 
@@ -1037,7 +1032,7 @@ public class Display implements AutoCloseable {
    * Initializes the keyboard mapping.
    */
   private void init_keyboard_mapping () {
-  
+
     input = new Input (this, min_keycode, max_keycode);
     input.keyboard_mapping ();
   }
@@ -1102,7 +1097,7 @@ public class Display implements AutoCloseable {
     } catch (Error e) {
       /* When an X error occurs, Java throws an `gnu.x11.Error' exception,
        * the normal execution order is disrupted; the reply of
-       * `input_focus()' resides in network buffer while nobody wants it. 
+       * `input_focus()' resides in network buffer while nobody wants it.
        * In case someone (`gnu.app.x11.test.Shape') catches the error and
        * continues to work, we should discard the input focus reply (by
        * clearing the socket input stream).

@@ -14,6 +14,9 @@ import gnu.x11.GC;
 import gnu.x11.Window;
 import java.net.SocketException;
 
+import static gnu.x11.Display.*;
+import static gnu.x11.DisplayName.*;
+
 /**
  * A simplistic benchmark for raw rendering throughput.
  *
@@ -65,7 +68,7 @@ public class Speedy extends gnu.app.Application {
 //    } catch (SocketException ex) {
 //      ex.printStackTrace ();
 //    }
-    display = new Display ();
+    display = unixConnection(parse(":0"));
     Window.Attributes atts = new Window.Attributes ();
     window = new Window (display.default_root, 0, 0, 600, 400, 0, atts);
     window.map ();

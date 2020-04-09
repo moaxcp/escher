@@ -3,6 +3,9 @@ package gnu.app.x11;
 
 import gnu.x11.*;
 
+import static gnu.x11.Display.*;
+import static gnu.x11.DisplayName.*;
+
 /**
  * X application.
  *
@@ -43,9 +46,9 @@ public class Application extends gnu.app.Application {
     option = (Option) super.option;
     String env = gnu.util.Environment.value ("DISPLAY");
     DisplayName display_name = option.display_name ("display",
-      "X server to connect to", new DisplayName(env));
+      "X server to connect to", parse(env));
 
     if (help_option) return;
-    display = new Display (display_name);
+    display = unixConnection(display_name);
   }
 }
