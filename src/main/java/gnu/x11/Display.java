@@ -16,7 +16,7 @@ import java.util.Hashtable;
 
 
 /** X server connection. */
-public class Display {
+public class Display implements AutoCloseable {
   public static final int CURRENT_TIME = 0;
 
 
@@ -1150,7 +1150,7 @@ public class Display {
       /* When an X error occurs, Java throws an `gnu.x11.Error' exception,
        * the normal execution order is disrupted; the reply of
        * `input_focus()' resides in network buffer while nobody wants it. 
-       * In case someone (`gnu.x11.test.Shape') catches the error and
+       * In case someone (`gnu.app.x11.test.Shape') catches the error and
        * continues to work, we should discard the input focus reply (by
        * clearing the socket input stream).
        *

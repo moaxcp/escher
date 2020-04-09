@@ -10,6 +10,15 @@ plugins {
 sourceCompatibility = 8
 targetCompatibility = 8
 
+sourceSets {
+    demo {
+        java {
+            compileClasspath += main.output
+            runtimeClasspath += main.output
+        }
+    }
+}
+
 testSets {
     integrationTest
 }

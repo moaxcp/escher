@@ -48,7 +48,7 @@
 * 0.2.1    (Feb 11, 2001)
 *** X Print Service Extension
 - X Print Service Extension
-  try: java gnu.x11.test.PrintHello
+  try: java gnu.app.x11.test.PrintHello
   http://escher.sourceforge.net/current/etc/screenshot/gnu/x11/test/PrintHello.ps
 - collect and link all implemented specifications
   http://escher.sourceforge.net/etc/specification/
@@ -67,7 +67,7 @@
 - start porting GLX (extension for OpenGL(tm))
   try: java gnu.x11.extension.glx.test.Hello
 - start porting RENDER (X Rendering Extension)
-  try: java gnu.x11.test.Blend
+  try: java gnu.app.x11.test.Blend
   http://escher.sourceforge.net/current/etc/screenshot/x11-test-blend.gif
   try: java gnu.app.displayhack.Sprites
   http://escher.sourceforge.net/current/etc/screenshot/app-displayhack-sprites.gif
@@ -84,7 +84,7 @@
   http://escher.sourceforge.net/current/etc/screenshot/displayhack-munch.gif
 - gnu.x11.extension.DBE double buffer extension
   http://escher.sourceforge.net/current/gnu/x11/test/TestDBE.java
-- gnu.x11.test.TestGraphics
+- gnu.app.x11.test.TestGraphics
 - various bug fixes and updates
 
 

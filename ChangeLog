@@ -51,7 +51,7 @@
    - renamed and re-organized filenames in ps.gz format
 ** gnu.x11.extension.Print
    - X Print Service Extension
-   - test: gnu.x11.test.PrintHello
+   - test: gnu.app.x11.test.PrintHello
    - use 'cat > /tmp/lp-output' as /usr/bin/lp to capture printer
      output as Postscript file 
 ** NEWS vs. CHANGES
@@ -78,7 +78,7 @@
    - many useful formats and methods for vector/matrix operations
 ** remove width and height fields
    - use window.width and window.height instead
-   - gnu.x11.test.Graphics
+   - gnu.app.x11.test.Graphics
    - gnu.app.displayhack.DisplayHack
 ** faster padding calculation in gnu.x11.Data
    - instead of lookup data, use AND logic operation
@@ -91,11 +91,11 @@
 * 0.1.6
 ** gnu.extension.render
    - start porting X Rendering Extension by Keith Packard
-   - gnu.x11.test.Blend, test blending in RENDER
+   - gnu.app.x11.test.Blend, test blending in RENDER
    - gnu.app.displayhack.Sprites, moving sprites to blend colors
 ** gnu.x11.Offset
    - support offset writing; allow writing on
-     gnu.x11.extension.Picture.Format, as in gnu.x11.test.Blend
+     gnu.x11.extension.Picture.Format, as in gnu.app.x11.test.Blend
 ** gnu.app.Sniff
    - a network middle-layer sniffer
    - use to debug protocol when developing this library
@@ -116,8 +116,8 @@
    - gnu.util.Classpath
    - gnu.util.Misc
    - gnu.util.ReloadableClassLoader
-** remove big requests test in gnu.x11.test.Internal
-   - as long as gnu.x11.test.Image and gnu.x11.test.ZPixmap work, big
+** remove big requests test in gnu.app.x11.test.Internal
+   - as long as gnu.app.x11.test.Image and gnu.app.x11.test.ZPixmap work, big
      requests works (since both tests use gnu.x11.Drawable#put_image)
 ** gnu.app.Zion
    - Echidna-like multiprocess system in Java, to allow multiple JVM
@@ -126,19 +126,19 @@
 ** new gnu.x11.Error
    - catch connection, core, and extension errors
    - `check_error' needs this to catch all x errors and then clear
-     sockets, as tested in gnu.x11.test.DBE
+     sockets, as tested in gnu.app.x11.test.DBE
 ** thread and socket connection
-   - both gnu.app.displayhack.DisplayHack and gnu.x11.test.Sync
+   - both gnu.app.displayhack.DisplayHack and gnu.app.x11.test.Sync
    - in dispatch_event(), do not call System#exit(int) when BUTTON3; instead call
      DisplayHack#kill(); otherwise, another thread will attempt to
      write to a socket that is already closed
-   - in run(), call properly gnu.x11.Application#close() such that
+   - in run(), call properly gnu.app.x11.Application#close() such that
      the socket is closed when exiting; do it in run() instead of
      exec() because run() always outlasts (user control vs. graphics
      drawing)
 ** gnu.x11.Display: >=24 depth
    - throw "unsupported" exception when available depths < 24; need >=
-     24 to draw in gnu.x11.test.{Image, ZPixmap}; also, select
+     24 to draw in gnu.app.x11.test.{Image, ZPixmap}; also, select
      best_pixmap_format = 24 (the only image format we can handle now)
 ** gnu.x11.extension.EVI
    - fixed "bug" in EVI#version()
@@ -166,7 +166,7 @@
    - gnu.x11.WindowChanges --> gnu.x11.WindowChanges
    - gnu.x11.Window.WindowAttributesReply
       --> gnu.x11.Window.AttributesReply
-   - gnu.x11.XApp --> gnu.x11.Application
+   - gnu.x11.XApp --> gnu.app.x11.Application
    - gnu.x11.XError --> gnu.x11.CoreError
    - gnu.x11.displayhack.* --> gnu.app.displayhack.*
    - gnu.x11.displayhack.eraser.CircleWipe
@@ -189,11 +189,11 @@
    - gnu.x11.request.PolyRectangleRequest --> gnu.x11.Request.Poly.Rectangle
    - gnu.x11.request.PolySegmentRequest --> gnu.x11.Request.Poly.Segment
    - gnu.x11.request.ValueListRequest --> gnu.x11.Request.ValueList
-   - gnu.x11.test.HelloX --> gnu.x11.test.Hello2
-   - gnu.x11.test.Poly --> gnu.x11.test.Polygon
-   - gnu.x11.test.TestGraphics --> gnu.x11.test.Graphics
-   - gnu.x11.test.TestThread --> gnu.x11.test.Sync
-   - gnu.x11.test.Test* --> gnu.x11.test.*
+   - gnu.app.x11.test.HelloX --> gnu.app.x11.test.Hello2
+   - gnu.app.x11.test.Poly --> gnu.app.x11.test.Polygon
+   - gnu.app.x11.test.TestGraphics --> gnu.app.x11.test.Graphics
+   - gnu.app.x11.test.TestThread --> gnu.app.x11.test.Sync
+   - gnu.app.x11.test.Test* --> gnu.app.x11.test.*
 ** predefined font gnu.x11.Cursor
    - import cursor fonts in /usr/include/X11/cursorfont.h
 ** gnu.app.puppet.Puppet
@@ -206,7 +206,7 @@
    - import all keysyms from /usr/include/X11/*keysym*.h to
      gnu.x11.keysym.*
    - removed keysyms in gnu.x11.Input
-   - print keysym table in gnu.x11.test.TestInfo
+   - print keysym table in gnu.app.x11.test.TestInfo
    - "correctly" assume Input.keysyms_per_keycode = 2
    - do not assume uppercase or lowercase keysyms returned from server
      (solaris vs. xfree86) in Input.keycode_to_keysym
@@ -220,15 +220,15 @@
      occurs 
 ** clear input stream in check_error of gnu.x11.Connection
    - input focus reply resides in network buffer while nobody wants
-     it; clear socket input stream so that gnu.x11.test.TestShape
+     it; clear socket input stream so that gnu.app.x11.test.TestShape
      works
 ** extension error factory
    - test double buffer extension "buffer error"
 
 
 * 0.1.5
-** gnu.x11.test.TestGraphics
-   - abstraction for most gnu.x11.test.*; trade clarity for
+** gnu.app.x11.test.TestGraphics
+   - abstraction for most gnu.app.x11.test.*; trade clarity for
      compactness; TestHello remains as verbose (do not use
      TestGraphics) for full illustration
 ** set socket timeout in gnu.x11.MessageFactory

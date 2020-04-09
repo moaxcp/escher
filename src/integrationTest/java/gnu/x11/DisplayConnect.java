@@ -4,6 +4,7 @@ import com.github.moaxcp.xephyr.*;
 import gnu.app.displayhack.*;
 import gnu.app.puppet.*;
 import gnu.x11.extension.*;
+import gnu.app.x11.test.*;
 import org.junit.jupiter.api.*;
 
 import java.io.*;
@@ -38,5 +39,15 @@ public class DisplayConnect {
   @Test
   void puppet() throws NotFoundException {
     new Puppet(new String[]{"--display", ":1"});
+  }
+
+  @Test
+  void hello() {
+    new Hello(new String[]{"--display", ":1"});
+  }
+
+  @Test
+  void hello2() {
+    new gnu.app.redbook.Hello(new String[]{"--display", ":1"});
   }
 }
