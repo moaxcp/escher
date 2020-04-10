@@ -5,6 +5,9 @@ import org.junit.jupiter.api.*;
 
 import java.io.*;
 
+import static gnu.x11.Display.*;
+import static gnu.x11.DisplayName.*;
+
 public class DisplayConnect {
 
   private XephyrRunner runner;
@@ -29,6 +32,6 @@ public class DisplayConnect {
   void connect() {
     //todo this should throw an exception when it doesn't work
     //todo need to be able to connect using Unix Socket as well as http
-    new Display(null, 1, 0);
+    unixConnection(parse(":1"));
   }
 }

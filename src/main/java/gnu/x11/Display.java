@@ -19,6 +19,9 @@ import java.util.Hashtable;
 public class Display implements AutoCloseable {
   public static final int CURRENT_TIME = 0;
 
+  private final String hostName;
+  private final int displayNumber;
+  private Socket socket;
 
   /**
    * The output stream.
@@ -30,27 +33,7 @@ public class Display implements AutoCloseable {
    */
   public ResponseInputStream in;
 
-  /**
-   * The socket.
-   */
-  private Socket socket;
-
-  /**
-   * The hostname to this display.
-   */
-  public String hostname;
-
-  /**
-   * The display number.
-   */
-  public int display_no;
-
   public Input input;
-
-  /**
-   * Indicates if this display is connected or not.
-   */
-  public boolean connected;
 
 
   // server information
@@ -74,7 +57,7 @@ public class Display implements AutoCloseable {
   public Pixmap.Format default_pixmap_format;
   public Window default_root;
   public Screen default_screen;
-  public int default_screen_no;
+  public final int default_screen_no;
 
   int min_keycode;
   int max_keycode;
@@ -151,40 +134,18 @@ public class Display implements AutoCloseable {
    * You need to provide an implementation for this kind of socket though.
    *
    * @param socket the socket to use for that connection
-   * @param hostname the hostname to connect to
-   * @param display_no the display number
+   * @param hostName the hostname to connect to
+   * @param displayNumber the display number
    * @param screen_no the screen number
    */
-  private Display (Socket socket, String hostname, int display_no,
-                  int screen_no) {
+  private Display (Socket socket, String hostName, int displayNumber,
+                   int screen_no) {
     default_screen_no = screen_no;
-    this.hostname = hostname;
-    this.display_no = display_no;
+    this.hostName = hostName;
+    this.displayNumber = displayNumber;
     this.socket = socket;
     init_streams ();
     init();
-  }
-
-  /**
-   * @see <a href="XOpenDisplay.html">XOpenDisplay</a>
-   */
-  public Display (String hostname, int display_no, int screen_no) {
-    default_screen_no = screen_no;
-    this.display_no = display_no;
-    this.hostname = hostname;
-    try {
-      socket = new Socket (hostname, 6000 + display_no);
-      init_streams ();
-      init ();
-    } catch (IOException ex) {
-      try {
-        socket = AFUNIXSocket.connectTo(new AFUNIXSocketAddress(new File("/tmp/.X11-unix/X" + display_no)));
-        init_streams ();
-        init ();
-      } catch (IOException e) {
-        handle_exception (e);
-      }
-    }
   }
 
   private void init() {
@@ -221,7 +182,6 @@ public class Display implements AutoCloseable {
       synchronized (i) {
         // Don't do read_reply() here, this is not needed and doesn't work
         // during connection setup.
-        connected = true;
         init_server_info (i);
       }
     }
@@ -907,17 +867,22 @@ public class Display implements AutoCloseable {
 
 
   /**
-   * @see <a href="XCloseDisplay.html">XCloseDisplay</a>
+   * @see <a href="XCloseDisplay.html">XCloseDisplay</a> //todo but does this release the X server?
    */
+  @Override
   public void close () {
-    // FIXME: Implement more sensible shutdown.
     try {
-      in.close ();
-      out.close ();
-      socket.close ();
-      connected = false;
-    } catch (IOException ex) {
-      handle_exception (ex);
+      try {
+        in.close();
+      } finally {
+        try {
+          out.close();
+        } finally {
+          socket.close();
+        }
+      }
+    }catch(IOException e) {
+      throw new X11ClientException("failed to close", e);
     }
   }
 
@@ -1059,16 +1024,21 @@ public class Display implements AutoCloseable {
 
     XAuthority[] auths = XAuthority.get_authorities();
 
+    String realHostName;
+
     // Fetch hostname.
-    if (hostname == null || hostname.equals("")
-        ||hostname.equals ("localhost")) {
+    if (hostName == null || hostName.equals("")
+        || hostName.equals ("localhost")) {
       // Translate localhost hostnames to the real hostname of this host.
       try {
         InetAddress local = InetAddress.getLocalHost ();
-        hostname = local.getHostName ();
+        realHostName = local.getHostName ();
       } catch (UnknownHostException ex) {
         ex.printStackTrace();
+        realHostName = ""; //hack to what it would have been originally
       }
+    } else {
+      realHostName = hostName;
     }
 
     // Find the XAuthority that matches the hostname and display no.
@@ -1076,9 +1046,9 @@ public class Display implements AutoCloseable {
     for (int i = 0; i < auths.length; i++) {
       XAuthority auth = auths[i];
       try {
-        if (auth.hostname != null && auth.display == display_no
+        if (auth.hostname != null && auth.display == displayNumber
             && InetAddress.getByName(auth.hostname)
-                 .equals(InetAddress.getByName(hostname))) {
+                 .equals(InetAddress.getByName(realHostName))) {
           found = auth;
           break;
         }
@@ -1094,7 +1064,7 @@ public class Display implements AutoCloseable {
     try {
       input.input_focus ();
 
-    } catch (Error e) {
+    } catch (X11ServiceException e) {
       /* When an X error occurs, Java throws an `gnu.x11.Error' exception,
        * the normal execution order is disrupted; the reply of
        * `input_focus()' resides in network buffer while nobody wants it.

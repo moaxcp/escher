@@ -2,7 +2,7 @@ package gnu.x11.extension;
 
 import gnu.x11.Data;
 import gnu.x11.Display;
-import gnu.x11.Error;
+import gnu.x11.X11ServiceException;
 import gnu.x11.RequestOutputStream;
 import gnu.x11.ResponseInputStream;
 import gnu.x11.Window;
@@ -696,11 +696,11 @@ public class Print extends gnu.x11.extension.Extension
   };
 
 
-  public Error build (Display display, int code, int seq_no, int bad,
-                      int minor_opcode, int major_opcode) {
+  public X11ServiceException build (Display display, int code, int seq_no, int bad,
+                                    int minor_opcode, int major_opcode) {
 
     String error_string = ERROR_STRINGS [code - first_error];
-    return new Error (display, error_string, code, seq_no, bad, 
+    return new X11ServiceException(display, error_string, code, seq_no, bad,
       minor_opcode, major_opcode);
   }
 

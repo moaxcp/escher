@@ -84,7 +84,7 @@ public class ResponseInputStream extends FilterInputStream {
     try {
       while (s < n)
         s += super.skip (n - s);
-    } catch (Exception ex) {
+    } catch (IOException ex) {
       handle_exception (ex);
     }
     return s;
@@ -237,8 +237,8 @@ public class ResponseInputStream extends FilterInputStream {
     read_data (buf, offset, len);
   }
 
-  private void handle_exception (Throwable ex) {
-    ex.printStackTrace();
+  private void handle_exception (IOException ex) {
+    throw new X11ClientException(ex);
   }
 
   public Event read_event () {
@@ -311,7 +311,7 @@ public class ResponseInputStream extends FilterInputStream {
       code = read_int8 ();
       in.reset ();
     } catch (IOException ex) {
-      ex.printStackTrace();
+      handle_exception (ex);
     }
     //System.err.println("reading code: " + code + " masked: " + (code & 0x7f));
     code = code & 0x7f; // Remove synthetic mask.
@@ -522,16 +522,16 @@ public class ResponseInputStream extends FilterInputStream {
       throw build_extension_error (display, code, seq_no, bad_value,
                                    minor_opcode, major_opcode);
 
-    gnu.x11.Error err = new gnu.x11.Error (display,
-                                           gnu.x11.Error.ERROR_STRINGS [code],
+    X11ServiceException err = new X11ServiceException(display,
+                                           X11ServiceException.ERROR_STRINGS [code],
                                            code, seq_no, bad_value,
                                            minor_opcode, major_opcode);
     throw err;
   }
 
-  private Error build_extension_error (Display display, int code, int seq_no,
-                                       int bad, int minor_opcode,
-                                       int major_opcode) {
+  private X11ServiceException build_extension_error (Display display, int code, int seq_no,
+                                                     int bad, int minor_opcode,
+                                                     int major_opcode) {
 
     gnu.x11.extension.ErrorFactory factory = display
     .extension_error_factories [code-128];

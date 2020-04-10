@@ -485,8 +485,8 @@ public class RequestOutputStream extends FilterOutputStream {
    *
    * @param ex the exception to handle
    */
-  private void handle_exception (Throwable ex) {
-    ex.printStackTrace();
+  private void handle_exception (IOException ex) {
+    throw new X11ClientException(ex);
   }
 
   public void increase_length (int i) {

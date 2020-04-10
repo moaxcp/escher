@@ -4,7 +4,7 @@ import gnu.app.x11.*;
 import gnu.x11.*;
 import gnu.x11.event.*;
 import gnu.x11.Input;           // shadow gnu.x11.event.Input
-import gnu.x11.Error;           // shadow java.lang.Error
+import gnu.x11.X11ServiceException;           // shadow java.lang.Error
 import gnu.x11.extension.XTest;
 import gnu.x11.extension.NotFoundException;
 import gnu.x11.keysym.Misc;
@@ -438,8 +438,8 @@ public class Puppet extends Application {
 
       display.check_error ();
       
-    } catch (Error e) {
-      if (e.code == Error.BAD_ACCESS && e.bad == root.id)
+    } catch (X11ServiceException e) {
+      if (e.code == X11ServiceException.BAD_ACCESS && e.bad == root.id)
 	throw new RuntimeException (
           "Failed to access root window\nAnother WM is running?");
       else
