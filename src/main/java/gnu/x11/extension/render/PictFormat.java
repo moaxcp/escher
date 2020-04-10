@@ -288,13 +288,12 @@ public class PictFormat {
   private Colormap colormap;
 
   /**
-   * Creates a PictFormat with a predefined ID. This is only used for the
-   * {@link #NONE} PictFormat constant.
+   * Creates a PictFormat with a predefined ID.
    *
    * @param id the predefined id
    */
   private PictFormat (int id) {
-    id = 0;
+    this.id = id;
   }
 
   /**
