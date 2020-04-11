@@ -33,7 +33,7 @@ public class Circle extends Eraser {
 
 
     for (int i=0; i<step_count; i++) {
-      window.fill_arc (hack.display.default_gc, 
+      window.fillArc(hack.display.getDefaultGC(),
         window.width/2 - radius, window.height/2 - radius,
         2*radius, 2*radius, (start+i*delta) % full, delta);
 

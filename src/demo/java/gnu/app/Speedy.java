@@ -9,9 +9,8 @@
 
 package gnu.app;
 
-import gnu.x11.Display;
-import gnu.x11.GC;
-import gnu.x11.Window;
+import gnu.x11.*;
+
 import java.net.SocketException;
 
 import static gnu.x11.Display.*;
@@ -69,8 +68,8 @@ public class Speedy extends gnu.app.Application {
 //      ex.printStackTrace ();
 //    }
     display = unixConnection(parse(":0"));
-    Window.Attributes atts = new Window.Attributes ();
-    window = new Window (display.default_root, 0, 0, 600, 400, 0, atts);
+    WindowAttributes atts = new WindowAttributes();
+    window = new Window (display.getDefaultRoot(), 0, 0, 600, 400, 0, atts);
     window.map ();
 
     drawLines (iterations, false);
@@ -92,7 +91,7 @@ public class Speedy extends gnu.app.Application {
       int y = (int) (Math.random () * 400);
       int w = (int) (Math.random () * 640);
       int h = (int) (Math.random () * 400);
-      gc.set_foreground ((int) (Math.random () * 0x1000000));
+      gc.setForeground((int) (Math.random () * 0x1000000));
       window.line (gc, x, y, w, h);
     }
     sync ();
@@ -113,7 +112,7 @@ public class Speedy extends gnu.app.Application {
       int y = (int) (Math.random () * 400);
       int w = (int) (Math.random () * (640 - x));
       int h = (int) (Math.random () * (400 - y));
-      gc.set_foreground ((int) (Math.random () * 0x1000000));
+      gc.setForeground ((int) (Math.random () * 0x1000000));
       window.rectangle (gc, x, y, w, h, false);
     }
     sync ();
@@ -134,7 +133,7 @@ public class Speedy extends gnu.app.Application {
       int y = (int) (Math.random () * 400);
       int w = (int) (Math.random () * (640 - x));
       int h = (int) (Math.random () * (400 - x));
-      gc.set_foreground ((int) (Math.random () * 0x1000000));
+      gc.setForeground ((int) (Math.random () * 0x1000000));
       window.rectangle (gc, x, y, w, h, true);
     }
     sync ();

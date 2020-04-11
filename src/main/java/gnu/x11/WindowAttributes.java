@@ -156,7 +156,7 @@ public class WindowAttributes extends ValueList {
      * @param i
      *                default: {}
      */
-    public void setEventMask(int i) {
+    public void setEventMask(int i) { //todo should use Event.EventMask
 
         set(11, i);
     }

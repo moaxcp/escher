@@ -40,6 +40,10 @@ public class Input {
       public int getCode() {
           return code;
       }
+
+      public boolean is(int code) {
+        return this.code == code;
+      }
       
       public int logicOr(KeyMask km) {
           return this.getCode() | km.getCode();
@@ -132,6 +136,14 @@ public class Input {
     this.display = display;
     this.minKeycode = min_keycode;
     this.maxKeycode = max_keycode;
+  }
+
+  public int getMinKeycode() {
+    return minKeycode;
+  }
+
+  public int getMaxKeycode() {
+    return maxKeycode;
   }
 
 

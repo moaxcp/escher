@@ -4,6 +4,8 @@ import gnu.app.x11.glx.*;
 import gnu.x11.extension.glx.GL;
 import gnu.x11.Input;
 
+import static java.lang.Thread.*;
+
 
 /**
  * Animate a spinning rectangle. To demonstrate double buffering and
@@ -49,8 +51,8 @@ public class DoubleBuffer extends Application implements Runnable {
 
   protected void handle_button (int button, int state, int x, int y) {
     switch (button) {
-    case Input.BUTTON1: spinning = true; break;
-    case Input.BUTTON2: spinning = false; break;
+    case Input.KeyMask.BUTTON1.getCode(): spinning = true; break;
+    case Input.KeyMask.BUTTON2.getCode(): spinning = false; break;
     }
   }
 
@@ -86,8 +88,12 @@ public class DoubleBuffer extends Application implements Runnable {
 
 
   public void run () {
-    while (!exit_now) {     
-      gnu.util.Misc.sleep (10);
+    while (!exit_now) {
+      try {
+        Thread.sleep (10);
+      } catch (InterruptedException e) {
+        Thread.currentThread().interrupt();
+      }
 
       // `exit_now' may have become true during sleep
       if (!spinning || exit_now) continue;

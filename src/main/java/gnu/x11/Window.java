@@ -3,6 +3,7 @@ package gnu.x11;
 
 import gnu.x11.event.Event;
 import gnu.x11.extension.glx.GLXDrawable;
+import lombok.*;
 
 /** X window. */
 public class Window extends Drawable implements GLXDrawable {
@@ -531,6 +532,7 @@ public class Window extends Drawable implements GLXDrawable {
 
     
     /** Reply of {@link #pointer()}. */
+    @Getter
     public class PointerInfo {
 
         private boolean sameScreen;
@@ -623,9 +625,9 @@ public class Window extends Drawable implements GLXDrawable {
     /** X window manager class hint. */
     public static class WMClassHint {
 
-        public String res;
+        private String res;
 
-        public int middle;
+        private int middle;
 
         public WMClassHint(Data data) {
 

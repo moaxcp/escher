@@ -28,7 +28,7 @@ public class SlideLines extends Eraser {
 
   public void erase (DisplayHack hack) {
     // no useless notify events
-    hack.eraser_gc.set_graphics_exposures (false);
+    hack.eraser_gc.setGraphicsExposures(false);
 
     if (hack.random.nextBoolean ())
       horizontal_erase (hack);
@@ -63,9 +63,9 @@ public class SlideLines extends Eraser {
           clear_x = window.width - x - dx;
         }
           
-        window.copy_area (window, hack.eraser_gc, from_x, y, 
+        window.copyArea(window, hack.eraser_gc, from_x, y,
           window.width-x-dx, dy, to_x, y);
-        window.clear_area (clear_x, y, dx, dy, false);
+        window.clearArea(clear_x, y, dx, dy, false);
       }
 
       if (sleep (hack)) return;
@@ -97,9 +97,9 @@ public class SlideLines extends Eraser {
           clear_y = window.height - y - dy;
         }
           
-        window.copy_area (window, hack.eraser_gc, x, from_y,
+        window.copyArea(window, hack.eraser_gc, x, from_y,
           dx, window.height-y-dy, x, to_y);
-        window.clear_area (x, clear_y, dx, dy, false);
+        window.clearArea(x, clear_y, dx, dy, false);
       }
 
       if (sleep (hack)) return;

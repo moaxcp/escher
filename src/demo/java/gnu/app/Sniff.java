@@ -57,7 +57,7 @@ public class Sniff extends Application {
         System.out.println ("< " + Data.byte_to_string (data));
       }
 
-      if (!something) gnu.util.Misc.sleep (100);
+      if (!something) Thread.sleep(100);
     }
   }
 

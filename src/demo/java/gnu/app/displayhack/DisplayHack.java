@@ -1,19 +1,14 @@
 package gnu.app.displayhack;
 
 import gnu.app.x11.*;
-import gnu.x11.Color;
-import gnu.x11.GC;
-import gnu.x11.Input;
-import gnu.x11.Rectangle;
-import gnu.x11.Window;
+import gnu.x11.*;
 import gnu.app.displayhack.eraser.Eraser;
-import gnu.x11.event.ButtonPress;
-import gnu.x11.event.ClientMessage;
-import gnu.x11.event.ConfigureNotify;
-import gnu.x11.event.Event;
-import gnu.x11.event.Expose;
-import gnu.x11.event.KeyPress;
+import gnu.x11.Input;
+import gnu.x11.event.*;
+
 import java.util.Random;
+
+import static gnu.x11.Input.KeyMask.*;
 
 
 /**
@@ -87,23 +82,22 @@ public abstract class DisplayHack extends Application
 
     if (rainbow_color)
       for (int i=0; i<color_count; i++)   
-        colors [i] = display.default_colormap.
-          alloc_random_rainbow_color (random);
+        colors [i] = display.getDefaultColormap().allocRandomRainbowColor(random);
 
     else
       for (int i=0; i<color_count; i++)   
-        colors [i] = display.default_colormap. alloc_random_color (random);
+        colors [i] = display.getDefaultColormap().allocRandomColor(random);
 
 
-    Window.Attributes win_attr = new Window.Attributes ();
-    win_attr.set_background (display.default_black);
-    win_attr.set_event_mask (Event.BUTTON_PRESS_MASK
-      | Event.STRUCTURE_NOTIFY_MASK 
-      | Event.EXPOSURE_MASK | Event.KEY_PRESS_MASK);
-    window = new Window (display.default_root, geometry, 0, win_attr);
+    WindowAttributes win_attr = new WindowAttributes ();
+    win_attr.setBackground(display.getDefaultBlack());
+    win_attr.setEventMask(Event.EventMask.BUTTON_PRESS_MASK.getMask()
+      | Event.EventMask.STRUCTURE_NOTIFY_MASK .getMask()
+      | Event.EventMask.EXPOSURE_MASK.getMask() | Event.EventMask.KEY_PRESS_MASK.getMask());
+    window = new Window (display.getDefaultRoot(), geometry, 0, win_attr);
 
-    window.set_wm (this, "main");
-    window.set_wm_delete_window ();
+    window.setWM(this, "main");
+    window.setWMDeleteWindow();
   }
 
 
@@ -125,20 +119,20 @@ public abstract class DisplayHack extends Application
 
 
   public void dispatch_event () {
-    Event event = display.next_event ();
+    Event event = display.nextEvent();
 
     switch (event.code ()) {
-    case ButtonPress.CODE: {
-      int button = ((ButtonPress) event).detail ();
-      if (button == Input.BUTTON1) restart ();
-      else if (button == Input.BUTTON3) exit ();
+      case BUTTON_PRESS: {
+      int button = ((ButtonPress) event).detail();
+      if (BUTTON1.is(button)) restart ();
+      else if (BUTTON3.is(button)) exit ();
       break;
 
-    } case ConfigureNotify.CODE:
-      window.set_geometry_cache (((ConfigureNotify) event).rectangle ());
+    } case CONFIGURE_NOTIFY:
+      window.setGeometryCache(((ConfigureNotify) event).rectangle ());
       break;
 
-    case Expose.CODE:
+    case EXPOSE:
       if (thread.isAlive ()) restart ();
       else {
         if (clear) window.clear (false); // before thread starts
@@ -146,20 +140,20 @@ public abstract class DisplayHack extends Application
       }
       break;
 	
-    case KeyPress.CODE: {
+    case KEY_PRESS: {
       KeyPress e = (KeyPress) event;
 	
       int keycode = e.detail ();
       int keystate = e.state ();
-      int keysym = display.input.keycode_to_keysym (keycode, keystate);
+      int keysym = display.getInput().keycodeToKeysym(keycode, keystate);
 
       if (keysym == ' ') restart ();
       else if (keysym == 'q' || keysym == 'Q' 
         || keysym == gnu.x11.keysym.Misc.ESCAPE) exit ();
       break;
 
-    } case ClientMessage.CODE:
-      if (((ClientMessage) event).delete_window ()) exit ();
+    } case CLIENT_MESSAGE:
+      if (((ClientMessage) event).deleteWindow()) exit ();
       break;
     }
   }
@@ -225,7 +219,7 @@ public abstract class DisplayHack extends Application
     while (!exit_now) {
       stop_now = false;
       paint ();
-      sleep (delay);
+        sleep (delay);
 
       // erase despite `stop_now'
       if (erase && !exit_now) erase ();
@@ -237,7 +231,13 @@ public abstract class DisplayHack extends Application
 
   public boolean sleep (long millis) {
     if (millis != 0) display.flush ();
-    if (!stop_now) gnu.util.Misc.sleep (millis);
+    if (!stop_now) {
+      try {
+        thread.sleep(millis);
+      } catch (InterruptedException e) {
+        Thread.currentThread().interrupt();
+      }
+    }
     return stop_now;
   }
 }

@@ -50,7 +50,7 @@ public class Sprites extends DisplayHack {
       this.width = width;
       this.height = height;
 
-      pixmap = new Pixmap (display.default_root, width, height, 
+      pixmap = new Pixmap (display.getDefaultRoot(), width, height,
         pf.depth ());
       picture = render.create_picture (pixmap, pf,
         DrawablePicture.Attributes.EMPTY); 
@@ -58,15 +58,15 @@ public class Sprites extends DisplayHack {
       if (sprite_gc == null)
         sprite_gc = new GC (pixmap);      
     
-      sprite_gc.set_foreground (0);
+      sprite_gc.setForeground(0);
       pixmap.rectangle (sprite_gc, 0, 0, width, height, true);
-      sprite_gc.set_foreground (color);
-      pixmap.fill_arc (sprite_gc, 0, 0, width, height, 0, 360 * 64);
+      sprite_gc.setForeground(color);
+      pixmap.fillArc(sprite_gc, 0, 0, width, height, 0, 360 * 64);
 
 
       for (int i=0; i<8; i++) {
-        sprite_gc.set_foreground (divide_color (color, 1<<(7-i)));
-        pixmap.fill_arc (sprite_gc, i, i, width-2*i, height-2*i, 0, 360 * 64);
+        sprite_gc.setForeground(divide_color (color, 1<<(7-i)));
+        pixmap.fillArc(sprite_gc, i, i, width-2*i, height-2*i, 0, 360 * 64);
       }
     }
 
@@ -117,9 +117,9 @@ public class Sprites extends DisplayHack {
     pf0.set_type(Type.DIRECT);
     PictFormat pf1;
  
-    int depth = display.default_screen.root_depth ();
+    int depth = display.getDefaultScreen().rootDepth();
     back_buffer_gc = new GC (window);
-    back_buffer_gc.set_foreground (display.default_white);
+    back_buffer_gc.setForeground(display.getDefaultWhite());
     back_buffer = new Pixmap (window, depth);
     back_buffer.fill_rectangle (back_buffer_gc, 0, 0, back_buffer.width,
                                 back_buffer.height);
@@ -164,7 +164,7 @@ public class Sprites extends DisplayHack {
   public void paint () {
     for (int i=0; i<COUNT; i++) sprites [i].clear ();
     for (int i=0; i<COUNT; i++) sprites [i].move ();
-    window.copy_area (back_buffer, back_buffer_gc, 0, 0, back_buffer.width,
+    window.copyArea(back_buffer, back_buffer_gc, 0, 0, back_buffer.width,
                       back_buffer.height, 0, 0);
   }
 

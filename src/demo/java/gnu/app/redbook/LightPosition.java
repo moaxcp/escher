@@ -1,6 +1,7 @@
 package gnu.app.redbook;
 
 import gnu.app.x11.glx.*;
+import gnu.x11.*;
 import gnu.x11.extension.glx.GL;
 
 
@@ -45,7 +46,7 @@ public class LightPosition extends Application {
 
 
   protected void handle_button (int button, int state, int x, int y) {
-    if (button == gnu.x11.Input.BUTTON1) {
+    if (button == Input.KeyMask.BUTTON1.getCode()) {
       rotate_angle = (rotate_angle + 30) % 360;
       mark_window_dirty ();
     }

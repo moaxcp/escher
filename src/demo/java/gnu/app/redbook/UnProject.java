@@ -31,8 +31,8 @@ public class UnProject extends Application {
 
 
   protected void handle_button (int button, int state, int x, int y) {
-    if (button == Input.BUTTON2) exit ();
-    if (button != Input.BUTTON1) return;
+    if (button == Input.KeyMask.BUTTON2.getCode()) exit ();
+    if (button != Input.KeyMask.BUTTON1.getCode()) return;
 
     int [] viewport = gl.integerv (GL.VIEWPORT);
     double [] modelview = gl.doublev (GL.MODELVIEW_MATRIX);

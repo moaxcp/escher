@@ -7,11 +7,9 @@ import gnu.x11.extension.EventFactory;
 import gnu.x11.extension.BigRequests;
 import gnu.x11.extension.NotFoundException;
 import gnu.x11.extension.XCMisc;
+import org.newsclub.net.unix.*;
 
-import java.io.BufferedInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
+import java.io.*;
 import java.net.InetAddress;
 import java.net.Socket;
 import java.net.UnknownHostException;
@@ -208,7 +206,24 @@ public class Display {
      */
     public ErrorFactory[] extensionErrorFactories = new ErrorFactory[128];
 
-    // <-- Constructors -->
+
+    public static Display netConnection(DisplayName name) {
+        try {
+            Socket socket = new Socket(name.getHostName(), 6000 + name.getDisplayNumber());
+            return new Display(socket, name.getHostName(), name.getDisplayNumber(), name.getScreenNumber());
+        } catch (IOException e) {
+            throw new X11ClientException(String.format("failed to create socket for %s", name), e);
+        }
+    }
+
+    public static Display unixConnection(DisplayName name) {
+        try {
+            Socket socket = AFUNIXSocket.connectTo(new AFUNIXSocketAddress(new File("/tmp/.X11-unix/X" + name.getDisplayNumber())));
+            return new Display(socket, name.getHostName(), name.getDisplayNumber(), name.getScreenNumber());
+        } catch(IOException e) {
+            throw new X11ClientException(String.format("failed to create socket for %s", name), e);
+        }
+    }
     
     /**
      * Sets up a display using a connection over the specified <code>socket</code>.
@@ -226,34 +241,13 @@ public class Display {
      *            the screen number
      * @throws X11ClientException
      */
-    public Display(Socket socket, String hostname, int displayNumber, int screenNumber) {
+    private Display(Socket socket, String hostname, int displayNumber, int screenNumber) {
 
         setDefaultScreenNumber(screenNumber);
         setHostname(hostname);
         setDisplayNumber(displayNumber);
         setSocket(socket);
         
-        init_streams();
-        init();
-    }
-
-    /**
-     * @throws X11ClientException
-     * @see <a href="XOpenDisplay.html">XOpenDisplay</a>
-     */
-    public Display(String hostname, int displayNumber, int screenNumber) {
-        
-        setDefaultScreenNumber(screenNumber);
-        setHostname(hostname);
-        setDisplayNumber(displayNumber);
-        try {
-            System.out.println("Debugging");
-            System.out.println(hostname + ":" + displayNumber + "." + screenNumber);
-            socket = new Socket(hostname, 6000 + displayNumber);
-            setSocket(socket);
-        } catch (IOException ex) {
-            handleException(ex);
-        }
         init_streams();
         init();
     }

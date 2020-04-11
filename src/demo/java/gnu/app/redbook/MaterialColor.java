@@ -1,6 +1,7 @@
 package gnu.app.redbook;
 
 import gnu.app.x11.glx.*;
+import gnu.x11.*;
 import gnu.x11.extension.glx.GL;
 
 
@@ -60,7 +61,7 @@ public class MaterialColor extends Application {
 
 
   protected void handle_button (int button, int state, int x, int y) {
-    int i = button - gnu.x11.Input.BUTTON1;
+    int i = button - Input.KeyMask.BUTTON1.getCode();
     if (i >= 3) return;
     change_diffuse (i);
   }

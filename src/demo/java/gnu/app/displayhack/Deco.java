@@ -40,11 +40,11 @@ public class Deco extends DisplayHack {
     if (width < min_size || height < min_size
       || random.nextInt (max_depth) > depth) { // stop recursion
     
-      gc.set_foreground (random_color ());
+      gc.setForeground(random_color ());
       window.rectangle (gc, x, y, width, height, true);
 
       // draw border to look nice
-      window.rectangle (display.default_gc, x, y, width, height, false);
+      window.rectangle (display.getDefaultGC(), x, y, width, height, false);
 
     } else if (random.nextBoolean ()) {
       /* A rounding bug in original implementation.

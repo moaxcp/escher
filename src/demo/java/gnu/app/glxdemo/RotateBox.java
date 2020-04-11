@@ -4,6 +4,8 @@ import gnu.app.x11.glx.*;
 import gnu.x11.extension.glx.GL;
 import gnu.x11.Input;
 
+import static java.awt.event.MouseEvent.*;
+
 
 /**
  * Draw a colorful box for rotation. Modified from
@@ -55,9 +57,9 @@ public class RotateBox extends Application {
 
   protected void handle_button (int button, int state, int x, int y) {
     switch (button) {
-    case Input.BUTTON1: x_angle += 10.0; break;
-    case Input.BUTTON2: y_angle += 10.0; break;
-    case Input.BUTTON3: z_angle += 10.0; break;
+    case BUTTON1: x_angle += 10.0; break;
+    case BUTTON2: y_angle += 10.0; break;
+    case BUTTON3: z_angle += 10.0; break;
     default: return;
     }
 

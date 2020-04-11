@@ -124,7 +124,7 @@ public class Squiral extends DisplayHack {
       // if road ahead is clear
       if (!clear (x+dx, y+dy) || !clear (x+dx+dx, y+dy+dy)) return false;
       
-      gc.set_foreground (color);
+      gc.setForeground(color);
       go (x+dx, y+dy);
       go (x+dx+dx, y+dy+dy);
 

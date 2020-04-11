@@ -2,9 +2,13 @@ package gnu.app.puppet;
 
 import gnu.app.x11.*;
 import gnu.x11.*;
+import gnu.x11.Host.*;
+import gnu.x11.Window.*;
+import gnu.x11.X11ServiceException.*;
 import gnu.x11.event.*;
 import gnu.x11.Input;           // shadow gnu.x11.event.Input
 import gnu.x11.X11ServiceException;           // shadow java.lang.Error
+import gnu.x11.event.Event.*;
 import gnu.x11.extension.XTest;
 import gnu.x11.extension.NotFoundException;
 import gnu.x11.keysym.Misc;
@@ -293,7 +297,7 @@ import java.util.Vector;
  * help output</a>
  */
 public class Puppet extends Application {
-  public static final int SYSTEM_MODIFIER = Input.CONTROL_MASK;
+  public static final int SYSTEM_MODIFIER = Input.KeyMask.CONTROL_MASK.getCode();
   public static final int SYSTEM_KEYSYM = Misc.DELETE;
   public static final int SWITCH_KEYSYM = Misc.TAB;
 
@@ -373,11 +377,12 @@ public class Puppet extends Application {
 //     Runtime.getRuntime ().addShutdownHook (new Thread () {
 //       public void run () { System.err.println ("shutting down..."); }});
 
-    root = display.default_root;
-    Window.NONE.display = display; // for move pointer
+    root = display.getDefaultRoot();
+    //todo not sure what this did
+    //Window.NONE.display = display; // for move pointer
     xtest = new XTest (display); // for press button
-    registers = new Client [display.input.max_keycode 
-      - display.input.min_keycode]; 
+    registers = new Client [display.getInput().getMaxKeycode()
+      - display.getInput().getMinKeycode()];
 
     _mit_priority_colors = (Atom) Atom.intern (display, "_MIT_PRIORITY_COLORS");
     wm_change_state = (Atom) Atom.intern (display, "WM_CHANGE_STATE");
@@ -394,10 +399,10 @@ public class Puppet extends Application {
     control_root_window ();
     scan_children ();
 
-    Window child = root.query_pointer().child;
+    Window child = root.queryPointer().getChild();
     if(child != null) {
       focus = (Client) Client.intern(child);
-      focus.set_input_focus();
+      focus.setInputFocus();
     }
     
     grab_keybut ();
@@ -414,7 +419,7 @@ public class Puppet extends Application {
 
 
   public void client_to_register (Client client, int keycode) {
-    int index = client.register = keycode - display.input.min_keycode;
+    int index = client.register = keycode - display.getInput().getMinKeycode();
     Client old = registers [index];
 
     if (old != null) old.register = -1;
@@ -424,22 +429,22 @@ public class Puppet extends Application {
 
   public void control_root_window () {
     try {
-      root.select_input (
-        Event.BUTTON_PRESS_MASK
+      root.selectInput(
+          EventMask.BUTTON_PRESS_MASK.getMask()
 
 	// unmap, destroy notify
-	| Event.SUBSTRUCTURE_NOTIFY_MASK
+	| EventMask.SUBSTRUCTURE_NOTIFY_MASK.getMask()
 
 	// map, configure, circulate request
-	| Event.SUBSTRUCTURE_REDIRECT_MASK
+	| EventMask.SUBSTRUCTURE_REDIRECT_MASK.getMask()
 
 	// icccm properties (wm name, hints, normal hints)
-	| Event.PROPERTY_CHANGE_MASK);
+	| EventMask.PROPERTY_CHANGE_MASK.getMask());
 
       display.check_error ();
       
     } catch (X11ServiceException e) {
-      if (e.code == X11ServiceException.BAD_ACCESS && e.bad == root.id)
+      if (e.code == ErrorCode.BAD_ACCESS && e.bad == root.getID())
 	throw new RuntimeException (
           "Failed to access root window\nAnother WM is running?");
       else
@@ -479,40 +484,40 @@ public class Puppet extends Application {
 
   public void grab_keybut () {
     // system key
-    root.grab_key_ignore_locks (SYSTEM_KEYSYM, SYSTEM_MODIFIER, true,
-      Window.ASYNCHRONOUS, Window.ASYNCHRONOUS);
+    root.grabKeyIgnoreLocks(SYSTEM_KEYSYM, SYSTEM_MODIFIER, true,
+        GrabMode.ASYNCHRONOUS, GrabMode.ASYNCHRONOUS);
 
     // rotate to next normal window - ignore class
-    root.grab_key_ignore_locks (SWITCH_KEYSYM, Input.META_MASK, true,
-      Window.ASYNCHRONOUS, Window.ASYNCHRONOUS);
-    root.grab_key_ignore_locks (SWITCH_KEYSYM,
-      Input.META_MASK|Input.SHIFT_MASK, true, Window.ASYNCHRONOUS,
-      Window.ASYNCHRONOUS);
+    root.grabKeyIgnoreLocks(SWITCH_KEYSYM, Input.KeyMask.META_MASK.getCode(), true,
+        GrabMode.ASYNCHRONOUS, GrabMode.ASYNCHRONOUS);
+    root.grabKeyIgnoreLocks (SWITCH_KEYSYM,
+      Input.KeyMask.META_MASK.logicOr(Input.KeyMask.SHIFT_MASK), true, GrabMode.ASYNCHRONOUS,
+        GrabMode.ASYNCHRONOUS);
 
     // rotate to next normal window - different class 
-    root.grab_key_ignore_locks (SWITCH_KEYSYM, Input.SUPER_MASK, true, 
-      Window.ASYNCHRONOUS, Window.ASYNCHRONOUS);
-    root.grab_key_ignore_locks (SWITCH_KEYSYM,
-      Input.SUPER_MASK|Input.SHIFT_MASK, true, Window.ASYNCHRONOUS,
-      Window.ASYNCHRONOUS);
+    root.grabKeyIgnoreLocks (SWITCH_KEYSYM, Input.KeyMask.SUPER_MASK.getCode(), true,
+        GrabMode.ASYNCHRONOUS, GrabMode.ASYNCHRONOUS);
+    root.grabKeyIgnoreLocks (SWITCH_KEYSYM,
+      Input.KeyMask.SUPER_MASK.logicOr(Input.KeyMask.SHIFT_MASK), true, GrabMode.ASYNCHRONOUS,
+        GrabMode.ASYNCHRONOUS);
 
     // rotate to next normal window - same class
-    root.grab_key_ignore_locks (SWITCH_KEYSYM, Input.ALT_MASK, 
-      true, Window.ASYNCHRONOUS, Window.ASYNCHRONOUS);
-    root.grab_key_ignore_locks (SWITCH_KEYSYM,
-      Input.ALT_MASK|Input.SHIFT_MASK, true, Window.ASYNCHRONOUS,
-      Window.ASYNCHRONOUS);
+    root.grabKeyIgnoreLocks (SWITCH_KEYSYM, Input.KeyMask.ALT_MASK.getCode(),
+      true, GrabMode.ASYNCHRONOUS, GrabMode.ASYNCHRONOUS);
+    root.grabKeyIgnoreLocks (SWITCH_KEYSYM,
+      Input.KeyMask.ALT_MASK.logicOr(Input.KeyMask.SHIFT_MASK), true, GrabMode.ASYNCHRONOUS,
+        GrabMode.ASYNCHRONOUS);
 
     // CLICK-TO-FOCUS
-    root.grab_button_ignore_locks (Window.ANY_BUTTON,
-      Input.CONTROL_MASK, true, Event.BUTTON_PRESS_MASK,
-      Window.ASYNCHRONOUS, Window.ASYNCHRONOUS, Window.NONE,
+    root.grabButtonIgnoreLocks (Window.ANY_BUTTON,
+      Input.KeyMask.CONTROL_MASK.getCode(), true, Event.EventMask.BUTTON_PRESS_MASK.getMask(),
+        GrabMode.ASYNCHRONOUS, GrabMode.ASYNCHRONOUS, Window.NONE,
       Cursor.NONE);
 
     // close / delete
-    root.grab_button_ignore_locks (Window.ANY_BUTTON,
-      Input.CONTROL_MASK | Input.META_MASK, true,
-      Event.BUTTON_PRESS_MASK, Window.ASYNCHRONOUS, Window.ASYNCHRONOUS,
+    root.grabButtonIgnoreLocks (Window.ANY_BUTTON,
+      Input.KeyMask.CONTROL_MASK.logicOr(Input.KeyMask.META_MASK), true,
+      Event.EventMask.BUTTON_PRESS_MASK.getMask(), GrabMode.ASYNCHRONOUS, GrabMode.ASYNCHRONOUS,
       Window.NONE, Cursor.NONE);    
   }
 
@@ -543,23 +548,23 @@ public class Puppet extends Application {
     // register
     int keysym = '0' + pref.register (id);
     if (keysym >= '0') {
-      int keycode = display.input.keysym_to_keycode (keysym);
-      client.register = keycode - display.input.min_keycode;
+      int keycode = display.getInput().keysymToKeycode(keysym);
+      client.register = keycode - display.getInput().getMinKeycode();
       registers [client.register] = client;
     }
 
 
-    int max_width = display.default_screen.width;
-    int max_height = display.default_screen.height;
+    int max_width = display.getDefaultScreen().getWidth();
+    int max_height = display.getDefaultScreen().getHeight();
 
 
     // position      
     Rectangle r = pref.position (id);
     if (r != null) {
       // similar to geometry parameter processing in X toolkit
-      r.x = (r.x + max_width) % max_width;
-      r.y = (r.y + max_height) % max_height;
-      client.move_resize (r);
+      r.setX((r.getX() + max_width) % max_width);
+      r.setY((r.getY() + max_height) % max_height);
+      client.moveResize(r);
       return true;		// user-specified position
     }
 
@@ -577,7 +582,7 @@ public class Puppet extends Application {
      * <p>Do it before <code>client.unmap ()</code>. 
      */
     client.state = HIDDEN;
-    client.set_wm_state (Window.WMState.ICONIC);
+    client.setWMState(Window.WMInitialState.ICONIC);
 
     client.unmap ();
     last_hide = client;
@@ -599,7 +604,7 @@ public class Puppet extends Application {
 
       if (c.state == NORMAL
         && c.class_hint != null
-	&& c.class_hint.class_equals (client.class_hint))
+	&& c.class_hint.classEquals(client.class_hint))
 
 	hide (c);
     }
@@ -607,7 +612,7 @@ public class Puppet extends Application {
 
 
   public void jump_to_register (int keycode) {
-    int index = keycode - display.input.min_keycode;
+    int index = keycode - display.getInput().getMinKeycode();
     Client client = registers [index];
 
     if (client != null) {
@@ -624,24 +629,24 @@ public class Puppet extends Application {
 
     switch (keysym) {
     case Misc.LEFT:            // `gravitate' or `gravitate-absolute'
-      focus.x = space.x + delta;
+      focus.x = space.getX() + delta;
       focus.move ();
       return false;
 
     case Misc.RIGHT:
-      focus.x = space.x
-        + space.width - focus.width - delta;
+      focus.x = space.getX()
+        + space.getWidth() - focus.width - delta;
       focus.move ();
       return false;
 
     case Misc.UP:
-      focus.y = space.y + delta;
+      focus.y = space.getY() + delta;
       focus.move ();
       return false;
 
     case Misc.DOWN:
-      focus.y = space.y
-        + space.height - focus.height - delta;
+      focus.y = space.getY()
+        + space.getHeight() - focus.height - delta;
       focus.move ();
       return false;
 
@@ -728,7 +733,7 @@ public class Puppet extends Application {
 
   public void key_dump_info () {
     System.out.println ("input focus: " + focus);
-    System.out.println ("mouse at: " + root.query_pointer ().root_position ());
+    System.out.println ("mouse at: " + root.queryPointer().rootPosition ());
 
     if (!argument_present) return; // `dump-basic-info'
 
@@ -791,7 +796,7 @@ public class Puppet extends Application {
 
     int x = x_direction * scale;
     int y = y_direction * scale;
-    Window.NONE.warp_pointer (x, y);
+    Window.NONE.warpPointer (x, y);
   }
 
 
@@ -901,15 +906,15 @@ public class Puppet extends Application {
       return false;
 
     case Misc.KP_BEGIN:
-      key_click_button (Input.BUTTON1);
+      key_click_button (Input.KeyMask.BUTTON1.getCode());
       return true;
 
     case Misc.KP_DIVIDE:
-      key_click_button (Input.BUTTON2);
+      key_click_button (Input.KeyMask.BUTTON2.getCode());
       return true;
 
     case Misc.KP_MULTIPLY:
-      key_click_button (Input.BUTTON3);
+      key_click_button (Input.KeyMask.BUTTON3.getCode());
       return true;
             
     case '1':
@@ -1061,7 +1066,7 @@ public class Puppet extends Application {
 
   public void key_warp_pointer () {
     if (!argument_present) {
-      focus.warp_pointer (10, 10);
+      focus.warpPointer(10, 10);
       return;
     }
       
@@ -1069,7 +1074,7 @@ public class Puppet extends Application {
     if (position == null)
       alert_user ("Warp position not defined: " + argument);
     else
-      root.warp_pointer (position);
+      root.warpPointer (position);
   }
 
 
@@ -1077,34 +1082,34 @@ public class Puppet extends Application {
     if (!clients.contains (client)) clients.add (client);
 
     // ready for move and resize
-    client.get_geometry ();
+    client.getGeometry ();
 
     // ready for next focus and preference
-    client.class_hint = client.wm_class_hint ();   
+    client.class_hint = client.wmClassHint();
 
     // ready for minimize
-    client.size_hints = client.wm_normal_hints ();
+    client.size_hints = client.wmNormalHints()();
 
     // ready for info
-    client.name = client.wm_name ();
+    client.name = client.wmName();
 
 
-    client.change_save_set (false);
+    client.changeSaveSet(ChangeOperation.INSERT);
 
 
     if (!grant_preference (client))
       // no position preference, do bounding box
-      client.move_resize (client.rectangle ().within (space));
+      client.moveResize (client.rectangle ().within (space));
   }
 
 
   public void maximize (Client client, boolean full_screen) {
     if (full_screen)
-      client.move_resize (0, 0, display.default_screen.width, 
-	display.default_screen.height);
+      client.moveResize (0, 0, display.getDefaultScreen().getWidth(),
+	display.getDefaultScreen().getHeight());
 
     else
-      client.move_resize (space);
+      client.moveResize (space);
   }
 
 
@@ -1206,7 +1211,7 @@ public class Puppet extends Application {
      * Respect null res_class.
      */
     String res_class = "";
-    if (next.class_hint != null) res_class = next.class_hint.res_class ();
+    if (next.class_hint != null) res_class = next.class_hint.resClass();
     if (!focus_so_far.contains (res_class)) {
       focus_so_far.add (res_class);
       return next;
@@ -1232,10 +1237,10 @@ public class Puppet extends Application {
       : next.state == NORMAL;
 
     if (next.class_hint != null) {
-      String c1 = next.class_hint.res.substring (0, 1);
+      String c1 = next.class_hint.resClass().substring (0, 1);
       String c2 = String.valueOf (c);
 
-      if (state && next.class_hint.res.length () > 0
+      if (state && next.class_hint.resClass().length () > 0
         && c1.equalsIgnoreCase (c2))
 
         return next;
@@ -1252,11 +1257,11 @@ public class Puppet extends Application {
     if (print_event) System.out.println (event);
 
     switch (event.code ()) {
-    case ButtonPress.CODE:
+    case EventCode.BUTTON_PRESS:
       when_button_press ((ButtonPress) event);
       break;
 
-    case ClientMessage.CODE: // un-avoidable
+    case EventCode.CLIENT_MESSAGE: // un-avoidable
       when_client_message ((ClientMessage) event);
       break;
 

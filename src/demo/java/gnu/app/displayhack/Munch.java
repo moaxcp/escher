@@ -1,6 +1,8 @@
 package gnu.app.displayhack;
 
 
+import gnu.x11.GC.Values.*;
+
 /**
  * Munching squares. It performs the munching squares hack until killed. It
  * picks square size, position, and gravity randomly. It consists of drawing
@@ -53,11 +55,11 @@ public class Munch extends DisplayHack {
     if (help_option) return;
 
     // TODO alpha composite (from RENDER/GLX) instead of xor?
-    if (xor) gc.set_function (gnu.x11.GC.Values.XOR);
+    if (xor) gc.setFunction(FunctionValues.XOR);
   }
 
 
-  public void paint () {
+  public void paint() {
     int window_size = Math.min (window.width, window.height);
 
     for (int i=0; i<square_count; i++) {
@@ -74,7 +76,7 @@ public class Munch extends DisplayHack {
       int origin_x = random_int (window.width - size);
       int origin_y = random_int (window.height - size);
 
-      gc.set_foreground (random_color ());
+      gc.setForeground(random_color ());
 
       // shift factors
       int t0 = 0, x0 = 0, y0 = 0;

@@ -46,7 +46,7 @@ public class Rorschach extends DisplayHack {
 
 
   public void paint () {
-    gc.set_foreground (random_color ());    
+    gc.setForeground(random_color ());
     
     int xlim = window.width;
     int ylim = window.height;

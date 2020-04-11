@@ -27,13 +27,13 @@ public class Client extends Window {
 
 
   public static Object intern (Window window) {
-    return intern (window.display, window.id);
+    return intern (window.getDisplay(), window.getID());
   }
 
 
   public static Object intern (Display display, int id) {
-    Object value = display.resources.get (new Integer (id));
-    if (value != null && value instanceof Client) return value;
+    Object value = display.getResources().get (id);
+    if (value instanceof Client) return value;
     return new Client (display, id);
   }
     

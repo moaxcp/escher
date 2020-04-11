@@ -1,14 +1,7 @@
 package gnu.app.x11.glx;
 
-import gnu.x11.Colormap;
-import gnu.x11.Window;
-import gnu.x11.event.ButtonPress;
-import gnu.x11.event.ClientMessage;
-import gnu.x11.event.ConfigureNotify;
-import gnu.x11.event.Expose;
-import gnu.x11.event.Event;
-import gnu.x11.event.KeyPress;
-import gnu.x11.event.MotionNotify;
+import gnu.x11.*;
+import gnu.x11.event.*;
 import gnu.x11.extension.glx.*;
 
 import java.lang.*;
@@ -17,19 +10,19 @@ import java.lang.Error;
 
 /** OpenGL application. */
 public abstract class Application extends gnu.app.x11.Application {
-  protected static final int EVENT_BIT = 1<<Event.LAST_MASK_INDEX+1;
-  protected static final int DELETE_BIT = 1<<Event.LAST_MASK_INDEX+2;    
+  protected static final int EVENT_BIT = 1<<Event.EventMask.LAST_MASK_INDEX.getMask()+1;
+  protected static final int DELETE_BIT = 1<<Event.EventMask.LAST_MASK_INDEX.getMask()+2;
 
-  protected static final int BUTTON_PRESS_BIT = Event.BUTTON_PRESS_MASK;
-  protected static final int BUTTON_MOTION_BIT = Event.BUTTON_MOTION_MASK;
-  protected static final int BUTTON1_MOTION_BIT = Event.BUTTON1_MOTION_MASK;
-  protected static final int BUTTON2_MOTION_BIT = Event.BUTTON2_MOTION_MASK;
-  protected static final int BUTTON3_MOTION_BIT = Event.BUTTON3_MOTION_MASK;
-  protected static final int BUTTON4_MOTION_BIT = Event.BUTTON4_MOTION_MASK;
-  protected static final int BUTTON5_MOTION_BIT = Event.BUTTON5_MOTION_MASK;
-  protected static final int KEYBOARD_BIT = Event.KEY_PRESS_MASK;
-  protected static final int POINTER_MOTION_BIT = Event.POINTER_MOTION_MASK;
-  protected static final int RESIZE_BIT = Event.STRUCTURE_NOTIFY_MASK;
+  protected static final int BUTTON_PRESS_BIT = Event.EventMask.BUTTON_PRESS_MASK.getMask();
+  protected static final int BUTTON_MOTION_BIT = Event.EventMask.BUTTON_MOTION_MASK.getMask();
+  protected static final int BUTTON1_MOTION_BIT = Event.EventMask.BUTTON1_MOTION_MASK.getMask();
+  protected static final int BUTTON2_MOTION_BIT = Event.EventMask.BUTTON2_MOTION_MASK.getMask();
+  protected static final int BUTTON3_MOTION_BIT = Event.EventMask.BUTTON3_MOTION_MASK.getMask();
+  protected static final int BUTTON4_MOTION_BIT = Event.EventMask.BUTTON4_MOTION_MASK.getMask();
+  protected static final int BUTTON5_MOTION_BIT = Event.EventMask.BUTTON5_MOTION_MASK.getMask();
+  protected static final int KEYBOARD_BIT = Event.EventMask.KEY_PRESS_MASK.getMask();
+  protected static final int POINTER_MOTION_BIT = Event.EventMask.POINTER_MOTION_MASK.getMask();
+  protected static final int RESIZE_BIT = Event.EventMask.STRUCTURE_NOTIFY_MASK.getMask();
 
   private static final int ANY_BUTTON_MOTION_BITS = BUTTON_MOTION_BIT 
     | BUTTON1_MOTION_BIT 
@@ -118,33 +111,33 @@ public abstract class Application extends gnu.app.x11.Application {
   protected void init_window (int width, int height) {
     visual_config = glx.visual_config (visual_config);
     int vid = visual_config.visual_id ();
-    gl = glx.create_context (vid, display.default_screen_no, GL.NONE0);
+    gl = glx.create_context (vid, display.getDefaultScreenNumber(), GL.NONE0);
 
     // FIXME share colormap
-    Colormap colormap = new Colormap (display.default_root, vid,
+    Colormap colormap = new Colormap (display.getDefaultRoot(), vid,
                                       Colormap.NONE);
     
-    Window.Attributes attr = new Window.Attributes ();
-    attr.set_colormap (colormap);
+    WindowAttributes attr = new WindowAttributes ();
+    attr.setColormap (colormap);
 
     // TODO use depth of x visual config instead of
     // `visual_config.buffer_size'?
     int depth = visual_config.buffer_size ();
 
-    int more = Event.EXPOSURE_MASK | Event.KEY_PRESS_MASK; // compulsory
+    int more = Event.EventMask.EXPOSURE_MASK.getMask() | Event.EventMask.KEY_PRESS_MASK.getMask(); // compulsory
 
     /* Bugs? Whenever button motion events are selected, it is required to
      * select button press event as well. 
      */
      if ((event_mask & ANY_BUTTON_MOTION_BITS) != 0)
-       more |= Event.BUTTON_PRESS_MASK;
-     attr.set_event_mask (event_mask | more);
+       more |= Event.EventMask.BUTTON_PRESS_MASK.getMask();
+     attr.setEventMask(event_mask | more);
 
-    window = new Window (display.default_root, 10, 10, width, height);
-    window.create (5, depth, Window.INPUT_OUTPUT, vid, attr);
+    window = new Window (display.getDefaultRoot(), 10, 10, width, height);
+    window.create (5, depth, Window.WinClass.INPUT_OUTPUT, vid, attr);
 
-    window.set_wm (this, "main");
-    window.set_wm_delete_window ();
+    window.setWM(this, "main");
+    window.setWMDeleteWindow();
 
     gl.make_current (window);
     glu = new GLU (gl);
@@ -166,12 +159,12 @@ public abstract class Application extends gnu.app.x11.Application {
     ButtonPress e = (ButtonPress) event;
     int button = e.detail ();
     int state = e.state ();      
-    handle_button (button, state, e.event_x (), e.event_y ());
+    handle_button (button, state, e.getEventX(), e.getEventY());
   }
 
 
   private void dispatch_client_message () {
-    if (!((ClientMessage) event).delete_window ()) return;
+    if (!((ClientMessage) event).deleteWindow()) return;
     if ((event_mask & DELETE_BIT) != 0 && handle_delete ()) return;
     exit ();
   }
@@ -183,17 +176,17 @@ public abstract class Application extends gnu.app.x11.Application {
       
     if (window.resized (e.rectangle ()))
       handle_resize (e.width (), e.height ());      
-    window.set_geometry_cache (e.rectangle ());
+    window.setGeometryCache(e.rectangle ());
   }
 
 
   private void dispatch_event () {
-    event = display.next_event ();
+    event = display.nextEvent();
     if ((event_mask & EVENT_BIT) != 0 && handle_event (event)) return;
 
     switch (event.code ()) {
-    case ButtonPress.CODE: dispatch_button_press (); break;
-    case ClientMessage.CODE: dispatch_client_message (); break;
+    case EventCode.BUTTON_PRESS: dispatch_button_press (); break;
+    case EventCode.CLIENT_MESSAGE: dispatch_client_message (); break;
     case ConfigureNotify.CODE: dispatch_configure_notify (); break;
     case Expose.CODE: dispatch_expose (); break;	
     case KeyPress.CODE: dispatch_key_press (); break;

@@ -7,9 +7,6 @@ import gnu.x11.ResponseInputStream;
 
 /** X client message event. */
 public final class ClientMessage extends Event {
-  public static final int CODE = 33;
-
-
   private int windowID;
   private int typeAtomID;
   private byte[] data;

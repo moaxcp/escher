@@ -43,7 +43,7 @@ public class WinOp extends Application {
 
     if (help_option) return;
     
-    if (window_id == 0) window_id = display.default_root.id;
+    if (window_id == 0) window_id = display.getDefaultRoot().getID();
     window = (Window) Window.intern (display, window_id);
     
     switch (operation) {
@@ -60,7 +60,7 @@ public class WinOp extends Application {
       break;
 
     case SET_INPUT_FOCUS:
-      window.set_input_focus ();
+      window.setInputFocus();
       break;
     }
 
@@ -70,16 +70,16 @@ public class WinOp extends Application {
 
   public void list_top_level () {
     // query all top-level windows
-    for (Window child : display.default_root.tree ().children ()) {
+    for (Window child : display.getDefaultRoot().tree ().children ()) {
 
       // selection criteria
-      Window.AttributesReply atts = child.attributes ();
-      String name = child.wm_name ();
-      if (! atts.override_redirect ()
-          && atts.map_state () == Window.AttributesReply.VIEWABLE
+      Window.AttributesReply atts = child.getAttributes();
+      String name = child.wmName();
+      if (! atts.overrideRedirect()
+          && atts.mapState() == Window.AttributesReply.VIEWABLE
 	  && name != null) {
 
-        System.out.println (child.id + " " + name);
+        System.out.println (child.getID() + " " + name);
 
       }
     }
