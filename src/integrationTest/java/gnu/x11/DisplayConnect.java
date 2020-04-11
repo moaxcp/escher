@@ -30,8 +30,6 @@ public class DisplayConnect {
 
   @Test
   void connect() {
-    //todo this should throw an exception when it doesn't work
-    //todo need to be able to connect using Unix Socket as well as http
     unixConnection(parse(":1"));
   }
 }
