@@ -1,4 +1,6 @@
-package gnu.util;
+package gnu.app;
+
+import gnu.util.Math;
 
 import java.util.Vector;
 
@@ -187,7 +189,7 @@ public class Option {
     }
 
     String full_description = description + " from " + low + " to " + high;
-    retval = Math.clamp (retval, 0.0f, 1.0f);
+    retval = gnu.util.Math.clamp (retval, 0.0f, 1.0f);
     add_spec (name, "float", full_description, 
       String.valueOf (default_value), String.valueOf (retval)); 
     return retval;

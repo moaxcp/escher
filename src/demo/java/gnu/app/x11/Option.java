@@ -1,8 +1,10 @@
-package gnu.x11;
+package gnu.app.x11;
 
+
+import gnu.x11.*;
 
 /** X {@link gnu.util.Option}. */
-public class Option extends gnu.util.Option {
+public class Option extends gnu.app.Option {
   public Option (String [] args) {
     super (args);
   }

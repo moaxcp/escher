@@ -1,7 +1,5 @@
 package gnu.app;
 
-import gnu.util.Option;
-
 
 /** Application with command-line parsing. */
 public class Application {

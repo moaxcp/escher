@@ -19,6 +19,10 @@ sourceSets {
     }
 }
 
+configurations {
+    demoImplementation.extendsFrom implementation
+}
+
 testSets {
     integrationTest
 }
@@ -63,3 +67,11 @@ integrationTest {
         html.enabled = true
     }
 }
+
+check.dependsOn integrationTest
+
+task demoJar(type: Jar) {
+    from sourceSets.demo.output
+}
+
+assemble.dependsOn demoJar
