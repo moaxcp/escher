@@ -2,7 +2,7 @@ package gnu.x11.extension.glx;
 
 
 /** GLX Error. */
-public class Error extends gnu.x11.Error {
+public class X11ServiceException extends gnu.x11.X11ServiceException {
   public static final int BAD_CONTEXT = 0;
   public static final int BAD_CONTEXT_STATE = 1;
   public static final int BAD_DRAWABLE = 2;
@@ -36,8 +36,8 @@ public class Error extends gnu.x11.Error {
   };
 
 
-  public Error (gnu.x11.Display display, int code, int seq_no, int bad,
-                int minor_opcode, int major_opcode) {
+  public X11ServiceException(gnu.x11.Display display, int code, int seq_no, int bad,
+                             int minor_opcode, int major_opcode) {
     
     super (display, ERROR_STRINGS [code], ErrorCode.getError(code), seq_no, bad, 
       minor_opcode, major_opcode); 

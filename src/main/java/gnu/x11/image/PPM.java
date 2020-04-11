@@ -3,7 +3,6 @@ package gnu.x11.image;
 
 import gnu.x11.Colormap;
 import gnu.x11.Display;
-import gnu.x11.EscherUnsupportedScreenBitDepthException;
 import gnu.x11.VisualInfo;
 
 import java.io.BufferedReader;
@@ -12,8 +11,7 @@ import java.io.InputStreamReader;
 
 public class PPM extends ZPixmap { // TODO
 
-    public PPM(Display display, java.io.InputStream in, VisualInfo xVisual)
-            throws IOException, EscherUnsupportedScreenBitDepthException {
+    public PPM(Display display, java.io.InputStream in, VisualInfo xVisual) throws IOException {
 
         // WARNING: very naive parsing
 

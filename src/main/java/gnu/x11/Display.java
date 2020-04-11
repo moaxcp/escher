@@ -224,10 +224,9 @@ public class Display {
      *            the display number
      * @param screenNumber
      *            the screen number
-     * @throws EscherServerConnectionException
+     * @throws X11ClientException
      */
-    public Display(Socket socket, String hostname, int displayNumber, int screenNumber)
-            throws EscherServerConnectionException {
+    public Display(Socket socket, String hostname, int displayNumber, int screenNumber) {
 
         setDefaultScreenNumber(screenNumber);
         setHostname(hostname);
@@ -239,11 +238,10 @@ public class Display {
     }
 
     /**
-     * @throws EscherServerConnectionException
+     * @throws X11ClientException
      * @see <a href="XOpenDisplay.html">XOpenDisplay</a>
      */
-    public Display(String hostname, int displayNumber, int screenNumber)
-            throws EscherServerConnectionException {
+    public Display(String hostname, int displayNumber, int screenNumber) {
         
         setDefaultScreenNumber(screenNumber);
         setHostname(hostname);
@@ -264,9 +262,9 @@ public class Display {
      * Performs client connection to the XServer, initialising all
      * the internal datastructures.
      * 
-     * @throws EscherServerConnectionException
+     * @throws X11ClientException
      */
-    private void init() throws EscherServerConnectionException {
+    private void init() {
 
         // authorization protocol
         XAuthority xauth = getAuthority();
@@ -1109,7 +1107,7 @@ public class Display {
      * 
      * @throws EscherServerConnectionException
      */
-    private void initServerInfo(ResponseInputStream i) throws EscherServerConnectionException {
+    private void initServerInfo(ResponseInputStream i) {
 
         int accepted = i.readInt8();
         boolean connectionFailed = false;
@@ -1185,8 +1183,7 @@ public class Display {
 
             logger.severe(debugMessage.toString());
 
-            throw new EscherServerConnectionException("Connection to the " +
-                                                      "XServer failed.");
+            throw new X11ClientException("Connection to the XServer failed.");
         }
 
         releaseNumber = i.readInt32();
@@ -1303,7 +1300,7 @@ public class Display {
         try {
             input.inputFocus();
 
-        } catch (Error e) {
+        } catch (X11ServiceException e) {
             /*
              * When an X error occurs, Java throws an `gnu.x11.Error' exception, the
              * normal execution order is disrupted; the reply of `input_focus()'

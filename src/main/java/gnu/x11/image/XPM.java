@@ -3,15 +3,13 @@ package gnu.x11.image;
 import gnu.x11.Color;
 import gnu.x11.Colormap;
 import gnu.x11.Display;
-import gnu.x11.EscherUnsupportedScreenBitDepthException;
 import gnu.x11.VisualInfo;
 
 import java.util.StringTokenizer;
 
 
 public class XPM extends ZPixmap { // TODO
-  public XPM (Display display, String [] xpm, VisualInfo xVisual)
-          throws EscherUnsupportedScreenBitDepthException {
+  public XPM (Display display, String [] xpm, VisualInfo xVisual) {
     super (display, xVisual);
 
     StringTokenizer values = new StringTokenizer (xpm [0]);

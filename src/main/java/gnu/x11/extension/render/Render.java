@@ -2,13 +2,9 @@ package gnu.x11.extension.render;
 
 import java.io.IOException;
 
-import gnu.x11.Data;
-import gnu.x11.Display;
-import gnu.x11.Drawable;
-import gnu.x11.Error;
-import gnu.x11.RequestOutputStream;
-import gnu.x11.ResponseInputStream;
-import gnu.x11.Error.ErrorCode;
+import gnu.x11.*;
+import gnu.x11.X11ServiceException;
+import gnu.x11.X11ServiceException.ErrorCode;
 
 
 /**
@@ -240,11 +236,11 @@ public class Render extends gnu.x11.extension.Extension
   };
 
 
-  public Error build (Display display, int code, int seq_no, int bad,
-                      int minor_opcode, int major_opcode) {
+  public X11ServiceException build (Display display, int code, int seq_no, int bad,
+                                    int minor_opcode, int major_opcode) {
 
     String error_string = ERROR_STRINGS [code - firstError];
-    return new Error (display, error_string, ErrorCode.getError(code), seq_no, bad, 
+    return new X11ServiceException(display, error_string, ErrorCode.getError(code), seq_no, bad,
       minor_opcode, major_opcode);
   }
 
@@ -301,7 +297,7 @@ public class Render extends gnu.x11.extension.Extension
     if (! must) {
       return null;
     }
-    throw new Error ("No matching: " + template);
+    throw new X11ServiceException("No matching: " + template);
   }
 
 

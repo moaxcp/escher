@@ -557,11 +557,10 @@ public abstract class Drawable extends Resource {
      * 
      * opcode 73.
      * 
-     * @throws EscherUnsupportedScreenBitDepthException
+     * @throws X11ClientException
      */
     public Image image(int x, int y, int width, int height, int planeMask,
-                       Image.Format format)
-            throws EscherUnsupportedScreenBitDepthException {
+                       Image.Format format) {
 
         RequestOutputStream o = display.getResponseOutputStream();
         Image image;

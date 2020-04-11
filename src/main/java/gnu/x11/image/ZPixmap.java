@@ -1,12 +1,7 @@
 
 package gnu.x11.image;
 
-import gnu.x11.Color;
-import gnu.x11.Display;
-import gnu.x11.EscherUnsupportedScreenBitDepthException;
-import gnu.x11.Pixmap;
-import gnu.x11.RGB;
-import gnu.x11.VisualInfo;
+import gnu.x11.*;
 import gnu.x11.color.ColorMapper;
 import gnu.x11.image.Image.Format;
 
@@ -25,10 +20,9 @@ public class ZPixmap extends Image {
      * 
      * @param display
      * @param xVisual
-     * @throws EscherUnsupportedScreenBitDepthException
+     * @throws X11ClientException
      */
-    ZPixmap(Display display, VisualInfo xVisual)
-            throws EscherUnsupportedScreenBitDepthException {
+    ZPixmap(Display display, VisualInfo xVisual) {
 
         super(Format.ZPIXMAP, display.getDefaultPixmapFormat());
 
@@ -47,12 +41,10 @@ public class ZPixmap extends Image {
      * @param height
      * @param format
      * @param data
-     * @throws EscherUnsupportedScreenBitDepthException 
-     * @throws UnsupportedBitDepthException
+     * @throws X11ClientException
      */
     public ZPixmap(Display display, int width, int height,
-                   Pixmap.Format format, byte[] data, VisualInfo xVisual)
-            throws EscherUnsupportedScreenBitDepthException {
+                   Pixmap.Format format, byte[] data, VisualInfo xVisual) {
 
         this(display, width, height, format, xVisual);
         this.data = data;
@@ -68,18 +60,15 @@ public class ZPixmap extends Image {
      *                the width in pixels
      * @param height
      *                the height in pixels
-     * @throws EscherUnsupportedScreenBitDepthException
-     * @throws UnsupportedBitDepthException
+     * @throws X11ClientException
      */
-    public ZPixmap(Display display, int width, int height, VisualInfo xVisual)
-            throws EscherUnsupportedScreenBitDepthException {
+    public ZPixmap(Display display, int width, int height, VisualInfo xVisual) {
         
         this(display, width, height, display.getDefaultPixmapFormat(), xVisual);
     }
 
     public ZPixmap(Display display, int width, int height,
-                   Pixmap.Format format, VisualInfo xVisual)
-            throws EscherUnsupportedScreenBitDepthException {
+                   Pixmap.Format format, VisualInfo xVisual) {
 
         super(width, height, Format.ZPIXMAP, format);
 
@@ -88,8 +77,7 @@ public class ZPixmap extends Image {
         this.delegate = getDelegate(format.getDepth());
     }
 
-    private ZPixmapDelegate getDelegate(int bitDepth)
-            throws EscherUnsupportedScreenBitDepthException {
+    private ZPixmapDelegate getDelegate(int bitDepth) {
 
         switch (bitDepth) {
         case 24:
@@ -102,8 +90,7 @@ public class ZPixmap extends Image {
             return new ZPixmap8();
             
         default:
-            throw new EscherUnsupportedScreenBitDepthException("Unsupported "
-                    + "Screen Depth for creating Pixmaps: " + bitDepth);
+            throw new X11ClientException("Unsupported Screen Depth for creating Pixmaps: " + bitDepth);
         }
 
     }

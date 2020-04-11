@@ -72,8 +72,8 @@ public class ResponseInputStream extends FilterInputStream {
         this.display = d;
     }
 
-    private Error buildExtensionError(Display display, int code, int seqNo,
-            int bad, int minorOpcode, int majorOpcode) {
+    private X11ServiceException buildExtensionError(Display display, int code, int seqNo,
+                                                    int bad, int minorOpcode, int majorOpcode) {
 
         gnu.x11.extension.ErrorFactory factory = display.extensionErrorFactories[code - 128];
 
@@ -307,8 +307,8 @@ public class ResponseInputStream extends FilterInputStream {
                     minor_opcode, major_opcode);
         }
 
-        gnu.x11.Error.ErrorCode error = gnu.x11.Error.ErrorCode.getError(code);
-        gnu.x11.Error err = new gnu.x11.Error(this.display,
+        X11ServiceException.ErrorCode error = X11ServiceException.ErrorCode.getError(code);
+        X11ServiceException err = new X11ServiceException(this.display,
                 error.getErrorMessage(), error, seq_no, bad_value,
                 minor_opcode, major_opcode);
         throw err;

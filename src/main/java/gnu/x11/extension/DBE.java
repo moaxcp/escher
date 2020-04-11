@@ -1,10 +1,7 @@
 package gnu.x11.extension;
 
-import gnu.x11.Drawable;
-import gnu.x11.RequestOutputStream;
-import gnu.x11.ResponseInputStream;
-import gnu.x11.Window;
-import gnu.x11.Error.ErrorCode;
+import gnu.x11.*;
+import gnu.x11.X11ServiceException.ErrorCode;
 
 
 /** 
@@ -300,10 +297,10 @@ public class DBE extends Extension implements ErrorFactory {
     = "BAD_DBE_BUFFER: parameter not a DBE back buffer";
 
 
-  public gnu.x11.Error build(gnu.x11.Display display, int code, int seqNumber,
-                              int bad, int minorOpcode, int majorOpcode) {
+  public X11ServiceException build(gnu.x11.Display display, int code, int seqNumber,
+                                   int bad, int minorOpcode, int majorOpcode) {
     ErrorCode errorCd = ErrorCode.getError(code);
-    return new gnu.x11.Error(display, ERROR_STRING, errorCd, seqNumber, bad,
+    return new X11ServiceException(display, ERROR_STRING, errorCd, seqNumber, bad,
                               minorOpcode, majorOpcode);
   }
 

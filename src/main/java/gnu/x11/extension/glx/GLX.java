@@ -1,9 +1,6 @@
 package gnu.x11.extension.glx;
 
-import gnu.x11.Data;
-import gnu.x11.Display;
-import gnu.x11.RequestOutputStream;
-import gnu.x11.ResponseInputStream;
+import gnu.x11.*;
 
 /**
  * OpenGL GLX Extension. The specification can be found <a href=
@@ -520,10 +517,10 @@ public class GLX extends gnu.x11.extension.Extension implements
         return new GL(this, visual_id, screen_no, share_list, false);
     }
 
-    public gnu.x11.Error build(Display display, int code, int seq_no, int bad,
-                               int minor_opcode, int major_opcode) {
+    public X11ServiceException build(Display display, int code, int seq_no, int bad,
+                                     int minor_opcode, int major_opcode) {
 
-        return new Error(display, code - firstError, seq_no, bad,
+        return new X11ServiceException(display, code - firstError, seq_no, bad,
                          minor_opcode, major_opcode);
     }
 
