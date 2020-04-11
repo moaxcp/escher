@@ -25,6 +25,7 @@ configurations {
 
 testSets {
     integrationTest
+    demoTest
 }
 
 repositories {
@@ -33,14 +34,18 @@ repositories {
 
 dependencies {
     api 'com.kohlschutter.junixsocket:junixsocket-core:2.3.2'
+
+    demoImplementation sourceSets.main.output
+
     testImplementation enforcedPlatform('org.junit:junit-bom:5.5.2')
     testImplementation 'org.junit.jupiter:junit-jupiter-api'
     testImplementation 'org.junit.jupiter:junit-jupiter-params'
     testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine'
     //https://github.com/openjdk/skara/pull/66
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
-
     testImplementation 'org.assertj:assertj-core:3.14.0'
+
+    demoTestImplementation sourceSets.demo.output
 }
 
 jacoco {
@@ -61,6 +66,14 @@ test {
 }
 
 integrationTest {
+    useJUnitPlatform()
+
+    reports {
+        html.enabled = true
+    }
+}
+
+demoTest {
     useJUnitPlatform()
 
     reports {

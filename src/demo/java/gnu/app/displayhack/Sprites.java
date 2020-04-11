@@ -4,6 +4,7 @@ import gnu.x11.GC;
 import gnu.x11.Pixmap;
 import gnu.x11.extension.render.DrawablePicture;
 import gnu.x11.extension.render.PictFormat;
+import gnu.x11.extension.render.PictFormat.*;
 import gnu.x11.extension.render.Picture;
 import gnu.x11.extension.render.Render;
 
@@ -113,6 +114,7 @@ public class Sprites extends DisplayHack {
 
     render = new Render (display);   
     PictFormat.Template pf0 = new PictFormat.Template ();
+    pf0.set_type(Type.DIRECT);
     PictFormat pf1;
  
     int depth = display.default_screen.root_depth ();

@@ -334,10 +334,8 @@ public class PictFormat {
    */
   boolean match (Template temp) {
     return (((temp.field_mask & Template.TYPE_MASK) != 0) && temp.type == type)
-           && (((temp.field_mask & Template.DEPTH_MASK) != 0)
-               && temp.depth == depth)
-           && (((temp.field_mask & Template.DIRECT_MASK) != 0)
-               && direct.match (temp));
+           && (((temp.field_mask & Template.DEPTH_MASK) != 0) && temp.depth == depth)
+           && (((temp.field_mask & Template.DIRECT_MASK) != 0) && direct.match (temp));
   }
 
   /**

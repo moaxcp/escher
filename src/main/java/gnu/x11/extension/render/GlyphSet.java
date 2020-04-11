@@ -70,6 +70,7 @@ public class GlyphSet extends gnu.x11.Resource {
         o.write_int32 (id);
         o.send ();
       }
+      disposed = true;
     }
   }
 
