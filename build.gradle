@@ -1,0 +1,90 @@
+plugins {
+    id 'java-library'
+    id 'org.ajoberstar.reckon' version '0.12.0'
+    id 'jacoco'
+    id 'io.freefair.lombok' version '5.0.0-rc6'
+    id 'org.unbroken-dome.test-sets' version '3.0.0'
+    id 'java-test-fixtures'
+}
+
+sourceCompatibility = 8
+targetCompatibility = 8
+
+sourceSets {
+    demo {
+        java {
+            compileClasspath += main.output
+            runtimeClasspath += main.output
+        }
+    }
+}
+
+configurations {
+    demoImplementation.extendsFrom implementation
+}
+
+testSets {
+    integrationTest
+    demoTest
+}
+
+repositories {
+    jcenter()
+}
+
+dependencies {
+    api 'com.kohlschutter.junixsocket:junixsocket-core:2.3.2'
+
+    demoImplementation sourceSets.main.output
+
+    testImplementation enforcedPlatform('org.junit:junit-bom:5.5.2')
+    testImplementation 'org.junit.jupiter:junit-jupiter-api'
+    testImplementation 'org.junit.jupiter:junit-jupiter-params'
+    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine'
+    //https://github.com/openjdk/skara/pull/66
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+    testImplementation 'org.assertj:assertj-core:3.14.0'
+
+    demoTestImplementation sourceSets.demo.output
+}
+
+jacoco {
+    toolVersion = '0.8.5'
+}
+
+reckon {
+    scopeFromProp()
+    snapshotFromProp()
+}
+
+test {
+    useJUnitPlatform()
+
+    reports {
+        html.enabled = true
+    }
+}
+
+integrationTest {
+    useJUnitPlatform()
+
+    reports {
+        html.enabled = true
+    }
+}
+
+demoTest {
+    useJUnitPlatform()
+
+    reports {
+        html.enabled = true
+    }
+}
+
+check.dependsOn integrationTest
+
+task demoJar(type: Jar) {
+    from sourceSets.demo.output
+}
+
+assemble.dependsOn demoJar
