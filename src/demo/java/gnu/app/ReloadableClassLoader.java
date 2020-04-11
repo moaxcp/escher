@@ -229,7 +229,7 @@ public class ReloadableClassLoader extends ClassLoader {
    * as to trade caching for correctness.
    */
   public static void reset () {
-    instance = new gnu.util.ReloadableClassLoader ();
+    instance = new ReloadableClassLoader ();
     classes.clear ();
   }
 }

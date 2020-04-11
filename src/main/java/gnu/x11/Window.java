@@ -1731,9 +1731,6 @@ public class Window extends Drawable implements GLXDrawable {
         changeAttributes(attr);
     }
 
-    
-    public static final Window POINTER_ROOT = new Window(1);
-
     // opcode 42 - set input focus
     /**
      * @param mode

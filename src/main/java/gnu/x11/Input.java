@@ -1,8 +1,13 @@
 package gnu.x11;
 
+import gnu.x11.event.*;
+import lombok.*;
+
+import java.util.*;
+
 /** X keyboard and pointer. */
 public class Input {
-    
+
   public enum KeyMask {
       // KEYBUTMASK - keyboard button mask
       SHIFT_MASK(1<<0),
@@ -128,7 +133,7 @@ public class Input {
   }
 
   private Display display;
-  private int minKeycode, maxKeycode, keysymsPerKeycode;
+  @Getter private int minKeycode, maxKeycode, keysymsPerKeycode;
   private int [] keysyms;
   
 
@@ -138,12 +143,12 @@ public class Input {
     this.maxKeycode = max_keycode;
   }
 
-  public int getMinKeycode() {
-    return minKeycode;
+  public int getKeySymsLength() {
+    return keysyms.length;
   }
 
-  public int getMaxKeycode() {
-    return maxKeycode;
+  public int getKeysym(int index) {
+    return keysyms[index];
   }
 
 

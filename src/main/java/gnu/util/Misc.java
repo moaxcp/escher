@@ -26,6 +26,18 @@ public class Misc {
     return dst;
   }
 
+  public static float [] linearize (float [] [] src) {
+    int s1 = src [0].length;
+    int s2 = src.length;
+    float [] dst = new float [s1 * s2];
+
+    for (int i=0; i<s2; i++) {
+      int offset = i * s1;
+      System.arraycopy (src [i], 0, dst, offset, s1);
+    }
+    return dst;
+  }
+
 
   //-- string
 

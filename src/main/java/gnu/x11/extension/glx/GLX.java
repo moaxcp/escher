@@ -530,6 +530,21 @@ public class GLX extends gnu.x11.extension.Extension implements
         // only one extension event
         return new PbufferClobberEvent(display, i);
     }
+
+
+    /**
+     * @see <a href="glXChooseVisual.html">glXChooseVisual</a>
+     */
+    public VisualConfig visualConfig (int screen_no,
+                                       VisualConfig template, boolean must) {
+
+        VisualConfig [] vcs = visual_configs (screen_no);
+        for (int i=0; i<vcs.length; i++)
+            if (vcs [i].compatible (template)) return vcs [i];
+
+        if (!must) return null;
+        throw new java.lang.Error ("No matching: " + template);
+    }
     
     /**
      * glXChooseVisual returns a XVisualInfo describing the visual that best

@@ -75,7 +75,7 @@ public class Info extends Application {
       System.out.println(children[i]);
 
     System.out.println ("\n\n---- properties of root");
-    Atom[] props = display.getDefaultRoot().properties ();
+    Atom[] props = display.getDefaultRoot().rotateWindowProperties ();
     for (int i = 0; i < props.length; i++)
       System.out.println(props[i]);
 
@@ -92,14 +92,14 @@ public class Info extends Application {
     System.out.println ("  keycode-count: "
       + (display.getInput().getMaxKeycode() - display.getInput().getMinKeycode() + 1));
     System.out.println ("  keysyms-per-keycode: : " 
-      + display.getInput().keysyms_per_keycode);
+      + display.getInput().getKeysymsPerKeycode());
 
     // compare to "xmodmap -pk"
     if (print_keysyms) {
       System.out.println ("  ** keysyms **");
-      for (int i=0; i<display.getInput().keysyms.length; i++)
+      for (int i=0; i<display.getInput().getKeySymsLength(); i++)
         System.out.println (i+display.getInput().getMinKeycode() + ": "
-          + display.getInput().keysyms [i]);
+          + display.getInput().getKeysym(i));
     }
   }
 

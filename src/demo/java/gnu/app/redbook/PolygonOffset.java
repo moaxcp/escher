@@ -1,6 +1,7 @@
 package gnu.app.redbook;
 
 import gnu.app.x11.glx.*;
+import gnu.x11.Input.*;
 import gnu.x11.extension.glx.GL;
 import gnu.x11.Input;
 
@@ -77,9 +78,9 @@ public class PolygonOffset extends Application {
 
    
   protected void handle_button (int button, int state, int x, int y) {
-    switch (button) {
-    case Input.BUTTON1: x_angle = (x_angle + 5) % 360; break;
-    case Input.BUTTON2: y_angle = (y_angle + 5) % 360; break;
+    switch (KeyMask.getButton(button)) {
+    case BUTTON1: x_angle = (x_angle + 5) % 360; break;
+    case BUTTON2: y_angle = (y_angle + 5) % 360; break;
     default: return;
     }
 

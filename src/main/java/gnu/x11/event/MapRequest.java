@@ -2,13 +2,14 @@ package gnu.x11.event;
 
 import gnu.x11.Display;
 import gnu.x11.ResponseInputStream;
+import lombok.*;
 
 
 /** X map request event. */
 public final class MapRequest extends Event {
 
-  private int parentWindowID;
-  private int windowID;
+  @Getter private int parentWindowID;
+  @Getter private int windowID;
 
   public MapRequest (Display display, ResponseInputStream in) {
     super (display, in);

@@ -4,13 +4,14 @@ import gnu.x11.Display;
 import gnu.x11.Rectangle;
 import gnu.x11.ResponseInputStream;
 import gnu.x11.Window;
+import lombok.*;
 
 
 /** X configure request event. */
 public final class ConfigureRequest extends Event {
     
-  private int parentWindowID;
-  private int windowID;
+  @Getter private int parentWindowID;
+  @Getter private int windowID;
   private int siblingID;
 
   private int x;

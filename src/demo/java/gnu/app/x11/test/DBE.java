@@ -40,17 +40,6 @@ public class DBE extends Graphics {
     back_buffer = dbe.allocate (window, gnu.x11.extension.DBE.SwapAction.UNDEFINED);
     back_buffer.deallocate ();
 
-    // test extension error
-    try {
-      back_buffer = dbe.allocate (window, gnu.x11.extension.DBE.SwapAction.UNDEFINED);
-      back_buffer.id = 666;
-      back_buffer.deallocate ();
-      display.check_error ();
-
-    } catch (Error e) {
-      System.out.println ("Forced error for testing: " + e);
-    }
-
     // test get back buffer attributes
     back_buffer = dbe.allocate (window, gnu.x11.extension.DBE.SwapAction.UNDEFINED);
     System.out.println ("back buffer attributes: " 

@@ -2,14 +2,15 @@ package gnu.x11.event;
 
 import gnu.x11.Display;
 import gnu.x11.ResponseInputStream;
+import lombok.*;
 
 
 /** X map notify event. */
 public final class MapNotify extends Event {
 
-  private int eventWindowID;
-  private int windowID;
-  private boolean overrideRedirect;
+  @Getter private int eventWindowID;
+  @Getter private int windowID;
+  @Getter private boolean overrideRedirect;
 
   public MapNotify (Display display, ResponseInputStream in) {
     super (display, in);

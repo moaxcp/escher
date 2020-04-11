@@ -50,9 +50,10 @@ public class DoubleBuffer extends Application implements Runnable {
 
 
   protected void handle_button (int button, int state, int x, int y) {
-    switch (button) {
-    case Input.KeyMask.BUTTON1.getCode(): spinning = true; break;
-    case Input.KeyMask.BUTTON2.getCode(): spinning = false; break;
+    if(button == Input.KeyMask.BUTTON1.getCode()) {
+      spinning = true;
+    } else if(button == Input.KeyMask.BUTTON2.getCode()) {
+      spinning = false;
     }
   }
 

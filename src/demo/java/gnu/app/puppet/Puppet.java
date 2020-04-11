@@ -16,6 +16,9 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Vector;
 
+import static gnu.x11.Host.ChangeOperation.*;
+import static java.awt.event.MouseEvent.*;
+
 
 /**
  * Window manager.
@@ -537,7 +540,7 @@ public class Puppet extends Application {
   public boolean grant_preference (Client client) {
     if (client.class_hint == null) return false;
 
-    String id = client.class_hint.res + ":";
+    String id = client.class_hint.resName() + ":";
     Object value;
 
 
@@ -629,25 +632,19 @@ public class Puppet extends Application {
 
     switch (keysym) {
     case Misc.LEFT:            // `gravitate' or `gravitate-absolute'
-      focus.x = space.getX() + delta;
-      focus.move ();
+      focus.move(space.getX() + delta, focus.getY());
       return false;
 
     case Misc.RIGHT:
-      focus.x = space.getX()
-        + space.getWidth() - focus.width - delta;
-      focus.move ();
+      focus.move(space.getX() + space.getWidth() - focus.width - delta, focus.getY());
       return false;
 
     case Misc.UP:
-      focus.y = space.getY() + delta;
-      focus.move ();
+      focus.move(focus.getX(), space.getY() + delta);
       return false;
 
     case Misc.DOWN:
-      focus.y = space.getY()
-        + space.getHeight() - focus.height - delta;
-      focus.move ();
+      focus.move(focus.getX(), space.getY() + space.getHeight() - focus.height - delta);
       return false;
 
     case '2':			// `scale-two-third'
@@ -782,9 +779,7 @@ public class Puppet extends Application {
       focus.resize ();
 
     } else {                    // `move'
-      focus.x += x_direction * delta;
-      focus.y += y_direction * delta;
-      focus.move ();
+      focus.move(focus.getX() + x_direction * delta, focus.getY() + y_direction * delta);
     }
   }
 
@@ -1088,13 +1083,13 @@ public class Puppet extends Application {
     client.class_hint = client.wmClassHint();
 
     // ready for minimize
-    client.size_hints = client.wmNormalHints()();
+    client.size_hints = client.wmNormalHints();
 
     // ready for info
     client.name = client.wmName();
 
 
-    client.changeSaveSet(ChangeOperation.INSERT);
+    client.changeSaveSet(INSERT);
 
 
     if (!grant_preference (client))
@@ -1188,7 +1183,7 @@ public class Puppet extends Application {
 
     if (focus_base.class_hint != null
       && next.class_hint != null
-      && focus_base.class_hint.class_equals (next.class_hint))
+      && focus_base.class_hint.classEquals (next.class_hint))
 
       return next;
 
@@ -1257,49 +1252,49 @@ public class Puppet extends Application {
     if (print_event) System.out.println (event);
 
     switch (event.code ()) {
-    case EventCode.BUTTON_PRESS:
+    case BUTTON_PRESS:
       when_button_press ((ButtonPress) event);
       break;
 
-    case EventCode.CLIENT_MESSAGE: // un-avoidable
+    case CLIENT_MESSAGE: // un-avoidable
       when_client_message ((ClientMessage) event);
       break;
 
-    case ConfigureRequest.CODE: // Event.SUBSTRUCTURE_NOTIFY
+    case CONFIGURE_REQUEST: // Event.SUBSTRUCTURE_NOTIFY
       when_configure_request ((ConfigureRequest) event);
       break;
 
-    case DestroyNotify.CODE: // Event.SUBSTRUCTURE_NOTIFY
+    case DESTROY_NOTIFY: // Event.SUBSTRUCTURE_NOTIFY
       when_destroy_notify ((DestroyNotify) event);
       break;
 
-    case KeyPress.CODE:	// grab key
+    case KEY_PRESS:	// grab key
       when_key_press ((KeyPress) event);
       break;
 
-    case KeyRelease.CODE:	// grab key
+    case KEY_RELEASE:	// grab key
       when_key_release ((KeyRelease) event);
       break;
 
-    case PropertyNotify.CODE: // Event.PROPERTY_CHANGE
+    case PROPERTY_NOTIFY: // Event.PROPERTY_CHANGE
       when_property_notify ((PropertyNotify) event);
       break;
 
-    case MapRequest.CODE:	// Event.SUBSTRUCTURE_REDIRECT
+    case MAP_REQUEST:	// Event.SUBSTRUCTURE_REDIRECT
       when_map_request ((MapRequest) event);
       break;
 
-    case MapNotify.CODE:	// Event.SUBSTRUCTURE_NOTIFY
+    case MAP_NOTIFY:	// Event.SUBSTRUCTURE_NOTIFY
       when_map_notify ((MapNotify) event);
       break;
       
-    case UnmapNotify.CODE:	 // Event.SUBSTRUCTURE_NOTIFY
+    case UNMAP_NOTIFY:	 // Event.SUBSTRUCTURE_NOTIFY
       when_unmap_notify ((UnmapNotify) event);
       break;
 
-    case ConfigureNotify.CODE: // Event.SUBSTRUCTURE_NOTIFY, ignored
-    case CreateNotify.CODE: // Event.SUBSTRUCTURE_NOTIFY, ignored
-    case MappingNotify.CODE: // un-avoidable, ignored TODO
+    case CONFIGURE_NOTIFY: // Event.SUBSTRUCTURE_NOTIFY, ignored
+    case CREATE_NOTIFY: // Event.SUBSTRUCTURE_NOTIFY, ignored
+    case MAPPING_NOTIFY: // un-avoidable, ignored TODO
       break;
 
     default:
@@ -1309,7 +1304,7 @@ public class Puppet extends Application {
 
 
   public void read_and_dispatch_event () {
-    Event first_event = display.next_event ();
+    Event first_event = display.nextEvent ();
    
     /* Race conditions: while reading an event of a window, the window may
      * have already unmapped or even destroyed. UnmapNotify or
@@ -1341,22 +1336,22 @@ public class Puppet extends Application {
      * <code>display.check_error ();</code> here and run the test, Puppet
      * will produce an {@link Error#BAD_WINDOW} error.
      */
-    display.grab_server ();
+    display.grabServer ();
     
     display.check_error ();
-    List other_events = display.in.pull_all_events ();
+    List<Event> other_events = display.getResponseInputStream().pullAllEvents ();
     
     for (Iterator it=other_events.iterator (); it.hasNext ();) {       
       Event event = (Event) it.next ();
 
-      if (event.code () == DestroyNotify.CODE) {	
+      if (event.code () == EventCode.DESTROY_NOTIFY) {
         Client client = (Client) Client.intern (display, 
-          ((DestroyNotify) event).window_id);
+          ((DestroyNotify) event).getWindowID());
         client.early_destroyed = true;
 
-      } else if (event.code () == UnmapNotify.CODE) {
+      } else if (event.code () == EventCode.UNMAP_NOTIFY) {
         Client client = (Client) Client.intern (display, 
-          ((UnmapNotify) event).window_id);
+          ((UnmapNotify) event).getWindowID());
         client.early_unmapped = true;
       }
     }
@@ -1379,7 +1374,7 @@ public class Puppet extends Application {
      */
     display.flush ();
 
-    display.ungrab_server ();
+    display.ungrabServer ();
   }
 
 
@@ -1410,21 +1405,21 @@ public class Puppet extends Application {
 
 
   public void relocate (Client client) {
-    int x_range = space.width - client.width;
-    int y_range = space.height - client.height;
+    int x_range = space.getWidth() - client.width;
+    int y_range = space.getHeight() - client.height;
 
     if (x_range < 0) x_range = 0;
     if (y_range < 0) y_range = 0;
    
-    client.x = x_range == 0 ? 0 : random.nextInt (x_range);
-    client.y = y_range == 0 ? 0 : random.nextInt (y_range);
+    int x = x_range == 0 ? 0 : random.nextInt (x_range);
+    int y = y_range == 0 ? 0 : random.nextInt (y_range);
 
 
     // origin of space
-    client.x += space.x;
-    client.y += space.y;
+    x += space.getX();
+    y += space.getY();
 
-    client.move ();
+    client.move (x, y);
   }
 
 
@@ -1443,8 +1438,8 @@ public class Puppet extends Application {
     client.width *= factor;    
     client.height *= factor;
 
-    client.width = Math.min (client.width, space.width);
-    client.height = Math.min (client.height, space.height);
+    client.width = Math.min (client.width, space.getWidth());
+    client.height = Math.min (client.height, space.getHeight());
 
     client.resize ();
     relocate (client);
@@ -1455,30 +1450,30 @@ public class Puppet extends Application {
     // query all top-level windows
     Window[] children = root.tree ().children ();
     for (Window w : children) {
-      Client client = (Client) Client.intern (display, w.id);
+      Client client = (Client) Client.intern (display, w.getID());
 
       // get override_redirect and map_state
-      client.attributes = client.attributes ();
+      client.attributes = client.getAttributes();
 
       /* Children of root to be managed: (1) not override redirect (pop-up
        * and transient windows). (2) VIEWABLE (previously mapped)
        */
-      if (client.attributes.override_redirect ()
-	|| client.attributes.map_state ()
-        != Window.AttributesReply.VIEWABLE)
+      if (client.attributes.overrideRedirect ()
+	|| client.attributes.mapState ()
+        != Window.MapState.VIEWABLE)
 
 	continue;		// not managed
 
 
-      Window.WMState wm_state = client.wm_state ();
-      if (wm_state != null && wm_state.state () == Window.WMState.ICONIC) {
+      Window.WMState wm_state = client.wmState ();
+      if (wm_state != null && wm_state.state () == Window.WMInitialState.ICONIC) {
 	hide (client);		// respect its iconic state
 
       } else {
 	// maintain our state variable
 	client.state = NORMAL;
 	// in case someone screws this up
-	client.set_wm_state (Window.WMState.NORMAL);
+	client.setWMState(Window.WMInitialState.NORMAL);
       }
 
 
@@ -1509,7 +1504,7 @@ public class Puppet extends Application {
       client = focus_base;
       focus_so_far.clear ();
       if (focus_base.class_hint != null)
-        focus_so_far.add (focus_base.class_hint.res_class ());
+        focus_so_far.add (focus_base.class_hint.resClass ());
     }
 
     client.raise ();		// we choose to do it
@@ -1519,10 +1514,10 @@ public class Puppet extends Application {
      * window is mapped and hence can be assigned focus to. Otherwise, an
      * {@link Error#BAD_WINDOW} will result.
      */
-    focus.set_input_focus ();
+    focus.setInputFocus ();
     
     // give hint
-    if (warp_pointer) client.warp_pointer (10, 10);
+    if (warp_pointer) client.warpPointer (10, 10);
 
 
     /* For changing focus in focus_key_pressed mode, do not update client order
@@ -1540,9 +1535,9 @@ public class Puppet extends Application {
      * <code>event.window()</code> since it always equals to
      * {@link #root}. Instead, check <code>event.child()</code>.
      */    
-    boolean control_down = (event.state () & Input.CONTROL_MASK) != 0;
-    boolean meta_down = (event.state () & Input.META_MASK) != 0;
-    boolean on_root = event.child_id () == 0;
+    boolean control_down = (event.getState () & Input.KeyMask.CONTROL_MASK.getCode()) != 0;
+    boolean meta_down = (event.getState () & Input.KeyMask.META_MASK.getCode()) != 0;
+    boolean on_root = event.getChildID() == 0;
 
     if (meta_down && on_root) { // `lanuch-on-root'
       try {
@@ -1556,18 +1551,18 @@ public class Puppet extends Application {
 
     
     if (!meta_down && on_root) { // `pointer-root-focus'
-      root.set_input_focus ();
+      root.setInputFocus ();
       return;
     }
        
 
-    Client client = (Client) Client.intern (display, event.child_id ());
+    Client client = (Client) Client.intern (display, event.getChildID ());
     if (client.early_unmapped || client.early_destroyed) return;
     if (!control_down) return;
     int button = event.detail ();
 
     switch (button) {
-    case Input.BUTTON1:
+    case BUTTON1:
       if (meta_down)            // `delete-window'
 	client.delete ();
 
@@ -1575,25 +1570,25 @@ public class Puppet extends Application {
 	// same as set_focus ()
 	client.raise ();
 	focus = client;
-	focus.set_input_focus ();
+	focus.setInputFocus ();
 	update_client_order (focus);
       }
       break;
 
-    case Input.BUTTON2:         // `focus-without-raise'
+    case BUTTON2:         // `focus-without-raise'
       focus = client;
-      focus.set_input_focus ();
+      focus.setInputFocus ();
       update_client_order (focus);
       break;
 
-    case Input.BUTTON3:
+    case BUTTON3:
       if (meta_down) client.kill (); // `kill-window'
       
       else {                    // `lower-behind'
 	// give focus to some other window (under pointer)
 	client.lower ();
-	focus = (Client) Client.intern (root.query_pointer ().child);
-	focus.set_input_focus ();    
+	focus = (Client) Client.intern (root.queryPointer ().getChild());
+	focus.setInputFocus ();
 	update_client_order (focus); // != client
       }
       break;
@@ -1603,13 +1598,13 @@ public class Puppet extends Application {
 
   public void when_client_message (ClientMessage event) {
     // client asks to change window state from normal to iconic 
-    Client client = (Client) Client.intern (display, event.window_id);
+    Client client = (Client) Client.intern (display, event.getWindowID());
     if (client.early_unmapped || client.early_destroyed) return;
 
     Atom type = event.type ();
     if (event.format () == 32 
-      && type.name.equals ("WM_CHANGE_STATE")
-      && event.wm_data () == Window.WMHints.ICONIC) {
+      && type.getName().equals ("WM_CHANGE_STATE")
+      && event.wm_data () == Window.WMInitialState.ICONIC.getCode()) {
 
       hide (client);
 
@@ -1623,12 +1618,12 @@ public class Puppet extends Application {
     // @see icccm/sec-4.html#s-4.1.5
 
     // TODO find space in screen to display window?
-    Client client = (Client) Client.intern (display, event.window_id);
+    Client client = (Client) Client.intern (display, event.getWindowID());
     if (client.early_unmapped || client.early_destroyed) return;
 
 
     if (client.class_hint != null) {
-      String id = client.class_hint.res + ":";
+      String id = client.class_hint.resName() + ":";
       if (pref.no_geometry_change (id)) return;
     }
 
@@ -1643,19 +1638,19 @@ public class Puppet extends Application {
      */
     client.configure (event.changes ());
     
-    client.set_geometry_cache (event.rectangle ());
+    client.setGeometryCache (event.rectangle ());
 
 
     // we choose to give it focus if it is normal and it raises
     if (client.state == NORMAL
-      && event.stack_mode () == Window.Changes.ABOVE)
+      && event.stackMode () == Window.Changes.StackMode.ABOVE)
 
       set_focus (client, false);
   }
 
 
   public void when_destroy_notify (DestroyNotify event) {    
-    Client client = (Client) Client.intern (display, event.window_id);
+    Client client = (Client) Client.intern (display, event.getWindowID());
     give_up_focus (client);
     
     register_fall_back (client);
@@ -1680,19 +1675,19 @@ public class Puppet extends Application {
   public void when_key_press (KeyPress event) {
     keycode = event.detail ();
     int keystate = event.state ();
-    keysym = display.input.keycode_to_keysym (keycode, keystate);
+    keysym = display.getInput().keycodeToKeysym (keycode, keystate);
 
-    shift_down = (keystate & Input.SHIFT_MASK) != 0;
-    control_down = (keystate & Input.CONTROL_MASK) != 0;
-    meta_down = (keystate & Input.META_MASK) != 0;    
-    alt_down = (keystate & Input.ALT_MASK) != 0;    
-    super_down = (keystate & Input.SUPER_MASK) != 0;    
+    shift_down = (keystate & Input.KeyMask.SHIFT_MASK.getCode()) != 0;
+    control_down = (keystate & Input.KeyMask.CONTROL_MASK.getCode()) != 0;
+    meta_down = (keystate & Input.KeyMask.META_MASK.getCode()) != 0;
+    alt_down = (keystate & Input.KeyMask.ALT_MASK.getCode()) != 0;
+    super_down = (keystate & Input.KeyMask.SUPER_MASK.getCode()) != 0;
 
 
     if (!system_key_pressed && !focus_key_pressed) {
-      int status = root.grab_keyboard (false, Window.ASYNCHRONOUS,
-        Window.ASYNCHRONOUS, display.CURRENT_TIME); 
-      if (status != Window.SUCCESS)
+      GrabStatus status = root.grabKeyboard (false, GrabMode.ASYNCHRONOUS,
+          GrabMode.ASYNCHRONOUS, display.CURRENT_TIME);
+      if (status != GrabStatus.SUCCESS)
 	throw new RuntimeException ("Failed to grab keyboard");
 
       focus_key_pressed = keysym == Misc.TAB;
@@ -1703,7 +1698,7 @@ public class Puppet extends Application {
       focus_base = focus;
       focus_so_far.clear ();
       if (focus_base.class_hint != null)
-        focus_so_far.add (focus.class_hint.res_class ());
+        focus_so_far.add (focus.class_hint.resClass ());
     }
 
 
@@ -1720,7 +1715,7 @@ public class Puppet extends Application {
 
 
     if (key_process ()) {       // done
-      display.input.ungrab_keyboard ();
+      display.getInput().ungrabKeyboard ();
       system_key_pressed = false;
       prefix0 = prefix1 = 0;
 
@@ -1735,7 +1730,7 @@ public class Puppet extends Application {
   public void when_key_release (KeyRelease event) {
     keycode = event.detail ();
     int keystate = event.state ();
-    keysym = display.input.keycode_to_keysym (keycode, keystate);
+    keysym = display.getInput().keycodeToKeysym (keycode, keystate);
 
     if (!focus_key_pressed
       || !(keysym == Misc.META_L
@@ -1745,7 +1740,7 @@ public class Puppet extends Application {
 	|| keysym == Misc.SUPER_L
 	|| keysym == Misc.SUPER_R)) return;
 
-    display.input.ungrab_keyboard ();
+    display.getInput().ungrabKeyboard ();
     focus_key_pressed = false;
 
     // finally user has chosen a new active window
@@ -1756,24 +1751,24 @@ public class Puppet extends Application {
   public void when_property_notify (PropertyNotify event) {
     Atom atom = event.atom (display);
 
-    Client client = (Client) Client.intern (display, event.window_id);
+    Client client = (Client) Client.intern (display, event.getWindowID());
     if (client.early_destroyed) return;
 
     if (atom == wm_colormap_windows
       || atom == wm_protocols)
       throw new java.lang.Error ("unhandled property notfiy: " + atom);
 
-    switch (atom.id) {  
+    switch (atom.getID()) {
     case Atom.WM_HINTS_ID:	// TODO any action?
-      client.wm_hints ();
+      client.wmHints ();
       break;
 
     case Atom.WM_NORMAL_HINTS_ID: // TODO any action?
-      client.size_hints = client.wm_normal_hints ();
+      client.size_hints = client.wmNormalHints ();
       break;
 
     case Atom.WM_NAME_ID:	
-      client.name = client.wm_name ();
+      client.name = client.wmName ();
       break;
 
     case Atom.WM_ICON_NAME_ID:	// fall through
@@ -1787,22 +1782,22 @@ public class Puppet extends Application {
   public void when_map_request (MapRequest event) {
     // client asks to change window state from withdrawn to normal/iconic,
     // or from iconic to normal
-    Client client = (Client) Client.intern (display, event.window_id);
+    Client client = (Client) Client.intern (display, event.getWindowID());
     if (client.early_unmapped || client.early_destroyed) return;
 
 
     // get override_redirect and map_state
-    client.attributes = client.attributes ();
-    if (client.attributes.override_redirect ()) return;
+    client.attributes = client.getAttributes ();
+    if (client.attributes.overrideRedirect ()) return;
 
     manage (client);
 
-    Window.WMHints wm_hints = client.wm_hints ();
+    Window.WMHints wm_hints = client.wmHints ();
 
     // assume NORMAL if initial_state not specified
     if (wm_hints == null
       || (wm_hints.flags () & Window.WMHints.STATE_HINT_MASK) == 0
-      || wm_hints.initial_state () == Window.WMHints.NORMAL) {
+      || wm_hints.initialState () == Window.WMInitialState.NORMAL) {
 
       /* Do not do any visible operations on the window such as focusing
        * and warping pointer, until a window is actually map, ie. 
@@ -1814,13 +1809,13 @@ public class Puppet extends Application {
       
     } else {			// must be iconic
       client.state = HIDDEN;
-      client.set_wm_state (Window.WMState.ICONIC);
+      client.setWMState (Window.WMInitialState.ICONIC);
     }
   }
 
 
   public void when_map_notify (MapNotify event) {
-    Client client = (Client) Client.intern (display, event.window_id);
+    Client client = (Client) Client.intern (display, event.getWindowID());
     if (client.early_unmapped || client.early_destroyed) return;
 
 
@@ -1835,9 +1830,9 @@ public class Puppet extends Application {
      * @see <a href="XMapWindow.html">XMapWindow</a>
      */
     if (client.attributes == null)
-      client.attributes = client.attributes ();
+      client.attributes = client.getAttributes ();
 
-    if (client.attributes.override_redirect ()) return;
+    if (client.attributes.overrideRedirect ()) return;
 
     /* Now and only now sets the window state to NORMAL (except during
      * initialization). Setting this earlier gives false impression that
@@ -1850,7 +1845,7 @@ public class Puppet extends Application {
      * state == NO_FOCUS from grant_preference ().
      */
     if (client.state != NO_FOCUS) client.state = NORMAL;
-    client.set_wm_state (Window.WMState.NORMAL);
+    client.setWMState(Window.WMInitialState.NORMAL);
 
     /* We can set focus to a window only when it is ready, ie.
      * MapNotify, not MapRequest.
@@ -1861,12 +1856,11 @@ public class Puppet extends Application {
 
   public void when_quit () {
     // so that I can keep typing
-    focus.warp_pointer (10, 10);
+    focus.warpPointer (10, 10);
 
     // set_input_focus () to POINTER_ROOT to restore the default focus
     // (every wm should do this)?
-    Window.POINTER_ROOT.display = display;
-    Window.POINTER_ROOT.set_input_focus ();
+    display.getDefaultRoot().setInputFocus ();
   }
  
 
@@ -1876,7 +1870,7 @@ public class Puppet extends Application {
      *
      * @see #when_destroy_notify(DestroyNotify)
      */
-    Client client = (Client) Client.intern (display, event.window_id);
+    Client client = (Client) Client.intern (display, event.getWindowID());
     if (client.early_destroyed) return;
 
     client.early_unmapped = false; // handled here
@@ -1894,8 +1888,8 @@ public class Puppet extends Application {
        * Then, what's the use of synthetic UnmapNotify event?
        */
       client.state = UNMANAGED;
-      client.set_wm_state (Window.WMState.WITHDRAWN);
-      client.change_save_set (true);
+      client.setWMState(Window.WMInitialState.WITHDRAWN);
+      client.changeSaveSet (INSERT);
     }
   }
 
@@ -1931,7 +1925,7 @@ public class Puppet extends Application {
 
       if (c.state == HIDDEN
         && c.class_hint != null
-	&& c.class_hint.class_equals (client.class_hint))
+	&& c.class_hint.classEquals (client.class_hint))
 
 	unhide (c);
     }

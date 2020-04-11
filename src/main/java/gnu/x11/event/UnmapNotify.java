@@ -2,12 +2,13 @@ package gnu.x11.event;
 
 import gnu.x11.Display;
 import gnu.x11.ResponseInputStream;
+import lombok.*;
 
 /** X unmap notify event. */
 public final class UnmapNotify extends Event {
 
-  private int eventWindowID;
-  private int windowID;
+  @Getter private int eventWindowID;
+  @Getter private int windowID;
 
   private boolean fromConfigure;
 
