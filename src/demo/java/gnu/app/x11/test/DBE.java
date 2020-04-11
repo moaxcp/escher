@@ -37,12 +37,12 @@ public class DBE extends Graphics {
     //  .toString (Enum.NEXT, "\n"));    
 
     // test allocation and deallocation
-    back_buffer = dbe.allocate (window, gnu.x11.extension.DBE.UNDEFINED);
+    back_buffer = dbe.allocate (window, gnu.x11.extension.DBE.SwapAction.UNDEFINED);
     back_buffer.deallocate ();
 
     // test extension error
     try {
-      back_buffer = dbe.allocate (window, gnu.x11.extension.DBE.UNDEFINED);
+      back_buffer = dbe.allocate (window, gnu.x11.extension.DBE.SwapAction.UNDEFINED);
       back_buffer.id = 666;
       back_buffer.deallocate ();
       display.check_error ();
@@ -52,7 +52,7 @@ public class DBE extends Graphics {
     }
 
     // test get back buffer attributes
-    back_buffer = dbe.allocate (window, gnu.x11.extension.DBE.UNDEFINED);
+    back_buffer = dbe.allocate (window, gnu.x11.extension.DBE.SwapAction.UNDEFINED);
     System.out.println ("back buffer attributes: " 
       + back_buffer.attributes ());
   }
@@ -60,14 +60,14 @@ public class DBE extends Graphics {
 
   public void paint () {   
     for (int i=0; i<10; i++) {
-      back_buffer.line (display.default_gc, 
+      back_buffer.line (display.getDefaultGC(),
         random.nextInt (back_buffer.width), 
         random.nextInt (back_buffer.height),
         random.nextInt (back_buffer.width), 
         random.nextInt (back_buffer.height));
     }
 
-    back_buffer.swap (gnu.x11.extension.DBE.UNDEFINED);
+    back_buffer.swap (gnu.x11.extension.DBE.SwapAction.UNDEFINED);
     display.flush ();
   }
 

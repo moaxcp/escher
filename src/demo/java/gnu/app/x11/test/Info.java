@@ -10,6 +10,8 @@ import gnu.x11.extension.render.Render;
 import gnu.x11.extension.glx.GLX;
 import gnu.x11.extension.glx.GL;
 
+import java.util.*;
+
 
 /** 
  * List info about X server. 
@@ -49,16 +51,16 @@ public class Info extends Application {
     extension_details ();
 
     System.out.println ("\n\n---- keyboard control\n"
-      + display.input.keyboard_control ());
+      + display.getInput().keyboardControl ());
     
     System.out.println ("\n\n---- pointer control\n"
-      + display.input.pointer_control ());
+      + display.getInput().pointerControl ());
     
     System.out.println ("\n\n---- screen saver\n"
-      + display.screen_saver ());
+      + display.screenSaver ());
     
     System.out.println ("\n\n---- font path");
-    String[] fontpath = display.font_path ();
+    String[] fontpath = display.fontPath ();
     for (int i = 0; i < fontpath.length; i++)
       System.out.println(fontpath[i]);
 
@@ -68,36 +70,36 @@ public class Info extends Application {
       System.out.println(fonts[i]);
 
     System.out.println ("\n\n---- children of root");
-    Window[] children = display.default_root.tree ().children ();
+    Window[] children = display.getDefaultRoot().tree ().children ();
     for (int i = 0; i < children.length; i++)
       System.out.println(children[i]);
 
     System.out.println ("\n\n---- properties of root");
-    Atom[] props = display.default_root.properties ();
+    Atom[] props = display.getDefaultRoot().properties ();
     for (int i = 0; i < props.length; i++)
       System.out.println(props[i]);
 
     System.out.println ("\n\n---- screens"
-      + Misc.to_string (display.screens));
+      + Arrays.toString(display.getScreens()));
 
     System.out.println ("\n\n---- pixmap formats"
-      + Misc.to_string (display.pixmap_formats));
+      + Arrays.toString(display.getPixmapFormats()));
 
 
     System.out.println ("\n\n---- keyboard symbols");
-    System.out.println ("  min-keycode: " + display.input.min_keycode);
-    System.out.println ("  max-keycode: " + display.input.max_keycode);
+    System.out.println ("  min-keycode: " + display.getInput().getMinKeycode());
+    System.out.println ("  max-keycode: " + display.getInput().getMaxKeycode());
     System.out.println ("  keycode-count: "
-      + (display.input.max_keycode - display.input.min_keycode + 1));
+      + (display.getInput().getMaxKeycode() - display.getInput().getMinKeycode() + 1));
     System.out.println ("  keysyms-per-keycode: : " 
-      + display.input.keysyms_per_keycode);
+      + display.getInput().keysyms_per_keycode);
 
     // compare to "xmodmap -pk"
     if (print_keysyms) {
       System.out.println ("  ** keysyms **");
-      for (int i=0; i<display.input.keysyms.length; i++)
-        System.out.println (i+display.input.min_keycode + ": " 
-          + display.input.keysyms [i]);
+      for (int i=0; i<display.getInput().keysyms.length; i++)
+        System.out.println (i+display.getInput().getMinKeycode() + ": "
+          + display.getInput().keysyms [i]);
     }
   }
 
@@ -132,11 +134,11 @@ public class Info extends Application {
 
     try {
       GLX glx = new GLX (display);
-      System.out.println (glx + Misc.to_string (glx.visual_configs (0)));
+      System.out.println (glx + Arrays.toString(glx.visual_configs (0)));
 
-      GL gl = glx.create_context (display.default_screen.root_visual_id (),
-        display.default_screen_no, GL.NONE0);
-      gl.make_current (display.default_root);
+      GL gl = glx.create_context (display.getDefaultScreen().getRootVisualID(),
+        display.getDefaultScreenNumber(), GL.NONE0);
+      gl.make_current (display.getDefaultRoot());
       System.out.println (gl + "\n");
 
     } catch (NotFoundException e) {
@@ -146,7 +148,7 @@ public class Info extends Application {
     try {
       Render render = new Render (display);
       System.out.println (render 
-        + Misc.to_string (render.picture_formats ()));
+        + Arrays.toString(render.picture_formats ()));
     } catch (NotFoundException e) {
       System.out.println ("render not found\n");
     }

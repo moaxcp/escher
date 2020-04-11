@@ -24,8 +24,7 @@ public class ZPixmap extends Graphics {
     if (help_option) return;
 
     int len = 256;
-    zpixmap = new gnu.x11.image.ZPixmap (display, len, len,
-                                         display.default_pixmap_format);
+    zpixmap = new gnu.x11.image.ZPixmap (display, len, len, null);
 
     // straight from XTC
     for (int y=0; y<len; y++) {
@@ -33,14 +32,14 @@ public class ZPixmap extends Graphics {
         int r = (x*y) & 0xff;
         int g = x^y;
         int b = (x*y>>1) & 0xff;
-        zpixmap.set (x, y, r, g, b);
+        zpixmap.putRGB(x, y, r, g, b);
       }
     }
   }
    
 
   public void paint () {
-    window.put_image (display.default_gc, zpixmap, 0, 0);
+    window.put_image (display.getDefaultGC(), zpixmap, 0, 0);
   }
 
 

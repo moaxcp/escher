@@ -1,8 +1,7 @@
 package gnu.app.x11.test;
 
-import gnu.x11.event.ClientMessage;
-import gnu.x11.event.Expose;
-import gnu.x11.event.KeyPress;
+import gnu.x11.event.*;
+
 import java.util.Random;
 
 
@@ -40,28 +39,28 @@ public class Sync extends Graphics implements Runnable {
   
   public void dispatch_event () {
     System.out.println ("blocking-read event");
-    event = display.next_event ();
+    event = display.nextEvent ();
     System.out.println ("got event " + event);
 
     switch (event.code ()) {
-    case gnu.x11.event.ButtonPress.CODE:
+    case BUTTON_PRESS:
       exit ();
       break;
 
-    case ClientMessage.CODE:
-      if (((ClientMessage) event).delete_window ()) exit ();
+    case CLIENT_MESSAGE:
+      if (((ClientMessage) event).deleteWindow ()) exit ();
       break;
 
-    case Expose.CODE:
+    case EXPOSE:
       if (!thread.isAlive ()) thread.start ();
       break;
 	
-    case KeyPress.CODE: {
+    case KEY_PRESS: {
       KeyPress e = (KeyPress) event;
 	
       int keycode = e.detail ();
       int keystate = e.state ();
-      int keysym = display.input.keycode_to_keysym (keycode, keystate);
+      int keysym = display.getInput().keycodeToKeysym (keycode, keystate);
 
       if (keysym == 'q' || keysym == 'Q' 
         || keysym == gnu.x11.keysym.Misc.ESCAPE) exit ();
@@ -82,16 +81,22 @@ public class Sync extends Graphics implements Runnable {
     while (!exit_now) {
       // generate round-trip request during `Display#next_event()'
       System.out.println ("try round-trip request");
-      display.input.input_focus ();
+      display.getInput().inputFocus ();
       System.out.println ("done round-trip request");
 
       // generate one-way request during `Display#next_event()'
-      window.line (display.default_gc, 
+      window.line (display.getDefaultGC(),
         random.nextInt (window.width), random.nextInt (window.height),
         random.nextInt (window.width), random.nextInt (window.height));
       display.flush ();
 
-      if (!exit_now) gnu.util.Misc.sleep (1000);
+      if (!exit_now) {
+        try {
+          Thread.sleep (1000);
+        } catch (InterruptedException e) {
+          Thread.currentThread().interrupt();
+        }
+      }
     }
 
     display.close ();

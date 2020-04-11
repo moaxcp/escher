@@ -33,8 +33,8 @@ public class Chinese extends Graphics {
         "No Chinese font defined on this X server");
 
     GC.Values gv = new GC.Values ();
-    gv.set_background (display.default_white);
-    gv.set_foreground (display.default_black);
+    gv.setBackground (display.getDefaultWhite());
+    gv.setForeground (display.getDefaultBlack());
     // just pick any of those matching fonts
     gv.set_font (fonts[0]);
     gc = new GC (window, gv);
@@ -43,7 +43,7 @@ public class Chinese extends Graphics {
   
   public void paint () {    
     // use `native2ascii' in jdk to get encoding (�A�n��)
-    window.image_text16 (gc, 20, 30,
+    window.imageText16 (gc, 20, 30,
       "\u00a7A\u00a6n\u00b6\u00dc");
   }
 

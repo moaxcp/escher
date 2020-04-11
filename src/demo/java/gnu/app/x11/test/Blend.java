@@ -48,7 +48,7 @@ public class Blend extends Graphics {
 
     // window picture (TODO: find visual)
     PictFormat.Template pf0 = new PictFormat.Template ();
-    pf0.set_depth (display.default_screen.root_depth ());
+    pf0.set_depth (display.getDefaultScreen().rootDepth ());
     pf1 = render.picture_format (pf0, true);
 
     window_picture = render.create_picture (window, pf1, 
@@ -82,25 +82,25 @@ public class Blend extends Graphics {
   public void paint () {
     window.clear (false);
 
-    color_gc.set_foreground (0xff0000);
+    color_gc.setForeground (0xff0000);
     color_pixmap.rectangle (color_gc, 0, 0, 1, 1, true);
 
-    alpha_gc.set_foreground (0x00);
+    alpha_gc.setForeground (0x00);
     alpha_pixmap.rectangle (alpha_gc, 0, 0, 
       window.width, window.height, true);
-    alpha_gc.set_foreground (0x7f);
+    alpha_gc.setForeground (0x7f);
     alpha_pixmap.rectangle (alpha_gc, 10, 10, 50, 50, true);
 
     render.composite (Render.OVER, color_picture, alpha_picture,
       window_picture, 0, 0, 0, 0, 0, 0, window.width, window.height);
 
-    color_gc.set_foreground (0x0000ff);
+    color_gc.setForeground (0x0000ff);
     color_pixmap.rectangle (color_gc, 0, 0, 1, 1, true);
 
-    alpha_gc.set_foreground (0x00);
+    alpha_gc.setForeground (0x00);
     alpha_pixmap.rectangle (alpha_gc, 0, 0, 
       window.width, window.height, true);
-    alpha_gc.set_foreground (0x7f);
+    alpha_gc.setForeground (0x7f);
     alpha_pixmap.rectangle (alpha_gc, 40, 40, 50, 50, true);
 
     render.composite (Render.OVER, color_picture, alpha_picture,

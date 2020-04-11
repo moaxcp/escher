@@ -2,6 +2,7 @@ package gnu.app.x11.test;
 
 import gnu.x11.event.ButtonPress;
 import gnu.x11.event.Event;
+import gnu.x11.event.Event.*;
 import gnu.x11.event.KeyPress;
 
 
@@ -32,13 +33,13 @@ public class SendEvent extends Graphics {
     System.out.println ("Sending a synthetic KeyPress...");
     KeyPress key_event = new KeyPress (display);
     key_event.set_window (window);
-    key_event.set_detail (display.input.keysym_to_keycode ('t'));
-    window.send_event (false, Event.NO_EVENT_MASK, key_event);
+    key_event.set_detail (display.getInput().keysymToKeycode('t'));
+    window.sendEvent (false, EventMask.NO_EVENT_MASK.getMask(), key_event);
     
     System.out.println ("Sending a synthetic ButtonPress to exit...");
     ButtonPress button_event = new ButtonPress (display);
     key_event.set_window (window);
-    window.send_event (false, Event.NO_EVENT_MASK, button_event);
+    window.sendEvent (false, EventMask.NO_EVENT_MASK.getMask(), button_event);
     display.flush ();
     while (!exit_now) {
       dispatch_event ();

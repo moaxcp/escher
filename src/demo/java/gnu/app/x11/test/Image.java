@@ -109,17 +109,17 @@ public class Image extends Graphics {
 
     System.out.print ("Loading images....");
     xbm = new XBM (display, 32, 32, xbm_data);
-    xpm = new XPM (display, xpm_data);
+    xpm = new XPM (display, xpm_data, null);
     FileInputStream ppm_file = new FileInputStream ("etc/image.pnm");
-    ppm = new PPM (display, ppm_file);
+    ppm = new PPM (display, ppm_file, null);
     System.out.println ("done.");
   }
 
 
   public void paint () {    
-    window.put_image (display.default_gc, xbm, 20, 25);
-    window.put_image (display.default_gc, xpm, 80, 20);
-    window.put_image (display.default_gc, ppm, 150, 30);
+    window.put_image (display.getDefaultGC(), xbm, 20, 25);
+    window.put_image (display.getDefaultGC(), xpm, 80, 20);
+    window.put_image (display.getDefaultGC(), ppm, 150, 30);
     display.flush ();
   }
 

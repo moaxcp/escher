@@ -38,29 +38,29 @@ public class PrintHello extends Application {
     if (help_option) return;
 
     Print print = new Print (display);
-    Print.Context context = print.create_context (printer_name);
+    Print.Context context = print.createContext(printer_name);
 
     System.out.println (print);
     System.out.println (context);
 
-    context.set_attributes (Print.Context.JOB_ATTRIBUTE_POOL,
-      Print.Context.ATTRIBUTE_MERGE,
+    context.set_attributes (Print.Attributes.JOB_ATTRIBUTE_POOL,
+      Print.Rule.ATTRIBUTE_MERGE,
       "*job-name: Hello world for Xprint");
     context.set ();
-    print.start_job (Print.SPOOL);
+    print.startJob (Print.OutputMode.SPOOL);
 
     Window root = context.screen ();
-    GC gc = root.screen ().default_gc ();
-    gc.set_font (new gnu.x11.Font (display, FONT));
+    GC gc = root.getScreen().defaultGC();
+    gc.setFont (new gnu.x11.Font (display, FONT));
     Window window = new Window (root, 100, 100, 100, 100);
     window.create ();
 
-    print.start_page (window);
+    print.startPage (window);
     window.map ();
     window.text (gc, 20, 30, "Hello World!");
-    print.end_page ();
+    print.endPage ();
 
-    print.end_job ();
+    print.endJob ();
     context.destroy ();
     display.close ();    
   }

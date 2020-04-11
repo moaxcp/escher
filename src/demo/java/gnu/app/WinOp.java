@@ -2,6 +2,7 @@ package gnu.app;
 
 import gnu.app.x11.Application;
 import gnu.x11.Window;
+import gnu.x11.Window.*;
 
 
 /**
@@ -76,7 +77,7 @@ public class WinOp extends Application {
       Window.AttributesReply atts = child.getAttributes();
       String name = child.wmName();
       if (! atts.overrideRedirect()
-          && atts.mapState() == Window.AttributesReply.VIEWABLE
+          && atts.mapState() == MapState.VIEWABLE
 	  && name != null) {
 
         System.out.println (child.getID() + " " + name);

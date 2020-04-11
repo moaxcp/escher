@@ -1,11 +1,9 @@
 package gnu.app.x11.test;
 
 import gnu.app.x11.*;
-import gnu.x11.Window;
-import gnu.x11.event.ClientMessage;
-import gnu.x11.event.Expose;
-import gnu.x11.event.Event;
-import gnu.x11.event.KeyPress;
+import gnu.x11.*;
+import gnu.x11.event.*;
+import gnu.x11.event.Event.*;
 
 
 /** 
@@ -33,44 +31,43 @@ public class Hello extends Application {
    
     if (help_option) return;
 
-    Window.Attributes win_attr = new Window.Attributes ();
-    win_attr.set_background (display.default_white);
-    win_attr.set_border (display.default_black);
-    win_attr.set_event_mask (Event.BUTTON_PRESS_MASK
-      | Event.EXPOSURE_MASK | Event.KEY_PRESS_MASK);
-    Window window = new Window (display.default_root, 10, 10,
+    WindowAttributes win_attr = new WindowAttributes();
+    win_attr.setBackground (display.getDefaultWhite());
+    win_attr.setBorder (display.getDefaultBlack());
+    win_attr.setEventMask (EventMask.BUTTON_PRESS_MASK.logicOr(EventMask.EXPOSURE_MASK.logicOr(EventMask.KEY_PRESS_MASK)));
+    Window window = new Window (display.getDefaultRoot(), 10, 10,
       100, 50, 5, win_attr);
     
-    window.set_wm (this, "main");
-    window.set_wm_delete_window ();
+    window.setWM (this, "main");
+    window.setWMDeleteWindow();
     window.map ();
     display.flush ();
 
     while (!exit_now) {
-      Event event = display.next_event ();
+      Event event = display.nextEvent ();
 
       switch (event.code ()) {
-      case gnu.x11.event.ButtonPress.CODE:
+        case BUTTON_PRESS:
         exit ();
         break;
 
-      case ClientMessage.CODE:
-        if (((ClientMessage) event).delete_window ()) exit ();
+      case CLIENT_MESSAGE:
+        if (((ClientMessage) event).deleteWindow()) exit ();
         break;
 
-      case Expose.CODE:
+      case EXPOSE:
         if (((Expose) event).count () == 0) {
-          window.text (display.default_gc, 20, 30, "Hello World!");
+          window.text (display.getDefaultGC(), 20, 30, "Hello World!");
           display.flush ();
         }
         break;
 	
-      case KeyPress.CODE: {
+      case KEY_PRESS: {
         KeyPress e = (KeyPress) event;
 	
         int keycode = e.detail ();
         int keystate = e.state ();
-        int keysym = display.input.keycode_to_keysym (keycode, keystate);
+        int keysym = display.getInput().keycodeToKeysym (keycode, keystate);
 
         if (keysym == 'q' || keysym == 'Q' 
           || keysym == gnu.x11.keysym.Misc.ESCAPE) exit ();

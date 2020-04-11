@@ -65,16 +65,16 @@ public class Zion extends Application {
       System.out.print ("zion> ");
       String command = br.readLine ();
       if (command == null) exit ();
-      if (Misc.empty (command)) continue;
+      if (command.isEmpty()) continue;
       
       if (command.equals ("reset")) 
-        gnu.util.ReloadableClassLoader.reset ();
+        ReloadableClassLoader.reset ();
       else if (command.equals ("exit")) exit ();
 
       else {
         // possbily reset
         if (command.charAt (0) == '=') {
-          gnu.util.ReloadableClassLoader.reset ();
+          ReloadableClassLoader.reset ();
           command = command.substring (1, command.length ());
         }
 
@@ -84,7 +84,7 @@ public class Zion extends Application {
           new SubVM (command, new String [0]);
         else {
           String args0 = command.substring (from, command.length ());
-          String [] args1 = Misc.tokenize (args0);
+          String [] args1 = Misc.tokenize (args0, " \t\n\r\f");
           String name = command.substring (0, from);
           new SubVM (name, args1);
         }
@@ -117,8 +117,7 @@ class SubVM extends Thread {
     
     try {               
       // Class.forName() uses loaded class instead of asking class loader
-      Class klass = gnu.util.ReloadableClassLoader
-        .instance.loadClass (name);
+      Class klass = ReloadableClassLoader.instance.loadClass (name);
 
       Class [] para_types = new Class [] {String [].class};
       main = klass.getDeclaredMethod ("main", para_types);        

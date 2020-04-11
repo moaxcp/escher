@@ -23,7 +23,7 @@ import static gnu.x11.DisplayName.*;
  * <p>Users can also specify --send-mode option. For instance, <code>java
  * gnu.app.x11.test.Hello --send-mode sync</code> will display the same
  * window but the protocol requests are sent synchronously. See {@link
- * Connection#send_mode} and {@link Connection#SEND_MODE_STRINGS} for more
+ * Connection#sendMode} and {@link Connection#SEND_MODE_STRINGS} for more
  * info.
  */
 public class Application extends gnu.app.Application {

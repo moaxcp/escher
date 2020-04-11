@@ -185,12 +185,12 @@ public abstract class Application extends gnu.app.x11.Application {
     if ((event_mask & EVENT_BIT) != 0 && handle_event (event)) return;
 
     switch (event.code ()) {
-    case EventCode.BUTTON_PRESS: dispatch_button_press (); break;
-    case EventCode.CLIENT_MESSAGE: dispatch_client_message (); break;
-    case ConfigureNotify.CODE: dispatch_configure_notify (); break;
-    case Expose.CODE: dispatch_expose (); break;	
-    case KeyPress.CODE: dispatch_key_press (); break;
-    case MotionNotify.CODE: dispatch_motion_notify (); break;
+      case BUTTON_PRESS: dispatch_button_press (); break;
+      case CLIENT_MESSAGE: dispatch_client_message (); break;
+      case CONFIGURE_NOTIFY: dispatch_configure_notify (); break;
+      case EXPOSE: dispatch_expose (); break;
+      case KEY_PRESS: dispatch_key_press (); break;
+      case MOTION_NOTIFY: dispatch_motion_notify (); break;
     }
   }
 
@@ -204,10 +204,10 @@ public abstract class Application extends gnu.app.x11.Application {
     KeyPress e = (KeyPress) event;
     int keycode = e.detail ();
     int keystate = e.state ();
-    int keysym = display.input.keycode_to_keysym (keycode, keystate);
+    int keysym = display.getInput().keycodeToKeysym(keycode, keystate);
 
     if ((event_mask & KEYBOARD_BIT) != 0)
-      handle_keyboard (keysym, keystate, e.event_x (), e.event_y ());
+      handle_keyboard (keysym, keystate, e.getEventX (), e.getEventY ());
 
     if (keysym == gnu.x11.keysym.Misc.ESCAPE) exit ();
   }
@@ -218,7 +218,7 @@ public abstract class Application extends gnu.app.x11.Application {
 
     MotionNotify e = (MotionNotify) event;
     int state = e.state ();      
-    handle_motion (state, e.event_x (), e.event_y ());
+    handle_motion (state, e.getEventY (), e.getEventY ());
   }
 
 

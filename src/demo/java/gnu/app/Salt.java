@@ -1,8 +1,10 @@
 package gnu.app;
 
 import gnu.app.x11.Application;
+import gnu.x11.Input.*;
 import gnu.x11.Window;
 import gnu.x11.event.Event;
+import gnu.x11.event.Event.*;
 import gnu.x11.event.KeyPress;
 
 
@@ -41,17 +43,17 @@ public class Salt extends Application {
 
     if (help_option) return;
 
-    for (Window window : display.default_root.tree ().children ()) {
+    for (Window window : display.getDefaultRoot().tree ().children ()) {
 
-      Window.WMClassHint class_hint = window.wm_class_hint ();
+      Window.WMClassHint class_hint = window.wmClassHint ();
       
       if (class_hint == null) continue;
       if (!class_hint.equals (res_name, res_class)) continue;
       
-      if (window.attributes ().override_redirect ()
-        || window.attributes ().map_state () 
-        != Window.AttributesReply.VIEWABLE
-	|| window.wm_name () == null) continue;
+      if (window.getAttributes().overrideRedirect ()
+        || window.getAttributes ().mapState ()
+        != Window.MapState.VIEWABLE
+	|| window.wmName () == null) continue;
 
 
       for (int i=0; i<message.length (); i++)
@@ -71,10 +73,10 @@ public class Salt extends Application {
 
     KeyPress key_event = new KeyPress (display);
     key_event.set_window (window);
-    key_event.set_detail (display.input.keysym_to_keycode (small_keysym));
-    if (capital) key_event.set_state (gnu.x11.Input.SHIFT_MASK);
+    key_event.set_detail (display.getInput().keysymToKeycode (small_keysym));
+    if (capital) key_event.set_state (KeyMask.SHIFT_MASK.getCode());
 
-    window.send_event (false, Event.NO_EVENT_MASK, key_event);
+    window.sendEvent (false, EventMask.NO_EVENT_MASK.getMask(), key_event);
   }
 
 

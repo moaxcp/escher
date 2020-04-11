@@ -26,10 +26,10 @@ public class Polygon extends Graphics {
 
 
   public void paint () {
-    window.rectangle (display.default_gc, 5, 5, window.width-10, 
+    window.rectangle (display.getDefaultGC(), 5, 5, window.width-10,
       window.height-10, false);
     
-    window.rectangle (display.default_gc, 10, 10, window.width-20, 
+    window.rectangle (display.getDefaultGC(), 10, 10, window.width-20,
       window.height-20, false);
     
 
@@ -41,8 +41,8 @@ public class Polygon extends Graphics {
       new Point (100, 75)
       };
 
-    window.fill_poly (display.default_gc, points, Drawable.CONVEX,
-                      Drawable.ORIGIN);
+    window.fillPoly (display.getDefaultGC(), points, Drawable.Fill.CONVEX,
+                      Drawable.CoordinateMode.ORIGIN);
     display.flush ();
   }
 

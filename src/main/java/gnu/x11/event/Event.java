@@ -1,6 +1,7 @@
 package gnu.x11.event;
 
 import gnu.x11.Display;
+import gnu.x11.Input.*;
 import gnu.x11.RequestOutputStream;
 import gnu.x11.ResponseInputStream;
 
@@ -47,6 +48,18 @@ public abstract class Event {
       public int getMask() {
         return mask;
       }
+
+    public boolean is(int mask) {
+      return this.mask == mask;
+    }
+
+    public int logicOr(EventMask em) {
+      return this.getMask() | em.getMask();
+    }
+
+    public int logicOr(int i) {
+      return this.getMask() | i;
+    }
       
       public static int maskOr(EventMask[] eventMasks) {
          int resultMask = 0;

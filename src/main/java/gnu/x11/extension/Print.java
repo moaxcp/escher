@@ -55,14 +55,14 @@ public class Print extends gnu.x11.extension.Extension
   public int serverMajorVersion, serverMinorVersion;
 
   
-  public enum EventMask {
+  public enum PrintMask {
       XPNoEventMask(0),
       XPPrintMask(1),
       XPAttributeMask(2);
       
       private int code;
       
-      EventMask(int code) {
+      PrintMask(int code) {
           this.code = code;
       }
       
@@ -233,12 +233,12 @@ public class Print extends gnu.x11.extension.Extension
     /**
      * @see <a href="XpSelectInput.html">XpSelectInput</a>
      */
-    public void selectInput(EventMask eventMask) {
+    public void selectInput(PrintMask printMask) {
       RequestOutputStream o = display.getResponseOutputStream();
       synchronized(o) {
         o.beginRequest(majorOpcode, 15, 3);
         o.writeInt32(id);
-        o.writeInt32(eventMask.getCode());
+        o.writeInt32(printMask.getCode());
         o.send();
       }
     }
@@ -246,13 +246,13 @@ public class Print extends gnu.x11.extension.Extension
   
     /** Reply of {@link #inputSelected(int)}. */
     public class InputSelectedInfo {
-      public EventMask eventMask;
+      public PrintMask printMask;
       public int allEventMasks;
       InputSelectedInfo(ResponseInputStream i) {
-        eventMask = EventMask.values()[i.readInt32()];
+        printMask = PrintMask.values()[i.readInt32()];
         allEventMasks = i.readInt32();
       }
-      public EventMask eventMask() { return eventMask; }
+      public PrintMask eventMask() { return printMask; }
       public int allEventsMask() { return allEventMasks; }
     }
   
@@ -261,7 +261,7 @@ public class Print extends gnu.x11.extension.Extension
     /**
      * @see <a href="XpInputSelected.html">XpInputSelected</a>
      */
-    public InputSelectedInfo inputSelected(EventMask eventMask) {
+    public InputSelectedInfo inputSelected(PrintMask printMask) {
 
       InputSelectedInfo info;
       RequestOutputStream o = display.getResponseOutputStream();

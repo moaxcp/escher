@@ -46,8 +46,8 @@ public class Shape extends Graphics {
     XBM xbm = new XBM (display, 32, 32, xbm_data);
     
     GC.Values gv = new GC.Values ();
-    gv.set_background (display.default_white);
-    gv.set_foreground (display.default_black);
+    gv.setBackground (display.getDefaultWhite());
+    gv.setForeground (display.getDefaultBlack());
     GC gc = new GC (mask, gv);
 
     mask.put_image (gc, xbm, 0, 0);
@@ -55,23 +55,14 @@ public class Shape extends Graphics {
 
     gnu.x11.extension.Shape shape = new gnu.x11.extension.Shape (display);
 
-    // test extension opcode string in error 
-    try {
-      shape.combine_mask (window, -1, 0, 0, mask, -1);
-      display.check_error (); 
-
-    } catch (Error e) {
-      System.out.println ("Forced error for testing: " + e);
-    }      
-
     // force a round trip after an error is generated
-    display.input.input_focus ();
+    display.getInput().inputFocus ();
 
     // test extension event mechanism
-    shape.select_input (window, true);
+    shape.selectInput (window, true);
 
-    shape.combine_mask (window, gnu.x11.extension.Shape.BOUNDING, 0, 0, 
-      mask, gnu.x11.extension.Shape.SUBTRACT);
+    shape.combineMask (window, gnu.x11.extension.Shape.Kind.BOUNDING, 0, 0,
+      mask, gnu.x11.extension.Shape.Operation.SUBTRACT);
   }
 
 
