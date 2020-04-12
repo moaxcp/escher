@@ -64,7 +64,7 @@ public enum EventCode {
     
     public static EventCode getEventByID(int id) {
         EventCode event = getEventCodes().get(id);
-        return (event == null) ? event : LAST_EVENT;
+        return (event != null) ? event : LAST_EVENT;
       }
     
     public EventCode and(int mask) {
