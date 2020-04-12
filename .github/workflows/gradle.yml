@@ -16,8 +16,9 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
-      with:
-        fetch-depth: 0 # needed for sonar blame info
+    # needed for sonar blame info and version in gradle
+      run: |
+      git fetch --prune --unshallow
     - name: Set up JDK 1.8
       uses: actions/setup-java@v1
       with:
