@@ -1,7 +1,6 @@
 package gnu.x11.event;
 
-import gnu.x11.Display;
-import gnu.x11.ResponseInputStream;
+import gnu.x11.*;
 
 
 /**

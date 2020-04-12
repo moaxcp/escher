@@ -1,5 +1,7 @@
 package gnu.x11.event;
 
+import lombok.*;
+
 import java.util.*;
 import java.util.stream.*;
 
@@ -52,7 +54,7 @@ public enum EventCode {
         .collect(toMap(EventCode::getCode, identity()));
   }
 
-  private final int code;
+  @Getter private final int code;
 
   EventCode(int code) {
     this.code = code;
@@ -78,14 +80,5 @@ public enum EventCode {
   public EventCode and(int mask) {
     int andMask = this.getCode() & mask;
     return fromCodes.get(andMask);
-  }
-
-  /**
-   * Returns the code for this event code.
-   *
-   * @return
-   */
-  public final int getCode() {
-    return code;
   }
 }

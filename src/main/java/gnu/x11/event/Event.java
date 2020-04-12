@@ -3,17 +3,19 @@ package gnu.x11.event;
 import gnu.x11.Display;
 import gnu.x11.RequestOutputStream;
 import gnu.x11.ResponseInputStream;
+import lombok.*;
 
 /**
  * The base class for all X events.
  */
+@Getter
 public abstract class Event {
 
   private Display display;
 
   private EventCode code;
 
-  private int detail;
+  @Setter private int detail; //todo temp for demo
 
   private int sequenceNumber;
 
@@ -41,61 +43,9 @@ public abstract class Event {
     code = c;
   }
 
-  /**
-   * The display from which this event originated.
-   */
-  public Display getDisplay() {
-    return display;
-  }
-
-  /**
-   * The event code;
-   */
-  public EventCode getCode() {
-    return code;
-  }
-
-  /**
-   * Event-specific detail information.
-   */
-  public int getDetail() {
-    return detail;
-  }
-
-  /**
-   * The sequence number of the event.
-   */
-  public int getSequenceNumber() {
-    return sequenceNumber;
-  }
-
-  public void setDisplay(Display display) {
-    this.display = display;
-  }
-
-  public void setCode(EventCode code) {
-    this.code = code;
-  }
-
-  public void setDetail(int detail) {
-    this.detail = detail;
-  }
-
-  public void setSequenceNumber(int sequenceNumber) {
-    this.sequenceNumber = sequenceNumber;
-  }
-
-  public EventCode code() {
-    return code;
-  }
-
-  public int sequenceNumber() {
-    return sequenceNumber;
-  }
-
   public String toString() {
     String class_name = "#" + getClass().getName();
-    return class_name + " " + code();
+    return class_name + " " + getCode();
   }
 
   /**

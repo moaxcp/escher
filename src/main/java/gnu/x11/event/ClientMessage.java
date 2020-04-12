@@ -46,6 +46,7 @@ public final class ClientMessage extends Event {
   }
 
 
+  //todo seems to return if this message is for a deleted window this is not obvious from the method name
   public boolean deleteWindow () {
     Atom wm_protocols = (Atom) Atom.intern (getDisplay(), "WM_PROTOCOLS");
     Atom wm_delete_window = (Atom) Atom.intern (getDisplay(),

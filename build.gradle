@@ -88,3 +88,7 @@ task demoJar(type: Jar) {
 }
 
 assemble.dependsOn demoJar
+
+lombok {
+    version = '1.18.12'
+}

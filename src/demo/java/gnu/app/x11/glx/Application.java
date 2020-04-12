@@ -184,7 +184,7 @@ public abstract class Application extends gnu.app.x11.Application {
     event = display.nextEvent();
     if ((event_mask & EVENT_BIT) != 0 && handle_event (event)) return;
 
-    switch (event.code ()) {
+    switch (event.getCode()) {
       case BUTTON_PRESS: dispatch_button_press (); break;
       case CLIENT_MESSAGE: dispatch_client_message (); break;
       case CONFIGURE_NOTIFY: dispatch_configure_notify (); break;

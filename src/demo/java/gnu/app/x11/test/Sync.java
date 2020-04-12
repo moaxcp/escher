@@ -42,7 +42,7 @@ public class Sync extends Graphics implements Runnable {
     event = display.nextEvent ();
     System.out.println ("got event " + event);
 
-    switch (event.code ()) {
+    switch (event.getCode()) {
     case BUTTON_PRESS:
       exit ();
       break;

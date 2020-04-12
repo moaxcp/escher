@@ -45,7 +45,7 @@ public class Hello extends Application {
     while (!exit_now) {
       Event event = display.nextEvent ();
 
-      switch (event.code ()) {
+      switch (event.getCode()) {
         case BUTTON_PRESS:
         exit ();
         break;

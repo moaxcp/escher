@@ -120,7 +120,7 @@ public abstract class DisplayHack extends Application
   public void dispatch_event () {
     Event event = display.nextEvent();
 
-    switch (event.code ()) {
+    switch (event.getCode()) {
       case BUTTON_PRESS: {
       int button = ((ButtonPress) event).detail();
       if (BUTTON1.is(button)) restart ();

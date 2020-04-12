@@ -54,7 +54,7 @@ public abstract class Graphics extends Application {
   protected void dispatch_event () {
     event = display.nextEvent();
 
-    switch (event.code ()) {
+    switch (event.getCode()) {
     case BUTTON_PRESS:
       exit ();
       break;

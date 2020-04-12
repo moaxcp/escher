@@ -1249,7 +1249,7 @@ public class Puppet extends Application {
   public void when (Event event) {
     if (print_event) System.out.println (event);
 
-    switch (event.code ()) {
+    switch (event.getCode()) {
     case BUTTON_PRESS:
       when_button_press ((ButtonPress) event);
       break;
@@ -1342,12 +1342,12 @@ public class Puppet extends Application {
     for (Iterator it=other_events.iterator (); it.hasNext ();) {       
       Event event = (Event) it.next ();
 
-      if (event.code () == EventCode.DESTROY_NOTIFY) {
+      if (event.getCode() == EventCode.DESTROY_NOTIFY) {
         Client client = (Client) Client.intern (display, 
           ((DestroyNotify) event).getWindowID());
         client.early_destroyed = true;
 
-      } else if (event.code () == EventCode.UNMAP_NOTIFY) {
+      } else if (event.getCode() == EventCode.UNMAP_NOTIFY) {
         Client client = (Client) Client.intern (display, 
           ((UnmapNotify) event).getWindowID());
         client.early_unmapped = true;
