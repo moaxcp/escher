@@ -93,3 +93,12 @@ assemble.dependsOn demoJar
 lombok {
     version = '1.18.12'
 }
+
+sonarqube {
+    properties {
+        properties["sonar.sources"] += sourceSets.demo.allSource.srcDirs
+        properties["sonar.sources"] += sourceSets.testFixtures.allSource.srcDirs
+        properties["sonar.tests"] += sourceSets.integrationTest.allSource.srcDirs
+        properties["sonar.tests"] += sourceSets.demoTest.allSource.srcDirs
+    }
+}
