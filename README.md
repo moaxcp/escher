@@ -12,11 +12,11 @@ native library. Applications using this library do not need to worry about compa
 
 ### Goals of release
 
-[] add github actions
-  [] run test
-  [] sonar scan
-  [] publish to github
-  [] publish to maven central
+- [ ] add github actions
+  - [ ] run test
+  - [ ] sonar scan
+  - [ ] publish to github
+  - [ ] publish to maven central
 
 ### Changes
 
