@@ -10,6 +10,16 @@ native library. Applications using this library do not need to worry about compa
 
 ## 0.4.0-SNAPSHOT
 
+### Goals of release
+
+[] add github actions
+  [] run test
+  [] sonar scan
+  [] publish to github
+  [] publish to maven central
+
+### Changes
+
 The first release from this fork. Includes previously unreleased code from the original sourceforge repository. A lot
 has changed in the unreleased code but this is a summary of what was changed in this fork:
 
