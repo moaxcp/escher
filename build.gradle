@@ -96,9 +96,9 @@ lombok {
 
 sonarqube {
     properties {
-        properties["sonar.sources"] += sourceSets.demo.allSource.srcDirs
-        properties["sonar.sources"] += sourceSets.testFixtures.allSource.srcDirs
-        properties["sonar.tests"] += sourceSets.integrationTest.allSource.srcDirs
-        properties["sonar.tests"] += sourceSets.demoTest.allSource.srcDirs
+        properties["sonar.sources"] += sourceSets.demo.allSource.srcDirs.findAll { it.exists() }
+        properties["sonar.sources"] += sourceSets.testFixtures.allSource.srcDirs.findAll { it.exists() }
+        properties["sonar.tests"] += sourceSets.integrationTest.allSource.srcDirs.findAll { it.exists() }
+        properties["sonar.tests"] += sourceSets.demoTest.allSource.srcDirs.findAll { it.exists() }
     }
 }
