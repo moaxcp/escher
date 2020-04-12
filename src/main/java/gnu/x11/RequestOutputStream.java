@@ -334,7 +334,7 @@ public class RequestOutputStream extends FilterOutputStream {
    *
    * @param v
    */
-  public void write (int v) throws IOException {
+  public void write (int v) {
     assert Thread.holdsLock (this);
     buffer [index] = (byte) v;
     index++;
@@ -600,7 +600,7 @@ public class RequestOutputStream extends FilterOutputStream {
    * @param ex the exception to handle
    */
   private void handleException (Throwable ex) {
-    ex.printStackTrace();
+    throw new X11ClientException(ex);
   }
 
   public void increaseLength (int i) {

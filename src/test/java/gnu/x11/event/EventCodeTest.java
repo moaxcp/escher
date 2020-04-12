@@ -2,15 +2,24 @@ package gnu.x11.event;
 
 import org.junit.jupiter.api.*;
 
-import java.util.stream.*;
-
+import static gnu.x11.event.EventCode.*;
 import static org.assertj.core.api.Assertions.*;
 
 public class EventCodeTest {
   @Test
-  void getEventByID() {
+  void of_with_each_code() {
     for(EventCode code : EventCode.values()) {
-      assertThat(EventCode.getEventByID(code.getCode())).isEqualTo(code);
+      assertThat(EventCode.of(code.getValue())).isEqualTo(code);
     }
+  }
+
+  @Test
+  void of_LAST_EVENT() {
+    assertThat(EventCode.of(1000)).isEqualTo(LAST_EVENT);
+  }
+
+  @Test
+  void and() {
+    assertThat(KEY_PRESS.and(KEY_PRESS.getValue())).isEqualTo(KEY_PRESS);
   }
 }

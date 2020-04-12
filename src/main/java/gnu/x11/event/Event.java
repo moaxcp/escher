@@ -1,7 +1,6 @@
 package gnu.x11.event;
 
 import gnu.x11.Display;
-import gnu.x11.Input.*;
 import gnu.x11.RequestOutputStream;
 import gnu.x11.ResponseInputStream;
 
@@ -105,7 +104,7 @@ public abstract class Event {
    */
   public Event (Display display, ResponseInputStream in) {
     this.display = display;
-    code = EventCode.getEventByID(in.readInt8());
+    code = EventCode.of(in.readInt8());
     detail = in.readInt8 ();
     sequenceNumber = in.readInt16();
   }
@@ -136,7 +135,7 @@ public abstract class Event {
    * @param o the output stream to write to
    */
   public void write (RequestOutputStream o) {
-    o.writeInt8(code.getCode());
+    o.writeInt8(code.getValue());
     o.writeInt8(detail);
     o.writeInt16(sequenceNumber); // Is this correct?
 

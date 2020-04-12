@@ -119,9 +119,6 @@ public class Display {
 
     private int maxKeycode;
 
-    /**
-     * @see Screen#default_gc()
-     */
     private GC defaultGC;
 
     // Resources

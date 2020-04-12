@@ -86,8 +86,7 @@ public class ResponseInputStream extends FilterInputStream {
     }
 
     private void handleException(Throwable ex) {
-
-        ex.printStackTrace();
+        throw new X11ClientException(ex);
     }
 
     public void pad(int n) {
@@ -372,7 +371,7 @@ public class ResponseInputStream extends FilterInputStream {
             code = this.readInt8();
             this.in.reset();
         } catch (IOException ex) {
-            ex.printStackTrace();
+            this.handleException(ex);
         }
         // System.err.println("reading code: " + code + " masked: " + (code &
         // 0x7f));
@@ -482,10 +481,7 @@ public class ResponseInputStream extends FilterInputStream {
      * Flushes the currently pending request and starts reading the reply. The
      * specified sequence number is used to check the reply sequence number.
      * 
-     * @param seq_no
-     *                the sequence number of the request
-     * 
-     * @return the input stream for reading the reply
+     * @param out
      */
     public void readReply(RequestOutputStream out) {
 
