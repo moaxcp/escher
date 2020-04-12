@@ -70,9 +70,9 @@ public class Salt extends Application {
     int small_keysym = !capital ? keysym : keysym + ('a' - 'A');
 
     KeyPress key_event = new KeyPress (display);
-    key_event.set_window (window);
+    key_event.setWindow (window);
     key_event.setDetail (display.getInput().keysymToKeycode (small_keysym));
-    if (capital) key_event.set_state (KeyMask.SHIFT_MASK.getCode());
+    if (capital) key_event.setState (KeyMask.SHIFT_MASK.getCode());
 
     window.sendEvent (false, EventMask.NO_EVENT_MASK.getMask(), key_event);
   }

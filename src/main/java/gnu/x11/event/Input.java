@@ -221,55 +221,21 @@ public abstract class Input extends Event {
         return this.sameScreen;
     }
 
-    /**
-     * @deprecated Use {@link #getRoot()} instead
-     */
-    public Window root() {
+    public Window getRoot() {
         return (Window) Window.intern(getDisplay(), getRootWindowID());
     }
 
-    public Window getRoot() {
-
-        return root();
-    }
-
-    /**
-     * @deprecated Use {@link #getChild()} instead
-     */
-    public Window child() {
-        
+    public Window getChild() {
         return (Window) Window.intern(getDisplay(), childWindowID);
     }
 
-    public Window getChild() {
 
-        return child();
-    }
-
-    /**
-     * @deprecated Use {@link #setWindow(Window)} instead
-     */
-    public void set_window(Window w) {
-
+    public void setWindow(Window w) {
         setEventWindowID(w.getID());
     }
 
-    public void setWindow(Window w) {
-
-        set_window(w);
-    }
-
-    /**
-     * @deprecated Use {@link #setState(int)} instead
-     */
-    public void set_state(int s) {
-        
-        state = s;
-    }
-
     public void setState(int s) {
-
-        set_state(s);
+        state = s;
     }
 
     public void write(RequestOutputStream o) {
