@@ -22,7 +22,12 @@ jobs:
         java-version: 1.8
     - name: Grant execute permission for gradlew
       run: chmod +x gradlew
-    - name: Test
+    - name: Unit Test
       run: ./gradlew test
-    - name: Assemble
+    - name: Assemble Jars
       run: ./gradlew assemble
+    - name: Sonarqube Scan
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+      run: ./gradlew -Dsonar.login=${SONAR_TOKEN} sonarqube
