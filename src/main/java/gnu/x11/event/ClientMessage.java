@@ -24,7 +24,7 @@ public final class ClientMessage extends Event {
   //-- reading
 
   public int format () {
-    return detail;
+    return getDetail();
   }
 
   public int type_id () {
@@ -47,8 +47,8 @@ public final class ClientMessage extends Event {
 
 
   public boolean deleteWindow () {
-    Atom wm_protocols = (Atom) Atom.intern (display, "WM_PROTOCOLS");
-    Atom wm_delete_window = (Atom) Atom.intern (display,
+    Atom wm_protocols = (Atom) Atom.intern (getDisplay(), "WM_PROTOCOLS");
+    Atom wm_delete_window = (Atom) Atom.intern (getDisplay(),
       "WM_DELETE_WINDOW");
 
     return format () == 32
@@ -58,7 +58,7 @@ public final class ClientMessage extends Event {
 
 
   public Atom type () { 
-    return (Atom) Atom.intern (display, type_id (), true); 
+    return (Atom) Atom.intern (getDisplay(), type_id (), true);
   }
   
   

@@ -57,7 +57,7 @@ public final class ConfigureRequest extends Event {
 
 
   public Window.Changes.StackMode stackMode () {
-    return Window.Changes.StackMode.getByCode(detail);
+    return Window.Changes.StackMode.getByCode(getDetail());
   }
 
   public int siblingID() {

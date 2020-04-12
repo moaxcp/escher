@@ -3,9 +3,7 @@ package gnu.app;
 import gnu.app.x11.Application;
 import gnu.x11.Input.*;
 import gnu.x11.Window;
-import gnu.x11.event.Event;
-import gnu.x11.event.Event.*;
-import gnu.x11.event.KeyPress;
+import gnu.x11.event.*;
 
 
 /**
@@ -73,7 +71,7 @@ public class Salt extends Application {
 
     KeyPress key_event = new KeyPress (display);
     key_event.set_window (window);
-    key_event.set_detail (display.getInput().keysymToKeycode (small_keysym));
+    key_event.setDetail (display.getInput().keysymToKeycode (small_keysym));
     if (capital) key_event.set_state (KeyMask.SHIFT_MASK.getCode());
 
     window.sendEvent (false, EventMask.NO_EVENT_MASK.getMask(), key_event);

@@ -783,7 +783,7 @@ public class Print extends gnu.x11.extension.Extension
      * @return valid:
      * {@link Attributes}
      */
-    public Attributes detail() { return Attributes.values()[detail + 1]; }
+    public Attributes detail() { return Attributes.values()[getDetail() + 1]; }
     public int contextID() { return contextID; }
   }  
   
@@ -807,7 +807,7 @@ public class Print extends gnu.x11.extension.Extension
      * @return valid:
      * {@link Notify},
      */
-    public Notify detail() { return Notify.values()[detail]; }
+    public Notify detail() { return Notify.values()[getDetail()]; }
   
   
     public int getContextID() { return contextID; }

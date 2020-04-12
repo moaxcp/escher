@@ -10,19 +10,19 @@ import java.lang.Error;
 
 /** OpenGL application. */
 public abstract class Application extends gnu.app.x11.Application {
-  protected static final int EVENT_BIT = 1<<Event.EventMask.LAST_MASK_INDEX.getMask()+1;
-  protected static final int DELETE_BIT = 1<<Event.EventMask.LAST_MASK_INDEX.getMask()+2;
+  protected static final int EVENT_BIT = 1<< EventMask.LAST_MASK_INDEX.getMask()+1;
+  protected static final int DELETE_BIT = 1<< EventMask.LAST_MASK_INDEX.getMask()+2;
 
-  protected static final int BUTTON_PRESS_BIT = Event.EventMask.BUTTON_PRESS_MASK.getMask();
-  protected static final int BUTTON_MOTION_BIT = Event.EventMask.BUTTON_MOTION_MASK.getMask();
-  protected static final int BUTTON1_MOTION_BIT = Event.EventMask.BUTTON1_MOTION_MASK.getMask();
-  protected static final int BUTTON2_MOTION_BIT = Event.EventMask.BUTTON2_MOTION_MASK.getMask();
-  protected static final int BUTTON3_MOTION_BIT = Event.EventMask.BUTTON3_MOTION_MASK.getMask();
-  protected static final int BUTTON4_MOTION_BIT = Event.EventMask.BUTTON4_MOTION_MASK.getMask();
-  protected static final int BUTTON5_MOTION_BIT = Event.EventMask.BUTTON5_MOTION_MASK.getMask();
-  protected static final int KEYBOARD_BIT = Event.EventMask.KEY_PRESS_MASK.getMask();
-  protected static final int POINTER_MOTION_BIT = Event.EventMask.POINTER_MOTION_MASK.getMask();
-  protected static final int RESIZE_BIT = Event.EventMask.STRUCTURE_NOTIFY_MASK.getMask();
+  protected static final int BUTTON_PRESS_BIT = EventMask.BUTTON_PRESS_MASK.getMask();
+  protected static final int BUTTON_MOTION_BIT = EventMask.BUTTON_MOTION_MASK.getMask();
+  protected static final int BUTTON1_MOTION_BIT = EventMask.BUTTON1_MOTION_MASK.getMask();
+  protected static final int BUTTON2_MOTION_BIT = EventMask.BUTTON2_MOTION_MASK.getMask();
+  protected static final int BUTTON3_MOTION_BIT = EventMask.BUTTON3_MOTION_MASK.getMask();
+  protected static final int BUTTON4_MOTION_BIT = EventMask.BUTTON4_MOTION_MASK.getMask();
+  protected static final int BUTTON5_MOTION_BIT = EventMask.BUTTON5_MOTION_MASK.getMask();
+  protected static final int KEYBOARD_BIT = EventMask.KEY_PRESS_MASK.getMask();
+  protected static final int POINTER_MOTION_BIT = EventMask.POINTER_MOTION_MASK.getMask();
+  protected static final int RESIZE_BIT = EventMask.STRUCTURE_NOTIFY_MASK.getMask();
 
   private static final int ANY_BUTTON_MOTION_BITS = BUTTON_MOTION_BIT 
     | BUTTON1_MOTION_BIT 
@@ -124,13 +124,13 @@ public abstract class Application extends gnu.app.x11.Application {
     // `visual_config.buffer_size'?
     int depth = visual_config.buffer_size ();
 
-    int more = Event.EventMask.EXPOSURE_MASK.getMask() | Event.EventMask.KEY_PRESS_MASK.getMask(); // compulsory
+    int more = EventMask.EXPOSURE_MASK.getMask() | EventMask.KEY_PRESS_MASK.getMask(); // compulsory
 
     /* Bugs? Whenever button motion events are selected, it is required to
      * select button press event as well. 
      */
      if ((event_mask & ANY_BUTTON_MOTION_BITS) != 0)
-       more |= Event.EventMask.BUTTON_PRESS_MASK.getMask();
+       more |= EventMask.BUTTON_PRESS_MASK.getMask();
      attr.setEventMask(event_mask | more);
 
     window = new Window (display.getDefaultRoot(), 10, 10, width, height);

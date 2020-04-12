@@ -45,26 +45,17 @@ public enum EventCode {
   MAPPING_NOTIFY(34),
   LAST_EVENT(36);
 
-  private final int code;
-
-  EventCode(int code) {
-    this.code = code;
-  }
-
-  /**
-   * Returns the code for this event code.
-   *
-   * @return
-   */
-  public final int getValue() {
-    return code;
-  }
-
   private static final Map<Integer, EventCode> fromCodes;
 
   static {
     fromCodes = Stream.of(values())
-        .collect(toMap(EventCode::getValue, identity()));
+        .collect(toMap(EventCode::getCode, identity()));
+  }
+
+  private final int code;
+
+  EventCode(int code) {
+    this.code = code;
   }
 
   /**
@@ -85,7 +76,16 @@ public enum EventCode {
    * @return
    */
   public EventCode and(int mask) {
-    int andMask = this.getValue() & mask;
+    int andMask = this.getCode() & mask;
     return fromCodes.get(andMask);
+  }
+
+  /**
+   * Returns the code for this event code.
+   *
+   * @return
+   */
+  public final int getCode() {
+    return code;
   }
 }

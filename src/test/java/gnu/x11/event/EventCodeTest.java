@@ -9,7 +9,7 @@ public class EventCodeTest {
   @Test
   void of_with_each_code() {
     for(EventCode code : EventCode.values()) {
-      assertThat(EventCode.of(code.getValue())).isEqualTo(code);
+      assertThat(EventCode.of(code.getCode())).isEqualTo(code);
     }
   }
 
@@ -20,6 +20,6 @@ public class EventCodeTest {
 
   @Test
   void and() {
-    assertThat(KEY_PRESS.and(KEY_PRESS.getValue())).isEqualTo(KEY_PRESS);
+    assertThat(KEY_PRESS.and(KEY_PRESS.getCode())).isEqualTo(KEY_PRESS);
   }
 }

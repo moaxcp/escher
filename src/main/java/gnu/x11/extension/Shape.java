@@ -439,7 +439,7 @@ public class Shape extends Extension implements EventFactory {
      * @return valid:
      * {@link Kind}
      */
-    public Kind kind() { return Kind.getByCode(detail); }
+    public Kind kind() { return Kind.getByCode(getDetail()); }
 
 
     public Rectangle rectangle() {

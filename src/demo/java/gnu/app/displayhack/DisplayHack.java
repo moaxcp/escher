@@ -3,7 +3,6 @@ package gnu.app.displayhack;
 import gnu.app.x11.*;
 import gnu.x11.*;
 import gnu.app.displayhack.eraser.Eraser;
-import gnu.x11.Input;
 import gnu.x11.event.*;
 
 import java.util.Random;
@@ -91,9 +90,9 @@ public abstract class DisplayHack extends Application
 
     WindowAttributes win_attr = new WindowAttributes ();
     win_attr.setBackground(display.getDefaultBlack());
-    win_attr.setEventMask(Event.EventMask.BUTTON_PRESS_MASK.getMask()
-      | Event.EventMask.STRUCTURE_NOTIFY_MASK .getMask()
-      | Event.EventMask.EXPOSURE_MASK.getMask() | Event.EventMask.KEY_PRESS_MASK.getMask());
+    win_attr.setEventMask(EventMask.BUTTON_PRESS_MASK.getMask()
+      | EventMask.STRUCTURE_NOTIFY_MASK .getMask()
+      | EventMask.EXPOSURE_MASK.getMask() | EventMask.KEY_PRESS_MASK.getMask());
     window = new Window (display.getDefaultRoot(), geometry, 0, win_attr);
 
     window.setWM(this, "main");

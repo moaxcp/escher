@@ -58,7 +58,7 @@ public abstract class Input extends Event {
 
     public int detail() {
 
-        return detail;
+        return getDetail();
     }
 
     /**
@@ -228,7 +228,7 @@ public abstract class Input extends Event {
      * @deprecated Use {@link #getRoot()} instead
      */
     public Window root() {
-        return (Window) Window.intern(display, getRootWindowID());
+        return (Window) Window.intern(getDisplay(), getRootWindowID());
     }
 
     public Window getRoot() {
@@ -241,7 +241,7 @@ public abstract class Input extends Event {
      */
     public Window child() {
         
-        return (Window) Window.intern(display, childWindowID);
+        return (Window) Window.intern(getDisplay(), childWindowID);
     }
 
     public Window getChild() {
@@ -260,19 +260,6 @@ public abstract class Input extends Event {
     public void setWindow(Window w) {
 
         set_window(w);
-    }
-
-    /**
-     * @deprecated Use {@link #setDetail(int)} instead
-     */
-    public void set_detail(int d) {
-        
-        detail = d;
-    }
-
-    public void setDetail(int d) {
-
-        set_detail(d);
     }
 
     /**

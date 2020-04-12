@@ -14,7 +14,7 @@ public final class KeymapNotify extends Event {
   private byte[] keys;
 
   public KeymapNotify (Display display, ResponseInputStream in) {
-    super ();
+    super(display);
     this.display = display;
     code = in.readInt8();
     keys = new byte[31];

@@ -4,7 +4,7 @@ import gnu.app.x11.*;
 import gnu.x11.*;
 import gnu.x11.event.*;
 
-import static gnu.x11.event.Event.EventMask.*;
+import static gnu.x11.event.EventMask.*;
 
 
 /** Base class for testing basic drawing. */

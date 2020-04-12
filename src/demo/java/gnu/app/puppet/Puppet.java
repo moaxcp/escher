@@ -2,13 +2,11 @@ package gnu.app.puppet;
 
 import gnu.app.x11.*;
 import gnu.x11.*;
-import gnu.x11.Host.*;
 import gnu.x11.Window.*;
 import gnu.x11.X11ServiceException.*;
 import gnu.x11.event.*;
 import gnu.x11.Input;           // shadow gnu.x11.event.Input
 import gnu.x11.X11ServiceException;           // shadow java.lang.Error
-import gnu.x11.event.Event.*;
 import gnu.x11.extension.XTest;
 import gnu.x11.extension.NotFoundException;
 import gnu.x11.keysym.Misc;
@@ -513,14 +511,14 @@ public class Puppet extends Application {
 
     // CLICK-TO-FOCUS
     root.grabButtonIgnoreLocks (Window.ANY_BUTTON,
-      Input.KeyMask.CONTROL_MASK.getCode(), true, Event.EventMask.BUTTON_PRESS_MASK.getMask(),
+      Input.KeyMask.CONTROL_MASK.getCode(), true, EventMask.BUTTON_PRESS_MASK.getMask(),
         GrabMode.ASYNCHRONOUS, GrabMode.ASYNCHRONOUS, Window.NONE,
       Cursor.NONE);
 
     // close / delete
     root.grabButtonIgnoreLocks (Window.ANY_BUTTON,
       Input.KeyMask.CONTROL_MASK.logicOr(Input.KeyMask.META_MASK), true,
-      Event.EventMask.BUTTON_PRESS_MASK.getMask(), GrabMode.ASYNCHRONOUS, GrabMode.ASYNCHRONOUS,
+      EventMask.BUTTON_PRESS_MASK.getMask(), GrabMode.ASYNCHRONOUS, GrabMode.ASYNCHRONOUS,
       Window.NONE, Cursor.NONE);    
   }
 

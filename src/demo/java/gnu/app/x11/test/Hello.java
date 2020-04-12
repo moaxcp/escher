@@ -3,7 +3,6 @@ package gnu.app.x11.test;
 import gnu.app.x11.*;
 import gnu.x11.*;
 import gnu.x11.event.*;
-import gnu.x11.event.Event.*;
 
 
 /** 
