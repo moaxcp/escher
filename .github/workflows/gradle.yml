@@ -24,12 +24,15 @@ jobs:
         java-version: 1.8
     - name: Grant execute permission for gradlew
       run: chmod +x gradlew
-    - name: Unit Test
-      run: ./gradlew test
-    - name: Assemble Jars
+    - name: Build Jars
       run: ./gradlew assemble
+    - name: Unit Test
+      continue-on-error: true
+      run: ./gradlew test
+    - name: Jacoco Test Report
+      run: ./gradlew jacocoTestReport
     - name: Sonarqube Scan
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-      run: ./gradlew -Dsonar.host.url=https://sonarcloud.io -Dsonar.organization=moaxcp -Dsonar.login=${SONAR_TOKEN} sonarqube
+      run: ./gradlew -x test -Dsonar.host.url=https://sonarcloud.io -Dsonar.organization=moaxcp -Dsonar.login=${SONAR_TOKEN} sonarqube
