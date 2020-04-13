@@ -36,3 +36,5 @@ has changed in the unreleased code but this is a summary of what was changed in 
 * Added use of [junixsocket](https://github.com/kohlschutter/junixsocket) since unixsocket is the dominate means of 
 connecting
 * small changes to api to use standard camelCase and allow demos to run
+* Added CI through github actions
+* Added project to sonarqube

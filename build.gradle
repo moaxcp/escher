@@ -53,6 +53,12 @@ jacoco {
     toolVersion = '0.8.5'
 }
 
+jacocoTestReport {
+    reports {
+        xml.enabled true
+    }
+}
+
 reckon {
     scopeFromProp()
     snapshotFromProp()
@@ -100,5 +106,7 @@ sonarqube {
         properties["sonar.sources"] += sourceSets.testFixtures.allSource.srcDirs.findAll { it.exists() }
         properties["sonar.tests"] += sourceSets.integrationTest.allSource.srcDirs.findAll { it.exists() }
         properties["sonar.tests"] += sourceSets.demoTest.allSource.srcDirs.findAll { it.exists() }
+
+        properties['sonar.sourceEncoding'] = 'UTF-8'
     }
 }
