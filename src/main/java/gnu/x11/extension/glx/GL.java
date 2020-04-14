@@ -978,7 +978,7 @@ public class GL extends gnu.x11.Resource implements GLConstant {
      *      href="http://www.opengl.org/sdk/docs/man/xhtml/glGet.xml">glGetIntegerv</a>
      * 
      * @param name
-     * @param ret
+     * @param param
      */
     public void getIntegerv(int name, int[] param, int offset) {
 
@@ -1009,7 +1009,7 @@ public class GL extends gnu.x11.Resource implements GLConstant {
      * @param light
      * @param pname
      * @param params
-     * @param params_offset
+     * @param paramsOffset
      */
     public void getLightfv(int light, int pname, float[] params,
                            int paramsOffset) {
@@ -1104,7 +1104,7 @@ public class GL extends gnu.x11.Resource implements GLConstant {
      *      glGetPixelMapuiv</a>
      * @param map
      * @param params
-     * @param offest
+     * @param offset
      */
     public void getPixelMapuiv(int map, int[] params, int offset) {
 
@@ -1735,7 +1735,7 @@ public class GL extends gnu.x11.Resource implements GLConstant {
      * 
      * @see <a
      *      href="http://www.opengl.org/documentation/specs/man_pages/hardcopy/GL/html/gl/begin.html">
-     *      glBegin
+     *      glBegin</a>
      */
     public void begin(int mode) {
 
@@ -1871,7 +1871,7 @@ public class GL extends gnu.x11.Resource implements GLConstant {
 
     // glx render opcode 13 - color3usv
     /**
-     * @see <a href=5.html">glColor3us</a>
+     * @see <a href="5.html">glColor3us</a>
      */
     public void color3us(int red, int green, int blue) {
 
@@ -1965,7 +1965,7 @@ public class GL extends gnu.x11.Resource implements GLConstant {
 
     // glx render opcode 21 - color4usv
     /**
-     * @see <a href=5.html">glColor4us</a>
+     * @see <a href="5.html">glColor4us</a>
      */
     public void color4us(int red, int green, int blue, int alpha) {
 

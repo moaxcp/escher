@@ -12,7 +12,7 @@ package gnu.x11;
  * See <a href='http://www.x.org/wiki/'>
  * http://www.x.org/wiki/</a> for details.
  * 
- * @author Mario Torre <neugens@aicas.com>
+ * @author Mario Torre neugens@aicas.com
  */
 public enum X11CoreCommand implements X11Command
 {

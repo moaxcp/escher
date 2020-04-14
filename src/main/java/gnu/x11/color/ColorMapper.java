@@ -6,7 +6,7 @@ import gnu.x11.VisualInfo;
  * Contains method to allow conversion between pixel formats
  * to use between application and the XServer.
  * 
- * @author Mario Torre <neugens@aicas.com>
+ * @author Mario Torre neugens@aicas.com
  */
 abstract public class ColorMapper {
     

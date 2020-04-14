@@ -310,8 +310,7 @@ public class Display {
      * If template is null, it returns a list of all the visual information
      * for the given screen, behaving like {@link #getVisualInfo()}.
      * 
-     * 
-     * @param screenNo
+     *
      * @param template
      * @return
      */
@@ -504,8 +503,6 @@ public class Display {
 
     // opcode 49 - list fonts
     /**
-     * @return valid: {@link Enum#next()} of type {@link Font},
-     *         {@link Enum#next_string()}
      * @see <a href="XListFonts.html">XListFonts</a>
      */
     public Font[] fonts(String pattern, int maxNameCount) {
@@ -615,8 +612,7 @@ public class Display {
 
     /**
      * Information about an X extension.
-     * 
-     * @see Display#query_extension .
+     *
      */
     public static class ExtensionInfo {
 
@@ -742,7 +738,7 @@ public class Display {
      * percent is nonnegative is: base - [(base * percent) / 100] + percent When
      * percent is negative, it is: base + [(base * percent) / 100]
      * 
-     * @param volume,
+     * @param percent,
      *            see above
      * @see <a href="XBell.html">XBell</a>
      */
@@ -759,10 +755,6 @@ public class Display {
 
     // opcode 107 - set screen saver
     /**
-     * @param preferBlanking
-     *            valid: {@link #NO}, {@link #YES}, {@link #DEFAULT}
-     * @param allowExposures
-     *            valid: {@link #NO}, {@link #YES}, {@link #DEFAULT}
      * @see <a href="XSetScreenSaver.html">XSetScreenSaver</a>
      */
     public void setScreenSaver(int timeout, int interval,
@@ -783,8 +775,7 @@ public class Display {
 
     /**
      * Informations about the screensaver.
-     * 
-     * @see {@link Display#get_screen_saver()}.
+     *
      */
     public static class ScreenSaverInfo {
 
@@ -859,8 +850,6 @@ public class Display {
 
     // opcode 109 - change hosts
     /**
-     * @param mode
-     *            valid: {@link #INSERT}, {@link #DELETE}
      * @see <a href="XAddHost.html">XAddHost</a>
      * @see <a href="XRemoveHost.html">XRemoveHost</a>
      */
@@ -907,8 +896,6 @@ public class Display {
 
     // opcode 111 - set access control
     /**
-     * @param mode
-     *            valid: {@link #ENABLE}, {@link #DISABLE}
      * @see <a href="XSetAccessControl.html">XSetAccessControl</a>
      */
     public void setAccessControl(Host.AccessControl mode) {
@@ -936,9 +923,6 @@ public class Display {
 
     // opcode 112 - set close down mode
     /**
-     * @param mode
-     *            valid: {@link #DESTROY}, {@link #RETAIN_PERMANENT},
-     *            {@link #RETAIN_TEMPORARY}
      * @see <a href="XSetCloseDownMode.html">XSetCloseDownMode</a>
      */
     public void setCloseDownMode(Host.Shape mode) {
@@ -952,8 +936,6 @@ public class Display {
 
     // opcode 115 - force screen saver
     /**
-     * @param mode
-     *            valid: {@link #ACTIVATE}, {@link #RESET}
      * @see <a href="XForceScreenSaver.html">XForceScreenSaver</a>
      */
     public void forceScreenSaver(Host.ForceScreenSaver mode) {
@@ -1095,8 +1077,6 @@ public class Display {
     /**
      * Reads the server information after connection setup. The information is
      * read from the connection's ResponseInputStream.
-     * 
-     * @throws EscherServerConnectionException
      */
     private void initServerInfo(ResponseInputStream i) {
 

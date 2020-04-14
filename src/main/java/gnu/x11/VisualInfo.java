@@ -12,7 +12,7 @@ package gnu.x11;
  * Each screen can have several different visual types supported at
  * different depths."
  * 
- * @author Mario Torre <neugens@aicas.com>
+ * @author Mario Torre neugens@aicas.com
  */
 public class VisualInfo {
 

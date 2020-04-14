@@ -1,16 +1,13 @@
 package gnu.x11.extension.glx;
 
-import java.util.ArrayList;
-import java.util.EnumMap;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 /**
  * List all OpenGL Extension known to Escher and collect them with OpenGL
  * specific version, so that they can be enabled depending on the version of
  * OpenGL available on the server.
  * 
- * @author Mario Torre <neugens@aicas.com>
+ * @author Mario Torre neugens@aicas.com
  */
 public enum GLXExtension {
     

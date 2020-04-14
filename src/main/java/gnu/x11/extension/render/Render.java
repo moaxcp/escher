@@ -1,10 +1,9 @@
 package gnu.x11.extension.render;
 
-import java.io.IOException;
-
 import gnu.x11.*;
-import gnu.x11.X11ServiceException;
-import gnu.x11.X11ServiceException.ErrorCode;
+import gnu.x11.X11ServiceException.*;
+
+import java.io.*;
 
 
 /**
@@ -149,7 +148,7 @@ public class Render extends gnu.x11.extension.Extension
 
   // render opcode 8 - composite
   /**
-   * @param operation
+   * @param op
    * {@link #CLEAR}
    * {@link #SRC}
    * {@link #DST}
@@ -244,10 +243,6 @@ public class Render extends gnu.x11.extension.Extension
       minor_opcode, major_opcode);
   }
 
-
-  /**
-   * @see DrawablePicture#Picture(Render, Drawable, DrawablePicture.Format, DrawablePicture.Attributes)
-   */  
   public DrawablePicture create_picture (Drawable drawable, PictFormat format,
                                          DrawablePicture.Attributes attr) {
     

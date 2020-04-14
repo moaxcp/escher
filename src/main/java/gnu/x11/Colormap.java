@@ -54,7 +54,7 @@ public class Colormap extends Resource {
    * FreeColors.
    *
    * @param window the window for which the colormap is allocated
-   * @param visual the visual type
+   * @param visualId the visual type
    * @param alloc one of {@link #NONE}, {@link #ALL}, see above for explanation
    *
    * @see <a href="XCreateColormap.html">XCreateColormap</a>
@@ -143,9 +143,6 @@ public class Colormap extends Resource {
    * values provided by the hardware. It also returns the pixel and RGB values
    * actually used. Multiple clients requesting the same effective RGB values
    * can be assigned the same read-only entry, allowing entries to be shared.
-   *
-   * The return value carries the pixel value as {@link Color#pixel} and
-   * the RGB value as {@link Color#exact}.
    *
    * @param red the red component
    * @param green the green component
@@ -352,9 +349,6 @@ public class Colormap extends Resource {
   }
 
 
-  /**
-   * Used in {@link Colormap#store_colors()}.
-   */
   public static class ColorItem {
 
     public int pixel;

@@ -78,7 +78,6 @@ public class EVI extends Extension {
   }
 
 
-  /** Reply of {@link #visualInfo(Visual[])} */
   public static class VisualInfoReply {
 
     private int nConflicts;

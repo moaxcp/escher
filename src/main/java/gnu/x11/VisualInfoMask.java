@@ -6,7 +6,7 @@ package gnu.x11;
 /**
  * This class 
  * 
- * @author Mario Torre <neugens@aicas.com>
+ * @author Mario Torre neugens@aicas.com
  */
 public class VisualInfoMask
 {

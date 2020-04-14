@@ -305,12 +305,6 @@ public class Window extends Drawable implements GLXDrawable {
             }
         }
 
-        /**
-         * @param i
-         *                valid: {@link #ABOVE}, {@link #BELOW},
-         *                {@link #TOP_IF}, {@link #BOTTOM_IF},
-         *                {@link #OPPOSITE}
-         */
         public void stackMode(StackMode mode) {
 
             set(6, mode.getCode());
@@ -358,8 +352,7 @@ public class Window extends Drawable implements GLXDrawable {
         }
     }
 
-    
-    /** Reply of {@link #property(boolean, Atom, Atom, int, int)}. */
+
     public class Property {
 
         private int format;
@@ -530,8 +523,7 @@ public class Window extends Drawable implements GLXDrawable {
         }
     }
 
-    
-    /** Reply of {@link #pointer()}. */
+
     @Getter
     public class PointerInfo {
 
@@ -721,10 +713,6 @@ public class Window extends Drawable implements GLXDrawable {
             return read4(32);
         }
 
-
-        /**
-         * @return valid: {@link WMInitialState.WITHDRAWN}, {@link WMInitialState.NORMAL}, {@link WMInitialState.ICONIC}
-         */
         public WMInitialState initialState() {
 
             return WMInitialState.getByCode(read4(40));
@@ -743,12 +731,6 @@ public class Window extends Drawable implements GLXDrawable {
             this.display = display;
         }
 
-        /**
-         * @return valid:
-         * {@link WMInitialState.WITHDRAWN},
-         * {@link WMInitialState.NORMAL},
-         * {@link WMInitialState.ICONIC}
-         */
         public WMInitialState state() {
 
             return WMInitialState.getByCode(read4(32));
@@ -786,9 +768,6 @@ public class Window extends Drawable implements GLXDrawable {
         this(parent, geometry.getX(), geometry.getY(), geometry.getWidth(), geometry.getHeight());
     }
 
-    /**
-     * @see #Window(Window, int, int, int, int, int, Window.Attributes)
-     */
     public Window(Window parent, Rectangle geometry, int borderWidth,
             WindowAttributes attr) {
 
@@ -810,9 +789,6 @@ public class Window extends Drawable implements GLXDrawable {
         this.height = height;
     }
 
-    /**
-     * @see #create(int, int, int, int, Window.Attributes)
-     */
     public Window(Window parent, int x, int y, int width, int height,
             int borderWidth, WindowAttributes attr) {
 
@@ -823,13 +799,11 @@ public class Window extends Drawable implements GLXDrawable {
     // opcode 1 - create window
     /**
      * @param depth
-     *                possible: {@link WinClass.COPY_FROM_PARENT}
      * 
      * @param klass
      *                valid: {@link WinClass}
      * 
      * @param visualID
-     *                possible: {@link WinClass.COPY_FROM_PARENT} or {@link Visual}
      *                
      * @see <a href="XCreateWindow.html">XCreateWindow</a>
      */
@@ -854,10 +828,6 @@ public class Window extends Drawable implements GLXDrawable {
         }
     }
 
-    
-    /**
-     * @see #create(int, int, int, int, WindowAttributes)
-     */
     public void create(int borderWidth, WindowAttributes attr) {
 
         create(borderWidth, WinClass.COPY_FROM_PARENT.getCode(), 
@@ -865,10 +835,6 @@ public class Window extends Drawable implements GLXDrawable {
                attr);
     }
 
-    
-    /**
-     * @see #create(int, Window.Attributes)
-     */
     public void create() {
 
         create(0, WindowAttributes.EMPTY);
@@ -880,8 +846,7 @@ public class Window extends Drawable implements GLXDrawable {
      * This request will be aggregated.
      * 
      * @see <a href="XChangeAttributes.html"> XChangeAttributes</a>
-     * 
-     * @see Request.Aggregate aggregation
+     *
      */
     public void changeAttributes(WindowAttributes attr) {
 
@@ -951,8 +916,6 @@ public class Window extends Drawable implements GLXDrawable {
     // opcode 6 - change save set
     /**
      * @param mode
-     *                valid: {@link Host.ChangeOperation.INSERT},
-     *                {@link Host.ChangeOperation.DELETE}
      * 
      * @see <a href="XChangeSaveSet.html">XChangeSaveSet</a>
      */
@@ -1052,7 +1015,6 @@ public class Window extends Drawable implements GLXDrawable {
      * This request will be aggregated.
      * 
      * @see <a href="XConfigureWindow.html">XConfigureWindow</a>
-     * @see Request.Aggregate aggregation
      */
     public void configure(Changes changes) {
 
@@ -1072,7 +1034,6 @@ public class Window extends Drawable implements GLXDrawable {
     // opcode 13 - circulate window
     /**
      * @param direction
-     *                valid: {@link #RAISE_LOWEST}, {@link #LOWER_HIGHEST}
      * 
      * @see <a href="XCirculateSubwindows.html">XCirculateSubwindows</a>
      */
@@ -1114,8 +1075,6 @@ public class Window extends Drawable implements GLXDrawable {
      * as parameter for writing. See setWMNormalHints ().
      * 
      * @param mode
-     *                valid: {@link PropertyMode.REPLACE}, {@link PropertyMode.PREPEND},
-     *                {@link PropertyMode.APPEND}
      * 
      * @param format:
      *                valid: <code>8</code>, <code>16</code>,
@@ -1236,8 +1195,6 @@ public class Window extends Drawable implements GLXDrawable {
     
     // opcode 21 - list properties
     /**
-     * @return valid: {@link Enum#next()} of type {@link Atom},
-     *         {@link Enum#next4()}
      * 
      * @see <a href="XRotateWindowProperties.html"> XRotateWindowProperties</a>
      */
@@ -1329,10 +1286,8 @@ public class Window extends Drawable implements GLXDrawable {
     // opcode 26 - grab pointer
     /**
      * @param pointerMode
-     *                valid: {@link GrabMode.SYNCHRONOUS}, {@link GrabMode.ASYNCHRONOUS}
      * 
      * @param keyboardMode
-     *                valid: {@link GrabMode.SYNCHRONOUS}, {@link GrabMode.ASYNCHRONOUS}
      * 
      * @param confineTo
      *                possible: {@link #NONE}
@@ -1340,9 +1295,6 @@ public class Window extends Drawable implements GLXDrawable {
      *                possible: {@link Cursor#NONE}
      * @param time
      *                possible: {@link Display#CURRENT_TIME}
-     * 
-     * @return valid: {@link GrabStatus.SUCCESS}, {@link GrabStatus.ALREADY_GRABBED},
-     *         {@link GrabStatus.FROZEN}, {@link GrabStatus.INVALID_TIME}, {@link GrabStatus.NOT_VIEWABLE}
      * 
      * @see <a href="XGrabPointer.html">XGrabPointer</a>
      */
@@ -1386,12 +1338,12 @@ public class Window extends Drawable implements GLXDrawable {
      * @param modifiers
      *                possible: {@link #ANY_MODIFIER}
      * @param pointerMode
-     *                valid: {@link GrabMode.SYNCHRONOUS},
-     *                       {@link GrabMode.ASYNCHRONOUS}
+     *                valid: {@link GrabMode#SYNCHRONOUS},
+     *                       {@link GrabMode#ASYNCHRONOUS}
      * 
      * @param keyboardMode
-     *                valid: {@link GrabMode.SYNCHRONOUS},
-     *                       {@link GrabMode.ASYNCHRONOUS}
+     *                valid: {@link GrabMode#SYNCHRONOUS},
+     *                       {@link GrabMode#ASYNCHRONOUS}
      * 
      * @param confineTo
      *                possible: {@link #NONE}
@@ -1445,16 +1397,16 @@ public class Window extends Drawable implements GLXDrawable {
     // opcode 31 - grab keyboard
     /**
      * @param pointerMode
-     *                valid: {@link GrabMode.SYNCHRONOUS}, {@link GrabMode.ASYNCHRONOUS}
+     *                valid: {@link GrabMode#SYNCHRONOUS}, {@link GrabMode#ASYNCHRONOUS}
      * 
      * @param keyboardMode
-     *                valid: {@link GrabMode.SYNCHRONOUS}, {@link GrabMode.ASYNCHRONOUS}
+     *                valid: {@link GrabMode#SYNCHRONOUS}, {@link GrabMode#ASYNCHRONOUS}
      * 
      * @param time
      *                possible: {@link Display#CURRENT_TIME}
      * 
-     * @return valid: {@link GrabStatus.SUCCESS}, {@link GrabStatus.ALREADY_GRABBED},
-     *         {@link GrabStatus.FROZEN}, {@link GrabStatus.INVALID_TIME}, {@link GrabStatus.NOT_VIEWABLE}
+     * @return valid: {@link GrabStatus#SUCCESS}, {@link GrabStatus#ALREADY_GRABBED},
+     *         {@link GrabStatus#FROZEN}, {@link GrabStatus#INVALID_TIME}, {@link GrabStatus#NOT_VIEWABLE}
      * 
      * @see <a href="XGrabKeyboard.html">XGrabKeyboard</a>
      */
@@ -1487,12 +1439,12 @@ public class Window extends Drawable implements GLXDrawable {
      * @param modifiers
      *                possible: {@link #ANY_MODIFIER}
      * @param pointerMode
-     *                valid: {@link GrabMode.SYNCHRONOUS},
-     *                       {@link GrabMode.ASYNCHRONOUS}
+     *                valid: {@link GrabMode#SYNCHRONOUS},
+     *                       {@link GrabMode#ASYNCHRONOUS}
      * 
      * @param keyboardMode
-     *                valid: {@link GrabMode.SYNCHRONOUS},
-     *                       {@link GrabMode.ASYNCHRONOUS}
+     *                valid: {@link GrabMode#SYNCHRONOUS},
+     *                       {@link GrabMode#ASYNCHRONOUS}
      * 
      * @see <a href="XGrabKey.html">XGrabKey</a>
      */
@@ -1520,7 +1472,7 @@ public class Window extends Drawable implements GLXDrawable {
     
     // opcode 34 - ungrab key
     /**
-     * @param key
+     * @param keysym
      *                possible: {@link #ANY_KEY}
      * @param modifiers
      *                possible: {@link #ANY_MODIFIER}
@@ -1647,11 +1599,6 @@ public class Window extends Drawable implements GLXDrawable {
         }
     }
 
-    
-    /**
-     * @see #changeAttributes(Window.Attributes)
-     * @see Attributes#setBackground(Color)
-     */
     public void setBackground(Color c) {
 
         WindowAttributes attr = new WindowAttributes();
@@ -1659,11 +1606,6 @@ public class Window extends Drawable implements GLXDrawable {
         changeAttributes(attr);
     }
 
-    
-    /**
-     * @see #changeAttributes(Window.Attributes)
-     * @see Attributes#setBackground(int)
-     */
     public void setBackground(int pixel) {
 
         WindowAttributes attr = new WindowAttributes();
@@ -1671,11 +1613,6 @@ public class Window extends Drawable implements GLXDrawable {
         changeAttributes(attr);
     }
 
-    
-    /**
-     * @see #changeAttributes(Window.Attributes)
-     * @see Attributes#setBackground(Pixmap)
-     */
     public void setBackground(Pixmap p) {
 
         WindowAttributes attr = new WindowAttributes();
@@ -1683,11 +1620,6 @@ public class Window extends Drawable implements GLXDrawable {
         changeAttributes(attr);
     }
 
-    
-    /**
-     * @see #changeAttributes(Window.Attributes)
-     * @see Attributes#setBorder(Color)
-     */
     public void setBorder(Color c) {
 
         WindowAttributes attr = new WindowAttributes();
@@ -1695,11 +1627,6 @@ public class Window extends Drawable implements GLXDrawable {
         changeAttributes(attr);
     }
 
-    
-    /**
-     * @see #changeAttributes(Window.Attributes)
-     * @see Attributes#setBorder(int)
-     */
     public void setBorder(int pixel) {
 
         WindowAttributes attr = new WindowAttributes();
@@ -1707,11 +1634,6 @@ public class Window extends Drawable implements GLXDrawable {
         changeAttributes(attr);
     }
 
-    
-    /**
-     * @see #changeAttributes(Window.Attributes)
-     * @see Attributes#setBorder(Pixmap)
-     */
     public void setBorder(Pixmap p) {
 
         WindowAttributes attr = new WindowAttributes();
@@ -1719,11 +1641,6 @@ public class Window extends Drawable implements GLXDrawable {
         changeAttributes(attr);
     }
 
-    
-    /**
-     * @see #changeAttributes(Window.Attributes)
-     * @see Attributes#setColormap(Colormap)
-     */
     public void setColormap(Colormap cmap) {
 
         WindowAttributes attr = new WindowAttributes();
@@ -1733,12 +1650,6 @@ public class Window extends Drawable implements GLXDrawable {
 
     // opcode 42 - set input focus
     /**
-     * @param mode
-     *                valid: {@link RevertTo.TO_NONE}, {@link RevertTo.TO_POINTER_ROOT},
-     *                {@link RevertTo.TO_PARENT}
-     * 
-     * @param time
-     *                possible: {@link Display#CURRENT_TIME}
      * @see <a href="XSetInputFocus.html">XSetInputFocus</a>
      */
     public void setInputFocus(RevertTo revertTo, int time) {
@@ -1775,9 +1686,6 @@ public class Window extends Drawable implements GLXDrawable {
     
     // opcode 83 - list installed colormaps
     /**
-     * @return valid: {@link Enum#next()} of type {@link Colormap},
-     *         {@link Enum#next4()}
-     * 
      * @see <a href="XListInstalledColormaps.html"> XListInstalledColormaps</a>
      */
     public Colormap[] listInstalledColormaps() {
@@ -1824,10 +1732,6 @@ public class Window extends Drawable implements GLXDrawable {
         }
     }
 
-    
-    /**
-     * @see #change_property(int, int, Atom, Atom, int, Object, int, int)
-     */
     public void changeProperty(Atom property, Atom type, int data) {
 
         changeProperty(PropertyMode.REPLACE, property, type, 32, new int[] {
@@ -1901,8 +1805,7 @@ public class Window extends Drawable implements GLXDrawable {
     /**
      * Grab key ignoring caps lock (LOCK), num lock (MOD2), and scroll lock
      * (MOD5).
-     * 
-     * @see #grabKey(int, int, boolean, int, int)
+     *
      * 
      * @see #grabButtonIgnoreLocks(int, int, boolean, int, GrabMode, GrabMode,
      *  Window, Cursor)
@@ -2108,7 +2011,6 @@ public class Window extends Drawable implements GLXDrawable {
   
     /**
      * @see <a href="XSelectInput.html">XSelectInput</a>
-     * @see #changeAttributes(Window.Attributes)
      */
     public void selectInput(int eventMask) {
 
@@ -2117,10 +2019,6 @@ public class Window extends Drawable implements GLXDrawable {
         changeAttributes(attr);
     }
 
-    
-    /**
-     * @see #setInputFocus(int, int)
-     */
     public void setInputFocus() {
 
         setInputFocus(RevertTo.TO_POINTER_ROOT, Display.CURRENT_TIME);
@@ -2161,7 +2059,6 @@ public class Window extends Drawable implements GLXDrawable {
     
     /**
      * @see <a href="XSetClassHint.html">XSetClassHint</a>
-     * @see #change_property(int, int, Atom, Atom, int, Object, int, int)
      */
     public void setWMClassHint(String res_name, String res_class) {
 
@@ -2174,7 +2071,6 @@ public class Window extends Drawable implements GLXDrawable {
     
     /**
      * @see <a href="XSetWMHints.html">XSetWMHints</a>
-     * @see #change_property(int, int, Atom, Atom, int, Object, int, int)
      */
     public void set_wm_hints(WMHints wm_hints) {
 
@@ -2286,7 +2182,6 @@ public class Window extends Drawable implements GLXDrawable {
 
     /**
      * @see <a href="XSetWMNormalHints.html">XSetWMNormalHints</a>
-     * @see #change_property(int, int, Atom, Atom, int, Object, int, int)
      */
     public void setWMNormalHints(WMSizeHints sizeHints) {
 
@@ -2296,7 +2191,6 @@ public class Window extends Drawable implements GLXDrawable {
 
     /**
      * @see <a href="XSetWMName.html">XSetWMName</a>
-     * @see #change_property(int, int, Atom, Atom, int, Object, int, int)
      */
     public void setWMName(String wmName) {
 
@@ -2323,26 +2217,16 @@ public class Window extends Drawable implements GLXDrawable {
         changeProperty(wmProtocols, Atom.ATOM, protocol.getID());
     }
 
-    /** 
-     * @see #setWMState(int, Window)
-     */
     public void setWMState(WMInitialState state) {
 
         setWMState(state, NONE);
     }
 
-
-    /** 
-     * @see #setWMState(int, Window)
-     */
     public void setWMState(WMState state) {
 
         setWMState(state.state(), state.icon());
     }
 
-    /** 
-     * @see #change_property(int, int, Atom, Atom, int, Object, int, int)
-     */
     public void setWMState(WMInitialState state, Window icon) {
 
         // FIXME: Re-think WM -stuff. Maybe do outside of Window as this is
@@ -2366,7 +2250,6 @@ public class Window extends Drawable implements GLXDrawable {
 
     /**
      * @see <a href="XGetClassHint.html">XGetClassHint</a>
-     * @see #property(boolean, Atom, Atom, int, int)
      */
     public WMClassHint wmClassHint() {
 
@@ -2384,7 +2267,6 @@ public class Window extends Drawable implements GLXDrawable {
 
     /**
      * @see <a href="XGetWMHints.html">XGetWMHints</a>
-     * @see #property(boolean, Atom, Atom, int, int)
      */
     public WMHints wmHints() {
 
@@ -2401,7 +2283,6 @@ public class Window extends Drawable implements GLXDrawable {
 
     /**
      * @see <a href="XGetWMName.html">XGetWMName</a>
-     * @see #property(boolean, Atom, Atom, int, int)
      */
     public String wmName() {
 
@@ -2416,7 +2297,6 @@ public class Window extends Drawable implements GLXDrawable {
 
     /**
      * @see <a href="XGetWMNormalHints.html">XGetWMNormalHints</a>
-     * @see #property(boolean, Atom, Atom, int, int)
      */
     public WMSizeHints wmNormalHints() {
 
@@ -2449,13 +2329,6 @@ public class Window extends Drawable implements GLXDrawable {
         return false;
     }
 
-    /** 
-     * @return valid:
-     * {@link Enum#next()} of type {@link Atom},
-     * {@link Enum#next4()}
-     *
-     * @see #property(boolean, Atom, Atom, int, int)
-     */
     public int[] wmProtocols() {
 
         // FIXME: Re-think WM -stuff. Maybe do outside of Window as this is
@@ -2476,9 +2349,6 @@ public class Window extends Drawable implements GLXDrawable {
         //    };
     }
 
-    /** 
-     * @see #property(boolean, Atom, Atom, int, int)
-     */
     public WMState wmState() {
 
         // FIXME: Re-think WM -stuff. Maybe do outside of Window as this is

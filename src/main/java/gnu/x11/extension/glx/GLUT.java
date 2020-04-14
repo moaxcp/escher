@@ -1,8 +1,8 @@
 package gnu.x11.extension.glx;
 
-import gnu.x11.Data;
-import gnu.util.Misc;
-import gnu.util.Vector3f;
+import gnu.util.*;
+
+import java.lang.Math;
 
 
 /**
@@ -11,7 +11,7 @@ import gnu.util.Vector3f;
  * >here</a>.
  *
  * <p>Modified from <code>glut_*.c</code> in <a href=
- * "http://reality.sgi.com/opengl/#glut>
+ * "http://reality.sgi.com/opengl/#glut">
  * glut</a> by Mark J. Kilgard.
  */
 public class GLUT {             // TODO

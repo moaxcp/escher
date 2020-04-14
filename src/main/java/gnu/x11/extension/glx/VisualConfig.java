@@ -1,7 +1,6 @@
 package gnu.x11.extension.glx;
 
-import gnu.x11.Data;
-import gnu.x11.ResponseInputStream;
+import gnu.x11.*;
 
 /**
  *
@@ -446,7 +445,6 @@ public class VisualConfig {
     
     /**
      * See if the current VisualConfig is compatible the given attributeList
-     * @param attributeList
      */
     public boolean compatible (VisualConfig template) {
         

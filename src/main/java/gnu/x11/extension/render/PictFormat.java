@@ -7,7 +7,7 @@ import gnu.x11.ResponseInputStream;
 /**
  * Format specification for Picture instances. This class cannot be
  * instantiated directly. Instead you can query the available formats
- * by using {@link Render#get_picture_formats()} and use one of those.
+ * by using ... and use one of those.
  * In order to make format selection easier, you can create a {@link Template}
  * and use
  * {@link Render#picture_format(gnu.x11.extension.render.PictFormat.Template, boolean)}

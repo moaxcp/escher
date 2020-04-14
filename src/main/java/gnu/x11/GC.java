@@ -46,7 +46,6 @@ public class GC extends Fontable {
     /**
      * Writes this object to the connection stream.
      *
-     * @param c the connection
      */
     public void write (RequestOutputStream s) {
 
@@ -237,26 +236,6 @@ public class GC extends Fontable {
         }   
     }
 
-  
-    /**
-     * @param i valid:
-     * {@link #CLEAR},
-     * {@link #AND},
-     * {@link #AND_REVERSE},
-     * {@link #COPY} (default),
-     * {@link #AND_INVERTED},
-     * {@link #NOOP},
-     * {@link #XOR},
-     * {@link #OR},
-     * {@link #NOR},
-     * {@link #EQUIV},
-     * {@link #INVERT},
-     * {@link #OR_REVERSE},
-     * {@link #COPY_INVERTED},
-     * {@link #OR_INVERTED},
-     * {@link #NAND},
-     * {@link #SET}
-     */
     public void setFunction (FunctionValues fv) { set (0, fv.getCode()); }
   
   
@@ -270,11 +249,7 @@ public class GC extends Fontable {
      * @see #setForeground(int)
      */
     public void setForeground (Color c) { setForeground (c.getPixel()); }
-  
-  
-    /** 
-     * @param i default: 0
-     */
+
     public void setForeground (int pixel) { set (2, pixel); }
   
   
@@ -282,11 +257,7 @@ public class GC extends Fontable {
      * @see #setBackground(int)
      */
     public void setBackground (Color c) { setBackground (c.getPixel()); }
-  
-  
-    /** 
-     * @param i default: 1
-     */
+
     public void setBackground (int pixel) { set (3, pixel); }
   
   
@@ -294,51 +265,15 @@ public class GC extends Fontable {
      * @param i default: 0
      */
     public void setLineWidth (int i) { set (4, i); }
-  
-  
-    /** 
-     * @param i valid:
-     * {@link #NOT_LAST} (default),
-     * {@link #ON_OFF_DASH},
-     * {@link #DOUBLE_DASH}
-     **/
+
     public void setLineStyle (LineStyle ls) { set (5, ls.getCode()); }
 
-  
-    /** 
-     * @param i valid:
-     * {@link #NOT_LAST} (default),
-     * {@link #BUTT},
-     * {@link #CAP_ROUND},
-     * {@link #PROJECTING}
-     */
     public void setCapStyle (CapStyle cp) { set (6, cp.getCode()); }
-  
-  
-    /** 
-     * @param i valid:
-     * {@link #MITER} (default),
-     * {@link #JOIN_ROUND},
-     * {@link #BEVEL}
-     */
-    public void setJoinStyle (JoinStyle js) { set (7, js.getCode()); }
-  
 
-    /** 
-     * @param i valid:
-     * {@link #NOT_LAST} (default),
-     * {@link #TILED},
-     * {@link #OPAQUE_STIPPLED},
-     * {@link #STIPPLED}
-     */
+    public void setJoinStyle (JoinStyle js) { set (7, js.getCode()); }
+
     public void setFillStyle (FillStyle fi) { set (8, fi.getCode()); }
- 
-  
-    /** 
-     * @param i valid:
-     * {@link #EVEN_ODD} (default),
-     * {@link #WINDING}
-     */
+
     public void setFillRule (FillRule fr) { set (9, fr.getCode()); }
   
   
@@ -365,19 +300,9 @@ public class GC extends Fontable {
      * @param i default: 0
      */
     public void setTileStippleYOrigin (int i) { set (13, i); }
-  
-  
-    /** 
-     * @param i default: server dependent font
-     */
+
     public void set_font (Font f) { set (14, f.id); }
-  
-  
-    /** 
-     * @param i valid:
-     * {@link #CLIP_BY_CHILDREN} (default),
-     * {@link #INCLUDE_INTERIORS}
-     */
+
     public void setSubwindowMode (SubWindowMode swm) { set (15, swm.getCode()); }
   
   
@@ -415,13 +340,7 @@ public class GC extends Fontable {
      * @param i default: 4 (that is, the list [4, 4])
      */
     public void setDashes (int i) { set (21, i); }
-  
 
-    /** 
-     * @param i valid:
-     * {@link #CHORD} (default),
-     * {@link #PIE_SLICE}
-     */
     public void setArcMode (ArcMode am) { set (22, am.getCode()); }
   
   
@@ -481,7 +400,6 @@ public class GC extends Fontable {
    * @param values the values to change
    *
    * @see <a href="XChangeGC.html">XChangeGC</a>
-   * @see Request.Aggregate aggregation
    */
   public void change (Values values) {
 
@@ -551,12 +469,6 @@ public class GC extends Fontable {
 
   // opcode 59 - set clip rectangles
   /**
-   * @param ordering valid:
-   * {@link #UN_SORTED},
-   * {@link #Y_SORTED},
-   * {@link #YX_SORTED},
-   * {@link #YX_BANDED}
-   *
    * @see <a href="XSetClipRectangles.html">XSetClipRectangles</a>
    */
   public void setClipRectangles (int clip_x_origin, int clip_y_origin,
@@ -823,7 +735,6 @@ public class GC extends Fontable {
 
   /**
    * @see #change(GC.Values)
-   * @see Values#setFillRule(int)
    */
   public void setFillRule (FillRule fr) {
     RequestOutputStream o = display.getResponseOutputStream();
@@ -845,7 +756,6 @@ public class GC extends Fontable {
 
   /**
    * @see #change(GC.Values)
-   * @see Values#setFillStyle(int)
    */
   public void setFillStyle (FillStyle fs) {
     RequestOutputStream o = display.getResponseOutputStream();
@@ -919,7 +829,6 @@ public class GC extends Fontable {
 
   /**
    * @see #change(GC.Values)
-   * @see Values#setFunction(int)
    */
   public void setFunction (FunctionValues fv) {
     RequestOutputStream o = display.getResponseOutputStream();
@@ -963,7 +872,6 @@ public class GC extends Fontable {
 
   /**
    * @see #change(GC.Values)
-   * @see Values#setJoinStyle(int)
    */
   public void setJoinSty (JoinStyle js) {
     RequestOutputStream o = display.getResponseOutputStream();
@@ -985,7 +893,6 @@ public class GC extends Fontable {
 
   /**
    * @see #change(GC.Values)
-   * @see Values#setLineStyle(int)
    */
   public void setLineStyle (LineStyle ls) {
     RequestOutputStream o = display.getResponseOutputStream();
@@ -1073,7 +980,6 @@ public class GC extends Fontable {
 
   /**
    * @see #change(GC.Values)
-   * @see Values#setSubwindowMode(int)
    */
   public void setSubwindowMode (SubWindowMode swm) {
     RequestOutputStream o = display.getResponseOutputStream();

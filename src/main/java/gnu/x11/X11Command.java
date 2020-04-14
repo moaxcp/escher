@@ -6,7 +6,7 @@ package gnu.x11;
 /**
  * Interface implement by the various X11 command enums.
  * 
- * @author Mario Torre <neugens@aicas.com>
+ * @author Mario Torre neugens@aicas.com
  */
 public interface X11Command {
 

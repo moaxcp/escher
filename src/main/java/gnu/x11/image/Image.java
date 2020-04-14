@@ -1,8 +1,7 @@
 
 package gnu.x11.image;
 
-import gnu.x11.Display;
-import gnu.x11.Pixmap;
+import gnu.x11.*;
 
 public abstract class Image {
 
@@ -80,9 +79,9 @@ public abstract class Image {
      * @param pixmapFormat
      *                the pixmap format
      */
-    Image(int width, int height, Format format, Pixmap.Format pixmap_format) {
+    Image(int width, int height, Format format, Pixmap.Format pixmapFormat) {
 
-        init(width, height, format, pixmap_format);
+        init(width, height, format, pixmapFormat);
 
         data = new byte[lineByteCount * height];
     }
@@ -101,10 +100,10 @@ public abstract class Image {
      * @param data
      *                the underlying data array
      */
-    Image(int width, int height, Format format, Pixmap.Format pixmap_format,
+    Image(int width, int height, Format format, Pixmap.Format pixmapFormat,
             byte[] data) {
 
-        init(width, height, format, pixmap_format);
+        init(width, height, format, pixmapFormat);
         this.data = data;
     }
 

@@ -10,7 +10,7 @@ import java.util.logging.Logger;
 /**
  * Wrapper class for debugging {@link RequestOutputStream}. 
  * 
- * @author Mario Torre <neugens@aicas.com>
+ * @author Mario Torre neugens@aicas.com
  */
 class DebugRequestOutputStream extends RequestOutputStream {
 

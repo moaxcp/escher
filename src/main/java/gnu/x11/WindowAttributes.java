@@ -88,21 +88,12 @@ public class WindowAttributes extends ValueList {
 
     /**
      * @param gravity
-     *                valid: {@link #FORGET} (default), {@link #NORTH_WEST},
-     *                {@link #NORTH}, {@link #NORTH_EAST}, {@link #WEST},
-     *                {@link #CENTER}, {@link #EAST}, {@link #SOUTH_WEST},
-     *                {@link #SOUTH}, {@link #SOUTH_EAST}, {@link #STATIC}
      */
     public void setWinGravity(Gravity gravity) {
 
         set(5, gravity.getCode());
     }
 
-    /**
-     * @param i
-     *                valid: {@link #NOT_USEFUL}(default),
-     *                {@link #WHEN_MAPPED}, {@link #ALWAYS}
-     */
     public void setBackingStore(Screen.BackingStore bs) {
 
         set(6, bs.getCode());
@@ -125,10 +116,6 @@ public class WindowAttributes extends ValueList {
         setBacking(c.getPixel());
     }
 
-    /**
-     * @param i
-     *                default: zero
-     */
     public void setBacking(int pixel) {
 
         set(8, pixel);

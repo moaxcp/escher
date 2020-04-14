@@ -1,9 +1,6 @@
 package gnu.x11;
 
-import gnu.x11.event.*;
 import lombok.*;
-
-import java.util.*;
 
 /** X keyboard and pointer. */
 public class Input {
@@ -206,16 +203,6 @@ public class Input {
 
   // opcode 35 - allow events
   /**
-   * @param mode valid:
-   * {@link #ASYNC_POINTER},
-   * {@link #SYNC_POINTER},
-   * {@link #REPLY_POINTER},
-   * {@link #ASYNC_KEYBOARD},
-   * {@link #SYNC_KEYBOARD},
-   * {@link #REPLY_KEYBOARD},
-   * {@link #ASYNC_BOTH},
-   * {@link #SYNC_BOTH}
-   *
    * @param time possible: {@link Display#CURRENT_TIME}
    * @see <a href="XAllowEvents.html">XAllowEvents</a>
    */
@@ -271,7 +258,6 @@ public class Input {
 
   // opcode 44 - query keymap
   /**
-   * @return valid: {@link Enum#next1()}
    * @see <a href="XQueryKeymap.html">XQueryKeymap</a>
    */
   public byte [] queryKeymap () {
@@ -480,10 +466,6 @@ public class Input {
 
   // opcode 116 - set pointer mapping
   /**
-   * @return valid:
-   * {@link #SUCCESS},
-   * {@link #BUSY}
-   *
    * @see <a href="XSetPointerMapping.html">XSetPointerMapping</a>
    */
   public Status setPointerMapping (byte [] map) {
@@ -535,11 +517,6 @@ public class Input {
 
   // opcode 118 - set modifier mapping
   /**
-   * @return valid:
-   * {@link #SUCCESS},
-   * {@link #BUSY},
-   * {@link #FAILED}
-   *
    * @see <a href="XSetModifierMapping.html">XSetModifierMapping</a>
    */
   public Status setModifierMapping (int keycodesPerModifier, byte [] keycodes) {
@@ -576,7 +553,6 @@ public class Input {
 
   // opcode 119 - get modifier mapping
   /**
-   * @return valid: {@link Enum#next1()}
    * @see <a href="XModifierKeymap.html">XModifierKeymap</a>
    */
   public ModifierMapping modifierMapping () {

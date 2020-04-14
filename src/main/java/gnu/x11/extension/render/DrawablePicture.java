@@ -1,13 +1,6 @@
 package gnu.x11.extension.render;
 
-import gnu.x11.Atom;
-import gnu.x11.Data;
-import gnu.x11.Drawable;
-import gnu.x11.GC;
-import gnu.x11.Pixmap;
-import gnu.x11.Rectangle;
-import gnu.x11.RequestOutputStream;
-import gnu.x11.ResponseInputStream;
+import gnu.x11.*;
 
 
 /** Picture in RENDER. */
@@ -53,12 +46,6 @@ public class DrawablePicture extends Picture {
      */
     public void set_graphics_exposures (boolean b) { set (7, b); }
 
-
-    /** 
-     * @param i valid:
-     * {@link gnu.x11.GC.Values#CLIP_BY_CHILDREN} (default),
-     * {@link gnu.x11.GC.Values#INCLUDE_INTERIORS}
-     */
     public void set_subwindow_mode (int i) { set (8, i); }
 
 
@@ -92,10 +79,6 @@ public class DrawablePicture extends Picture {
      */
     public void set_dither (Atom a) { set (11, a.getID()); }
 
-
-    /** 
-     * @param b default: false
-     */
     public void set_component_alpha (boolean i) { set (12, i); }
   }
   
@@ -103,8 +86,6 @@ public class DrawablePicture extends Picture {
   // render opcode 4 - create picture
   /**
    * @see <a href="XRenderCreatePicture.html">XRenderCreatePicture</a>
-   * @see Render#create_picture(Drawable, DrawablePicture.Format, 
-   * DrawablePicture.Attributes)
    */
   public DrawablePicture (Render render, Drawable drawable, PictFormat format, 
                   Attributes attr) {

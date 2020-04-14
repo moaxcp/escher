@@ -508,9 +508,6 @@ public class GLX extends gnu.x11.extension.Extension implements
         return props;
     }
 
-    /**
-     * @see GL#GL(GLX, int, int, GL)
-     */
     public GL create_context(int visual_id, int screen_no, GL share_list) {
 
         /* Sending direct==true here leads to a bad crasher. */

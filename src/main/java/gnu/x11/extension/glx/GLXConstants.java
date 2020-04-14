@@ -3,7 +3,7 @@ package gnu.x11.extension.glx;
 /**
  * Set of constants used to query GLX extensions.
  *
- * @author Mario Torre <neugens@aicas.com>
+ * @author Mario Torre neugens@aicas.com
  */
 public class GLXConstants
 {

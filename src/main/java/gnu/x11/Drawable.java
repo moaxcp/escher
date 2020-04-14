@@ -1,10 +1,7 @@
 
 package gnu.x11;
 
-import gnu.x11.Host.ChangeOperation;
-import gnu.x11.Host.Shape;
-import gnu.x11.image.Image;
-import gnu.x11.image.ZPixmap;
+import gnu.x11.image.*;
 
 /** X drawable. */
 public abstract class Drawable extends Resource {
@@ -235,7 +232,7 @@ public abstract class Drawable extends Resource {
      * @param npoints
      *                the number of points
      * @param coordinateMode
-     *                valid: {@link #ORIGIN}, {@link #PREVIOUS}
+     *                valid: {@link CoordinateMode#ORIGIN}, {@link CoordinateMode#PREVIOUS}
      * 
      * @see <a href="XDrawPoints.html">XDrawPoints</a>
      */
@@ -258,17 +255,7 @@ public abstract class Drawable extends Resource {
 
     /**
      * Draws multiple points.
-     * 
-     * @param gc
-     *                the GC to use
-     * @param xpoints
-     *                the points' x coordinates
-     * @param ypoints
-     *                the points' y coodinates
-     * @param npoints
-     *                the number of points
-     * @param coordinate_mode
-     *                valid: {@link #ORIGIN}, {@link #PREVIOUS}
+     *
      * 
      * @see <a href="XDrawPoints.html">XDrawPoints</a>
      */
@@ -301,7 +288,6 @@ public abstract class Drawable extends Resource {
      * @param npoints
      *                the number of points
      * @param coordinateMode
-     *                valid: {@link #ORIGIN}, {@link #PREVIOUS}
      * 
      * @see <a href="XDrawLines.html">XDrawLines</a>
      */
@@ -350,8 +336,7 @@ public abstract class Drawable extends Resource {
      *                the GC to use
      * @param points
      *                the points that make up the lines
-     * @param coordinate_mode
-     *                valid: {@link #ORIGIN}, {@link #PREVIOUS}
+     * @param coordinateMode
      * 
      * @see <a href="XDrawLines.html">XDrawLines</a>
      */
@@ -415,7 +400,6 @@ public abstract class Drawable extends Resource {
      * 
      * @see <a href="XDrawRectangles.html">XDrawRectangles</a>
      * @see <a href="XFillRectangles.html">XFillRectangles</a>
-     * @see Request.Aggregate aggregation
      */
     public void polyRectangle(GC gc, Rectangle[] rectangles) {
 
@@ -481,14 +465,10 @@ public abstract class Drawable extends Resource {
      * This request will be aggregated.
      * 
      * @param shape
-     *                valid: {@link #NOT_LAST}, {@link #BUTT},
-     *                {@link #CAP_ROUND}
      * 
-     * @param coordinate_mode
-     *                valid: {@link #ORIGIN}, {@link #PREVIOUS}
+     * @param coordinateMode
      * 
      * @see <a href="XFillPolygon.html">XFillPolygon</a>
-     * @see Request.Aggregate aggregation
      */
     public void fillPoly(GC gc, Point[] points, Fill shape, CoordinateMode coordinateMode) {
 
@@ -736,7 +716,6 @@ public abstract class Drawable extends Resource {
     // opcode 97 - query best size
     /**
      * @param klass
-     *                valid: {@link #CURSOR}, {@link #TILE}, {@link #STIPPLE}
      * 
      * @see <a href="XQueryBestSize.html">XQueryBestSize</a>
      */
@@ -772,9 +751,9 @@ public abstract class Drawable extends Resource {
      *                the bounding rectangle, x coordinate
      * @param y
      *                the bounding rectangle, y coordinate
-     * @param w
+     * @param width
      *                the bounding rectangle, width
-     * @param h
+     * @param height
      *                the bounding rectangle, height
      * @param angle1
      *                the start angle, from 3 o'clock ccw, in degrees
@@ -813,9 +792,9 @@ public abstract class Drawable extends Resource {
      *                the bounding rectangle, x coordinate
      * @param y
      *                the bounding rectangle, y coordinate
-     * @param w
+     * @param width
      *                the bounding rectangle, width
-     * @param h
+     * @param height
      *                the bounding rectangle, height
      * @param angle1
      *                the start angle, from 3 o'clock ccw, in degrees
@@ -974,7 +953,6 @@ public abstract class Drawable extends Resource {
      * @param width the width
      * @param height the height
      *
-     * @see #poly_fill_rectangle(GC, Rectangle[])
      */
     public void fill_rectangle(GC gc, int x, int y, int width, int height) {
 
@@ -1010,9 +988,6 @@ public abstract class Drawable extends Resource {
         });
     }
 
-    /**
-     * @see #text(GC, int, int, String, int, Font)
-     */
     public void text(GC gc, int x, int y, String s) {
 
         polyText(gc, x, y, new Text[] {

@@ -14,7 +14,7 @@ import gnu.x11.X11Command;
  * See <a href='http://www.opengl.org/documentation/specs/'>
  * http://www.opengl.org/documentation/specs/</a> for details.
  * 
- * @author Mario Torre <neugens@aicas.com>
+ * @author Mario Torre neugens@aicas.com
  */
 public enum GLXRenderingCommand implements X11Command {
     

@@ -13,7 +13,7 @@ public class Rectangle {
   /**
    * Construct from a resource geometry specification string.
    *
-   * <ul>supported formats
+   * <ul>
    * <li>width x height + x + y (e.g. 100x300+50+50 or 100x300-20+20)
    * <li>width x height (e.g. 100x300)
    * <li>+ x + y (+50+50 or -20-20)

@@ -15,7 +15,7 @@ native library. Applications using this library do not need to worry about compa
 - [x] setup [reckon](https://github.com/ajoberstar/reckon) plugin
 - [ ] add github actions
   - [x] run test
-  - [ ] sonar scan
+  - [x] sonar scan
   - [ ] publish to github
   - [ ] publish to maven central
 

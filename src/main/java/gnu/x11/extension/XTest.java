@@ -108,7 +108,6 @@ public class XTest extends Extension {
   // xtest opcode 2 - fake input
   /**
    * @param type valid {@link FakeEvent}
-   * @param time possible: {@link gnu.x11.Display#CURRENT_TIME}
    */
   public void fakeInput(FakeEvent type, int detail, int delay, Window root, 
                           int x, int y) {

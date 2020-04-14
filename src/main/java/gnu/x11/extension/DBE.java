@@ -11,7 +11,7 @@ import gnu.x11.X11ServiceException.ErrorCode;
  * "http://escher.sourceforge.net/etc/specification/dbe-protocol.ps.gz"
  * >protocol</a>).
  * 
- * <p>Check <a href=" "../../../../etc/faq/dbe">this</a> for an insightful
+ * <p>Check <a href="../../../../etc/faq/dbe">this</a> for an insightful
  * discusson on the merit of DBE. 
  */
 public class DBE extends Extension implements ErrorFactory {
@@ -74,11 +74,7 @@ public class DBE extends Extension implements ErrorFactory {
 
   // dbe opcode 3 - swap buffers
   /**
-   * @param actions array of actions; valid action: 
-   * {@link SwapAction.UNDEFINED}
-   * {@link SwapAction.BACKGROUND}
-   * {@link SwapAction.UNTOUCHED}
-   * {@link SwapAction.COPIED}
+   * @param actions array of actions
    *
    * @see <a href="XdbeSwapBuffers.html">XdbeSwapBuffers</a>
    */  
@@ -208,13 +204,6 @@ public class DBE extends Extension implements ErrorFactory {
 
 
     // dbe opcode 1 - allocate back buffer name
-    /**
-     * @param swapActionHint valid: 
-     * {@link SwapAction.UNDEFINED}
-     * {@link SwapAction.BACKGROUND}
-     * {@link SwapAction.UNTOUCHED}
-     * {@link SwapAction.COPIED}
-     */
     public BackBuffer(Window window, SwapAction swapActionHint) {
       super(window.getDisplay());
       this.window = window;
@@ -304,10 +293,6 @@ public class DBE extends Extension implements ErrorFactory {
                               minorOpcode, majorOpcode);
   }
 
-
-  /** 
-   * @see #swap(Window[], int[])
-   */
   public void swap(Window window, SwapAction[] action) {
     swap(new Window [] {window}, action);
   }

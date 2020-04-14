@@ -351,8 +351,7 @@ public class Shape extends Extension implements EventFactory {
     return enabled;
   }
 
-  
-  /** Reply of {@link #rectangles()} */
+
   public static class RectanglesInfo {
 
     /**

@@ -1,12 +1,11 @@
 package gnu.x11.color;
 
-import gnu.x11.VisualInfo;
-import gnu.x11.image.ZPixmap;
+import gnu.x11.*;
 
 /**
  * Implements default conversion from ARGB to 16 bits RGB.
  * 
- * @author Mario Torre <neugens@aicas.com>
+ * @author Mario Torre neugens@aicas.com
  */
 public class GenericColorMapper extends ColorMapper {
      

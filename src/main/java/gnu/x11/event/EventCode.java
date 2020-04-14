@@ -72,7 +72,7 @@ public enum EventCode {
   }
 
   /**
-   * Returns event code matching code & mask. May return null.
+   * Returns event code matching code and mask. May return null.
    *
    * @param mask
    * @return

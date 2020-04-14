@@ -243,8 +243,7 @@ public class Print extends gnu.x11.extension.Extension
       }
     }
   
-  
-    /** Reply of {@link #inputSelected(int)}. */
+
     public class InputSelectedInfo {
       public PrintMask printMask;
       public int allEventMasks;
@@ -334,12 +333,6 @@ public class Print extends gnu.x11.extension.Extension
   
     // print 19 - get one attribute
     /**
-     * @param pool valid:
-     * {@link Attributes},
-     *
-     * @param rule valid:
-     * {@link Rule}
-     *
      * @see <a href="XpGetOneAttribute.html">XpGetOneAttribute</a>
      */
     public String oneAttribute(Attributes pool, String name) {
@@ -488,7 +481,6 @@ public class Print extends gnu.x11.extension.Extension
     /**
      * All possible attributes.
      *
-     * @see #attributes(int)
      */
     public String attributes() {
       return attributes(Attributes.JOB_ATTRIBUTE_POOL)
@@ -567,7 +559,6 @@ public class Print extends gnu.x11.extension.Extension
   
   // print opcode 1 - get printer list
   /**
-   * @return valid: {@link Enum#next()}
    * @see <a href="XpGetPrinterList.html">XpGetPrinterList</a>
    */
   public Printer[] printerList(String name) {
@@ -719,9 +710,6 @@ public class Print extends gnu.x11.extension.Extension
 
   // printer opcode 22 - query screens
   /**
-   * @return valid:
-   * {@link Enum#next()} of type {@link Window},
-   * {@link Enum#next4()}
    *
    * @see <a href="XpQueryScreens.html">XpQueryScreens</a>
    */
