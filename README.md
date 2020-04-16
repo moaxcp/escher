@@ -1,6 +1,7 @@
 # Escher
 
 ![Java CI with Gradle](https://github.com/moaxcp/escher/workflows/Java%20CI%20with%20Gradle/badge.svg?branch=master)
+[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=com.github.moaxcp%3Aescher-core&metric=alert_status)](https://sonarcloud.io/dashboard?id=com.github.moaxcp%3Aescher-core)
 
 Escher is a fork from the original [escher](https://sourceforge.net/projects/escher/) project. It is an
 X11 client implementation written in java. This project directly connects to the X11 server rather than binding to a 
