@@ -1,24 +1,15 @@
 
 package gnu.x11;
 
-import gnu.x11.event.Event;
-import gnu.x11.extension.ErrorFactory;
-import gnu.x11.extension.EventFactory;
-import gnu.x11.extension.BigRequests;
-import gnu.x11.extension.NotFoundException;
-import gnu.x11.extension.XCMisc;
+import gnu.x11.event.*;
+import gnu.x11.extension.*;
+import lombok.*;
 import org.newsclub.net.unix.*;
 
 import java.io.*;
-import java.net.InetAddress;
-import java.net.Socket;
-import java.net.UnknownHostException;
-import java.util.ArrayList;
-import java.util.HashMap;
-
-import java.util.Hashtable;
-import java.util.List;
-import java.util.logging.Level;
+import java.net.*;
+import java.util.*;
+import java.util.logging.*;
 
 /** X server connection. */
 // TODO Support Multiple Screens
@@ -203,19 +194,14 @@ public class Display {
      */
     public ErrorFactory[] extensionErrorFactories = new ErrorFactory[128];
 
-
-    public static Display netConnection(DisplayName name) {
+    public static Display connect(@NonNull DisplayName name) {
         try {
+            if(name.getHostName() == null) {
+                Socket socket = AFUNIXSocket.connectTo(new AFUNIXSocketAddress(new File("/tmp/.X11-unix/X" + name.getDisplayNumber())));
+                return new Display(socket, name.getHostName(), name.getDisplayNumber(), name.getScreenNumber());
+            }
+
             Socket socket = new Socket(name.getHostName(), 6000 + name.getDisplayNumber());
-            return new Display(socket, name.getHostName(), name.getDisplayNumber(), name.getScreenNumber());
-        } catch (IOException e) {
-            throw new X11ClientException(String.format("failed to create socket for %s", name), e);
-        }
-    }
-
-    public static Display unixConnection(DisplayName name) {
-        try {
-            Socket socket = AFUNIXSocket.connectTo(new AFUNIXSocketAddress(new File("/tmp/.X11-unix/X" + name.getDisplayNumber())));
             return new Display(socket, name.getHostName(), name.getDisplayNumber(), name.getScreenNumber());
         } catch(IOException e) {
             throw new X11ClientException(String.format("failed to create socket for %s", name), e);

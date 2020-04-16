@@ -5,7 +5,6 @@ import org.junit.jupiter.api.*;
 
 import java.io.*;
 
-import static gnu.x11.Display.*;
 import static gnu.x11.DisplayName.*;
 
 public class DisplayConnect {
@@ -30,6 +29,6 @@ public class DisplayConnect {
 
   @Test
   void connect() {
-    unixConnection(parse(":1"));
+    Display.connect(parse(":1"));
   }
 }

@@ -49,6 +49,6 @@ public class Application extends gnu.app.Application {
       "X server to connect to", parse(env));
 
     if (help_option) return;
-    display = unixConnection(display_name);
+    display = connect(display_name);
   }
 }

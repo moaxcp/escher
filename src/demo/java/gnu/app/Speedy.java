@@ -11,8 +11,6 @@ package gnu.app;
 
 import gnu.x11.*;
 
-import java.net.SocketException;
-
 import static gnu.x11.Display.*;
 import static gnu.x11.DisplayName.*;
 
@@ -67,7 +65,7 @@ public class Speedy extends gnu.app.Application {
 //    } catch (SocketException ex) {
 //      ex.printStackTrace ();
 //    }
-    display = unixConnection(parse(":0"));
+    display = connect(parse(":0"));
     WindowAttributes atts = new WindowAttributes();
     window = new Window (display.getDefaultRoot(), 0, 0, 600, 400, 0, atts);
     window.map ();

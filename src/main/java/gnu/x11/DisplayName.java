@@ -10,10 +10,24 @@ import static gnu.util.Strings.*;
 @Getter
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class DisplayName {
-  final String hostName;
-  final int displayNumber;
-  final int screenNumber;
+  private final String hostName;
+  private final int displayNumber;
+  private final int screenNumber;
 
+  /**
+   * Parses a DisplayName from the DISPLAY environment variable.
+   * @return resulting DiplayName
+   */
+  public static DisplayName parse() {
+    return parse(System.getenv("DISPLAY"));
+  }
+
+  /**
+   * Parses a DisplayName from convention. The convention for a display name is
+   * <code>hostName:displayNumber.screenNumber</code>. hostName and screenNumber are optional.
+   * @param convention of <code>hostName:displayNumber.screenNumber</code>
+   * @return resulting DisplayName
+   */
   public static DisplayName parse(@NonNull String convention) {
     requiresNonBlank("convention", convention);
     int i = convention.indexOf(':');
@@ -38,7 +52,10 @@ public class DisplayName {
     return new DisplayName(hostName, displayNumber, screenNumber);
   }
 
-
+  /**
+   * Returns the string representation of this DisplayName.
+   * @return
+   */
   public String toString() {
     String h = hostName == null ? "" : hostName;
     return h + ":" + displayNumber + "." + screenNumber;
