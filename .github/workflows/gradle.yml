@@ -36,9 +36,13 @@ jobs:
     - name: Jacoco Test Report
       run: ./gradlew jacocoTestReport
     - name: Sonarqube Scan
-      run: ./gradlew -x test -Dsonar.host.url=https://sonarcloud.io -Dsonar.organization=moaxcp -Dsonar.login=${SONAR_TOKEN} sonarqube
-    - name: Debug passphrase
-      run: echo "$ENCRYPTED_SIGNING_PASSPHRASE"
+      run: >
+        ./gradlew
+        -x test
+        -Dsonar.host.url=https://sonarcloud.io
+        -Dsonar.organization=moaxcp
+        -Dsonar.login=${SONAR_TOKEN}
+        sonarqube
     - name: Decrypt signing key
       # for tags only if: startsWith(github.ref, 'refs/tags/')
       run: ./decrypt_secret.sh
@@ -47,19 +51,19 @@ jobs:
       run: >
         ./gradlew
         -Pnexus.username=moaxcp
-        -Pnexus.password="$NEXUS_PASSWORD"
+        -Pnexus.password=${NEXUS_PASSWORD}
         -Psigning.keyId=A9A4043B
         -Psigning.secretKeyRingFile=$HOME/secrets/signingkey.gpg
-        -Psigning.password="$ENCRYPTED_SIGNING_PASSPHRASE"
+        -Psigning.password=${ENCRYPTED_SIGNING_PASSPHRASE}
         publishAllPublicationsToOSSRepository --stacktrace
     - name: Publish release to nexus
       if: startsWith(github.ref, 'refs/tags/')
       run: >
         ./gradlew
         -Pnexus.username=moaxcp
-        -Pnexus.password="$NEXUS_PASSWORD"
+        -Pnexus.password=${NEXUS_PASSWORD}
         -Psigning.keyId=A9A4043B
         -Psigning.secretKeyRingFile=$HOME/secrets/signingkey.gpg
-        -Psigning.password="$ENCRYPTED_SIGNING_PASSPHRASE"
+        -Psigning.password=${ENCRYPTED_SIGNING_PASSPHRASE}
         publishAllPublicationsToOSSRepository
         closeAndReleaseRepository --stacktrace
