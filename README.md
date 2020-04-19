@@ -14,11 +14,13 @@ native library. Applications using this library do not need to worry about compa
 ### Goals of release
 
 - [x] setup [reckon](https://github.com/ajoberstar/reckon) plugin
-- [ ] add github actions
+- [x] add github actions
   - [x] run test
   - [x] sonar scan
-  - [ ] publish to github
-  - [ ] publish to maven central
+  - [x] publish release to github
+  - [x] publish snapshots to maven central
+  - [x] publish release to maven central
+- [ ] fix new issues in sonar
 
 ### Changes
 

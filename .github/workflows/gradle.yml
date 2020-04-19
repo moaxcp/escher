@@ -45,7 +45,7 @@ jobs:
         sonarqube
     - name: Decrypt signing key
       run: ./decrypt_secret.sh
-    - name: Publish snapshot to nexus
+    - name: Publish snapshot to OSS
       if: ${{!startsWith(github.ref, 'refs/tags/')}}
       run: >
         ./gradlew
@@ -55,7 +55,7 @@ jobs:
         -Psigning.secretKeyRingFile=${HOME}/secrets/signingkey.gpg
         -Psigning.password=${ENCRYPTED_SIGNING_PASSPHRASE}
         publishAllPublicationsToOSSRepository --stacktrace
-    - name: Publish release to nexus
+    - name: Publish release to OSS
       if: startsWith(github.ref, 'refs/tags/')
       run: >
         ./gradlew
@@ -66,3 +66,13 @@ jobs:
         -Psigning.password=${ENCRYPTED_SIGNING_PASSPHRASE}
         publishAllPublicationsToOSSRepository
         closeAndReleaseRepository --stacktrace
+    - name: Publish release to github
+      if: startsWith(github.ref, 'refs/tags/')
+      run: >
+        ./gradlew
+        -Pgithub.user=moaxcp
+        -Pgithub.key=${GITHUB_TOKEN}
+        -Psigning.keyId=A9A4043B
+        -Psigning.secretKeyRingFile=$HOME/secrets/signingkey.gpg
+        -Psigning.password=${ENCRYPTED_SIGNING_PASSPHRASE}
+        publishAllPublicationsToGitHubPackagesRepository --stacktrace

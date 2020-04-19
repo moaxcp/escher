@@ -188,6 +188,14 @@ publishing {
                         password = project.findProperty('nexus.password')
                     }
                 }
+                maven {
+                    name = "GitHubPackages"
+                    url = uri("https://maven.pkg.github.com/moaxcp/escher")
+                    credentials {
+                        username = project.findProperty('github.user')
+                        password = project.findProperty('github.key')
+                    }
+                }
             }
         }
     }
