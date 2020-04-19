@@ -1,4 +1,4 @@
-package gnu.util;
+package publicapi;
 
 import org.junit.jupiter.api.*;
 

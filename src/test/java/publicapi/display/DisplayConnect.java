@@ -1,4 +1,4 @@
-package gnu.x11;
+package publicapi.display;
 
 import org.junit.jupiter.api.*;
 

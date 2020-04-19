@@ -1,5 +1,6 @@
-package gnu.x11;
+package publicapi.display;
 
+import gnu.x11.*;
 import org.junit.*;
 import org.junit.runner.*;
 import org.powermock.core.classloader.annotations.*;
@@ -11,7 +12,7 @@ import static org.powermock.api.mockito.PowerMockito.*;
 
 @RunWith(PowerMockRunner.class)
 @PrepareForTest( { DisplayName.class })
-public class DisplayNameJunit4 {
+public class DisplayNameEnvironment {
   @Test
   public void parse_environment() {
     mockStatic(System.class);

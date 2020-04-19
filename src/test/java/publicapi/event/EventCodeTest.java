@@ -1,5 +1,6 @@
-package gnu.x11.event;
+package publicapi.event;
 
+import gnu.x11.event.*;
 import org.junit.jupiter.api.*;
 
 import static gnu.x11.event.EventCode.*;
