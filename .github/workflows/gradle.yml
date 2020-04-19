@@ -13,7 +13,7 @@ env:
   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
   SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
   ENCRYPTED_SIGNING_PASSPHRASE: ${{ secrets.ENCRYPTED_SIGNING_PASSPHRASE }}
-
+  NEXUS_PASSWORD: ${{ secrets.NEXUS_PASSWORD }}
 
 jobs:
   build:
