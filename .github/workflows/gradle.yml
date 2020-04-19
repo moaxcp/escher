@@ -44,7 +44,6 @@ jobs:
         -Dsonar.login=${SONAR_TOKEN}
         sonarqube
     - name: Decrypt signing key
-      # for tags only if: startsWith(github.ref, 'refs/tags/')
       run: ./decrypt_secret.sh
     - name: Publish snapshot to nexus
       if: ${{!startsWith(github.ref, 'refs/tags/')}}
@@ -53,7 +52,7 @@ jobs:
         -Pnexus.username=moaxcp
         -Pnexus.password=${NEXUS_PASSWORD}
         -Psigning.keyId=A9A4043B
-        -Psigning.secretKeyRingFile=$HOME/secrets/signingkey.gpg
+        -Psigning.secretKeyRingFile=${HOME}/secrets/signingkey.gpg
         -Psigning.password=${ENCRYPTED_SIGNING_PASSPHRASE}
         publishAllPublicationsToOSSRepository --stacktrace
     - name: Publish release to nexus
