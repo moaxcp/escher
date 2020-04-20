@@ -8,7 +8,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 public class DisplayConnect {
   @Test
-  void connect_fails_with_null_display() {
+  void connect_fails_with_null_display_name() {
     NullPointerException exception = assertThrows(NullPointerException.class, () -> connect(null));
     assertThat(exception).hasMessage("name is marked non-null but is null");
   }
