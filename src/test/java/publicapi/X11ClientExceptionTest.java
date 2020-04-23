@@ -41,4 +41,10 @@ public class X11ClientExceptionTest {
     assertThat(result).hasMessage("message");
     assertThat(result).hasCause(cause);
   }
+
+  @Test
+  void constructor_3_fails_with_null_message() {
+    NullPointerException exception = assertThrows(NullPointerException.class, () -> new X11ClientException((String) null));
+    assertThat(exception).hasMessage("message is marked non-null but is null");
+  }
 }
