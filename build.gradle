@@ -47,12 +47,9 @@ dependencies {
     testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine'
     //https://github.com/openjdk/skara/pull/66
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
-    testRuntimeOnly 'org.junit.vintage:junit-vintage-engine'
-    testImplementation 'junit:junit:4.13'
     testImplementation 'org.assertj:assertj-core:3.14.0'
 
-    testImplementation 'org.powermock:powermock-api-mockito2:2.0.7'
-    testImplementation 'org.powermock:powermock-module-junit4:2.0.7'
+    testImplementation 'org.jmockit:jmockit:1.49'
 
 
     demoTestImplementation sourceSets.demo.output
@@ -86,6 +83,7 @@ test {
     reports {
         html.enabled = true
     }
+    jvmArgs "-javaagent:${classpath.find { it.name.contains("jmockit") }.absolutePath}"
 }
 
 integrationTest {

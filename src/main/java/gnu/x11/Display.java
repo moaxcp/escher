@@ -4,7 +4,6 @@ package gnu.x11;
 import gnu.x11.event.*;
 import gnu.x11.extension.*;
 import lombok.*;
-import org.newsclub.net.unix.*;
 
 import java.io.*;
 import java.net.*;
@@ -40,17 +39,17 @@ public class Display {
     /**
      * The socket.
      */
-    private Socket socket;
+    private final Socket socket;
 
     /**
      * The hostname to this display.
      */
-    private String hostname;
+    private final String hostName;
 
     /**
      * The display number.
      */
-    private int displayNumber;
+    private final int displayNumber;
     
     /**
      *  The display input (Keyboard/mouse) 
@@ -194,43 +193,12 @@ public class Display {
      */
     public ErrorFactory[] extensionErrorFactories = new ErrorFactory[128];
 
-    public static Display connect(@NonNull DisplayName name) {
-        try {
-            if(name.getHostName() == null) {
-                Socket socket = AFUNIXSocket.connectTo(new AFUNIXSocketAddress(new File("/tmp/.X11-unix/X" + name.getDisplayNumber())));
-                return new Display(socket, name.getHostName(), name.getDisplayNumber(), name.getScreenNumber());
-            }
+    public Display(@NonNull Socket socket, int displayNumber, int screenNumber) {
+        this.socket = socket;
+        this.hostName = socket.getInetAddress().getHostName();
+        this.displayNumber = displayNumber;
+        this.defaultScreenNumber = screenNumber;
 
-            Socket socket = new Socket(name.getHostName(), 6000 + name.getDisplayNumber());
-            return new Display(socket, name.getHostName(), name.getDisplayNumber(), name.getScreenNumber());
-        } catch(IOException e) {
-            throw new X11ClientException(String.format("failed to create socket for %s", name), e);
-        }
-    }
-    
-    /**
-     * Sets up a display using a connection over the specified <code>socket</code>.
-     * This should be used when there is a need to use non-TCP sockets, like
-     * connecting to an X server via Unix domain sockets. You need to provide an
-     * implementation for this kind of socket though.
-     * 
-     * @param socket
-     *            the socket to use for that connection
-     * @param hostname
-     *            the hostname to connect to
-     * @param displayNumber
-     *            the display number
-     * @param screenNumber
-     *            the screen number
-     * @throws X11ClientException
-     */
-    private Display(Socket socket, String hostname, int displayNumber, int screenNumber) {
-
-        setDefaultScreenNumber(screenNumber);
-        setHostname(hostname);
-        setDisplayNumber(displayNumber);
-        setSocket(socket);
-        
         init_streams();
         init();
     }
@@ -1217,18 +1185,6 @@ public class Display {
 
         XAuthority[] auths = XAuthority.getAuthorities();
 
-        // Fetch hostname.
-        if (hostname == null || hostname.equals("")
-                        || hostname.equals("localhost")) {
-            // Translate localhost hostnames to the real hostname of this host.
-            try {
-                InetAddress local = InetAddress.getLocalHost();
-                hostname = local.getHostName();
-            } catch (UnknownHostException ex) {
-                ex.printStackTrace();
-            }
-        }
-
         // Fetch display no.
         String displayNo = String.valueOf(displayNumber);
 
@@ -1240,7 +1196,7 @@ public class Display {
                 if (auth.getHostname() != null
                     && auth.getDisplayNumber().equals(displayNo)
                     && InetAddress.getByName(auth.getHostname()).equals(
-                       InetAddress.getByName(hostname))) {
+                       InetAddress.getByName(hostName))) {
                     found = auth;
                     break;
                 }
@@ -1368,9 +1324,9 @@ public class Display {
     }
 
     
-    public String getHostname() {
+    public String getHostName() {
     
-        return hostname;
+        return hostName;
     }
 
     
@@ -1593,24 +1549,6 @@ public class Display {
     public ErrorFactory[] getExtensionErrorFactories() {
     
         return extensionErrorFactories;
-    }
-
-    
-    public void setSocket(Socket socket) {
-    
-        this.socket = socket;
-    }
-
-    
-    public void setHostname(String hostname) {
-    
-        this.hostname = hostname;
-    }
-
-    
-    public void setDisplayNumber(int displayNumber) {
-    
-        this.displayNumber = displayNumber;
     }
 
     

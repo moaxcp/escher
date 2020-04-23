@@ -3,7 +3,6 @@ package gnu.app.x11;
 
 import gnu.x11.*;
 
-import static gnu.x11.Display.*;
 import static gnu.x11.DisplayName.*;
 
 /**
@@ -49,6 +48,6 @@ public class Application extends gnu.app.Application {
       "X server to connect to", parse(env));
 
     if (help_option) return;
-    display = connect(display_name);
+    display = display_name.connect();
   }
 }
