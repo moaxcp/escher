@@ -102,8 +102,6 @@ demoTest {
     }
 }
 
-check.dependsOn integrationTest
-
 task demoJar(type: Jar) {
     from sourceSets.demo.output
 }
