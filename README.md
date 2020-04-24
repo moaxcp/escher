@@ -9,7 +9,7 @@ native library. Applications using this library do not need to worry about compa
 
 # Versions
 
-## 0.4.0-SNAPSHOT
+## 0.4.0
 
 ### Goals of release
 
@@ -20,7 +20,7 @@ native library. Applications using this library do not need to worry about compa
   - [x] publish release to github
   - [x] publish snapshots to maven central
   - [x] publish release to maven central
-- [ ] fix new issues in sonar
+- [x] fix new issues in sonar
 
 ### Changes
 
