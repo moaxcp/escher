@@ -6,10 +6,7 @@ name: Java CI with Gradle
 on:
   push:
     branches: [ master ]
-  pull_request:
-    branches: [ master ]
-  release:
-    types: [created]
+  tags: 'v*'
 env:
   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
   SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}

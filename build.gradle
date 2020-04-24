@@ -12,7 +12,7 @@ plugins {
     id 'de.marcphilipp.nexus-publish' version '0.4.0'
 }
 
-group = 'com.github.moaxcp'
+group = 'com.github.moaxcp.escher'
 
 sourceSets {
     demo {
@@ -208,7 +208,7 @@ signing {
 }
 
 nexusStaging {
+    packageGroup = 'com.github.moaxcp'
     username = System.getProperty('nexus.username')
     password = System.getProperty('nexus.password')
-    packageGroup = 'com.github.moaxcp.escher'
 }
