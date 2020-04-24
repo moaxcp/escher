@@ -199,7 +199,7 @@ public class Display {
         this.displayNumber = displayNumber;
         this.defaultScreenNumber = screenNumber;
 
-        init_streams();
+        initStreams();
         init();
     }
     
@@ -1238,7 +1238,7 @@ public class Display {
     /**
      * Initializes the input and output streams.
      */
-    private void init_streams() {
+    private void initStreams() {
 
         String _debug = System.getProperty("escher.debug_streams", null);
 
@@ -1278,9 +1278,8 @@ public class Display {
         return defaultRoot;
     }
     
-    private void handleException(Throwable ex) {
-
-        ex.printStackTrace();
+    private void handleException(Exception ex) {
+        throw new X11ClientException(ex);
     }
     
     // Accessors
