@@ -123,6 +123,11 @@ sonarqube {
     }
 }
 
+nexusStaging {
+    username = System.getProperty('nexus.username')
+    password = System.getProperty('nexus.password')
+}
+
 publishing {
     publications {
         mavenJava(MavenPublication) {

@@ -9,8 +9,7 @@ on:
   pull_request:
     branches: [ master ]
   release:
-    types:
-      - created
+    types: [created]
 env:
   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
   SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
@@ -47,16 +46,6 @@ jobs:
         sonarqube
     - name: Decrypt signing key
       run: ./decrypt_secret.sh
-    - name: Publish snapshot to OSS
-      if: ${{!startsWith(github.ref, 'refs/tags/')}}
-      run: >
-        ./gradlew
-        -Pnexus.username=moaxcp
-        -Pnexus.password=${NEXUS_PASSWORD}
-        -Psigning.keyId=A9A4043B
-        -Psigning.secretKeyRingFile=${HOME}/secrets/signingkey.gpg
-        -Psigning.password=${ENCRYPTED_SIGNING_PASSPHRASE}
-        publishAllPublicationsToOSSRepository --stacktrace
     - name: Publish release to OSS
       if: startsWith(github.ref, 'refs/tags/')
       run: >
