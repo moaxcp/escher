@@ -99,7 +99,9 @@ public class Render extends gnu.x11.extension.Extension
             pfs [idx] = new PictFormat (i);
           }
           // TODO: Read LISTofPICTSCREEN and LISTofSUBPIXEL.
-          try { i.skip (i.available ()); } catch (IOException ex) { }
+          try { i.skip (i.available ()); } catch (IOException ex) {
+            throw new X11ClientException(ex);
+          }
           picture_formats_cache = pfs;
         }
       }

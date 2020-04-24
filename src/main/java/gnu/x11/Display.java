@@ -949,7 +949,7 @@ public class Display {
             try {
                 xcmisc = new XCMisc(this);
             } catch (NotFoundException e) {
-                throw new RuntimeException("Failed to allocate new resource id");
+                throw new X11ClientException("Failed to allocate new resource id", e);
             }
         }
 
@@ -1201,7 +1201,7 @@ public class Display {
                     break;
                 }
             } catch (UnknownHostException ex) {
-                System.err.println("warning unknown host :" + auth.getHostname());
+                throw new X11ClientException(ex);
             }
         }
         return found;
@@ -1226,9 +1226,7 @@ public class Display {
             try {
                 inputStream.skip(inputStream.available());
             } catch (IOException ie) {
-                throw new java.lang.Error(
-                                          "Failed to clear socket input stream: "
-                                                          + ie);
+                e.addSuppressed(ie);
             }
 
             throw e;

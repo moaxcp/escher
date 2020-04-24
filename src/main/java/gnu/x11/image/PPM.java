@@ -1,9 +1,7 @@
 
 package gnu.x11.image;
 
-import gnu.x11.Colormap;
-import gnu.x11.Display;
-import gnu.x11.VisualInfo;
+import gnu.x11.*;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -31,11 +29,10 @@ public class PPM extends ZPixmap { // TODO
         int index = dimension.indexOf(' ');
         try {
             width = Integer.parseInt(dimension.substring(0, index));
-            height = Integer.parseInt(dimension.substring(index + 1, dimension
-                    .length()));
+            height = Integer.parseInt(dimension.substring(index + 1));
 
-        } catch (Exception e) {
-            throw new Error("Invalid dimension: " + dimension);
+        } catch (NumberFormatException e) {
+            throw new X11ClientException(e);
         }
 
         String color_count = bin.readLine();

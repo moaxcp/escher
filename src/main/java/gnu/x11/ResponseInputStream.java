@@ -333,7 +333,8 @@ public class ResponseInputStream extends FilterInputStream {
             if (ev == null) {
                 try {
                     Thread.sleep(40);
-                } catch (Exception ex) {
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
                 }
                 // Thread.yield ();
             }

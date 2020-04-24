@@ -171,9 +171,9 @@ public class XAuthority {
       }
       in.close ();
     } catch (FileNotFoundException ex) {
-      System.err.println ("Can't find Xauthority file: " + authFilename);
+      throw new X11ClientException(ex);
     } catch (IOException ex) {
-      System.err.println ("Unexpected problem while reading Xauthority file");
+      throw new X11ClientException(ex);
     }
 
     return (XAuthority[]) authorities.toArray

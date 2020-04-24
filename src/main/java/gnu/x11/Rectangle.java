@@ -54,7 +54,7 @@ public class Rectangle {
       }
 
     } catch (RuntimeException e) {
-      throw new RuntimeException ("Invalid geometry specification: "
+      throw new IllegalArgumentException ("Invalid geometry specification: "
         + "\nSupported examples:"
         + "\n  100x300+50+50 or 100x300-20+20"
         + "\n  100x300"
