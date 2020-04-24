@@ -13,6 +13,7 @@ plugins {
 }
 
 group = 'com.github.moaxcp'
+description = 'An x11 client written in java.'
 
 sourceSets {
     demo {
