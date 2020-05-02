@@ -1,16 +1,12 @@
 package gnu.app.x11.test;
 
-import gnu.app.x11.*;
-import gnu.util.Misc;
-import gnu.x11.Atom;
-import gnu.x11.Font;
-import gnu.x11.Window;
+import gnu.app.Application;
+import gnu.x11.*;
 import gnu.x11.extension.NotFoundException;
-import gnu.x11.extension.render.Render;
-import gnu.x11.extension.glx.GLX;
 import gnu.x11.extension.glx.GL;
-
-import java.util.*;
+import gnu.x11.extension.glx.GLX;
+import gnu.x11.extension.render.Render;
+import java.util.Arrays;
 
 
 /** 

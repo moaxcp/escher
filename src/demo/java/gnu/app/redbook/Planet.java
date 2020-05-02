@@ -22,7 +22,7 @@ import gnu.x11.extension.glx.GL;
  * @see <a href="../../../../etc/screenshot/gnu/app/redbook/Planet.help">
  * help output</a>
  */
-public class Planet extends Application {
+public class Planet extends GLXApplication {
   private int day, year;
 
 

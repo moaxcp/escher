@@ -16,7 +16,7 @@ import gnu.x11.extension.glx.GL;
  * @see <a href="../../../../etc/screenshot/gnu/app/redbook/NonRectangular.help">
  * help output</a>
  */
-public class NonRectangular extends Application {
+public class NonRectangular extends GLXApplication {
   private static final float [] BLUE_DIFFUSE = {0.1f, 0.1f, 0.7f, 1.0f};
   private static final float [] BLUE_SPECULAR = {1.0f, 1.0f, 1.0f, 1.0f};
   private static final float [] YELLOW_DIFFUSE = {0.7f, 0.7f, 0.0f, 1.0f};

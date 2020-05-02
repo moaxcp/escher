@@ -13,7 +13,7 @@ import gnu.x11.extension.glx.GL;
  * @see <a href="../../../../etc/screenshot/gnu/app/redbook/LineStipple.help">
  * help output</a>
  */
-public class LineStipple extends Application {
+public class LineStipple extends GLXApplication {
   public LineStipple (String [] args) {
     super (args, RESIZE_BIT);
 

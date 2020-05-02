@@ -14,7 +14,7 @@ import gnu.x11.extension.glx.GL;
  * @see <a href="../../../../etc/screenshot/gnu/app/redbook/ModelTransform.help">
  * help output</a>
  */
-public class ModelTransform extends Application {
+public class ModelTransform extends GLXApplication {
   public ModelTransform (String [] args) {
     super (args, RESIZE_BIT);
 

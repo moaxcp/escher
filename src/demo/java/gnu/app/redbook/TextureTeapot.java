@@ -24,7 +24,7 @@ import gnu.x11.extension.glx.GL;
  * @see <a href="../../../../etc/screenshot/gnu/app/redbook/TextureTeapot.help">
  * help output</a>
  */
-public class TextureTeapot extends Application {
+public class TextureTeapot extends GLXApplication {
   private static final int IMAGE_SIZE = 32;
   private static byte[] IMAGE;
   private static final byte [] IMAGE0 = new byte [IMAGE_SIZE * 4];

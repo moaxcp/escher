@@ -16,7 +16,7 @@ import gnu.x11.extension.glx.GL;
  * @see <a href="../../../../etc/screenshot/gnu/app/redbook/Robot.help">
  * help output</a>
  */
-public class Robot extends Application {
+public class Robot extends GLXApplication {
   private int shoulder_angle, elbow_angle;
 
 

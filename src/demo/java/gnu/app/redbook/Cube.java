@@ -15,7 +15,7 @@ import gnu.x11.extension.glx.GL;
  * @see <a href="../../../../etc/screenshot/gnu/app/redbook/Cube.help">
  * help output</a>
  */
-public class Cube extends Application {
+public class Cube extends GLXApplication {
   public Cube (String [] args) {
     super (args, RESIZE_BIT);
 

@@ -8,7 +8,7 @@ import gnu.x11.extension.glx.GL;
  * Draw a bitmapped letter F on the screen for several times. To
  * demonstrate {@link GL#bitmap}. Modified from <code>drawf.c</code>.
  */
-public class BitmapLetter extends Application {
+public class BitmapLetter extends GLXApplication {
   // start from low-left corner --> inverted F
   private byte [] LETTER = {
     (byte) 0xc0, (byte) 0x00,   // x x 0 0 0 0 0 0

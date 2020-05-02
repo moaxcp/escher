@@ -15,7 +15,7 @@ import gnu.x11.extension.glx.GL;
  * @see <a href="../../../../etc/screenshot/gnu/app/redbook/BitmapFont.help">
  * help output</a>
  */
-public class BitmapFont extends Application {
+public class BitmapFont extends GLXApplication {
   private byte [] SPACE = new byte [13]; // all zeros
 
   private byte [] [] LETTERS = {

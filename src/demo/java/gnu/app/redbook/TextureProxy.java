@@ -14,7 +14,7 @@ import gnu.x11.extension.glx.GL;
  * @see <a href="../../../../etc/screenshot/gnu/app/redbook/TextureProxy.help">
  * help output</a>
  */
-public class TextureProxy extends Application {
+public class TextureProxy extends GLXApplication {
   private int [] textures;  
 
 

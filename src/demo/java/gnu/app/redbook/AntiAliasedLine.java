@@ -17,7 +17,7 @@ import gnu.x11.extension.glx.GL;
  * @see <a href="../../../../etc/screenshot/gnu/app/redbook/AntiAliasedLine.help">
  * help output</a>
  */
-public class AntiAliasedLine extends Application {
+public class AntiAliasedLine extends GLXApplication {
   private int rotate_angle;
 
 

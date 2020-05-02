@@ -22,7 +22,7 @@ import gnu.x11.extension.glx.GL;
  * @see <a href="../../../../etc/screenshot/gnu/app/redbook/Fog.help">
  * help output</a>
  */
-public class Fog extends Application {
+public class Fog extends GLXApplication {
   private static final float [] FOG_COLOR = {0.5f, 0.5f, 0.5f, 1.0f};
   private static final float [] LIGHT_MODEL_AMBIENT
     = {0.2f, 0.2f, 0.2f, 1.0f};

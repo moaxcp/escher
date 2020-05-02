@@ -1,13 +1,13 @@
 package gnu.app.displayhack;
 
-import gnu.app.x11.*;
-import gnu.x11.*;
+import gnu.app.Application;
 import gnu.app.displayhack.eraser.Eraser;
+import gnu.x11.*;
 import gnu.x11.event.*;
-
 import java.util.Random;
 
-import static gnu.x11.Input.KeyMask.*;
+import static gnu.x11.Input.KeyMask.BUTTON1;
+import static gnu.x11.Input.KeyMask.BUTTON3;
 
 
 /**

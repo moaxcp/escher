@@ -2,7 +2,6 @@ package gnu.app.glxdemo;
 
 import gnu.app.x11.glx.*;
 import gnu.x11.extension.glx.GL;
-import gnu.x11.Input;
 
 import static java.awt.event.MouseEvent.*;
 
@@ -25,7 +24,7 @@ import static java.awt.event.MouseEvent.*;
  * @see <a href="../../../../etc/screenshot/gnu/app/glxdemo/RotateBox.help">
  * help output</a>
  */
-public class RotateBox extends Application {
+public class RotateBox extends GLXApplication {
   private float x_angle = 42.0f;
   private float y_angle = 82.0f;
   private float z_angle = 112.0f;

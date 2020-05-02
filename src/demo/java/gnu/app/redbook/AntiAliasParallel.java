@@ -14,7 +14,7 @@ import gnu.x11.extension.glx.GL;
  * @see <a href="../../../../etc/screenshot/gnu/app/redbook/AntiAliasParallel.help">
  * help output</a>
  */
-public class AntiAliasParallel extends Application {
+public class AntiAliasParallel extends GLXApplication {
   private static final int ACCUM_SIZE = 8;
 
   private static final float [] TORUS_DIFFUSE

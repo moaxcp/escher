@@ -15,7 +15,7 @@ import gnu.x11.extension.glx.GL;
  * @see <a href="../../../../etc/screenshot/gnu/app/redbook/DisplayList.help">
  * help output</a>
  */
-public class DisplayList extends Application {
+public class DisplayList extends GLXApplication {
   private int display_list;
 
 

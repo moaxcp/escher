@@ -20,7 +20,7 @@ import gnu.x11.extension.glx.GL;
  * @see <a href="../../../../etc/screenshot/gnu/app/redbook/MaterialColor.help">
  * help output</a>
  */
-public class MaterialColor extends Application {
+public class MaterialColor extends GLXApplication {
   private static final float [] LIGHT_POSITION
     = {1.0f, 1.0f, 1.0f, 0.0f};
   private static final float [] MATERIAL_SPECULAR

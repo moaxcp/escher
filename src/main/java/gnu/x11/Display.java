@@ -12,7 +12,7 @@ import java.util.logging.*;
 
 /** X server connection. */
 // TODO Support Multiple Screens
-public class Display {
+public class Display implements AutoCloseable {
 
     private static java.util.logging.Logger logger;
     static {
@@ -969,16 +969,19 @@ public class Display {
      * @see <a href="XCloseDisplay.html">XCloseDisplay</a>
      */
     public void close() {
-
-        // FIXME: Implement more sensible shutdown.
         try {
-            inputStream.close();
-            outputStream.close();
-            socket.close();
-        } catch (IOException ex) {
-            handleException(ex);
+            try {
+                inputStream.close();
+            } finally {
+                try {
+                    outputStream.close();
+                } finally {
+                    socket.close();
+                }
+            }
+        } catch(IOException ex) {
+            throw new X11ClientException(ex);
         }
-        connected = false;
     }
 
     /**

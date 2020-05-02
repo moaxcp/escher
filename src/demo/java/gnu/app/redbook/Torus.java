@@ -19,7 +19,7 @@ import gnu.x11.extension.glx.GL;
  * @see <a href="../../../../etc/screenshot/gnu/app/redbook/Torus.help">
  * help output</a>
  */
-public class Torus extends Application {
+public class Torus extends GLXApplication {
   private int display_list;
 
 

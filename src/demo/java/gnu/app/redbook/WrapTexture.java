@@ -21,7 +21,7 @@ import gnu.x11.extension.glx.GL;
  * @see <a href="../../../../etc/screenshot/gnu/app/redbook/WrapTexture.help">
  * help output</a>
  */
-public class WrapTexture extends Application {
+public class WrapTexture extends GLXApplication {
   private boolean support_bind;
   private int texture;  
 

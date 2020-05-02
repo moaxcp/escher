@@ -1,7 +1,7 @@
 package gnu.app;
 
 import gnu.util.Math;
-
+import gnu.x11.*;
 import java.util.Vector;
 
 
@@ -43,6 +43,59 @@ public class Option {
       "show working of option parsing", false);
   }
 
+  public DisplayName display_name (String name, String description, DisplayName default_value) {
+
+    DisplayName retval = default_value;
+
+    try {
+      String opt = option (name);
+      if (opt != null) retval = DisplayName.parse(opt);
+
+    } catch (RuntimeException e) {
+      invalid_names.append (name + ", ");
+      // fall through
+    }
+
+    add_spec (name, "display name", description, default_value.toString (),
+        retval.toString ());
+    return retval;
+  }
+
+  public RGB rgb (String name, String description, RGB default_value) {
+    RGB retval = default_value;
+
+    try {
+      String opt = option (name);
+      if (opt != null) retval = new RGB (opt);
+
+    } catch (RuntimeException e) {
+      invalid_names.append (name + ", ");
+      // fall through
+    }
+
+    add_spec (name, "RGB", description,
+        default_value.spec (), retval.spec ());
+    return retval;
+  }
+
+  public Rectangle rectangle (String name, String description,
+                              Rectangle default_value) {
+
+    Rectangle retval = default_value;
+
+    try {
+      String opt = option (name);
+      if (opt != null) retval = new Rectangle (option (name));
+
+    } catch (RuntimeException e) {
+      invalid_names.append (name + ", ");
+      // fall through
+    }
+
+    add_spec (name, "Rectangle", description,
+        default_value.spec (), retval.spec ());
+    return retval;
+  }
 
   /** 
    * Print "about" and list possible options. This method

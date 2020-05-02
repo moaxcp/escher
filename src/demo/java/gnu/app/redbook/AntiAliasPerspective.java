@@ -14,7 +14,7 @@ import gnu.x11.extension.glx.GL;
  * @see <a href="../../../../etc/screenshot/gnu/app/redbook/AntiAliasPerspective.help">
  * help output</a>
  */
-public class AntiAliasPerspective extends Application {
+public class AntiAliasPerspective extends GLXApplication {
   private static final int ACCUM_SIZE = 8;
 
   private static final float [] TORUS_DIFFUSE

@@ -37,7 +37,7 @@ import gnu.x11.keysym.Misc;
  * @see <a href="../../../../etc/screenshot/gnu/app/glxdemo/Triangle.help">
  * help output</a>
  */
-public class Triangle extends Application {
+public class Triangle extends GLXApplication {
   private static final int SOLID = 0;
   private static final int LINE = 1;
   private static final int POINT = 2;

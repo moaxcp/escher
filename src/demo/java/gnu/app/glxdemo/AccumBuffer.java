@@ -16,7 +16,7 @@ import gnu.x11.extension.glx.GL;
  * @see <a href="../../../../etc/screenshot/gnu/app/glxdemo/AccumBuffer.help">
  * help output</a>
  */
-public class AccumBuffer extends Application {
+public class AccumBuffer extends GLXApplication {
   private int rectangle1, rectangle2;
 
 

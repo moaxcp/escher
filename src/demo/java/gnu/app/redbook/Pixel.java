@@ -22,7 +22,7 @@ import gnu.x11.extension.glx.GL;
  * @see <a href="../../../../etc/screenshot/gnu/app/redbook/Pixel.help">
  * help output</a>
  */
-public class Pixel extends Application {
+public class Pixel extends GLXApplication {
   private float zoom_factor = 1.0f;
 
 

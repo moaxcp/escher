@@ -14,7 +14,7 @@ import gnu.x11.extension.glx.GL;
  * @see <a href="../../../../etc/screenshot/gnu/app/redbook/SmoothShade.help">
  * help output</a>
  */
-public class SmoothShade extends Application {
+public class SmoothShade extends GLXApplication {
   public SmoothShade (String [] args) {
     super (args, RESIZE_BIT);
 

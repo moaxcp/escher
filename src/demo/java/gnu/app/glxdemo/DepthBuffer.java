@@ -16,7 +16,7 @@ import gnu.x11.extension.glx.GL;
  * @see <a href="../../../../etc/screenshot/gnu/app/glxdemo/DepthBuffer.help">
  * help output</a>
  */
-public class DepthBuffer extends Application {
+public class DepthBuffer extends GLXApplication {
   private static final byte [] HALFTONE = {
     (byte) 0xaa, (byte) 0xaa, (byte) 0xaa, (byte) 0xaa,
     (byte) 0x55, (byte) 0x55, (byte) 0x55, (byte) 0x55,

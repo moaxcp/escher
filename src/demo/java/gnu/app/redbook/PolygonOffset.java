@@ -3,7 +3,6 @@ package gnu.app.redbook;
 import gnu.app.x11.glx.*;
 import gnu.x11.Input.*;
 import gnu.x11.extension.glx.GL;
-import gnu.x11.Input;
 
 
 /**
@@ -28,7 +27,7 @@ import gnu.x11.Input;
  * @see <a href="../../../../etc/screenshot/gnu/app/redbook/PolygonOffset.help">
  * help output</a>
  */
-public class PolygonOffset extends Application {
+public class PolygonOffset extends GLXApplication {
   private static final float [] LIGHT_AMBIENT = {0.0f, 0.0f, 0.0f, 1.0f};
   private static final float [] LIGHT_DIFFUSE = {1.0f, 1.0f, 1.0f, 1.0f};
   private static final float [] LIGHT_SPECULAR = {1.0f, 1.0f, 1.0f, 1.0f};

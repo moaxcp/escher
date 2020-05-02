@@ -15,7 +15,7 @@ import gnu.x11.extension.glx.GL;
  * @see <a href="../../../../etc/screenshot/gnu/app/glxdemo/ABGR.help">
  * help output</a>
  */
-public class ABGR extends Application {
+public class ABGR extends GLXApplication {
   private static final int IMAGE_SIZE = 128;
   private static byte[] IMAGE;
   private static final byte [] IMAGE0 = new byte [IMAGE_SIZE * IMAGE_SIZE * 4];

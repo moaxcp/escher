@@ -13,7 +13,7 @@ import gnu.x11.extension.glx.GL;
  * @see <a href="../../../../etc/screenshot/gnu/app/redbook/BezierSurface.help">
  * help output</a>
  */
-public class BezierSurface extends Application {
+public class BezierSurface extends GLXApplication {
   private static final float [] [] [] CONTROL_POINTS = {
     {{-1.5f, -1.5f, 4.0f},
      {-0.5f, -1.5f, 2.0f},

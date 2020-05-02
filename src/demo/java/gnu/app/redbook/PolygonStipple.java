@@ -13,7 +13,7 @@ import gnu.x11.extension.glx.GL;
  * @see <a href="../../../../etc/screenshot/gnu/app/redbook/PolygonStipple.help">
  * help output</a>
  */
-public class PolygonStipple extends Application {
+public class PolygonStipple extends GLXApplication {
   private static final byte [] FLY = {
     (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, 
     (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00,

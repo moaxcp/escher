@@ -4,8 +4,6 @@ import gnu.app.x11.glx.*;
 import gnu.x11.extension.glx.GL;
 import gnu.x11.Input;
 
-import static java.lang.Thread.*;
-
 
 /**
  * Animate a spinning rectangle. To demonstrate double buffering and
@@ -18,7 +16,7 @@ import static java.lang.Thread.*;
  * @see <a href="../../../../etc/screenshot/gnu/app/redbook/DoubleBuffer.help">
  * help output</a>
  */
-public class DoubleBuffer extends Application implements Runnable {
+public class DoubleBuffer extends GLXApplication implements Runnable {
   private int rotate_angle;
   private boolean spinning;
   private Thread thread = new Thread (this, "spin");

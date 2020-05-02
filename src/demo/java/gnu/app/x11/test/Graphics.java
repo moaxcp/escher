@@ -1,7 +1,8 @@
 package gnu.app.x11.test;
 
-import gnu.app.x11.*;
-import gnu.x11.*;
+import gnu.app.Application;
+import gnu.x11.Window;
+import gnu.x11.WindowAttributes;
 import gnu.x11.event.*;
 
 import static gnu.x11.event.EventMask.*;

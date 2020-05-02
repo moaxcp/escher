@@ -14,7 +14,7 @@ import gnu.x11.extension.glx.GL;
  * @see <a href="../../../../etc/screenshot/gnu/app/redbook/BezierMesh.help">
  * help output</a>
  */
-public class BezierMesh extends Application {
+public class BezierMesh extends GLXApplication {
   private static final float [] [] [] CONTROL_POINTS = {
     {{-1.5f, -1.5f, 4.0f},
      {-0.5f, -1.5f, 2.0f},

@@ -28,7 +28,7 @@ import gnu.x11.keysym.Misc;
  * @see <a href="../../../../etc/screenshot/gnu/app/glxdemo/Point.help">
  * help output</a>
  */
-public class Point extends Application {
+public class Point extends GLXApplication {
   private static final float DELTA = 1.0f;
 
 

@@ -1,20 +1,18 @@
 package gnu.app.puppet;
 
-import gnu.app.x11.*;
+import gnu.app.Application;
+import gnu.x11.Input;
 import gnu.x11.*;
-import gnu.x11.Window.*;
-import gnu.x11.X11ServiceException.*;
+import gnu.x11.Window.GrabMode;
+import gnu.x11.Window.GrabStatus;
+import gnu.x11.X11ServiceException.ErrorCode;
 import gnu.x11.event.*;
-import gnu.x11.Input;           // shadow gnu.x11.event.Input
-import gnu.x11.X11ServiceException;           // shadow java.lang.Error
-import gnu.x11.extension.XTest;
 import gnu.x11.extension.NotFoundException;
+import gnu.x11.extension.XTest;
 import gnu.x11.keysym.Misc;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Vector;
+import java.util.*;
 
-import static gnu.x11.Host.ChangeOperation.*;
+import static gnu.x11.Host.ChangeOperation.INSERT;
 import static java.awt.event.MouseEvent.*;
 
 

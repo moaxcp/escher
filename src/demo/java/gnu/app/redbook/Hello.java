@@ -13,7 +13,7 @@ import gnu.x11.extension.glx.GL;
  * @see <a href="../../../../etc/screenshot/gnu/app/redbook/Hello.help">
  * help output</a>
  */
-public class Hello extends Application {
+public class Hello extends GLXApplication {
   public Hello (String [] args) {
     super (args, 0);
 

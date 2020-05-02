@@ -14,7 +14,7 @@ import gnu.x11.extension.glx.GL;
  * @see <a href="../../../../etc/screenshot/gnu/app/redbook/StrokeFont.help">
  * help output</a>
  */
-public class StrokeFont extends Application {
+public class StrokeFont extends GLXApplication {
   private static final String LINE1 = "A SPARE SERAPE APPEARS AS";
   private static final String LINE2 = "APES PREPARE RARE PEPPERS";
 

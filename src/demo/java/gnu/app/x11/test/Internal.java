@@ -1,9 +1,9 @@
 package gnu.app.x11.test;
 
-import gnu.app.x11.*;
+import gnu.app.Application;
 import gnu.x11.Cursor;
 
-import static gnu.x11.Cursor.Shape.*;
+import static gnu.x11.Cursor.Shape.X_CURSOR;
 
 
 /**

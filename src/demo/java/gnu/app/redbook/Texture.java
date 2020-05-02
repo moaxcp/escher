@@ -14,7 +14,7 @@ import gnu.x11.extension.glx.GL;
  * @see <a href="../../../../etc/screenshot/gnu/app/redbook/Texture.help">
  * help output</a>
  */
-public class Texture extends Application {
+public class Texture extends GLXApplication {
   private boolean support_bind;
   private int texture;  
 

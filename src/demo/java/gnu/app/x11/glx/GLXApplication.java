@@ -9,7 +9,7 @@ import java.lang.Error;
 
 
 /** OpenGL application. */
-public abstract class Application extends gnu.app.x11.Application {
+public abstract class GLXApplication extends gnu.app.Application {
   protected static final int EVENT_BIT = 1<< EventMask.LAST_MASK_INDEX.getMask()+1;
   protected static final int DELETE_BIT = 1<< EventMask.LAST_MASK_INDEX.getMask()+2;
 
@@ -47,7 +47,7 @@ public abstract class Application extends gnu.app.x11.Application {
   protected boolean window_dirty;
 
 
-  protected Application (String [] args, int event_mask) {
+  protected GLXApplication(String [] args, int event_mask) {
     super (args);
     this.event_mask = event_mask;
 

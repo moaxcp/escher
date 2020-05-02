@@ -13,7 +13,7 @@ import gnu.x11.extension.glx.GL;
  * @see <a href="../../../../etc/screenshot/gnu/app/redbook/Clip.help">
  * help output</a>
  */
-public class Clip extends Application {
+public class Clip extends GLXApplication {
   private static final double [] CLIP_PLANE0 = {0.0, 1.0, 0.0, 0.0};
   private static final double [] CLIP_PLANE1 = {1.0, 0.0, 0.0, 0.0};
 

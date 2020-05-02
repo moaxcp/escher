@@ -13,7 +13,7 @@ import gnu.x11.extension.glx.GL;
  * @see <a href="../../../../etc/screenshot/gnu/app/redbook/BezierCurve.help">
  * help output</a>
  */
-public class BezierCurve extends Application {
+public class BezierCurve extends GLXApplication {
   private static final double [] CONTROL_POINTS = {
     -4.0f, -4.0f, 0.0f,
     -2.0f, 4.0f, 0.0f,

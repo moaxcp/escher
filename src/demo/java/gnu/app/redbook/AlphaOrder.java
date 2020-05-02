@@ -15,7 +15,7 @@ import gnu.x11.extension.glx.GL;
  * @see <a href="../../../../etc/screenshot/gnu/app/redbook/AlphaOrder.help">
  * help output</a>
  */
-public class AlphaOrder extends Application {
+public class AlphaOrder extends GLXApplication {
   private boolean left_first = true;
 
 

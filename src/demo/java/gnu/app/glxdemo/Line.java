@@ -24,7 +24,7 @@ import gnu.x11.keysym.Misc;
  * @see <a href="../../../../etc/screenshot/gnu/app/glxdemo/Line.help">
  * help output</a>
  */
-public class Line extends Application {
+public class Line extends GLXApplication {
   private static final float [] POINT_A = {-160.0f, 0.0f, 0.0f};
   private static final float [] POINT_B = {-130.0f, 0.0f, 0.0f};
   private static final float [] POINT_C = {-40.0f, -50.0f, 0.0f};

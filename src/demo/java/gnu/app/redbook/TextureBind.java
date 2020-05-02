@@ -13,7 +13,7 @@ import gnu.x11.extension.glx.GL;
  * @see <a href="../../../../etc/screenshot/gnu/app/redbook/TextureBind.help">
  * help output</a>
  */
-public class TextureBind extends Application {
+public class TextureBind extends GLXApplication {
   private int [] textures;  
 
 

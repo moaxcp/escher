@@ -13,7 +13,7 @@ import gnu.x11.extension.glx.GL;
  * @see <a href="../../../../etc/screenshot/gnu/app/redbook/Quadric.help">
  * help output</a>
  */
-public class Quadric extends Application {
+public class Quadric extends GLXApplication {
   private static final float [] LIGHT_POSITION = {1.0f, 1.0f, 1.0f, 0.0f};
   private static final float MATERIAL_SHININESS = 50.0f;
 

@@ -21,7 +21,7 @@ import gnu.x11.extension.glx.GL;
  * @see <a href="../../../../etc/screenshot/gnu/app/glxdemo/Primitive.help">
  * help output</a>
  */
-public class Primitive extends Application {
+public class Primitive extends GLXApplication {
   private static final int COLUMN_COUNT = 4;
   private static final int GAP = 10;
   private static final int ROW_COUNT = 3;

@@ -15,7 +15,7 @@ import gnu.x11.extension.glx.GL;
  * @see <a href="../../../../etc/screenshot/gnu/app/redbook/Mipmap.help">
  * help output</a>
  */
-public class Mipmap extends Application {
+public class Mipmap extends GLXApplication {
   private boolean support_bind;
   private int texture;  
 

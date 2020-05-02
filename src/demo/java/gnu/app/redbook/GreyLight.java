@@ -15,7 +15,7 @@ import gnu.x11.extension.glx.GL;
  * @see <a href="../../../../etc/screenshot/gnu/app/redbook/GreyLight.help">
  * help output</a>
  */
-public class GreyLight extends Application {
+public class GreyLight extends GLXApplication {
   private static final float [] LIGHT_AMBIENT = {0.0f, 0.0f, 0.0f, 1.0f};
   private static final float [] LIGHT_DIFFUSE = {1.0f, 1.0f, 1.0f, 1.0f};
   private static final float [] LIGHT_SPECULAR = {1.0f, 1.0f, 1.0f, 1.0f};

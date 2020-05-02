@@ -17,7 +17,7 @@ import gnu.x11.Input;
  * @see <a href="../../../../etc/screenshot/gnu/app/redbook/UnProject.help">
  * help output</a>
  */
-public class UnProject extends Application {
+public class UnProject extends GLXApplication {
   public UnProject (String [] args) {
     super (args, BUTTON_PRESS_BIT | RESIZE_BIT);
 

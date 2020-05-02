@@ -1,6 +1,5 @@
 package gnu.app;
 
-import gnu.app.x11.Application;
 import gnu.x11.Input.*;
 import gnu.x11.Window;
 import gnu.x11.event.*;

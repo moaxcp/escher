@@ -20,7 +20,7 @@ import gnu.x11.extension.glx.GL;
  * @see <a href="../../../../etc/screenshot/gnu/app/redbook/LightPosition.help">
  * help output</a>
  */
-public class LightPosition extends Application {
+public class LightPosition extends GLXApplication {
   private static final float [] LIGHT_POSITION = {0.0f, 0.0f, 1.5f, 1.0f};
 
   private int rotate_angle;

@@ -15,7 +15,7 @@ import gnu.x11.extension.glx.GL;
  * @see <a href="../../../../etc/screenshot/gnu/app/glxdemo/StencilBuffer.help">
  * help output</a>
  */
-public class StencilBuffer extends Application {
+public class StencilBuffer extends GLXApplication {
   public StencilBuffer (String [] args) {
     super (args, RESIZE_BIT);
 

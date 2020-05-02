@@ -16,7 +16,7 @@ import gnu.util.Misc;
  * @see <a href="../../../../etc/screenshot/gnu/app/redbook/SurfaceTexture.help">
  * help output</a>
  */
-public class SurfaceTexture extends Application {
+public class SurfaceTexture extends GLXApplication {
   private static final int IMAGE_SIZE = 64;
 
   private static final byte [] IMAGE = new byte [IMAGE_SIZE * IMAGE_SIZE * 3]; 
