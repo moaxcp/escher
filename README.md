@@ -7,6 +7,12 @@ Escher is a fork from the original [escher](https://sourceforge.net/projects/esc
 X11 client implementation written in java. This project directly connects to the X11 server rather than binding to a 
 native library. Applications using this library do not need to worry about compatibility with a native library.
 
+# Development Info
+
+https://gitlab.freedesktop.org/xorg
+
+
+
 # Versions
 
 ## 0.4.0

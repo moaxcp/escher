@@ -1,14 +1,14 @@
 
 package gnu.x11;
 
-import gnu.x11.event.*;
+import gnu.x11.event.Event;
 import gnu.x11.extension.*;
-import lombok.*;
-
 import java.io.*;
 import java.net.*;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
-import java.util.logging.*;
+import java.util.logging.Level;
+import lombok.NonNull;
 
 /** X server connection. */
 // TODO Support Multiple Screens
@@ -214,15 +214,11 @@ public class Display implements AutoCloseable {
         // authorization protocol
         XAuthority xauth = getAuthority();
 
-        byte[] authName;
-        byte[] authData;
+        String authName = "";
+        byte[] authData = new byte[0];
         if (xauth != null) {
             authName = xauth.getProtocolName();
             authData = xauth.getProtocolData();
-        } else {
-            // In case the X authority couldn't be established...
-            authName = new byte[0];
-            authData = new byte[0];
         }
 
         RequestOutputStream o = outputStream;
@@ -231,11 +227,11 @@ public class Display implements AutoCloseable {
             o.writeInt8(0); // Unused.
             o.writeInt16(11);// major version
             o.writeInt16(0);// minor version
-            o.writeInt16(authName.length);
+            o.writeInt16(authName.length());
             o.writeInt16(authData.length);
             o.writeInt16(0); // Unused.
-            o.writeBytes(authName);
-            o.writePad(authName.length);
+            o.writeBytes(authName.getBytes(StandardCharsets.UTF_8));
+            o.writePad(authName.length());
             o.writeBytes(authData);
             o.writePad(authData.length);
             o.flush();
@@ -1085,29 +1081,26 @@ public class Display implements AutoCloseable {
         // understand the failure
         if (connectionFailed) {
 
-            if (DEBUG) {
+            String codes = (failedLength > 1 ? "codes" : "code");
 
-                String codes = (failedLength > 1 ? "codes" : "code");
+            debugMessage.append("XServer returned " + failedLength +
+                                " error ");
+            debugMessage.append(codes);
 
-                debugMessage.append("XServer returned " + failedLength +
-                                    " error ");
-                debugMessage.append(codes);
+            int reason = 0;
+            for (int n = 0; n < failedLength; n++) {
+                reason = i.readInt32();
 
-                int reason = 0;
-                for (int n = 0; n < failedLength; n++) {
-                    reason = i.readInt32();
-
-                    debugMessage.append("XServer returned error code: " +
-                                        reason + "\n");
-                }
-
-                debugMessage.append("XServer are allowed to use non " +
-                                     "standard errors codes\n");
-                debugMessage.append("Please, consult the manual of your " +
-                                    "XServer\n" +
-                                    "to map the error codes to human " +
-                                    "readable values.\n");
+                debugMessage.append("XServer returned error code: " +
+                                    reason + "\n");
             }
+
+            debugMessage.append("XServer are allowed to use non " +
+                                 "standard errors codes\n");
+            debugMessage.append("Please, consult the manual of your " +
+                                "XServer\n" +
+                                "to map the error codes to human " +
+                                "readable values.\n");
 
             logger.severe(debugMessage.toString());
 
@@ -1186,19 +1179,16 @@ public class Display implements AutoCloseable {
      */
     private XAuthority getAuthority() {
 
-        XAuthority[] auths = XAuthority.getAuthorities();
-
-        // Fetch display no.
-        String displayNo = String.valueOf(displayNumber);
+        List<XAuthority> auths = XAuthority.getAuthorities();
 
         // Find the XAuthority that matches the hostname and display no.
         XAuthority found = null;
-        for (int i = 0; i < auths.length; i++) {
-            XAuthority auth = auths[i];
+        for (int i = 0; i < auths.size(); i++) {
+            XAuthority auth = auths.get(i);
             try {
-                if (auth.getHostname() != null
-                    && auth.getDisplayNumber().equals(displayNo)
-                    && InetAddress.getByName(auth.getHostname()).equals(
+                if (auth.getAddress() != null
+                    && auth.getDisplayNumber() == displayNumber
+                    && InetAddress.getByName(auth.getAddress()).equals(
                        InetAddress.getByName(hostName))) {
                     found = auth;
                     break;
