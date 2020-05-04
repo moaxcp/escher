@@ -35,9 +35,21 @@ public class XAuthorityTest {
   }
 
   @Test
+  void constructor_fails_on_null_protocolName() {
+    NullPointerException exception = assertThrows(NullPointerException.class, () -> new XAuthority(Family.LOCAL, "host".getBytes(), 0, null, new byte[1]));
+    assertThat(exception).hasMessage("protocolName is marked non-null but is null");
+  }
+
+  @Test
   void constructor_fails_on_blank_protocolName() {
     IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> new XAuthority(Family.LOCAL, "host".getBytes(), 0, " ", new byte[1]));
     assertThat(exception).hasMessage("protocolName must not be blank.");
+  }
+
+  @Test
+  void constructor_fails_on_null_protocolData() {
+    NullPointerException exception = assertThrows(NullPointerException.class, () -> new XAuthority(Family.LOCAL, "host".getBytes(), 0, "magic", null));
+    assertThat(exception).hasMessage("protocolData is marked non-null but is null");
   }
 
   @Test

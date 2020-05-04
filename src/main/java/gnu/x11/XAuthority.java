@@ -112,11 +112,11 @@ public class XAuthority {
     return bytes;
   }
 
+  @ToString
   public enum Family {
     INTERNET(0),
     LOCAL(256),
     WILD(65535),
-    NETNAME(254),
     KRB5PRINCIPAL(254),
     LOCALHOST(252);
 
