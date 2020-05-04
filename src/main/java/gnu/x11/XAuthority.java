@@ -9,7 +9,6 @@ import java.util.*;
 import lombok.*;
 
 import static gnu.util.Strings.requiresNonBlank;
-import static gnu.x11.Conventions.getXAuthorityFile;
 
 /**
  * An XAuthority.
@@ -44,6 +43,14 @@ public class XAuthority {
    */
   public static List<XAuthority> getAuthorities() {
     return getAuthorities(getXAuthorityFile());
+  }
+
+  public static File getXAuthorityFile() {
+    String authFilename = System.getenv("XAUTHORITY");
+    if (authFilename == null || authFilename.equals("")) {
+      authFilename = System.getProperty("user.home") + File.separatorChar + ".Xauthority";
+    }
+    return new File(authFilename);
   }
 
   public static List<XAuthority> getAuthorities(File file) {
