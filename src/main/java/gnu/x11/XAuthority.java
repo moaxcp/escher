@@ -2,6 +2,9 @@
 package gnu.x11;
 
 import java.io.*;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 import lombok.*;
 
@@ -17,14 +20,14 @@ import static gnu.x11.Conventions.getXAuthorityFile;
 public class XAuthority {
 
   @NonNull Family family;
-  @NonNull String address;
+  @NonNull byte[] address;
   int displayNumber;
   @NonNull String protocolName;
   @NonNull byte[] protocolData;
 
-  public XAuthority(@NonNull Family family, @NonNull String address, int displayNumber, @NonNull String protocolName, @NonNull byte[] protocolData) {
+  public XAuthority(@NonNull Family family, @NonNull byte[] address, int displayNumber, @NonNull String protocolName, @NonNull byte[] protocolData) {
     this.family = family;
-    this.address = requiresNonBlank("address", address);
+    this.address = address;
     if(displayNumber < 0) {
       throw new IllegalArgumentException("displayNumber was \"" + displayNumber + "\" expected >= 0.");
     }
@@ -50,8 +53,6 @@ public class XAuthority {
       while(read.isPresent()) {
         XAuthority current = read.get();
         authorities.add(current);
-        in.readUnsignedShort(); //newline
-        in.readUnsignedShort();
         read = read(in);
       }
     } catch(IOException ex) {
@@ -63,15 +64,39 @@ public class XAuthority {
   public static Optional<XAuthority> read(DataInput in) {
     try {
       Family family = Family.getByCode(in.readUnsignedShort());
-      String address = in.readUTF();
+      int dataLength = in.readUnsignedShort();
+      byte[] address = readBytes(in, dataLength);
       int number = Integer.parseInt(in.readUTF());
       String name = in.readUTF();
-      int dataLength = in.readUnsignedShort();
+      dataLength = in.readUnsignedShort();
       byte[] data = readBytes(in, dataLength);
       return Optional.of(new XAuthority(family, address, number, name, data));
     } catch(IOException ex) {
       return Optional.empty();
     }
+  }
+
+  public static Optional<XAuthority> getAuthority(String hostName) {
+    List<XAuthority> auths = getAuthorities();
+    for (int i = 0; i < auths.size(); i++) {
+      XAuthority auth = auths.get(i);
+      try {
+        switch(auth.getFamily()) {
+          case WILD:
+            return Optional.of(auth);
+          default:
+            InetAddress authAddress = InetAddress.getByName(new String(auth.getAddress(), StandardCharsets.UTF_8));
+            InetAddress hostNameAddress = InetAddress.getByName(hostName);
+            if(authAddress.equals(hostNameAddress)) {
+              return Optional.of(auth);
+            }
+            break;
+        }
+      } catch (UnknownHostException ex) {
+        throw new X11ClientException(ex);
+      }
+    }
+    return Optional.empty();
   }
 
   private static byte[] readBytes(DataInput in, int length) throws IOException {
@@ -81,7 +106,7 @@ public class XAuthority {
   }
 
   public enum Family {
-    ZERO(0),
+    INTERNET(0),
     LOCAL(256),
     WILD(65535),
     NETNAME(254),

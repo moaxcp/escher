@@ -1,6 +1,7 @@
 
 package gnu.x11;
 
+import gnu.x11.XAuthority.Family;
 import gnu.x11.event.Event;
 import gnu.x11.extension.*;
 import java.io.*;
@@ -195,7 +196,15 @@ public class Display implements AutoCloseable {
 
     public Display(@NonNull Socket socket, int displayNumber, int screenNumber) {
         this.socket = socket;
-        this.hostName = socket.getInetAddress().getHostName();
+        String socketHostName = socket.getInetAddress().getHostName();
+        if(socketHostName.equals("localhost")) {
+            try {
+                socketHostName = InetAddress.getLocalHost().getHostName();
+            } catch (UnknownHostException e) {
+                throw new X11ClientException(e);
+            }
+        }
+        this.hostName = socketHostName;
         this.displayNumber = displayNumber;
         this.defaultScreenNumber = screenNumber;
 
@@ -212,13 +221,16 @@ public class Display implements AutoCloseable {
     private void init() {
 
         // authorization protocol
-        XAuthority xauth = getAuthority();
+        Optional<XAuthority> xauth = XAuthority.getAuthority(hostName);
 
-        String authName = "";
-        byte[] authData = new byte[0];
-        if (xauth != null) {
-            authName = xauth.getProtocolName();
-            authData = xauth.getProtocolData();
+        String authName;
+        byte[] authData;
+        if (xauth.isPresent()) {
+            authName = xauth.get().getProtocolName();
+            authData = xauth.get().getProtocolData();
+        } else {
+            authName = "";
+            authData = new byte[0];
         }
 
         RequestOutputStream o = outputStream;
@@ -1170,34 +1182,6 @@ public class Display implements AutoCloseable {
                         + "\n  vendor: " + vendor + "\n  release-number: "
                         + releaseNumber + "\n  maximum-request-length: "
                         + maximumRequestLength;
-    }
-
-    /**
-     * Fetches the XAuthority that matches this display.
-     * 
-     * @return the XAuthority that matches this display
-     */
-    private XAuthority getAuthority() {
-
-        List<XAuthority> auths = XAuthority.getAuthorities();
-
-        // Find the XAuthority that matches the hostname and display no.
-        XAuthority found = null;
-        for (int i = 0; i < auths.size(); i++) {
-            XAuthority auth = auths.get(i);
-            try {
-                if (auth.getAddress() != null
-                    && auth.getDisplayNumber() == displayNumber
-                    && InetAddress.getByName(auth.getAddress()).equals(
-                       InetAddress.getByName(hostName))) {
-                    found = auth;
-                    break;
-                }
-            } catch (UnknownHostException ex) {
-                throw new X11ClientException(ex);
-            }
-        }
-        return found;
     }
 
     public void check_error() {

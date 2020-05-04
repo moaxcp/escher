@@ -18,7 +18,7 @@ public class XAuthorityTest {
 
   @Test
   void constructor_fails_on_null_family() {
-    NullPointerException exception = assertThrows(NullPointerException.class, () -> new XAuthority(null, "hostName", 0, "magic", new byte[1]));
+    NullPointerException exception = assertThrows(NullPointerException.class, () -> new XAuthority(null, "hostName".getBytes(), 0, "magic", new byte[1]));
     assertThat(exception).hasMessage("family is marked non-null but is null");
   }
 
@@ -29,28 +29,22 @@ public class XAuthorityTest {
   }
 
   @Test
-  void constructor_fails_on_blank_address() {
-    IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> new XAuthority(Family.LOCAL, " ", 0, "magic", new byte[1]));
-    assertThat(exception).hasMessage("address must not be blank.");
-  }
-
-  @Test
   void constructor_fails_on_negative_displayNumber() {
-    IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> new XAuthority(Family.LOCAL, "host", -1, "magic", new byte[1]));
+    IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> new XAuthority(Family.LOCAL, "host".getBytes(), -1, "magic", new byte[1]));
     assertThat(exception).hasMessage("displayNumber was \"-1\" expected >= 0.");
   }
 
   @Test
   void constructor_fails_on_blank_protocolName() {
-    IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> new XAuthority(Family.LOCAL, "host", 0, " ", new byte[1]));
+    IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> new XAuthority(Family.LOCAL, "host".getBytes(), 0, " ", new byte[1]));
     assertThat(exception).hasMessage("protocolName must not be blank.");
   }
 
   @Test
   void constructor() {
-    XAuthority xAuthority = new XAuthority(Family.LOCAL, "host", 0, "magic", new byte[]{1, 2, 3});
+    XAuthority xAuthority = new XAuthority(Family.LOCAL, "host".getBytes(), 0, "magic", new byte[]{1, 2, 3});
     assertThat(xAuthority.getFamily()).isEqualTo(Family.LOCAL);
-    assertThat(xAuthority.getAddress()).isEqualTo("host");
+    assertThat(xAuthority.getAddress()).isEqualTo("host".getBytes());
     assertThat(xAuthority.getDisplayNumber()).isEqualTo(0);
     assertThat(xAuthority.getProtocolName()).isEqualTo("magic");
     assertThat(xAuthority.getProtocolData()).isEqualTo(new byte[]{1, 2, 3});
@@ -68,21 +62,30 @@ public class XAuthorityTest {
   @Test
   void read() throws IOException {
     new Expectations() {{
-      in.readUnsignedShort(); returns(256, 3, 3);
-      in.readUTF(); returns("host", "3", "magic");
-      in.readFully((byte[]) any); result = new Delegate() {
+      in.readUnsignedShort(); returns(256, 4, 3);
+      in.readUTF(); returns("3", "magic");
+      Delegate one = new Delegate() {
+        public void readFully(byte[] bytes) {
+          bytes[0] = 104;
+          bytes[1] = 111;
+          bytes[2] = 115;
+          bytes[3] = 116;
+        }
+      };
+      Delegate two = new Delegate() {
         public void readFully(byte[] bytes) {
           bytes[0] = 1;
           bytes[1] = 2;
           bytes[2] = 3;
         }
       };
+      in.readFully((byte[]) any); result = new Delegate[] {one, two};
     }};
     Optional<XAuthority> read = XAuthority.read(in);
     assertThat(read).isPresent();
     XAuthority xAuthority = read.get();
     assertThat(xAuthority.getFamily()).isEqualTo(Family.LOCAL);
-    assertThat(xAuthority.getAddress()).isEqualTo("host");
+    assertThat(xAuthority.getAddress()).isEqualTo("host".getBytes());
     assertThat(xAuthority.getDisplayNumber()).isEqualTo(3);
     assertThat(xAuthority.getProtocolName()).isEqualTo("magic");
     assertThat(xAuthority.getProtocolData()).isEqualTo(new byte[]{1, 2, 3});

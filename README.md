@@ -15,6 +15,11 @@ https://gitlab.freedesktop.org/xorg
 
 # Versions
 
+## 0.5.0
+
+Updated `XAuthority` to properly detect the Auth Family. There were also some bugs when reading the file. Referencing 
+[libXau](https://gitlab.freedesktop.org/xorg/lib/libxau/-/tree/master) made debugging much easier. 
+
 ## 0.4.0
 
 ### Goals of release
