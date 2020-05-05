@@ -5,6 +5,7 @@ import gnu.x11.XAuthority.Family;
 import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class XAuthorityFamilyTest {
   @Test
@@ -51,5 +52,11 @@ public class XAuthorityFamilyTest {
   @Test
   void localhost_getByCode() {
     assertThat(Family.getByCode(252)).isEqualTo(Family.LOCALHOST);
+  }
+
+  @Test
+  void fail_getByCode() {
+    IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> Family.getByCode(-1234));
+    assertThat(exception).hasMessage("Unsupported code \"-1234\"");
   }
 }
