@@ -6,6 +6,7 @@ import java.net.*;
 import java.util.Optional;
 import jdk.nashorn.internal.ir.annotations.Ignore;
 import mockit.*;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -35,7 +36,7 @@ public class DisplayConstructor {
   }
 
   @Test
-  @Ignore
+  @Disabled
   void constructor(@Injectable Socket socket, @Injectable InetAddress inetAddress, @Injectable XAuthority xAuthority, @Injectable InputStream in, @Injectable OutputStream out) throws IOException {
     new Expectations() {{
       socket.getInetAddress().getHostName(); result = "localhost";
