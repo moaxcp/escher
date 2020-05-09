@@ -10,14 +10,20 @@ public class XephyrRunner {
   private final boolean br;
   private final boolean ac;
   private final boolean noreset;
+  private final Boolean iglx;
+  private final boolean glamor;
+  private final List<String> enableExtensions;
   private final List<String> args;
   private Process process;
 
   @Builder
-  public XephyrRunner(boolean br, boolean ac, boolean noreset, @Singular List<String> args) {
+  public XephyrRunner(boolean br, boolean ac, boolean noreset, Boolean iglx, boolean glamor, @Singular List<String> enableExtensions, @Singular List<String> args) {
     this.br = br;
     this.ac = ac;
     this.noreset = noreset;
+    this.iglx = iglx;
+    this.glamor = glamor;
+    this.enableExtensions = enableExtensions;
     this.args = args;
   }
 
@@ -32,6 +38,20 @@ public class XephyrRunner {
     }
     if(noreset) {
       command.add("-noreset");
+    }
+    if(iglx != null) {
+      if(iglx) {
+        command.add("+iglx");
+      } else {
+        command.add("-iglx");
+      }
+    }
+    if(glamor) {
+      command.add("-glamor");
+    }
+    for(String extension : enableExtensions) {
+      command.add("+extension");
+      command.add(extension);
     }
 
     command.addAll(args);

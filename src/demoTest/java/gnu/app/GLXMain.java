@@ -19,6 +19,9 @@ public class GLXMain {
         .ac(true)
         .br(true)
         .noreset(true)
+        .iglx(true)
+        .glamor(true)
+        .enableExtension("GLX")
         .arg(":1")
         .build();
     runner.start();

@@ -1,8 +1,7 @@
 package publicapi;
 
 import gnu.x11.XAuthority.Family;
-import java.io.DataInput;
-import java.io.IOException;
+import java.io.*;
 import java.util.Optional;
 import mockit.*;
 import org.junit.jupiter.api.Test;
