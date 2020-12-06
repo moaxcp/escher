@@ -87,21 +87,21 @@ public class XAuthority {
     List<XAuthority> auths = getAuthorities();
     for (int i = 0; i < auths.size(); i++) {
       XAuthority auth = auths.get(i);
-      try {
         switch(auth.getFamily()) {
           case WILD:
             return Optional.of(auth);
           default:
-            InetAddress authAddress = InetAddress.getByName(new String(auth.getAddress(), StandardCharsets.UTF_8));
-            InetAddress hostNameAddress = InetAddress.getByName(hostName);
-            if(authAddress.equals(hostNameAddress)) {
-              return Optional.of(auth);
+            try {
+              InetAddress authAddress = InetAddress.getByName(new String(auth.getAddress(), StandardCharsets.UTF_8));
+              InetAddress hostNameAddress = InetAddress.getByName(hostName);
+              if (authAddress.equals(hostNameAddress)) {
+                return Optional.of(auth);
+              }
+            }catch(UnknownHostException e) {
+              //do nothing
             }
             break;
         }
-      } catch (UnknownHostException ex) {
-        throw new X11ClientException(ex);
-      }
     }
     return Optional.empty();
   }
